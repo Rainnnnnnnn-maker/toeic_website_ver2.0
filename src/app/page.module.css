@@ -54,6 +54,7 @@
 
 .searchInput {
   width: 100%;
+  flex: 1;
   border: 1px solid #d1d5db;
   border-radius: 12px;
   padding: 12px 14px;
@@ -190,12 +191,15 @@
 
   .controlsRow {
     flex-direction: row;
-    justify-content: space-between;
     align-items: center;
   }
 
   .searchInput {
-    max-width: 400px;
+    flex: 1;
+  }
+
+  .pagination {
+    margin-left: auto;
   }
 
   .wordGrid {
