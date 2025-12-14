@@ -52,9 +52,6 @@ export default async function WordPage({ params }: PageProps) {
               <span className={styles.breadcrumbCurrent}>{entry.term}</span>
             </p>
             <h1 className={styles.pageTitle}>AIによる単語の詳しい解説</h1>
-            <p className={styles.pageSubtitle}>
-              発音・日本語の意味（品詞別）・語形変化・類義語・TOEIC例文・ニュアンスなどをわかりやすく表示します。
-            </p>
           </div>
         </header>
 

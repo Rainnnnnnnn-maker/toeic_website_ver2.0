@@ -242,7 +242,11 @@ export async function GET(
     });
   } catch (e) {
     const message =
-      e && typeof e === "object" && "message" in e ? String((e as any).message) : "";
+      e instanceof Error
+        ? e.message
+        : e && typeof e === "object" && "message" in e
+          ? String((e as { message?: unknown }).message ?? "")
+          : "";
     return Response.json(
       { error: message || "Failed to fetch word details from Gemini" },
       { status: 500 }

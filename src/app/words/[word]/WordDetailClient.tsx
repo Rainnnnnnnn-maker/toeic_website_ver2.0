@@ -157,21 +157,23 @@ export function WordDetailClient({ word }: Props) {
         <div>
           <h1 className={styles.wordHeading}>{data.word}</h1>
           {pronunciationLabel && (
-            <p className={styles.pronunciation}>{pronunciationLabel}</p>
+            <div className={styles.pronRow}>
+              <p className={styles.pronunciation}>{pronunciationLabel}</p>
+              <button
+                type="button"
+                className={styles.audioButton}
+                onClick={handlePlayAudio}
+                disabled={state.audioLoading}
+                aria-label="発音を再生"
+              >
+                <span className={styles.audioIcon}>
+                  {state.audioLoading ? "…" : "🔊"}
+                </span>
+              </button>
+            </div>
           )}
         </div>
-        <button
-          type="button"
-          className={styles.audioButton}
-          onClick={handlePlayAudio}
-          disabled={state.audioLoading}
-        >
-          <span className={styles.audioIcon}>
-            {state.audioLoading ? "…" : "▶"}
-          </span>
-          <span className={styles.audioLabel}>発音を再生</span>
-          </button>
-        </div>
+      </div>
 
       <section className={styles.section}>
         <h2 className={styles.sectionTitle}>日本語の意味（品詞別）</h2>

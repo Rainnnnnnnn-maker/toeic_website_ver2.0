@@ -15,10 +15,10 @@ function ttlSeconds(): number {
 export async function getWordDetails(word: string): Promise<WordDetails | null> {
   const redis = getRedis();
   const key = cacheKeyForWord(word);
-  const value = await redis.get(key as any);
+  const value = await redis.get<string | WordDetails>(key);
   if (!value) return null;
   try {
-    let obj: unknown = value as any;
+    let obj: unknown = value;
     if (typeof value === "string") {
       obj = JSON.parse(value) as unknown;
     }
@@ -27,7 +27,7 @@ export async function getWordDetails(word: string): Promise<WordDetails | null> 
       typeof obj === "object" &&
       "word" in obj &&
       "meanings" in obj &&
-      Array.isArray((obj as any).meanings)
+      Array.isArray((obj as { meanings?: unknown }).meanings)
     ) {
       return obj as WordDetails;
     }

@@ -1,5 +1,6 @@
-'use client';
-import { useMemo, useState, useEffect } from "react";
+ 'use client';
+import { useMemo, useState } from "react";
+import type { ChangeEvent } from "react";
 import Link from "next/link";
 import styles from "./page.module.css";
 import type { Word } from "@/data/words";
@@ -13,9 +14,11 @@ export default function WordsListClient({ words }: Props) {
   const [page, setPage] = useState(1);
   const pageSize = 20;
 
-  useEffect(() => {
+  const handleQueryChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const nextQuery = e.target.value;
+    setQuery(nextQuery);
     setPage(1);
-  }, [query]);
+  };
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -33,7 +36,7 @@ export default function WordsListClient({ words }: Props) {
       <div className={styles.controlsRow}>
         <input
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={handleQueryChange}
           className={styles.searchInput}
           placeholder="単語を検索..."
           aria-label="単語検索"
