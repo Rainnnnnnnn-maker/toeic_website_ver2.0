@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getWordBySlug } from "@/data/words";
+import { getWordDetails, setWordDetails } from "@/lib/wordCache";
 
 type RawWordPayload = {
   word: string;
@@ -171,6 +172,22 @@ export async function GET(
     return Response.json({ error: "Word not found" }, { status: 404 });
   }
 
+  let cacheBypass = false;
+  try {
+    const cached = await getWordDetails(entry.term);
+    if (cached) {
+      return Response.json(cached, {
+        status: 200,
+        headers: {
+          "Cache-Control": "public, max-age=3600",
+          "X-Cache": "HIT",
+        },
+      });
+    }
+  } catch {
+    cacheBypass = true;
+  }
+
   const apiKey = process.env.GEMINI_API_KEY;
 
   if (!apiKey) {
@@ -210,11 +227,17 @@ export async function GET(
     const raw = parseJsonFromText(text);
     const data = normalizePayload(entry.term, raw);
 
+    try {
+      await setWordDetails(entry.term, data);
+    } catch {
+    }
+
     return Response.json(data, {
       status: 200,
       headers: {
         "Cache-Control": "public, max-age=3600",
         "X-Generation-Time": String(Date.now() - startedAt),
+        "X-Cache": cacheBypass ? "BYPASS" : "MISS",
       },
     });
   } catch (e) {
