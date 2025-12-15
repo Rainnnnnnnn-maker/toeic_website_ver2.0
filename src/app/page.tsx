@@ -9,7 +9,7 @@ export default function Home() {
     <div className={styles.page}>
       <main className={styles.main}>
         <header className={styles.header}>
-          <h1 className={styles.title}>TOEIC重要単語集</h1>
+          <h1 className={styles.title}>TOEIC 重要単語集</h1>
         </header>
         <WordsListClient words={words} />
       </main>
