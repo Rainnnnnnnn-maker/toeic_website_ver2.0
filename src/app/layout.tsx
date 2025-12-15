@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-	title: "日本人のためのTOEIC単語サイト",
+	title: "TOEIC重要単語",
 	description:
-		"TOEIC頻出のビジネス英単語をAI解説で効率よく学べる日本人向けサイト",
+		"TOEIC頻出の重要単語をAI解説で効率よく学べる",
 };
 
 export const viewport: Viewport = {
