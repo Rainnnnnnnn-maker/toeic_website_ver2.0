@@ -18,6 +18,3 @@ jobs:
       - run: npm ci
       - run: npm run lint --if-present
       - run: npm run build
-      - name: Force fail (temporary)
-        if: github.ref == 'refs/heads/main'
-        run: exit 1
