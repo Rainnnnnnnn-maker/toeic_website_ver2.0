@@ -51,7 +51,7 @@ export default async function WordPage({ params }: PageProps) {
               <span className={styles.breadcrumbSeparator}>/</span>
               <span className={styles.breadcrumbCurrent}>{entry.term}</span>
             </p>
-            <h1 className={styles.pageTitle}>AIによる単語の詳しい解説</h1>
+            <h1 className={styles.pageTitle}>AIによる単語の詳細解説</h1>
           </div>
         </header>
 
