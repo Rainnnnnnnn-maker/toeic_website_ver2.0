@@ -1,6 +1,6 @@
 import styles from "./page.module.css";
 import { getAllWords } from "@/data/words";
-import WordsListClient from "./WordsListCli";
+import WordsListClient from "./WordsListClient";
 
 export default function Home() {
   const words = getAllWords();
