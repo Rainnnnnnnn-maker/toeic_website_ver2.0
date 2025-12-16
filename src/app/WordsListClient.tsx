@@ -23,7 +23,7 @@ export default function WordsListClient({ words }: Props) {
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return words;
-    return words.filter((w) => w.term.toLowerCase().includes(q));
+    return words.filter((w) => w.term.toLowerCase().startsWith(q));
   }, [words, query]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
@@ -71,7 +71,7 @@ export default function WordsListClient({ words }: Props) {
             className={styles.wordCard}
           >
             <span className={styles.wordText}>{word.term}</span>
-            <span className={styles.wordMeta}>クリックしてAIによる詳しい解説を見る</span>
+            <span className={styles.wordMeta}>クリックしてAIによる解説を見る</span>
           </Link>
         ))}
       </div>

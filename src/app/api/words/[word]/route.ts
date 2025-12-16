@@ -179,7 +179,7 @@ export async function GET(
       return Response.json(cached, {
         status: 200,
         headers: {
-          "Cache-Control": "public, max-age=3600",
+          "Cache-Control": "public, max-age=0, s-maxage=86400, stale-while-revalidate=604800",
           "X-Cache": "HIT",
         },
       });
@@ -235,7 +235,7 @@ export async function GET(
     return Response.json(data, {
       status: 200,
       headers: {
-        "Cache-Control": "public, max-age=3600",
+        "Cache-Control": "public, max-age=0, s-maxage=86400, stale-while-revalidate=604800",
         "X-Generation-Time": String(Date.now() - startedAt),
         "X-Cache": cacheBypass ? "BYPASS" : "MISS",
       },

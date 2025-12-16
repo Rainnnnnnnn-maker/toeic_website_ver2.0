@@ -26,8 +26,42 @@ export function WordDetailClient({ word }: Props) {
     let cancelled = false;
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 20000);
+    let shouldSkipNetwork = false;
+
+    const storageKey = `word-detail:${word}`;
+
+    if (typeof window !== "undefined") {
+      try {
+        const raw = window.localStorage.getItem(storageKey);
+        if (raw) {
+          const parsed = JSON.parse(raw) as {
+            data?: WordDetails;
+            expiresAt?: number;
+          };
+          if (
+            parsed &&
+            typeof parsed === "object" &&
+            typeof parsed.expiresAt === "number" &&
+            parsed.expiresAt > Date.now() &&
+            parsed.data
+          ) {
+            shouldSkipNetwork = true;
+            setState((prev) => ({
+              ...prev,
+              data: parsed.data,
+              loading: false,
+              error: undefined,
+            }));
+          }
+        }
+      } catch {
+      }
+    }
 
     async function fetchDetails() {
+      if (shouldSkipNetwork) {
+        return;
+      }
       setState((prev) => ({ ...prev, loading: true, error: undefined }));
 
       console.log("Fetching word details for:", word);
@@ -43,6 +77,17 @@ export function WordDetailClient({ word }: Props) {
         const json = (await response.json()) as WordDetails;
 
         if (!cancelled) {
+          if (typeof window !== "undefined") {
+            try {
+              const ttlMs = 24 * 60 * 60 * 1000;
+              const payload = {
+                data: json,
+                expiresAt: Date.now() + ttlMs,
+              };
+              window.localStorage.setItem(storageKey, JSON.stringify(payload));
+            } catch {
+            }
+          }
           setState((prev) => ({
             ...prev,
             data: json,
