@@ -45,3 +45,7 @@ next-env.d.ts
 #test
 __tests__/
 .env*.local
+
+
+#debug log
+debug.log
