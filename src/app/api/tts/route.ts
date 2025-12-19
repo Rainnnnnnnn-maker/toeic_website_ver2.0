@@ -1,3 +1,4 @@
+import "server-only";
 export async function POST(request: Request) {
   const apiKey = process.env.TTS_API_KEY;
 

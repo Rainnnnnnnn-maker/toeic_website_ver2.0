@@ -1,3 +1,4 @@
+import "server-only";
 import { NextRequest } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getWordBySlug } from "@/data/words";

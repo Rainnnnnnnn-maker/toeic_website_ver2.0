@@ -1,3 +1,4 @@
+import "server-only";
 import type { WordDetails } from "@/app/api/words/[word]/route";
 import { getRedis } from "./upstash";
 
