@@ -14,6 +14,7 @@ export default function StudyClient({ words }: Props) {
   const router = useRouter();
   const [currentWord, setCurrentWord] = useState<Word | null>(null);
   const [showDialog, setShowDialog] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
 
   const pickRandomWord = useCallback(() => {
     if (words.length === 0) return;
@@ -31,6 +32,11 @@ export default function StudyClient({ words }: Props) {
     return () => clearTimeout(timer);
   }, [pickRandomWord]);
 
+  useEffect(() => {
+    if (!currentWord) return;
+    router.prefetch(`/words/${currentWord.slug}`);
+  }, [currentWord, router]);
+
   const handleRemembered = () => {
     pickRandomWord();
   };
@@ -41,6 +47,7 @@ export default function StudyClient({ words }: Props) {
 
   const handleDialogConfirm = () => {
     if (currentWord) {
+      setIsNavigating(true);
       router.push(`/words/${currentWord.slug}`);
     }
   };
@@ -111,12 +118,14 @@ export default function StudyClient({ words }: Props) {
               <button 
                 className={`${styles.dialogButton} ${styles.cancelButton}`}
                 onClick={handleDialogCancel}
+                disabled={isNavigating}
               >
                 いいえ
               </button>
               <button 
                 className={`${styles.dialogButton} ${styles.confirmButton}`}
                 onClick={handleDialogConfirm}
+                disabled={isNavigating}
               >
                 はい
               </button>
