@@ -12,7 +12,7 @@ export default function Home() {
         <header className={styles.header}>
           <div className={styles.headerContent}>
             <p className={styles.tagline}>LEVEL UP YOUR SCORE</p>
-            <h1 className={styles.title}>TOEIC 重要単語集</h1>
+            <h1 className={styles.title}>2026年版 TOEIC 重要単語集</h1>
             <p className={styles.subtitle}>
               頻出単語を効率よく学習して、スコアアップを目指しましょう。
             </p>
