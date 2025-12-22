@@ -23,7 +23,11 @@ export default function StudyClient({ words }: Props) {
 
   // Initial load
   useEffect(() => {
-    pickRandomWord();
+    // Use setTimeout to avoid "setState in effect" warning and ensure client-side execution
+    const timer = setTimeout(() => {
+      pickRandomWord();
+    }, 0);
+    return () => clearTimeout(timer);
   }, [pickRandomWord]);
 
   const handleRemembered = () => {
