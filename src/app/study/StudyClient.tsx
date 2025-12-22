@@ -25,6 +25,7 @@ export default function StudyClient({ words }: Props) {
   useEffect(() => {
     // Use setTimeout to avoid "setState in effect" warning and ensure client-side execution
     const timer = setTimeout(() => {
+      setShowDialog(false);
       pickRandomWord();
     }, 0);
     return () => clearTimeout(timer);
