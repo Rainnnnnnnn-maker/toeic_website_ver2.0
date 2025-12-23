@@ -18,7 +18,7 @@ export default function Home() {
             </p>
           </div>
           <Link href="/study" className={styles.ctaButton}>
-            学習モードを開始する
+            学習モード
           </Link>
         </header>
         <WordsListClient words={words} />
