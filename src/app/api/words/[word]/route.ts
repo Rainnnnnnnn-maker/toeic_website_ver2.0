@@ -107,10 +107,41 @@ Constraints:
 `;
 
 function parseJsonFromText(text: string): RawWordPayload {
-  const start = text.indexOf("{");
-  const end = text.lastIndexOf("}");
-  const jsonSlice = start !== -1 && end !== -1 ? text.slice(start, end + 1) : text;
-  return JSON.parse(jsonSlice) as RawWordPayload;
+  const trimmed = text.trim();
+  const withoutFences = trimmed
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/\s*```$/, "")
+    .trim();
+
+  if (!withoutFences.includes("{")) {
+    throw new Error("Gemini response did not include a JSON object");
+  }
+
+  const start = withoutFences.indexOf("{");
+  const end = withoutFences.lastIndexOf("}");
+  const jsonSlice = start !== -1 && end !== -1 ? withoutFences.slice(start, end + 1) : withoutFences;
+
+  if (!jsonSlice.trim().endsWith("}")) {
+    throw new Error("Gemini JSON output appears truncated (missing closing brace)");
+  }
+
+  try {
+    return JSON.parse(jsonSlice) as RawWordPayload;
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "";
+    throw new Error(msg ? `Invalid JSON from Gemini: ${msg}` : "Invalid JSON from Gemini");
+  }
+}
+
+function buildModel(client: GoogleGenerativeAI, maxOutputTokens: number) {
+  return client.getGenerativeModel({
+    model: "gemini-2.5-flash-lite",
+    generationConfig: {
+      temperature: 0.2,
+      maxOutputTokens,
+      responseMimeType: "application/json",
+    },
+  });
 }
 
 function normalizePayload(word: string, payload: RawWordPayload): WordDetails {
@@ -198,35 +229,41 @@ export async function GET(
   try {
     const startedAt = Date.now();
     const client = new GoogleGenerativeAI(apiKey);
-    const model = client.getGenerativeModel({
-      model: "gemini-2.5-flash-lite",
-      generationConfig: {
-        temperature: 0.2,
+    const promptBase = systemPrompt.replaceAll("${word}", entry.term);
+    const prompts = [
+      {
         maxOutputTokens: 1024,
-        responseMimeType: "application/json",
+        prompt: promptBase,
       },
-    });
+      {
+        maxOutputTokens: 2048,
+        prompt:
+          promptBase +
+          "\n\nIMPORTANT:\n- Output MUST be a single complete JSON object.\n- If output would be long, reduce toeicExamples to 3 and synonyms to 3.\n- Keep JSON valid and complete (no truncation).\n",
+      },
+    ];
 
-    const prompt = systemPrompt.replaceAll("${word}", entry.term);
+    let data: WordDetails | null = null;
+    let lastError: unknown;
 
-    let result;
-    try {
-      result = await model.generateContent(prompt);
-    } catch {
-      const fallback = client.getGenerativeModel({
-        model: "gemini-2.5-flash-lite",
-        generationConfig: {
-          temperature: 0.2,
-          maxOutputTokens: 1024,
-          responseMimeType: "application/json",
-        },
-      });
-      result = await fallback.generateContent(prompt);
+    for (const attempt of prompts) {
+      try {
+        const model = buildModel(client, attempt.maxOutputTokens);
+        const result = await model.generateContent(attempt.prompt);
+        const text = result.response.text();
+        const raw = parseJsonFromText(text);
+        data = normalizePayload(entry.term, raw);
+        break;
+      } catch (e) {
+        lastError = e;
+      }
     }
 
-    const text = result.response.text();
-    const raw = parseJsonFromText(text);
-    const data = normalizePayload(entry.term, raw);
+    if (!data) {
+      throw lastError instanceof Error
+        ? lastError
+        : new Error("Failed to generate a valid JSON response from Gemini");
+    }
 
     try {
       await setWordDetails(entry.term, data);
