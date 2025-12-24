@@ -10,7 +10,25 @@ export const size = {
 
 export const contentType = "image/png";
 
+async function loadGoogleFont(font: string, text: string) {
+	const url = `https://fonts.googleapis.com/css2?family=${font}&text=${encodeURIComponent(text)}`;
+	const css = await (await fetch(url)).text();
+	const resource = css.match(/src: url\((.+)\) format\('(opentype|truetype)'\)/);
+
+	if (resource) {
+		const res = await fetch(resource[1]);
+		return res.arrayBuffer();
+	}
+
+	throw new Error("failed to load font");
+}
+
 export default async function Image() {
+	const fontData = await loadGoogleFont(
+		"Noto+Sans+JP",
+		"TOEIC重要単語頻出の重要単語をAI解説で効率よく学べるLEVELUPYOURSCORE2026年版学習モードでAI解説と一緒に単語を攻略TOEICWordsAI解説付きincrease/allocate/revenue頻出ビジネス英語を例文と一緒にチェック単語数:200+toeic-words.com",
+	);
+
 	return new ImageResponse(
 		<div
 			style={{
@@ -21,7 +39,7 @@ export default async function Image() {
 				alignItems: "center",
 				background:
 					"radial-gradient(circle at 0% 0%, #e0f2fe 0, #f9fafb 45%, #ffffff 100%)",
-				fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+				fontFamily: '"Noto Sans JP", sans-serif',
 			}}
 		>
 			<div
@@ -232,6 +250,13 @@ export default async function Image() {
 		</div>,
 		{
 			...size,
+			fonts: [
+				{
+					name: "Noto Sans JP",
+					data: fontData,
+					style: "normal",
+				},
+			],
 		},
 	);
 }
