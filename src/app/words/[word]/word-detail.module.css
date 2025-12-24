@@ -73,6 +73,15 @@
   gap: 16px;
 }
 
+.aiDisclaimer {
+  margin: 0;
+  margin-top: 14px;
+  font-size: 12px;
+  line-height: 1.7;
+  color: #737578;
+  text-align: center;
+}
+
 .wordHeading {
 	font-size: 24px;
 	color: #0f172a;

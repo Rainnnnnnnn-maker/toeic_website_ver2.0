@@ -56,6 +56,10 @@ export default async function WordPage({ params }: PageProps) {
         </header>
 
         <WordDetailClient word={entry.slug} />
+
+        <p className={styles.aiDisclaimer}>
+          AIによる解釈は必ずしも正しいとは限りません。重要な情報は確認するようにしてください。
+        </p>
       </main>
     </div>
   );
