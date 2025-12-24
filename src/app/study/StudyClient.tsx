@@ -54,7 +54,6 @@ export default function StudyClient({ words }: Props) {
 
   const handleDialogCancel = () => {
     setShowDialog(false);
-    pickRandomWord();
   };
 
   if (!currentWord) {
@@ -101,7 +100,7 @@ export default function StudyClient({ words }: Props) {
             onClick={handleForgot}
             aria-label="覚えていない"
           >
-            <span className={styles.buttonIcon}>×</span>
+            <span className={styles.buttonIcon}>？</span>
             <span className={styles.buttonLabel}>覚えていない</span>
           </button>
         </section>
