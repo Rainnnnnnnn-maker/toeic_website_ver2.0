@@ -15,9 +15,22 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+	metadataBase: new URL("https://toeic-words.com"),
 	title: "TOEIC重要単語",
-	description:
-		"TOEIC頻出の重要単語をAI解説で効率よく学べる",
+	description: "TOEIC頻出の重要単語をAI解説で効率よく学べる",
+	openGraph: {
+		title: "TOEIC重要単語",
+		description: "TOEIC頻出の重要単語をAI解説で効率よく学べる",
+		url: "https://toeic-words.com",
+		siteName: "TOEIC重要単語",
+		locale: "ja_JP",
+		type: "website",
+	},
+	twitter: {
+		card: "summary_large_image",
+		title: "TOEIC重要単語",
+		description: "TOEIC頻出の重要単語をAI解説で効率よく学べる",
+	},
 };
 
 export const viewport: Viewport = {
