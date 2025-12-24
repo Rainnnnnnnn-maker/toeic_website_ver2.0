@@ -91,7 +91,7 @@ export default function StudyClient({ words }: Props) {
             onClick={handleRemembered}
             aria-label="覚えている"
           >
-            <span className={styles.buttonIcon}>〇</span>
+            <span className={styles.buttonIcon}>💡</span>
             <span className={styles.buttonLabel}>覚えている</span>
           </button>
           
@@ -100,7 +100,7 @@ export default function StudyClient({ words }: Props) {
             onClick={handleForgot}
             aria-label="覚えていない"
           >
-            <span className={styles.buttonIcon}>？</span>
+            <span className={styles.buttonIcon}>❔</span>
             <span className={styles.buttonLabel}>覚えていない</span>
           </button>
         </section>
