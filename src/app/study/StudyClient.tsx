@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import styles from './study.module.css';
@@ -10,9 +10,73 @@ type Props = {
   words: Word[];
 };
 
+type PersistedStudyStateV1 = {
+  v: 1;
+  currentSlug: string;
+  rememberedSlugs: string[];
+  forgottenSlugs: string[];
+  updatedAt: number;
+};
+
+const studyStateStorageKey = 'toeic-study-state-v1';
+
+function getNavigationType(): string | undefined {
+  if (typeof window === 'undefined') return undefined;
+  const entry = window.performance.getEntriesByType('navigation')[0];
+  if (!entry) return undefined;
+  if ('type' in entry) {
+    return (entry as PerformanceNavigationTiming).type;
+  }
+  return undefined;
+}
+
+function parsePersistedStudyState(raw: string): PersistedStudyStateV1 | null {
+  try {
+    const data = JSON.parse(raw) as unknown;
+    if (!data || typeof data !== 'object') return null;
+    const obj = data as Record<string, unknown>;
+    if (obj.v !== 1) return null;
+    if (typeof obj.currentSlug !== 'string') return null;
+    if (!Array.isArray(obj.rememberedSlugs) || !obj.rememberedSlugs.every((s) => typeof s === 'string')) {
+      return null;
+    }
+    if (!Array.isArray(obj.forgottenSlugs) || !obj.forgottenSlugs.every((s) => typeof s === 'string')) {
+      return null;
+    }
+    if (typeof obj.updatedAt !== 'number') return null;
+    return obj as PersistedStudyStateV1;
+  } catch {
+    return null;
+  }
+}
+
+function uniqueStrings(values: string[]): string[] {
+  return Array.from(new Set(values));
+}
+
+function addUnique(values: string[], value: string): string[] {
+  if (values.includes(value)) return values;
+  return [...values, value];
+}
+
+function removeValue(values: string[], value: string): string[] {
+  return values.filter((v) => v !== value);
+}
+
 export default function StudyClient({ words }: Props) {
   const router = useRouter();
   const [currentWord, setCurrentWord] = useState<Word | null>(null);
+  const [rememberedSlugs, setRememberedSlugs] = useState<string[]>([]);
+  const [forgottenSlugs, setForgottenSlugs] = useState<string[]>([]);
+  const initializedRef = useRef(false);
+
+  const wordBySlug = useMemo(() => {
+    const map = new Map<string, Word>();
+    for (const w of words) {
+      map.set(w.slug, w);
+    }
+    return map;
+  }, [words]);
 
   const pickRandomWord = useCallback(() => {
     if (words.length === 0) return;
@@ -20,14 +84,62 @@ export default function StudyClient({ words }: Props) {
     setCurrentWord(words[randomIndex]);
   }, [words]);
 
-  // Initial load
   useEffect(() => {
-    // Use setTimeout to avoid "setState in effect" warning and ensure client-side execution
+    if (initializedRef.current) return;
+    initializedRef.current = true;
+
+    const navigationType = getNavigationType();
+
     const timer = setTimeout(() => {
+      if (navigationType === 'reload') {
+        try {
+          window.sessionStorage.removeItem(studyStateStorageKey);
+        } catch {
+        }
+        setRememberedSlugs([]);
+        setForgottenSlugs([]);
+        pickRandomWord();
+        return;
+      }
+
+      try {
+        const raw = window.sessionStorage.getItem(studyStateStorageKey);
+        if (raw) {
+          const persisted = parsePersistedStudyState(raw);
+          if (persisted) {
+            const word = wordBySlug.get(persisted.currentSlug);
+            if (word) {
+              setCurrentWord(word);
+              setRememberedSlugs(uniqueStrings(persisted.rememberedSlugs));
+              setForgottenSlugs(uniqueStrings(persisted.forgottenSlugs));
+              return;
+            }
+          }
+        }
+      } catch {
+      }
+
       pickRandomWord();
     }, 0);
+
     return () => clearTimeout(timer);
-  }, [pickRandomWord]);
+  }, [pickRandomWord, wordBySlug]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (!currentWord) return;
+    try {
+      const nextState: PersistedStudyStateV1 = {
+        v: 1,
+        currentSlug: currentWord.slug,
+        rememberedSlugs,
+        forgottenSlugs,
+        updatedAt: Date.now(),
+      };
+      window.sessionStorage.setItem(studyStateStorageKey, JSON.stringify(nextState));
+    } catch {
+    }
+  }, [currentWord, rememberedSlugs, forgottenSlugs]);
 
   useEffect(() => {
     if (!currentWord) return;
@@ -35,11 +147,16 @@ export default function StudyClient({ words }: Props) {
   }, [currentWord, router]);
 
   const handleRemembered = () => {
+    if (!currentWord) return;
+    setRememberedSlugs((prev) => addUnique(prev, currentWord.slug));
+    setForgottenSlugs((prev) => removeValue(prev, currentWord.slug));
     pickRandomWord();
   };
 
   const handleForgot = () => {
     if (!currentWord) return;
+    setForgottenSlugs((prev) => addUnique(prev, currentWord.slug));
+    setRememberedSlugs((prev) => removeValue(prev, currentWord.slug));
     router.push(`/words/${currentWord.slug}`);
   };
 
