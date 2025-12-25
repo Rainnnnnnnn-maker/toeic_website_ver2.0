@@ -13,8 +13,6 @@ type Props = {
 export default function StudyClient({ words }: Props) {
   const router = useRouter();
   const [currentWord, setCurrentWord] = useState<Word | null>(null);
-  const [showDialog, setShowDialog] = useState(false);
-  const [isNavigating, setIsNavigating] = useState(false);
 
   const pickRandomWord = useCallback(() => {
     if (words.length === 0) return;
@@ -26,7 +24,6 @@ export default function StudyClient({ words }: Props) {
   useEffect(() => {
     // Use setTimeout to avoid "setState in effect" warning and ensure client-side execution
     const timer = setTimeout(() => {
-      setShowDialog(false);
       pickRandomWord();
     }, 0);
     return () => clearTimeout(timer);
@@ -42,18 +39,8 @@ export default function StudyClient({ words }: Props) {
   };
 
   const handleForgot = () => {
-    setShowDialog(true);
-  };
-
-  const handleDialogConfirm = () => {
-    if (currentWord) {
-      setIsNavigating(true);
-      router.push(`/words/${currentWord.slug}`);
-    }
-  };
-
-  const handleDialogCancel = () => {
-    setShowDialog(false);
+    if (!currentWord) return;
+    router.push(`/words/${currentWord.slug}`);
   };
 
   if (!currentWord) {
@@ -105,33 +92,6 @@ export default function StudyClient({ words }: Props) {
           </button>
         </section>
       </main>
-
-      {showDialog && (
-        <div className={styles.overlay} role="dialog" aria-modal="true">
-          <div className={styles.dialog}>
-            <h2 className={styles.dialogTitle}>確認</h2>
-            <p className={styles.dialogMessage}>
-              この単語の詳細ページへ移動しますか？
-            </p>
-            <div className={styles.dialogActions}>
-              <button 
-                className={`${styles.dialogButton} ${styles.cancelButton}`}
-                onClick={handleDialogCancel}
-                disabled={isNavigating}
-              >
-                いいえ
-              </button>
-              <button 
-                className={`${styles.dialogButton} ${styles.confirmButton}`}
-                onClick={handleDialogConfirm}
-                disabled={isNavigating}
-              >
-                はい
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
