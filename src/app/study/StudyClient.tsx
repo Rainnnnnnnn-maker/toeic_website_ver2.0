@@ -69,6 +69,9 @@ export default function StudyClient({ words }: Props) {
   const [rememberedSlugs, setRememberedSlugs] = useState<string[]>([]);
   const [forgottenSlugs, setForgottenSlugs] = useState<string[]>([]);
   const initializedRef = useRef(false);
+  const [countdownValue, setCountdownValue] = useState<number | null>(null);
+  const [countdownKey, setCountdownKey] = useState(0);
+  const countdownTimeoutsRef = useRef<number[]>([]);
 
   const wordBySlug = useMemo(() => {
     const map = new Map<string, Word>();
@@ -78,11 +81,68 @@ export default function StudyClient({ words }: Props) {
     return map;
   }, [words]);
 
+  const clearCountdown = useCallback(() => {
+    for (const id of countdownTimeoutsRef.current) {
+      clearTimeout(id);
+    }
+    countdownTimeoutsRef.current = [];
+    setCountdownValue(null);
+  }, []);
+
+  const startCountdown = useCallback(() => {
+    for (const id of countdownTimeoutsRef.current) {
+      clearTimeout(id);
+    }
+    countdownTimeoutsRef.current = [];
+
+    setCountdownValue(3);
+    setCountdownKey((k) => k + 1);
+
+    const t2 = window.setTimeout(() => {
+      setCountdownValue(2);
+      setCountdownKey((k) => k + 1);
+    }, 1000);
+    const t1 = window.setTimeout(() => {
+      setCountdownValue(1);
+      setCountdownKey((k) => k + 1);
+    }, 2000);
+    const t0 = window.setTimeout(() => {
+      setCountdownValue(0);
+      setCountdownKey((k) => k + 1);
+    }, 3000);
+    const th = window.setTimeout(() => {
+      setCountdownValue(null);
+    }, 3060);
+
+    countdownTimeoutsRef.current = [t2, t1, t0, th];
+  }, []);
+
   const pickRandomWord = useCallback(() => {
     if (words.length === 0) return;
+
+    if (typeof window !== 'undefined') {
+      startCountdown();
+    }
+
     const randomIndex = Math.floor(Math.random() * words.length);
     setCurrentWord(words[randomIndex]);
-  }, [words]);
+  }, [startCountdown, words]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const onPageShow = (event: PageTransitionEvent) => {
+      if (event.persisted || getNavigationType() === 'back_forward') {
+        clearCountdown();
+      }
+    };
+
+    window.addEventListener('pageshow', onPageShow);
+    return () => {
+      window.removeEventListener('pageshow', onPageShow);
+      clearCountdown();
+    };
+  }, [clearCountdown]);
 
   useEffect(() => {
     if (initializedRef.current) return;
@@ -187,6 +247,13 @@ export default function StudyClient({ words }: Props) {
           <div className={styles.wordCard}>
             <span className={styles.wordText}>{currentWord.term}</span>
           </div>
+          {countdownValue !== null && (
+            <div className={styles.countdownOverlay} aria-hidden="true">
+              <div key={countdownKey} className={styles.countdownBubble}>
+                {countdownValue}
+              </div>
+            </div>
+          )}
         </section>
 
         <section className={styles.controls}>
