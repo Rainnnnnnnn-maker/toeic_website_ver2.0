@@ -22,6 +22,14 @@ export const metadata: Metadata = {
 	},
 	description: "TOEIC頻出の重要単語をAI解説で効率よく学べる",
 	keywords: ["TOEIC", "英単語", "単語帳", "学習", "例文"],
+	icons: {
+		icon: [
+			{ url: "/favicon.ico", type: "image/x-icon" },
+			{ url: "/icon.png", type: "image/png" },
+		],
+		shortcut: ["/favicon.ico"],
+		apple: [{ url: "/apple-icon.png", type: "image/png" }],
+	},
 	robots: {
 		index: true,
 		follow: true,
