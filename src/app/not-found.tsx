@@ -1,5 +1,10 @@
 import Link from "next/link";
 
+export const metadata = {
+	title: "ページが見つかりません",
+	robots: { index: false, follow: false },
+};
+
 export default function NotFound() {
   return (
     <div
@@ -80,4 +85,3 @@ export default function NotFound() {
     </div>
   );
 }
-
