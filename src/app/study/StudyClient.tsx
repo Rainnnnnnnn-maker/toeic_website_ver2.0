@@ -146,11 +146,12 @@ export default function StudyClient({ words }: Props) {
 
   useEffect(() => {
     if (initializedRef.current) return;
-    initializedRef.current = true;
+    const timer = window.setTimeout(() => {
+      if (initializedRef.current) return;
+      initializedRef.current = true;
 
-    const navigationType = getNavigationType();
+      const navigationType = getNavigationType();
 
-    const timer = setTimeout(() => {
       if (navigationType === 'reload') {
         try {
           window.sessionStorage.removeItem(studyStateStorageKey);
@@ -182,7 +183,7 @@ export default function StudyClient({ words }: Props) {
       pickRandomWord();
     }, 0);
 
-    return () => clearTimeout(timer);
+    return () => window.clearTimeout(timer);
   }, [pickRandomWord, wordBySlug]);
 
   useEffect(() => {
