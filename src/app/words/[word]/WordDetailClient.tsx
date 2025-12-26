@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./word-detail.module.css";
 import type { WordDetails } from "@/app/api/words/[word]/route";
 
@@ -23,6 +23,8 @@ export function WordDetailClient({ word }: Props) {
   });
 
   useEffect(() => {
+    setState({ loading: true, audioLoading: false });
+
     let cancelled = false;
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 20000);
@@ -30,32 +32,30 @@ export function WordDetailClient({ word }: Props) {
 
     const storageKey = `word-detail:${word}`;
 
-    if (typeof window !== "undefined") {
-      try {
-        const raw = window.localStorage.getItem(storageKey);
-        if (raw) {
-          const parsed = JSON.parse(raw) as {
-            data?: WordDetails;
-            expiresAt?: number;
-          };
-          if (
-            parsed &&
-            typeof parsed === "object" &&
-            typeof parsed.expiresAt === "number" &&
-            parsed.expiresAt > Date.now() &&
-            parsed.data
-          ) {
-            shouldSkipNetwork = true;
-            setState((prev) => ({
-              ...prev,
-              data: parsed.data,
-              loading: false,
-              error: undefined,
-            }));
-          }
+    try {
+      const raw = window.localStorage.getItem(storageKey);
+      if (raw) {
+        const parsed = JSON.parse(raw) as {
+          data?: WordDetails;
+          expiresAt?: number;
+        };
+        if (
+          parsed &&
+          typeof parsed === "object" &&
+          typeof parsed.expiresAt === "number" &&
+          parsed.expiresAt > Date.now() &&
+          parsed.data
+        ) {
+          shouldSkipNetwork = true;
+          setState((prev) => ({
+            ...prev,
+            data: parsed.data,
+            loading: false,
+            error: undefined,
+          }));
         }
-      } catch {
       }
+    } catch {
     }
 
     async function fetchDetails() {
@@ -64,7 +64,6 @@ export function WordDetailClient({ word }: Props) {
       }
       setState((prev) => ({ ...prev, loading: true, error: undefined }));
 
-      console.log("Fetching word details for:", word);
       try {
         const response = await fetch(`/api/words/${encodeURIComponent(word)}`, {
           signal: controller.signal,
@@ -77,16 +76,14 @@ export function WordDetailClient({ word }: Props) {
         const json = (await response.json()) as WordDetails;
 
         if (!cancelled) {
-          if (typeof window !== "undefined") {
-            try {
-              const ttlMs = 24 * 60 * 60 * 1000;
-              const payload = {
-                data: json,
-                expiresAt: Date.now() + ttlMs,
-              };
-              window.localStorage.setItem(storageKey, JSON.stringify(payload));
-            } catch {
-            }
+          try {
+            const ttlMs = 24 * 60 * 60 * 1000;
+            const payload = {
+              data: json,
+              expiresAt: Date.now() + ttlMs,
+            };
+            window.localStorage.setItem(storageKey, JSON.stringify(payload));
+          } catch {
           }
           setState((prev) => ({
             ...prev,
@@ -117,13 +114,6 @@ export function WordDetailClient({ word }: Props) {
       controller.abort();
     };
   }, [word]);
-
-  const pronunciationLabel = useMemo(() => {
-    if (!state.data?.pronunciation) {
-      return "";
-    }
-    return state.data.pronunciation;
-  }, [state.data?.pronunciation]);
 
   async function handlePlayAudio() {
     if (state.audioUrl) {
@@ -201,9 +191,9 @@ export function WordDetailClient({ word }: Props) {
       <div className={styles.headerRow}>
         <div>
           <h1 className={styles.wordHeading}>{data.word}</h1>
-          {pronunciationLabel && (
+          {data.pronunciation && (
             <div className={styles.pronRow}>
-              <p className={styles.pronunciation}>{pronunciationLabel}</p>
+              <p className={styles.pronunciation}>{data.pronunciation}</p>
               <button
                 type="button"
                 className={styles.audioButton}
