@@ -269,20 +269,50 @@
 }
 
 .errorText {
-  font-size: 14px;
-  color: #b91c1c;
+  color: #ef4444;
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 24px;
 }
 
 .retryButton {
-  margin-top: 8px;
-  align-self: flex-start;
-  padding: 8px 12px;
-  border-radius: 999px;
-  border: 1px solid #fecaca;
-  background: #fee2e2;
-  color: #991b1b;
-  font-size: 13px;
-  cursor: pointer;
+  display: inline-flex;
+  padding: 10px 20px;
+  background: #4f46e5;
+  color: white;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.retryButton:hover {
+  background: #4338ca;
+}
+
+.loadingState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 0;
+  color: #6b7280;
+  gap: 16px;
+}
+
+.loadingSpinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e5e7eb;
+  border-top-color: #4f46e5;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .wordSkeleton,
