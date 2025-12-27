@@ -2,32 +2,12 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import { notFound } from "next/navigation";
 import { getAllWords, getWordBySlug } from "@/data/words";
+import { getWordDetail } from "@/lib/actions";
 import styles from "./word-detail.module.css";
 
 const WordDetailClient = dynamic(
   () => import("./WordDetailClient").then((m) => m.WordDetailClient),
-  {
-    loading: () => (
-      <div className={styles.detailContainer}>
-        <div className={styles.headerRow}>
-          <div className={styles.wordSkeleton} />
-          <div className={styles.pronunciationSkeleton} />
-        </div>
-        <div className={styles.sectionSkeleton} style={{ width: "140px" }} />
-        <div className={styles.skeletonBlock} />
-        <div className={styles.skeletonBlock} />
-        <div className={styles.sectionSkeleton} style={{ width: "80px" }} />
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginBottom: "24px" }}>
-          <div className={styles.skeletonPill} />
-          <div className={styles.skeletonPill} />
-          <div className={styles.skeletonPill} />
-        </div>
-        <div className={styles.sectionSkeleton} style={{ width: "120px" }} />
-        <div className={styles.skeletonBlock} style={{ height: "80px" }} />
-        <div className={styles.skeletonBlock} style={{ height: "80px" }} />
-      </div>
-    ),
-  }
+  { ssr: true } // Client ComponentでもSSR有効化
 );
 
 type PageProps = {
@@ -48,6 +28,27 @@ export default async function WordPage({ params }: PageProps) {
     notFound();
   }
 
+  // Server Component内でデータを取得（L1 Cache: Next.js Data Cache）
+  // データがない場合は生成処理が走る（L2: Redis -> L3: Gemini）
+  const detailData = await getWordDetail(word);
+
+  if (!detailData) {
+    // 生成失敗時などのハンドリング（必要に応じてエラーページなど）
+    // ここでは簡易的にnotFoundとするか、エラー表示用のUIを出す
+    return (
+      <div className={styles.page}>
+        <main className={styles.main}>
+           <div className={styles.detailContainer}>
+            <p className={styles.errorText}>データの取得に失敗しました。時間をおいて再度お試しください。</p>
+            <Link href="/" className={styles.retryButton}>
+              一覧へ戻る
+            </Link>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.page}>
       <main className={styles.main}>
@@ -64,7 +65,7 @@ export default async function WordPage({ params }: PageProps) {
           </div>
         </header>
 
-        <WordDetailClient word={entry.slug} />
+        <WordDetailClient initialData={detailData} />
 
         <p className={styles.aiDisclaimer}>
           AIによる解説は必ずしも正しいとは限りません。重要な情報は確認するようにしてください。

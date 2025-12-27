@@ -1,128 +1,29 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import styles from "./word-detail.module.css";
-import type { WordDetails } from "@/app/api/words/[word]/route";
+import type { WordDetails } from "@/lib/actions";
 
 type Props = {
-  word: string;
+  initialData: WordDetails;
 };
 
 type State = {
-  data?: WordDetails;
-  loading: boolean;
-  error?: string;
   audioUrl?: string;
   audioLoading: boolean;
 };
 
-export function WordDetailClient({ word }: Props) {
+export function WordDetailClient({ initialData }: Props) {
   const [state, setState] = useState<State>({
-    loading: true,
     audioLoading: false,
   });
 
-  useEffect(() => {
-    setState({ loading: true, audioLoading: false });
-
-    let cancelled = false;
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 20000);
-    let shouldSkipNetwork = false;
-
-    const storageKey = `word-detail:${word}`;
-
-    try {
-      const raw = window.localStorage.getItem(storageKey);
-      if (raw) {
-        const parsed = JSON.parse(raw) as {
-          data?: WordDetails;
-          expiresAt?: number;
-        };
-        if (
-          parsed &&
-          typeof parsed === "object" &&
-          typeof parsed.expiresAt === "number" &&
-          parsed.expiresAt > Date.now() &&
-          parsed.data
-        ) {
-          shouldSkipNetwork = true;
-          setState((prev) => ({
-            ...prev,
-            data: parsed.data,
-            loading: false,
-            error: undefined,
-          }));
-        }
-      }
-    } catch {
-    }
-
-    async function fetchDetails() {
-      if (shouldSkipNetwork) {
-        return;
-      }
-      setState((prev) => ({ ...prev, loading: true, error: undefined }));
-
-      try {
-        const response = await fetch(`/api/words/${encodeURIComponent(word)}`, {
-          signal: controller.signal,
-        });
-        if (!response.ok) {
-          const errJson = await response.json().catch(() => null);
-          const message = errJson?.error ?? "Failed to load word details";
-          throw new Error(message);
-        }
-        const json = (await response.json()) as WordDetails;
-
-        if (!cancelled) {
-          try {
-            const ttlMs = 24 * 60 * 60 * 1000;
-            const payload = {
-              data: json,
-              expiresAt: Date.now() + ttlMs,
-            };
-            window.localStorage.setItem(storageKey, JSON.stringify(payload));
-          } catch {
-          }
-          setState((prev) => ({
-            ...prev,
-            data: json,
-            loading: false,
-            error: undefined,
-          }));
-        }
-      } catch (e) {
-        if (!cancelled) {
-          const msg = e instanceof Error ? e.message : "";
-          setState((prev) => ({
-            ...prev,
-            loading: false,
-            error: msg
-              ? `AIエラー: ${msg}`
-              : "AIデータの取得に失敗しました。時間をおいて再度お試しください。",
-          }));
-        }
-      }
-    }
-
-    fetchDetails();
-
-    return () => {
-      cancelled = true;
-      clearTimeout(timeout);
-      controller.abort();
-    };
-  }, [word]);
+  const data = initialData;
 
   async function handlePlayAudio() {
     if (state.audioUrl) {
       const audio = new Audio(state.audioUrl);
       audio.play();
-      return;
-    }
-
-    if (!state.data) {
       return;
     }
 
@@ -134,7 +35,7 @@ export function WordDetailClient({ word }: Props) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ text: state.data.word }),
+        body: JSON.stringify({ text: data.word }),
       });
 
       if (!response.ok) {
@@ -158,42 +59,6 @@ export function WordDetailClient({ word }: Props) {
       alert("音声の生成に失敗しました。時間をおいて再度お試しください。");
     }
   }
-
-  if (state.loading) {
-    return (
-      <div className={styles.detailContainer}>
-        <div className={styles.headerRow}>
-          <div className={styles.wordSkeleton} />
-          <div className={styles.pronunciationSkeleton} />
-        </div>
-        <div className={styles.sectionSkeleton} style={{ width: "140px" }} />
-        <div className={styles.skeletonBlock} />
-        <div className={styles.skeletonBlock} />
-        <div className={styles.sectionSkeleton} style={{ width: "80px" }} />
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginBottom: "24px" }}>
-          <div className={styles.skeletonPill} />
-          <div className={styles.skeletonPill} />
-          <div className={styles.skeletonPill} />
-        </div>
-        <div className={styles.sectionSkeleton} style={{ width: "120px" }} />
-        <div className={styles.skeletonBlock} style={{ height: "80px" }} />
-        <div className={styles.skeletonBlock} style={{ height: "80px" }} />
-      </div>
-    );
-  }
-
-  if (state.error || !state.data) {
-    return (
-      <div className={styles.detailContainer}>
-        <p className={styles.errorText}>{state.error ?? "データを取得できませんでした。"}</p>
-        <button className={styles.retryButton} onClick={() => location.reload()}>
-          再読み込み
-        </button>
-      </div>
-    );
-  }
-
-  const data = state.data;
 
   return (
     <div className={styles.detailContainer}>
@@ -302,56 +167,34 @@ export function WordDetailClient({ word }: Props) {
       {data.synonyms.length > 0 && (
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>類義語</h2>
-          <div className={styles.pillList}>
-            {data.synonyms.map((s) => (
-              <span key={s} className={styles.pill}>{s}</span>
+          <ul className={styles.pillList}>
+            {data.synonyms.map((s, i) => (
+              <li key={i} className={styles.pill}>{s}</li>
             ))}
+          </ul>
+        </section>
+      )}
+
+      {data.nuance && (
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>ニュアンス・イメージ</h2>
+          <div className={styles.sectionBody}>
+            <p>{data.nuance}</p>
           </div>
         </section>
       )}
 
       {data.toeicExamples.length > 0 && (
         <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>TOEIC例文</h2>
-          <ul className={styles.exampleList}>
-            {data.toeicExamples.map((example, index) => (
-              <li key={index} className={styles.exampleItem}>
-                <p className={styles.exampleSentence}>{example.english}</p>
-                <p className={styles.exampleTranslation}>{example.japanese}</p>
-              </li>
+          <h2 className={styles.sectionTitle}>TOEICでの使われ方</h2>
+          <div className={styles.sectionBody}>
+            {data.toeicExamples.map((ex, i) => (
+              <div key={i} style={{ marginBottom: i < data.toeicExamples.length - 1 ? 12 : 0 }}>
+                <p className={styles.exampleSentence}>{ex.english}</p>
+                <p className={styles.exampleTranslation}>{ex.japanese}</p>
+              </div>
             ))}
-          </ul>
-        </section>
-      )}
-
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>ニュアンス</h2>
-        <p className={styles.sectionBody}>{data.nuance}</p>
-      </section>
-
-      {data.usageNotes && (
-        <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>使い方の注意</h2>
-          {data.usageNotes.commonCollocations?.length ? (
-            <div className={styles.pillList}>
-              {data.usageNotes.commonCollocations.map((c) => (
-                <span key={c} className={styles.pill}>{c}</span>
-              ))}
-            </div>
-          ) : null}
-          {data.usageNotes.register && (
-            <p className={styles.sectionBody}>レジスター：{data.usageNotes.register}</p>
-          )}
-          {data.usageNotes.regionalVariations && (
-            <p className={styles.sectionBody}>地域差：{data.usageNotes.regionalVariations}</p>
-          )}
-        </section>
-      )}
-
-      {data.etymology && (
-        <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>語源</h2>
-          <p className={styles.sectionBody}>{data.etymology}</p>
+          </div>
         </section>
       )}
     </div>
