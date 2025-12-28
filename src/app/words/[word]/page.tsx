@@ -17,12 +17,12 @@ type PageProps = {
 };
 
 export function generateStaticParams() {
-  // APIキー未設定時はビルド時の静的生成をスキップする
-  // これにより、CI等でキーがない場合のビルドエラーを回避し、ランタイム生成（SSR/ISR）にフォールバックさせる
+  const words = getAllWords();
   if (!process.env.GEMINI_API_KEY) {
-    return [];
+    const first = words[0];
+    return first ? [{ word: first.slug }] : [{ word: "placeholder" }];
   }
-  return getAllWords().map((word) => ({ word: word.slug }));
+  return words.map((word) => ({ word: word.slug }));
 }
 
 export default async function WordPage({ params }: PageProps) {
@@ -33,13 +33,17 @@ export default async function WordPage({ params }: PageProps) {
     notFound();
   }
 
-  // Server Component内でデータを取得（L1 Cache: Next.js Data Cache）
-  // データがない場合は生成処理が走る（L2: Redis -> L3: Gemini）
-  const detailData = await getWordDetail(word);
+  let detailData = null;
+
+  if (process.env.GEMINI_API_KEY) {
+    try {
+      detailData = await getWordDetail(word);
+    } catch {
+      detailData = null;
+    }
+  }
 
   if (!detailData) {
-    // 生成失敗時などのハンドリング（必要に応じてエラーページなど）
-    // ここでは簡易的にnotFoundとするか、エラー表示用のUIを出す
     return (
        <div className={styles.detailContainer}>
         <p className={styles.errorText}>データの取得に失敗しました。時間をおいて再度お試しください。</p>
