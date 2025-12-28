@@ -2,7 +2,7 @@ import "server-only";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getWordBySlug } from "@/data/words";
 import { getWordDetails as getRedisWordDetails, setWordDetails as setRedisWordDetails } from "@/lib/wordCache";
-import { unstable_cache } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 
 type RawWordPayload = {
   word: string;
@@ -274,11 +274,10 @@ async function getWordDetailInternal(slug: string): Promise<WordDetails | null> 
 }
 
 // Exported cached function (L1 Cache: Next.js Data Cache)
-export const getWordDetail = unstable_cache(
-  async (slug: string) => getWordDetailInternal(slug),
-  ["word-detail"],
-  {
-    revalidate: 604800, // 7 days (7 * 24 * 60 * 60)
-    tags: ["word-detail"],
-  }
-);
+export async function getWordDetail(slug: string) {
+  "use cache";
+  cacheTag("word-detail");
+  cacheLife("weeks");
+
+  return getWordDetailInternal(slug);
+}
