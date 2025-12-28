@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./word-detail.module.css";
 import type { WordDetails } from "@/lib/actions";
 
@@ -17,6 +17,16 @@ export function WordDetailClient({ initialData }: Props) {
   const [state, setState] = useState<State>({
     audioLoading: false,
   });
+  const [skeletonVisible, setSkeletonVisible] = useState(true);
+
+  useEffect(() => {
+    const id = window.setTimeout(() => {
+      setSkeletonVisible(false);
+    }, 300);
+    return () => {
+      window.clearTimeout(id);
+    };
+  }, []);
 
   const data = initialData;
 
@@ -62,6 +72,25 @@ export function WordDetailClient({ initialData }: Props) {
 
   return (
     <div className={styles.detailContainer}>
+      <div
+        className={`${styles.minSkeletonOverlay} ${skeletonVisible ? "" : styles.minSkeletonOverlayHidden}`}
+        aria-hidden="true"
+      >
+        <div className={`${styles.skeleton} ${styles.skeletonTitle}`} />
+        <div className={`${styles.skeleton} ${styles.skeletonSubtitle}`} />
+        <div className={styles.skeletonSection}>
+          <div className={`${styles.skeleton} ${styles.skeletonSectionTitle}`} />
+          <div className={`${styles.skeleton} ${styles.skeletonText}`} />
+          <div className={`${styles.skeleton} ${styles.skeletonText}`} />
+          <div className={`${styles.skeleton} ${styles.skeletonText} ${styles.skeletonTextShort}`} />
+        </div>
+        <div className={styles.skeletonSection}>
+          <div className={`${styles.skeleton} ${styles.skeletonSectionTitle}`} />
+          <div className={`${styles.skeleton} ${styles.skeletonText}`} style={{ height: "60px" }} />
+          <div style={{ height: "12px" }} />
+          <div className={`${styles.skeleton} ${styles.skeletonText}`} style={{ height: "60px" }} />
+        </div>
+      </div>
       <div className={styles.headerRow}>
         <div>
           <h1 className={styles.wordHeading}>{data.word}</h1>
