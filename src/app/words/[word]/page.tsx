@@ -17,6 +17,11 @@ type PageProps = {
 };
 
 export function generateStaticParams() {
+  // APIキー未設定時はビルド時の静的生成をスキップする
+  // これにより、CI等でキーがない場合のビルドエラーを回避し、ランタイム生成（SSR/ISR）にフォールバックさせる
+  if (!process.env.GEMINI_API_KEY) {
+    return [];
+  }
   return getAllWords().map((word) => ({ word: word.slug }));
 }
 
