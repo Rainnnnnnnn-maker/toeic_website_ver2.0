@@ -22,6 +22,51 @@
   align-items: flex-start;
 }
 
+.navRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: -8px;
+  padding-bottom: 8px;
+}
+
+.navButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 16px;
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 9999px;
+  color: #4b5563;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  user-select: none;
+}
+
+.navButton:hover:not(.disabled) {
+  background-color: #f9fafb;
+  border-color: #d1d5db;
+  color: #111827;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.navButton:active:not(.disabled) {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.navButton.disabled {
+  visibility: hidden;
+  pointer-events: none;
+}
+
 .pageTitle {
   font-size: 24px;
   line-height: 1.4;
@@ -62,7 +107,7 @@
 }
 
 .detailContainer {
-  margin-top: 16px;
+  margin-top: 0;
   padding: 20px 20px;
   background: rgba(255, 255, 255, 0.96);
   border-radius: 20px;
