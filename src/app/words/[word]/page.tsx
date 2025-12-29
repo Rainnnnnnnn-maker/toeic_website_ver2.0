@@ -17,31 +17,29 @@ type PageProps = {
 };
 
 export function generateStaticParams() {
-  const words = getAllWords();
-  if (!process.env.GEMINI_API_KEY) {
-    const first = words[0];
-    return first ? [{ word: first.slug }] : [{ word: "placeholder" }];
-  }
-  return words.map((word) => ({ word: word.slug }));
+  // Cache Components有効時は最低1件返す必要があるが、
+  // 全件返すとビルド時にGemini APIを大量にコールしてしまい、時間がかかり不安定になる。
+  // そのため、ダミーのパスを1つだけ返し、実質的にオンデマンド生成（ISR）とする。
+  return [{ word: "__build_placeholder__" }];
 }
 
 export default async function WordPage({ params }: PageProps) {
   const { word } = await params;
+
+  // ビルド用のプレースホルダーの場合は処理をスキップ
+  if (word === "__build_placeholder__") {
+    notFound();
+  }
+
   const entry = getWordBySlug(word);
 
   if (!entry) {
     notFound();
   }
 
-  let detailData = null;
-
-  if (process.env.GEMINI_API_KEY) {
-    try {
-      detailData = await getWordDetail(word);
-    } catch {
-      detailData = null;
-    }
-  }
+  // Server Component内でデータを取得（L1 Cache: Next.js Data Cache）
+  // データがない場合は生成処理が走る（L2: Redis -> L3: Gemini）
+  const detailData = await getWordDetail(word);
 
   if (!detailData) {
     return (
