@@ -41,7 +41,7 @@ export default function Home() {
             </p>
           </div>
           <Link href="/study" className={styles.ctaButton}>
-            学習モード
+            <span className={styles.ctaButtonLabel}>学習モード</span>
           </Link>
         </header>
         <WordsListClient words={words} />

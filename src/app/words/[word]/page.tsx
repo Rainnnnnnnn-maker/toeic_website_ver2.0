@@ -1,7 +1,7 @@
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { notFound } from "next/navigation";
-import { getAllWords, getWordBySlug } from "@/data/words";
+import { getWordBySlug } from "@/data/words";
 import { getWordDetail } from "@/lib/actions";
 import styles from "./word-detail.module.css";
 

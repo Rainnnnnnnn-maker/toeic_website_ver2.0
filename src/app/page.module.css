@@ -50,26 +50,43 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 12px 24px;
-  background-color: rgba(22, 163, 195, 0.35);
-  color: #051d4c;
-  border-radius: 12px;
+  gap: 8px;
+  padding: 14px 26px;
+  min-height: 44px;
+  background: linear-gradient(135deg, #726ece, #1eabed);
+  color: #ffffff;
+  border-radius: 9999px;
   font-weight: 600;
   font-size: 15px;
-  transition: all 0.2s ease;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  transition: transform 0.16s ease, box-shadow 0.16s ease, filter 0.16s ease;
   align-self: flex-start;
   margin-top: 8px;
-  box-shadow: none;
-  border: 2px solid #2a2a65;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.28);
+  border: none;
+  cursor: pointer;
 }
 
 .ctaButton:hover {
-  background-color: rgba(189, 192, 196, 0.25);
-  transform: translateY(-2px);
+  transform: translateY(-1px) scale(1.02);
+  filter: brightness(1.05);
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.32);
 }
 
 .ctaButton:active {
-  transform: translateY(0);
+  transform: translateY(0) scale(0.99);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.22);
+}
+
+.ctaButton:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(191, 219, 254, 0.9), 0 12px 30px rgba(15, 23, 42, 0.28);
+}
+
+.ctaButtonLabel {
+  display: inline-flex;
+  align-items: center;
 }
 
 .gridSection {
@@ -129,22 +146,6 @@
 }
 
 .pageInfo {
-  font-size: 13px;
-  color: #6b7280;
-}
-
-.gridHeader {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.sectionTitle {
-  font-size: 18px;
-  color: #111827;
-}
-
-.sectionDescription {
   font-size: 13px;
   color: #6b7280;
 }
