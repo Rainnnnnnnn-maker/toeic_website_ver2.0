@@ -8,6 +8,7 @@ import WordsListClient from "./WordsListClient";
 export const metadata: Metadata = {
   title: "2026年版 TOEIC 重要単語集",
   description: "TOEIC頻出の重要単語を、一覧・検索・AI解説で効率よく学べる単語集。",
+  keywords: ["TOEIC", "単語", "英単語", "2026", "重要単語", "頻出", "AI解説","AI"],
   alternates: {
     canonical: "/",
   },
