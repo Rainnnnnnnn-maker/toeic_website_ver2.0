@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import Script from "next/script";
 import styles from "./page.module.css";
-import { getAllWords } from "@/data/words";
+import { getImportantWords, getMediumWords } from "@/data/words";
 import WordsListClient from "./WordsListClient";
 
 export const metadata: Metadata = {
@@ -15,7 +15,8 @@ export const metadata: Metadata = {
 };
 
 export default function Home() {
-  const words = getAllWords();
+  const importantWords = getImportantWords();
+  const mediumWords = getMediumWords();
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -45,7 +46,7 @@ export default function Home() {
             <span className={styles.ctaButtonLabel}>学習モード</span>
           </Link>
         </header>
-        <WordsListClient words={words} />
+        <WordsListClient importantWords={importantWords} mediumWords={mediumWords} />
       </main>
     </div>
   );

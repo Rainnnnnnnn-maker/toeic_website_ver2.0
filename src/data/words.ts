@@ -6,8 +6,12 @@ export type Word = {
   term: string;
 };
 
-function loadWordsFromFile(): Word[] {
-  const filePath = path.join(process.cwd(), ".doc", "word.txt");
+function loadWordsFromFile(filename: string): Word[] {
+  const filePath = path.join(process.cwd(), ".doc", filename);
+  if (!fs.existsSync(filePath)) {
+    console.warn(`Word file not found: ${filename}`);
+    return [];
+  }
   const content = fs.readFileSync(filePath, "utf-8");
   const seen = new Set<string>();
   const lines = content.split(/\r?\n/);
@@ -23,12 +27,30 @@ function loadWordsFromFile(): Word[] {
   return words;
 }
 
-const WORD_CACHE: Word[] = loadWordsFromFile();
+const IMPORTANT_WORDS: Word[] = loadWordsFromFile("word.txt");
+const MEDIUM_WORDS: Word[] = loadWordsFromFile("word_mid.txt");
+
+// Combine all words, ensuring uniqueness by slug for the global lookup
+const ALL_WORDS_MAP = new Map<string, Word>();
+[...IMPORTANT_WORDS, ...MEDIUM_WORDS].forEach(w => {
+  if (!ALL_WORDS_MAP.has(w.slug)) {
+    ALL_WORDS_MAP.set(w.slug, w);
+  }
+});
+const ALL_WORDS = Array.from(ALL_WORDS_MAP.values());
 
 export function getAllWords() {
-  return WORD_CACHE;
+  return ALL_WORDS;
+}
+
+export function getImportantWords() {
+  return IMPORTANT_WORDS;
+}
+
+export function getMediumWords() {
+  return MEDIUM_WORDS;
 }
 
 export function getWordBySlug(slug: string) {
-  return WORD_CACHE.find((word) => word.slug === slug);
+  return ALL_WORDS_MAP.get(slug);
 }

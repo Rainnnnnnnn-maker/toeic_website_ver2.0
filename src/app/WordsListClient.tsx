@@ -4,15 +4,20 @@ import type { ChangeEvent } from "react";
 import Link from "next/link";
 import styles from "./page.module.css";
 import type { Word } from "@/data/words";
+import TabNavigation, { TabId } from "@/components/TabNavigation";
 
 type Props = {
-  words: Word[];
+  importantWords: Word[];
+  mediumWords: Word[];
 };
 
-export default function WordsListClient({ words }: Props) {
+export default function WordsListClient({ importantWords, mediumWords }: Props) {
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
+  const [activeTab, setActiveTab] = useState<TabId>('important');
   const pageSize = 20;
+
+  const currentList = activeTab === 'medium' ? mediumWords : importantWords;
 
   const handleQueryChange = (e: ChangeEvent<HTMLInputElement>) => {
     const nextQuery = e.target.value;
@@ -20,11 +25,16 @@ export default function WordsListClient({ words }: Props) {
     setPage(1);
   };
 
+  const handleTabChange = (tab: TabId) => {
+    setActiveTab(tab);
+    setPage(1);
+  };
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return words;
-    return words.filter((w) => w.term.toLowerCase().startsWith(q));
-  }, [words, query]);
+    if (!q) return currentList;
+    return currentList.filter((w) => w.term.toLowerCase().startsWith(q));
+  }, [currentList, query]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
   const currentPage = Math.min(page, totalPages);
@@ -63,6 +73,9 @@ export default function WordsListClient({ words }: Props) {
           </button>
         </div>
       </div>
+
+      <TabNavigation activeTab={activeTab} onTabChange={handleTabChange} />
+
       <div className={styles.wordGrid}>
         {current.map((word) => (
           <Link

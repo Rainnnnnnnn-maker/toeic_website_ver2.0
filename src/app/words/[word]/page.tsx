@@ -1,9 +1,11 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { notFound } from "next/navigation";
 import { getWordBySlug } from "@/data/words";
 import { getWordDetail } from "@/lib/actions";
 import styles from "./word-detail.module.css";
+import Loading from "./loading";
 
 const WordDetailClient = dynamic(
   () => import("./WordDetailClient").then((m) => m.WordDetailClient),
@@ -37,14 +39,40 @@ export default async function WordPage({ params }: PageProps) {
     notFound();
   }
 
+  return (
+    <Suspense fallback={<Loading />}>
+      <WordDetailFetcher word={word} />
+    </Suspense>
+  );
+}
+
+export async function generateMetadata({ params }: PageProps) {
+  const { word } = await params;
+  const entry = getWordBySlug(word);
+  
+  if (!entry) {
+    return {
+      title: "単語が見つかりません",
+    };
+  }
+
+  return {
+    title: `${entry.term} | TOEIC重要単語`,
+    description: `TOEIC重要単語「${entry.term}」の意味、語形変化、類義語、例文などをAIが詳しく解説します。`,
+  };
+}
+
+async function WordDetailFetcher({ word }: { word: string }) {
   // Server Component内でデータを取得（L1 Cache: Next.js Data Cache）
   // データがない場合は生成処理が走る（L2: Redis -> L3: Gemini）
   const detailData = await getWordDetail(word);
 
   if (!detailData) {
     return (
-       <div className={styles.detailContainer}>
-        <p className={styles.errorText}>データの取得に失敗しました。時間をおいて再度お試しください。</p>
+      <div className={styles.detailContainer}>
+        <p className={styles.errorText}>
+          データの取得に失敗しました。時間をおいて再度お試しください。
+        </p>
         <Link href="/" className={styles.retryButton}>
           一覧へ戻る
         </Link>
@@ -52,7 +80,5 @@ export default async function WordPage({ params }: PageProps) {
     );
   }
 
-  return (
-    <WordDetailClient initialData={detailData} />
-  );
+  return <WordDetailClient initialData={detailData} />;
 }
