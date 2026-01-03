@@ -22,6 +22,10 @@ export const metadata: Metadata = {
   },
   description: "TOEIC頻出の重要単語をAI解説で効率よく学べる",
   keywords: ["TOEIC", "単語", "英単語", "2026", "重要単語", "頻出", "AI解説","AI"],
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/apple-icon.png",
+  },
   robots: {
     index: true,
     follow: true,
