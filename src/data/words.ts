@@ -27,30 +27,45 @@ function loadWordsFromFile(filename: string): Word[] {
   return words;
 }
 
-const IMPORTANT_WORDS: Word[] = loadWordsFromFile("word.txt");
-const MEDIUM_WORDS: Word[] = loadWordsFromFile("word_mid.txt");
+const IMPORTANT_WORDS: Word[] = [];
+const MEDIUM_WORDS: Word[] = [];
+let ALL_WORDS_MAP: Map<string, Word> | null = null;
+let ALL_WORDS: Word[] | null = null;
 
-// Combine all words, ensuring uniqueness by slug for the global lookup
-const ALL_WORDS_MAP = new Map<string, Word>();
-[...IMPORTANT_WORDS, ...MEDIUM_WORDS].forEach(w => {
-  if (!ALL_WORDS_MAP.has(w.slug)) {
-    ALL_WORDS_MAP.set(w.slug, w);
-  }
-});
-const ALL_WORDS = Array.from(ALL_WORDS_MAP.values());
+function ensureWordsLoaded() {
+  if (ALL_WORDS_MAP) return;
+
+  const important = loadWordsFromFile("word.txt");
+  const medium = loadWordsFromFile("word_mid.txt");
+  
+  IMPORTANT_WORDS.push(...important);
+  MEDIUM_WORDS.push(...medium);
+
+  ALL_WORDS_MAP = new Map<string, Word>();
+  [...important, ...medium].forEach(w => {
+    if (!ALL_WORDS_MAP!.has(w.slug)) {
+      ALL_WORDS_MAP!.set(w.slug, w);
+    }
+  });
+  ALL_WORDS = Array.from(ALL_WORDS_MAP.values());
+}
 
 export function getAllWords() {
-  return ALL_WORDS;
+  ensureWordsLoaded();
+  return ALL_WORDS!;
 }
 
 export function getImportantWords() {
+  ensureWordsLoaded();
   return IMPORTANT_WORDS;
 }
 
 export function getMediumWords() {
+  ensureWordsLoaded();
   return MEDIUM_WORDS;
 }
 
 export function getWordBySlug(slug: string) {
-  return ALL_WORDS_MAP.get(slug);
+  ensureWordsLoaded();
+  return ALL_WORDS_MAP!.get(slug);
 }
