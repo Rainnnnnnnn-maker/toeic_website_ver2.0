@@ -43,6 +43,7 @@ export default function WordsListClient({ importantWords, mediumWords }: Props) 
 
   return (
     <section className={styles.gridSection}>
+      <TabNavigation activeTab={activeTab} onTabChange={handleTabChange} />
       <div className={styles.controlsRow}>
         <input
           value={query}
@@ -74,7 +75,7 @@ export default function WordsListClient({ importantWords, mediumWords }: Props) 
         </div>
       </div>
 
-      <TabNavigation activeTab={activeTab} onTabChange={handleTabChange} />
+      
 
       <div className={styles.wordGrid}>
         {current.map((word) => (
