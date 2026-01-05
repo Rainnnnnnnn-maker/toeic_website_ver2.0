@@ -6,6 +6,7 @@ import { getWordBySlug } from "@/data/words";
 import { getWordDetail } from "@/lib/actions";
 import styles from "./word-detail.module.css";
 import Loading from "./loading";
+import { DynamicMetadata } from "./components/DynamicMetadata";
 
 const WordDetailClient = dynamic(
   () => import("./WordDetailClient").then((m) => m.WordDetailClient),
@@ -25,6 +26,11 @@ export function generateStaticParams() {
   return [{ word: "__build_placeholder__" }];
 }
 
+// データ取得をPromise化するためのラッパー
+async function fetchWord(slug: string) {
+  return getWordBySlug(slug);
+}
+
 export default async function WordPage({ params }: PageProps) {
   const { word } = await params;
 
@@ -33,33 +39,20 @@ export default async function WordPage({ params }: PageProps) {
     notFound();
   }
 
-  const entry = getWordBySlug(word);
-
-  if (!entry) {
-    notFound();
-  }
+  // 以前の同期的な getWordBySlug 呼び出しと 404 判定を削除し、
+  // Suspense 内で処理させることで TTFB を改善する。
+  // DynamicMetadata に Promise を渡し、クライアント側でタイトルを更新する。
 
   return (
-    <Suspense fallback={<Loading />}>
-      <WordDetailFetcher word={word} />
-    </Suspense>
+    <>
+      <Suspense fallback={null}>
+        <DynamicMetadata wordPromise={fetchWord(word)} />
+      </Suspense>
+      <Suspense fallback={<Loading />}>
+        <WordDetailFetcher word={word} />
+      </Suspense>
+    </>
   );
-}
-
-export async function generateMetadata({ params }: PageProps) {
-  const { word } = await params;
-  const entry = getWordBySlug(word);
-  
-  if (!entry) {
-    return {
-      title: "単語が見つかりません",
-    };
-  }
-
-  return {
-    title: `${entry.term} | TOEIC重要単語`,
-    description: `TOEIC重要単語「${entry.term}」の意味、語形変化、類義語、例文などをAIが詳しく解説します。`,
-  };
 }
 
 async function WordDetailFetcher({ word }: { word: string }) {
