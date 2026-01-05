@@ -1,22 +1,8 @@
 import Link from "next/link";
-import type { Metadata } from "next";
 import Script from "next/script";
 import styles from "./page.module.css";
 import { getImportantWords, getMediumWords } from "@/data/words";
 import WordsListClient from "./WordsListClient";
-
-export const metadata: Metadata = {
-  title: "2026年版 TOEIC 重要単語集",
-  description: "TOEIC頻出の重要単語を、一覧・検索・AI解説で効率よく学べる単語集。",
-  keywords: ["TOEIC", "単語", "英単語", "サイト","アプリ", "2026", "重要単語", "頻出", "AI解説","AI"],
-  alternates: {
-    canonical: "/",
-  },
-  icons: {
-    icon: "/favicon.ico",
-    apple: "/apple-icon.png",
-  },
-};
 
 export default function Home() {
   const importantWords = getImportantWords();
