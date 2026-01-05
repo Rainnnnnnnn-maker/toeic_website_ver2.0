@@ -34,11 +34,6 @@ async function fetchWord(slug: string) {
 export default async function WordPage({ params }: PageProps) {
   const { word } = await params;
 
-  // ビルド用のプレースホルダーの場合は処理をスキップ
-  if (word === "__build_placeholder__") {
-    notFound();
-  }
-
   // 以前の同期的な getWordBySlug 呼び出しと 404 判定を削除し、
   // Suspense 内で処理させることで TTFB を改善する。
   // DynamicMetadata に Promise を渡し、クライアント側でタイトルを更新する。
