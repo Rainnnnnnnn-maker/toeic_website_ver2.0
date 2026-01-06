@@ -23,9 +23,11 @@ export default function FavoritesPage() {
               学習中に気になった単語を復習しましょう。
             </p>
           </div>
-          <Link href="/" className={styles.secondaryButton} style={{ alignSelf: "flex-start" }}>
-            ← トップへ戻る
-          </Link>
+          <div className={styles.ctaGroup}>
+            <Link href="/" className={styles.secondaryButton}>
+              ← 単語一覧へ戻る
+            </Link>
+          </div>
         </header>
         <FavoritesListClient allWords={allWords} />
       </main>
