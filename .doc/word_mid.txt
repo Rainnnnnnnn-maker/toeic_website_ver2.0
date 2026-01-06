@@ -30,7 +30,6 @@ advocate
 affect
 affiliated
 afford
-affordable
 afterwords
 agency
 agreement
@@ -53,19 +52,14 @@ annual
 anonymous
 anticipated
 anyway
-apologize
 appearance
 applaud
-appliance
 applicable
-apply
 appointment
 appraisal
 appreciate
 apprentice
 appropriate
-approve
-approximately
 architecture
 arrangement
 assembly
@@ -86,7 +80,6 @@ audience
 auditor
 auditorium
 authentic
-author
 authority
 authorize
 automaticallly
@@ -143,9 +136,7 @@ compile
 complaint
 complement
 compliment
-complimentary
 completion
-complex
 compliance
 complicated
 component
