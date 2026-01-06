@@ -36,7 +36,7 @@ export default function TabNavigation({ activeTab, onTabChange }: TabNavigationP
 
   const handleTabClick = (tab: Tab) => {
     if (tab.status === 'coming_soon') {
-      setToastMessage('feature');
+      setToastMessage('coming soon...');
       return;
     }
     onTabChange(tab.id);
