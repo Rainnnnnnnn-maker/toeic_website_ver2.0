@@ -1,5 +1,5 @@
  'use client';
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef } from "react";
 import type { ChangeEvent } from "react";
 import Link from "next/link";
 import styles from "./page.module.css";
@@ -15,6 +15,7 @@ export default function WordsListClient({ importantWords, mediumWords }: Props) 
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
   const [activeTab, setActiveTab] = useState<TabId>('important');
+  const inputRef = useRef<HTMLInputElement>(null);
   const pageSize = 20;
 
   const currentList = activeTab === 'medium' ? mediumWords : importantWords;
@@ -23,6 +24,12 @@ export default function WordsListClient({ importantWords, mediumWords }: Props) 
     const nextQuery = e.target.value;
     setQuery(nextQuery);
     setPage(1);
+  };
+
+  const handleClear = () => {
+    setQuery("");
+    setPage(1);
+    inputRef.current?.focus();
   };
 
   const handleTabChange = (tab: TabId) => {
@@ -45,13 +52,40 @@ export default function WordsListClient({ importantWords, mediumWords }: Props) 
     <section className={styles.gridSection}>
       <TabNavigation activeTab={activeTab} onTabChange={handleTabChange} />
       <div className={styles.controlsRow}>
-        <input
-          value={query}
-          onChange={handleQueryChange}
-          className={styles.searchInput}
-          placeholder="単語を検索..."
-          aria-label="単語検索"
-        />
+        <div className={styles.searchContainer}>
+          <input
+            ref={inputRef}
+            value={query}
+            onChange={handleQueryChange}
+            className={styles.searchInput}
+            placeholder="単語を検索..."
+            aria-label="単語検索"
+          />
+          {query && (
+            <button
+              className={styles.clearButton}
+              onClick={handleClear}
+              aria-label="検索条件をクリア"
+              type="button"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+                stroke="currentColor"
+                width="16"
+                height="16"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          )}
+        </div>
         <div className={styles.pagination}>
           <button
             className={styles.pageButton}
