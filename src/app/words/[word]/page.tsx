@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import Link from "next/link";
+import Script from "next/script";
 import dynamic from "next/dynamic";
 import { Metadata } from "next";
 import { getWordBySlug } from "@/data/words";
@@ -79,9 +80,58 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function WordPage({ params }: PageProps) {
   const { word } = await params;
+  
+  // 構造化データのための詳細情報取得
+  // generateMetadataでも呼ばれているが、Next.jsのRequest Memoizationにより再利用されるはず
+  // ただし、getWordDetail自体はキャッシュ関数なので、2回呼んでもコストは低い
+  let detail: WordDetails | null = null;
+  try {
+    detail = await getWordDetail(word);
+  } catch (e) {
+    // エラーハンドリングは後続のFetcherに任せる
+  }
+
+  const jsonLd = [];
+
+  // BreadcrumbList
+  jsonLd.push({
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "TOP",
+        "item": "https://toeic-words.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": word,
+        "item": `https://toeic-words.com/words/${word}`
+      }
+    ]
+  });
+
+  // DefinedTerm (if details are available)
+  if (detail) {
+    jsonLd.push({
+      "@context": "https://schema.org",
+      "@type": "DefinedTerm",
+      "name": detail.word,
+      "description": detail.japaneseTranslation,
+      "inDefinedTermSet": "https://toeic-words.com",
+      "termCode": detail.word
+    });
+  }
 
   return (
     <>
+      <Script
+        id="json-ld-structured-data"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Suspense fallback={<Loading />}>
         <WordDetailFetcher word={word} />
       </Suspense>

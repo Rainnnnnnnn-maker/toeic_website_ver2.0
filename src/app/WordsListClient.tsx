@@ -50,6 +50,26 @@ export default function WordsListClient({ importantWords, mediumWords }: Props) 
 
   return (
     <section className={styles.gridSection}>
+      <div className={styles.introSection}>
+        {activeTab === 'important' ? (
+          <div>
+            <h2 className={styles.levelTitle}>最重要単語（TOEIC 600点レベル）</h2>
+            <p className={styles.levelDescription}>
+              TOEICスコアアップのために最初に覚えるべき基礎単語です。ビジネスシーンで頻出する動詞や名詞を中心に収録しています。
+              まずはこのリストを完璧にすることで、Part 1〜4の聞き取りやPart 5の読解スピードが向上します。
+            </p>
+          </div>
+        ) : (
+          <div>
+            <h2 className={styles.levelTitle}>中級単語（TOEIC 730〜800点レベル）</h2>
+            <p className={styles.levelDescription}>
+              さらなるスコアアップを目指すための応用単語です。
+              より抽象的な概念や、やや難易度の高いビジネス用語が含まれます。Part 5、Part 6、、Part 7の語彙問題対策としても有効です。
+            </p>
+          </div>
+        )}
+      </div>
+
       <TabNavigation activeTab={activeTab} onTabChange={handleTabChange} />
       <div className={styles.controlsRow}>
         <div className={styles.searchContainer}>
