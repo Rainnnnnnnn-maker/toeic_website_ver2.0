@@ -32,9 +32,14 @@ export default function Home() {
               頻出単語を効率よく学習して、スコアアップを目指しましょう。
             </p>
           </div>
-          <Link href="/study" className={styles.ctaButton}>
-            <span className={styles.ctaButtonLabel}>学習モード</span>
-          </Link>
+          <div className={styles.ctaGroup}>
+            <Link href="/study" className={styles.ctaButton}>
+              <span className={styles.ctaButtonLabel}>学習モード</span>
+            </Link>
+            <Link href="/favorites" className={styles.secondaryButton}>
+              <span className={styles.ctaButtonLabel}>お気に入り</span>
+            </Link>
+          </div>
         </header>
         <WordsListClient importantWords={importantWords} mediumWords={mediumWords} />
       </main>

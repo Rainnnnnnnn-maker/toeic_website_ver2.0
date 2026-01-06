@@ -276,3 +276,47 @@
 		grid-template-columns: repeat(4, minmax(0, 1fr));
 	}
 }
+
+.ctaGroup {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.secondaryButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 26px;
+  min-height: 44px;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #ffffff;
+  border-radius: 9999px;
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  transition: transform 0.16s ease, box-shadow 0.16s ease, filter 0.16s ease;
+  box-shadow: 0 12px 30px rgba(217, 119, 6, 0.28);
+  border: none;
+  cursor: pointer;
+}
+
+.secondaryButton:hover {
+  transform: translateY(-1px) scale(1.02);
+  filter: brightness(1.05);
+  box-shadow: 0 18px 40px rgba(217, 119, 6, 0.32);
+}
+
+.secondaryButton:active {
+  transform: translateY(0) scale(0.99);
+  box-shadow: 0 8px 20px rgba(217, 119, 6, 0.22);
+}
+
+.secondaryButton:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(253, 186, 116, 0.9), 0 12px 30px rgba(217, 119, 6, 0.28);
+}

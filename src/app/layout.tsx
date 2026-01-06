@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { FavoritesProvider } from "@/context/FavoritesContext";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -73,7 +74,9 @@ export default function RootLayout({
 	return (
 		<html lang="ja">
 			<body className={`${geistSans.variable} ${geistMono.variable}`}>
-				{children}
+				<FavoritesProvider>
+					{children}
+				</FavoritesProvider>
 				<Analytics />
 				<SpeedInsights />
 			</body>

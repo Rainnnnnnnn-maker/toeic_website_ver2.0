@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Star } from "lucide-react";
+import { useFavorites } from "@/context/FavoritesContext";
 import styles from "./word-detail.module.css";
 import type { WordDetails } from "@/lib/actions";
 
@@ -14,6 +16,7 @@ type State = {
 };
 
 export function WordDetailClient({ initialData }: Props) {
+  const { isFavorite, toggleFavorite } = useFavorites();
   const [state, setState] = useState<State>({
     audioLoading: false,
   });
@@ -145,6 +148,19 @@ export function WordDetailClient({ initialData }: Props) {
             </div>
           )}
         </div>
+        <button
+          onClick={() => toggleFavorite(data.word)}
+          className={styles.favoriteButton}
+          aria-label={isFavorite(data.word) ? "お気に入りから削除" : "お気に入りに追加"}
+          title={isFavorite(data.word) ? "お気に入りから削除" : "お気に入りに追加"}
+        >
+          <Star
+            size={24}
+            fill={isFavorite(data.word) ? "#FFC107" : "none"}
+            color={isFavorite(data.word) ? "#FFC107" : "#94a3b8"}
+            strokeWidth={2}
+          />
+        </button>
       </div>
 
       <section className={styles.section}>
