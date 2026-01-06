@@ -95,6 +95,49 @@
   gap: 16px;
 }
 
+.seoSection {
+  margin-top: 48px;
+  padding-top: 48px;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.seoArticle {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.seoTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 8px;
+}
+
+.seoText {
+  font-size: 15px;
+  line-height: 1.8;
+  color: #475569;
+}
+
+.seoList {
+  list-style: disc;
+  padding-left: 24px;
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.seoListItem {
+  font-size: 15px;
+  line-height: 1.6;
+  color: #475569;
+}
+
 .controlsRow {
   display: flex;
   flex-direction: column;
