@@ -30,7 +30,7 @@
 .backButton {
   position: absolute;
   left: 0;
-  top: 0;
+  top: -15px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
