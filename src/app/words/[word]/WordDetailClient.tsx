@@ -238,7 +238,7 @@ export function WordDetailClient({ initialData, linkedWords = {} }: Props) {
 
       {data.nuance && (
         <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>ニュアンス・イメージ</h2>
+          <h2 className={styles.sectionTitle}>ニュアンス</h2>
           <div className={styles.sectionBody}>
             <p>{data.nuance}</p>
           </div>
