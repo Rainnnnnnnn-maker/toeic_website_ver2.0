@@ -11,7 +11,8 @@ export default function Home() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "TOEIC重要単語",
+    name: "TOEIC重要単語集",
+    alternateName: ["TOEIC重要単語", "TOEIC Words"],
     url: "https://toeic-words.com/",
     inLanguage: "ja-JP",
   };

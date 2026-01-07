@@ -41,7 +41,7 @@ export const metadata: Metadata = {
     title: "TOEIC重要単語",
     description: "TOEIC頻出の重要単語をAI解説で効率よく学べる",
     url: "https://toeic-words.com",
-    siteName: "TOEIC重要単語",
+    siteName: "TOEIC重要単語集",
     locale: "ja_JP",
     type: "website",
     images: [
