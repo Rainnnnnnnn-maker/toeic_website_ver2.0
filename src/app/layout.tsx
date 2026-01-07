@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     default: "TOEIC重要単語",
     template: "%s | TOEIC重要単語",
   },
-  description: "TOEIC頻出の重要単語をAI解説で効率よく学べる",
+  description: "TOEIC頻出の重要単語をAI解説、AI例文で効率よく学べる",
   icons: {
     icon: "/favicon.ico",
     apple: "/apple-icon.png",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "TOEIC重要単語",
-    description: "TOEIC頻出の重要単語をAI解説で効率よく学べる",
+    description: "TOEIC頻出の重要単語をAI解説、AI例文で効率よく学べる",
     url: "https://toeic-words.com",
     siteName: "TOEIC重要単語集",
     locale: "ja_JP",
@@ -56,7 +56,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "TOEIC重要単語",
-    description: "TOEIC頻出の重要単語をAI解説で効率よく学べる",
+    description: "TOEIC頻出の重要単語をAI解説、AI例文で効率よく学べる",
     images: ["/opengraph-image"],
   },
 };

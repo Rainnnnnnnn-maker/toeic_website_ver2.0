@@ -12,6 +12,7 @@ export default function Home() {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: "TOEIC重要単語集",
+    description: "TOEIC頻出の重要単語をAI解説、AI例文で効率よく学べる",
     alternateName: ["TOEIC重要単語", "TOEIC Words"],
     url: "https://toeic-words.com/",
     inLanguage: "ja-JP",
