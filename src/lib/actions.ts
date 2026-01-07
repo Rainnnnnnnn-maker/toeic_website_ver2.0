@@ -100,6 +100,8 @@ Return ONLY a JSON object for "\${word}" with the following fields:
 }
 
 Constraints:
+- partOfSpeech は日本語で出力する
+- meaning は日本語で出力する
 - meanings は品詞ごとに1〜2文で簡潔に
 - 語形変化は最大5件、類義語は最大5件、toeicExamples は3〜5件
 - 語源・使用注意・地域差などの付加情報は含めない
