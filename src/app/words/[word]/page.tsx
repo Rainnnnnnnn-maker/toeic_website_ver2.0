@@ -95,7 +95,7 @@ export default async function WordPage({ params }: PageProps) {
   try {
     detail = await getWordDetail(word);
   } catch (e) {
-    // エラーハンドリングは後続のFetcherに任せる
+    console.error(`Failed to fetch word detail for slug "${word}"`, e);
   }
 
   const jsonLd = [];
