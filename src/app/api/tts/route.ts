@@ -1,4 +1,6 @@
 import "server-only";
+import { getWordBySlug } from "@/data/words";
+
 export async function POST(request: Request) {
   const apiKey = process.env.TTS_API_KEY;
 
@@ -10,6 +12,13 @@ export async function POST(request: Request) {
 
   if (!body || typeof body.text !== "string" || !body.text.trim()) {
     return Response.json({ error: "Invalid request body" }, { status: 400 });
+  }
+
+  // Guard: Check if the word exists in our whitelist
+  // We check case-insensitive match since the whitelist logic uses slugs
+  const wordEntry = getWordBySlug(body.text.toLowerCase());
+  if (!wordEntry) {
+    return Response.json({ error: "Word not allowed" }, { status: 400 });
   }
 
   try {
