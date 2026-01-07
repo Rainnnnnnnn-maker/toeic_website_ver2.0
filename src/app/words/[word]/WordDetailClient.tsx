@@ -247,7 +247,7 @@ export function WordDetailClient({ initialData, linkedWords = {} }: Props) {
 
       {data.toeicExamples.length > 0 && (
         <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>TOEICでの使われ方</h2>
+          <h2 className={styles.sectionTitle}>TOEIC AI例文</h2>
           <div className={styles.sectionBody}>
             {data.toeicExamples.map((ex, i) => (
               <div key={i} style={{ marginBottom: i < data.toeicExamples.length - 1 ? 12 : 0 }}>
