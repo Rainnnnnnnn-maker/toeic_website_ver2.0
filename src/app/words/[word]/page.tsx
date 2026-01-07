@@ -164,5 +164,29 @@ async function WordDetailFetcher({ word }: { word: string }) {
     );
   }
 
-  return <WordDetailClient initialData={detailData} />;
+  // 内部リンク用のマッピングを作成
+  const linkedWords: Record<string, string> = {};
+  
+  // チェック対象の単語リスト
+  const candidates = new Set<string>();
+  
+  // 1. 類義語
+  detailData.synonyms.forEach(s => candidates.add(s));
+  
+  // 2. 詳細な意味の中の類義語
+  detailData.meanings.forEach(m => {
+    m.detailedMeanings.forEach(d => {
+      d.synonyms?.forEach(s => candidates.add(s));
+    });
+  });
+
+  // 存在確認とマッピング
+  candidates.forEach(term => {
+    const found = getWordBySlug(term.toLowerCase());
+    if (found) {
+      linkedWords[term] = found.slug;
+    }
+  });
+
+  return <WordDetailClient initialData={detailData} linkedWords={linkedWords} />;
 }

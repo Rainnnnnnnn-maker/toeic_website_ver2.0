@@ -272,6 +272,27 @@
   border: 1px solid #e5e7eb;
 }
 
+.wordLink {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 2px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-block;
+  color: #2563eb !important; /* 青色を強制 */
+  font-weight: 700 !important;
+  font-size: 1.1em !important;
+  border-color: #bfdbfe !important;
+  background-color: #eff6ff !important;
+}
+
+.wordLink:hover {
+  color: #1d4ed8 !important;
+  background-color: #dbeafe !important;
+  border-color: #93c5fd !important;
+  transform: translateY(-1px);
+}
+
 .synonymList {
   list-style: none;
   margin: 0;

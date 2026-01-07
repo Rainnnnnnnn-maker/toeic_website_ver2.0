@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { Star } from "lucide-react";
 import { useFavorites } from "@/context/FavoritesContext";
 import styles from "./word-detail.module.css";
@@ -8,6 +9,7 @@ import type { WordDetails } from "@/lib/actions";
 
 type Props = {
   initialData: WordDetails;
+  linkedWords?: Record<string, string>;
 };
 
 type State = {
@@ -15,7 +17,7 @@ type State = {
   audioLoading: boolean;
 };
 
-export function WordDetailClient({ initialData }: Props) {
+export function WordDetailClient({ initialData, linkedWords = {} }: Props) {
   const { isFavorite, toggleFavorite } = useFavorites();
   const [state, setState] = useState<State>({
     audioLoading: false,
@@ -202,7 +204,10 @@ export function WordDetailClient({ initialData }: Props) {
           <ul className={styles.pillList}>
             {data.wordForms.map((wf, i) => (
               <li key={`${wf.form}-${i}`} className={styles.pill}>
-                {wf.form}（{wf.type}）
+                {wf.form}
+                <span style={{ marginLeft: 6, fontSize: "14px", color: "#6b7280" }}>
+                  （{wf.type}）
+                </span>
               </li>
             ))}
           </ul>
@@ -214,7 +219,18 @@ export function WordDetailClient({ initialData }: Props) {
           <h2 className={styles.sectionTitle}>類義語</h2>
           <ul className={styles.pillList}>
             {data.synonyms.map((s, i) => (
-              <li key={i} className={styles.pill}>{s}</li>
+              <li key={i} className={styles.pill}>
+                {linkedWords[s] ? (
+                  <Link
+                    href={`/words/${linkedWords[s]}`}
+                    className={styles.wordLink}
+                  >
+                    {s}
+                  </Link>
+                ) : (
+                  s
+                )}
+              </li>
             ))}
           </ul>
         </section>
