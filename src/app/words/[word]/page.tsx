@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import Script from "next/script";
 import dynamic from "next/dynamic";
 import { Metadata } from "next";
@@ -26,10 +27,10 @@ export function generateStaticParams() {
   return [{ word: "__build_placeholder__" }];
 }
 
-// データ取得をPromise化するためのラッパー
-async function fetchWord(slug: string) {
-  return getWordBySlug(slug);
-}
+// データ取得をPromise化するためのラッパー（利用しない）
+// async function fetchWord(slug: string) {
+//   return getWordBySlug(slug);
+// }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { word: slug } = await params;
@@ -80,6 +81,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function WordPage({ params }: PageProps) {
   const { word } = await params;
+
+  // 存在しない単語の場合は404ページへ遷移
+  // __build_placeholder__ はビルド用ダミーパスなので除外
+  if (word !== "__build_placeholder__" && !getWordBySlug(word)) {
+    notFound();
+  }
   
   // 構造化データのための詳細情報取得
   // generateMetadataでも呼ばれているが、Next.jsのRequest Memoizationにより再利用されるはず
