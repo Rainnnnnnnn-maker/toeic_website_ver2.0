@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { loadGoogleFont } from "@/lib/og-utils";
 
 export const runtime = "edge";
 
@@ -10,18 +11,6 @@ export const size = {
 
 export const contentType = "image/png";
 
-async function loadGoogleFont(font: string, text: string) {
-  const url = `https://fonts.googleapis.com/css2?family=${font}&text=${encodeURIComponent(text)}`;
-  const css = await (await fetch(url)).text();
-  const resource = css.match(/src: url\((.+)\) format\('(opentype|truetype)'\)/);
-
-  if (resource) {
-    const res = await fetch(resource[1]);
-    return res.arrayBuffer();
-  }
-
-  throw new Error("failed to load font");
-}
 
 export default async function Image() {
   const title = "TOEIC 重要単語集";
@@ -47,7 +36,7 @@ export default async function Image() {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          background: "radial-gradient(circle at center, #e0f2fe 0, #f9fafb 45%, #ffffff 100%)",
+          background: "radial-gradient(circle at center, #ccfbf1 0, #f9fafb 45%, #ffffff 100%)",
           fontFamily: '"Noto Sans JP", sans-serif',
         }}
       >
@@ -57,18 +46,18 @@ export default async function Image() {
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            background: "rgba(255, 255, 255, 0.8)",
+            background: "rgba(255, 255, 255, 0.96)",
             padding: "60px 100px",
             borderRadius: 40,
-            border: "1px solid rgba(255, 255, 255, 0.6)",
-            boxShadow: "0 20px 60px -10px rgba(0, 0, 0, 0.1)",
+            border: "1px solid #e5e7eb",
+            boxShadow: "0 18px 40px rgba(15, 23, 42, 0.08)",
           }}
         >
           <div
             style={{
               fontSize: 24,
               letterSpacing: "0.2em",
-              color: "#64748b",
+              color: "#6b7280",
               marginBottom: 20,
               fontWeight: 600,
             }}
@@ -87,8 +76,11 @@ export default async function Image() {
             <div
                style={{
                 fontSize: 32,
-                color: "#3b82f6",
+                color: "#4f46e5",
                 fontWeight: 700,
+                background: "#eef2ff",
+                padding: "4px 20px",
+                borderRadius: 999,
               }}
             >
               {subtitle}
