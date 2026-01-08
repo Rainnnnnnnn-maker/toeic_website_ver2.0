@@ -167,6 +167,11 @@ export function WordDetailClient({ initialData, linkedWords = {} }: Props) {
 
       <section className={styles.section}>
         <h2 className={styles.sectionTitle}>日本語の意味（品詞別）</h2>
+        <div className={styles.sectionBody} style={{ marginBottom: "12px" }}>
+          <p>
+            <strong>意味</strong>：{data.japaneseTranslation}
+          </p>
+        </div>
         {data.meanings.map((m, idx) => (
           <div key={idx} className={styles.sectionBody}>
             <p><strong>{m.partOfSpeech}</strong>：{m.meaning}</p>
