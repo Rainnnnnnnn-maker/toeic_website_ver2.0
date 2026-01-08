@@ -103,6 +103,8 @@ Constraints:
 - partOfSpeech は日本語で出力する
 - meaning は日本語で出力する
 - meanings は品詞ごとに1〜2文で簡潔に
+- definition は短い日本語で出力する
+- englishDefinition は短い英語で出力する
 - 語形変化は最大5件、類義語は最大5件、toeicExamples は3〜5件
 - 語源・使用注意・地域差などの付加情報は含めない
 - JSON以外のテキストは出力しない

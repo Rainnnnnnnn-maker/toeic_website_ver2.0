@@ -110,6 +110,7 @@ catering
 caution
 celebration
 centerpiece
+certify
 certificate
 characteristic
 chemist
