@@ -64,7 +64,7 @@ export default function WordsListClient({ importantWords, mediumWords }: Props) 
             <h2 className={styles.levelTitle}>中級単語（TOEIC 730〜800点レベル）</h2>
             <p className={styles.levelDescription}>
               さらなるスコアアップを目指すための応用単語です。
-              やや難易度の高い単語ですが、Part 5、Part 6、、Part 7の問題対策としても有効です。
+              やや難易度の高い単語ですが、Part 5、Part 6、Part 7の問題対策としても有効です。
             </p>
           </div>
         )}

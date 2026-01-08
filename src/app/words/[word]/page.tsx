@@ -55,7 +55,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 
   const title = detail
-    ? `${detail.word}のTOEIC例文・AI例文・例文・意味・覚え方「${detail.japaneseTranslation}」 | TOEIC重要単語`
+    ? `${detail.word}のTOEIC品詞・AI例文・例文・意味「${detail.japaneseTranslation}」 | TOEIC重要単語`
     : `${wordEntry.term} | TOEIC重要単語`;
 
   const description = detail
