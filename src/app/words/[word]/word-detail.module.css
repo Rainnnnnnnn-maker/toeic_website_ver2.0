@@ -27,7 +27,8 @@
   justify-content: space-between;
   align-items: center;
   margin-top: -8px;
-  padding-bottom: 8px;
+  padding-bottom: 0;
+  margin-bottom: -8px;
 }
 
 .navButton {
@@ -68,7 +69,7 @@
 }
 
 .pageTitle {
-  font-size: 24px;
+  font-size: 20px;
   line-height: 1.4;
   color: #0f172a;
   letter-spacing: 0.02em;
