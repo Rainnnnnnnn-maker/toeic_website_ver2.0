@@ -3,6 +3,7 @@ import { getAllWords } from "@/data/words";
 import FavoritesListClient from "./FavoritesListClient";
 import styles from "../page.module.css";
 import type { Metadata } from "next";
+import ReviewModeButton from "../ReviewModeButton";
 
 export const metadata: Metadata = {
   title: "お気に入り単語",
@@ -24,6 +25,7 @@ export default function FavoritesPage() {
             </p>
           </div>
           <div className={styles.ctaGroup}>
+            <ReviewModeButton />
             <Link href="/" className={styles.secondaryButton}>
               ← 単語一覧へ戻る
             </Link>

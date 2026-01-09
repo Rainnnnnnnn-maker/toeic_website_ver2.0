@@ -8,6 +8,10 @@ import type { Word } from '@/data/words';
 
 type Props = {
   words: Word[];
+  storageKey?: string;
+  pageTitle?: string;
+  backLink?: string;
+  backLinkText?: string;
 };
 
 type PersistedStudyStateV1 = {
@@ -18,7 +22,10 @@ type PersistedStudyStateV1 = {
   updatedAt: number;
 };
 
-const studyStateStorageKey = 'toeic-study-state-v1';
+const DEFAULT_STORAGE_KEY = 'toeic-study-state-v1';
+const DEFAULT_PAGE_TITLE = '英単語学習';
+const DEFAULT_BACK_LINK = '/';
+const DEFAULT_BACK_LINK_TEXT = '← 単語一覧へ戻る';
 
 function getNavigationType(): string | undefined {
   if (typeof window === 'undefined') return undefined;
@@ -63,7 +70,13 @@ function removeValue(values: string[], value: string): string[] {
   return values.filter((v) => v !== value);
 }
 
-export default function StudyClient({ words }: Props) {
+export default function StudyClient({ 
+  words, 
+  storageKey = DEFAULT_STORAGE_KEY,
+  pageTitle = DEFAULT_PAGE_TITLE,
+  backLink = DEFAULT_BACK_LINK,
+  backLinkText = DEFAULT_BACK_LINK_TEXT
+}: Props) {
   const router = useRouter();
   const [currentWord, setCurrentWord] = useState<Word | null>(null);
   const [rememberedSlugs, setRememberedSlugs] = useState<string[]>([]);
@@ -124,9 +137,23 @@ export default function StudyClient({ words }: Props) {
       startCountdown();
     }
 
-    const randomIndex = Math.floor(Math.random() * words.length);
-    setCurrentWord(words[randomIndex]);
-  }, [startCountdown, words]);
+    let nextWord;
+    let safetyCounter = 0;
+    
+    // 現在の単語と同じ場合は再抽選する（リストが2つ以上ある場合のみ）
+    do {
+      const randomIndex = Math.floor(Math.random() * words.length);
+      nextWord = words[randomIndex];
+      safetyCounter++;
+    } while (
+      words.length > 1 && 
+      currentWord && 
+      nextWord.slug === currentWord.slug && 
+      safetyCounter < 10
+    );
+
+    setCurrentWord(nextWord);
+  }, [startCountdown, words, currentWord]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -154,7 +181,7 @@ export default function StudyClient({ words }: Props) {
 
       if (navigationType === 'reload') {
         try {
-          window.sessionStorage.removeItem(studyStateStorageKey);
+          window.sessionStorage.removeItem(storageKey);
         } catch {
         }
         setRememberedSlugs([]);
@@ -164,7 +191,7 @@ export default function StudyClient({ words }: Props) {
       }
 
       try {
-        const raw = window.sessionStorage.getItem(studyStateStorageKey);
+        const raw = window.sessionStorage.getItem(storageKey);
         if (raw) {
           const persisted = parsePersistedStudyState(raw);
           if (persisted) {
@@ -184,7 +211,7 @@ export default function StudyClient({ words }: Props) {
     }, 0);
 
     return () => window.clearTimeout(timer);
-  }, [pickRandomWord, wordBySlug]);
+  }, [pickRandomWord, wordBySlug, storageKey]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -197,10 +224,10 @@ export default function StudyClient({ words }: Props) {
         forgottenSlugs,
         updatedAt: Date.now(),
       };
-      window.sessionStorage.setItem(studyStateStorageKey, JSON.stringify(nextState));
+      window.sessionStorage.setItem(storageKey, JSON.stringify(nextState));
     } catch {
     }
-  }, [currentWord, rememberedSlugs, forgottenSlugs]);
+  }, [currentWord, rememberedSlugs, forgottenSlugs, storageKey]);
 
   useEffect(() => {
     if (!currentWord) return;
@@ -235,10 +262,10 @@ export default function StudyClient({ words }: Props) {
     <div className={styles.page}>
       <main className={styles.main}>
         <header className={styles.header}>
-          <Link href="/" className={styles.backButton}>
-            ← 単語一覧へ戻る
+          <Link href={backLink} className={styles.backButton}>
+            {backLinkText}
           </Link>
-          <h1 className={styles.title}>英単語学習</h1>
+          <h1 className={styles.title}>{pageTitle}</h1>
           <p className={styles.subtitle}>
             表示された単語を知っていますか？
           </p>
