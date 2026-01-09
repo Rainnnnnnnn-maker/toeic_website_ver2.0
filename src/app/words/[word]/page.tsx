@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import Script from "next/script";
 import dynamic from "next/dynamic";
 import { Metadata } from "next";
-import { getWordBySlug } from "@/data/words";
+import { getWordBySlug, getImportantWords } from "@/data/words";
 import { getWordDetail, type WordDetails } from "@/lib/actions";
 import styles from "./word-detail.module.css";
 import Loading from "./loading";
@@ -21,9 +21,16 @@ type PageProps = {
 };
 
 export function generateStaticParams() {
-  // Cache Components有効時は最低1件返す必要があるが、
-  // 全件返すとビルド時にGemini APIを大量にコールしてしまい、時間がかかり不安定になる。
-  // そのため、ダミーのパスを1つだけ返し、実質的にオンデマンド生成（ISR）とする。
+  const words = getImportantWords();
+  
+  // 重要単語が存在する場合はそれらをビルド時に生成する（SSG）
+  // これにより、Bot等のアクセスによるISR Usage（Function実行）を削減できる。
+  // ユーザーの前提通りキャッシュがあればAPIコールは発生しない。
+  if (words.length > 0) {
+    return words.map((w) => ({ word: w.slug }));
+  }
+
+  // 万が一単語が取得できない場合はダミーを返し、オンデマンドISRとする
   return [{ word: "__build_placeholder__" }];
 }
 
