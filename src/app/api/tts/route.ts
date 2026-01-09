@@ -72,3 +72,18 @@ export async function POST(request: Request) {
     return Response.json({ error: "Unexpected error while calling TTS API" }, { status: 500 });
   }
 }
+
+export async function GET() {
+  return Response.json(
+    {
+      error: "Method Not Allowed",
+      message: "This endpoint requires a POST request with a JSON body containing the 'text' to synthesize.",
+    },
+    {
+      status: 405,
+      headers: {
+        Allow: "POST",
+      },
+    }
+  );
+}
