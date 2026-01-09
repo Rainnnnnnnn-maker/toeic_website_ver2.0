@@ -25,7 +25,7 @@ type PersistedStudyStateV1 = {
 const DEFAULT_STORAGE_KEY = 'toeic-study-state-v1';
 const DEFAULT_PAGE_TITLE = '英単語学習';
 const DEFAULT_BACK_LINK = '/';
-const DEFAULT_BACK_LINK_TEXT = '← 単語一覧へ戻る';
+const DEFAULT_BACK_LINK_TEXT = '単語一覧へ戻る';
 
 function getNavigationType(): string | undefined {
   if (typeof window === 'undefined') return undefined;

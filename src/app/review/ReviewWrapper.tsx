@@ -25,7 +25,7 @@ export default function ReviewWrapper({ allWords }: Props) {
         <main className={styles.main}>
           <header className={styles.header}>
             <Link href="/favorites" className={styles.backButton}>
-              ← お気に入りへ戻る
+              お気に入りへ戻る
             </Link>
             <h1 className={styles.title}>復習モード</h1>
           </header>
@@ -65,7 +65,7 @@ export default function ReviewWrapper({ allWords }: Props) {
       storageKey="toeic-review-state-v1" 
       pageTitle="復習モード"
       backLink="/favorites"
-      backLinkText="← お気に入りへ戻る"
+      backLinkText="お気に入りへ戻る"
     />
   );
 }

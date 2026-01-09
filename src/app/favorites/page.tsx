@@ -27,7 +27,7 @@ export default function FavoritesPage() {
           <div className={styles.ctaGroup}>
             <ReviewModeButton />
             <Link href="/" className={styles.secondaryButton}>
-              ← 単語一覧へ戻る
+              単語一覧へ戻る
             </Link>
           </div>
         </header>

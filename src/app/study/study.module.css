@@ -29,7 +29,7 @@
 
 .backButton {
   position: absolute;
-  left: 0;
+  right: 0;
   top: -15px;
   display: inline-flex;
   align-items: center;
@@ -174,13 +174,13 @@
 }
 
 .rememberButton {
-  background-color: #f0fdf4;
-  color: #15803d;
-  border: 2px solid #dcfce7;
+  background-color: #bbf7d0;
+  color: #14532d;
+  border: 2px solid #86efac;
 }
 
 .rememberButton:hover {
-  background-color: #dcfce7;
+  background-color: #86efac;
   transform: translateY(-2px);
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
@@ -190,13 +190,13 @@
 }
 
 .forgotButton {
-  background-color: #fef2f2;
-  color: #b91c1c;
-  border: 2px solid #fee2e2;
+  background-color: #fecaca;
+  color: #7f1d1d;
+  border: 2px solid #fca5a5;
 }
 
 .forgotButton:hover {
-  background-color: #fee2e2;
+  background-color: #fca5a5;
   transform: translateY(-2px);
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
