@@ -64,7 +64,7 @@ exhibition
 expand
 expect
 expense
-excute
+execute
 executive
 experienced
 extension
