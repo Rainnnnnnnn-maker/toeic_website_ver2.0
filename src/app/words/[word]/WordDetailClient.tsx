@@ -75,27 +75,23 @@ export function WordDetailClient({ initialData, linkedWords = {} }: Props) {
     }
   }
 
-  return (
-    <div className={styles.detailContainer}>
-      <div
-        className={`${styles.minSkeletonOverlay} ${skeletonVisible ? "" : styles.minSkeletonOverlayHidden}`}
-        aria-hidden="true"
-      >
+  if (skeletonVisible) {
+    return (
+      <div className={styles.detailContainer}>
         <div className={`${styles.skeleton} ${styles.skeletonTitle}`} />
         <div className={`${styles.skeleton} ${styles.skeletonSubtitle}`} />
         <div className={styles.skeletonSection}>
           <div className={`${styles.skeleton} ${styles.skeletonSectionTitle}`} />
           <div className={`${styles.skeleton} ${styles.skeletonText}`} />
-          <div className={`${styles.skeleton} ${styles.skeletonText}`} />
           <div className={`${styles.skeleton} ${styles.skeletonText} ${styles.skeletonTextShort}`} />
         </div>
-        <div className={styles.skeletonSection}>
-          <div className={`${styles.skeleton} ${styles.skeletonSectionTitle}`} />
-          <div className={`${styles.skeleton} ${styles.skeletonText}`} style={{ height: "60px" }} />
-          <div style={{ height: "12px" }} />
-          <div className={`${styles.skeleton} ${styles.skeletonText}`} style={{ height: "60px" }} />
-        </div>
+        {/* Examples Section Skeleton removed to match server loading state and show footer */}
       </div>
+    );
+  }
+
+  return (
+    <div className={styles.detailContainer}>
       <div className={styles.headerRow}>
         <div>
           <h1 className={styles.wordHeading}>{data.word}</h1>

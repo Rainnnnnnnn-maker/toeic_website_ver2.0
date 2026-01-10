@@ -11,17 +11,10 @@ export default function Loading() {
       <div className={styles.skeletonSection}>
         <div className={`${styles.skeleton} ${styles.skeletonSectionTitle}`} />
         <div className={`${styles.skeleton} ${styles.skeletonText}`} />
-        <div className={`${styles.skeleton} ${styles.skeletonText}`} />
         <div className={`${styles.skeleton} ${styles.skeletonText} ${styles.skeletonTextShort}`} />
       </div>
 
-      {/* Examples Section Skeleton */}
-      <div className={styles.skeletonSection}>
-        <div className={`${styles.skeleton} ${styles.skeletonSectionTitle}`} />
-        <div className={`${styles.skeleton} ${styles.skeletonText}`} style={{ height: "60px" }} />
-        <div style={{ height: "12px" }} />
-        <div className={`${styles.skeleton} ${styles.skeletonText}`} style={{ height: "60px" }} />
-      </div>
+      {/* Examples Section Skeleton - Removed to reduce height for visibility of footer disclaimer */}
     </div>
   );
 }
