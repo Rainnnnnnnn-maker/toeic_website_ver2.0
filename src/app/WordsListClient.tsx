@@ -6,6 +6,8 @@ import styles from "./page.module.css";
 import type { Word } from "@/data/words";
 import TabNavigation, { TabId } from "@/components/TabNavigation";
 
+type WordWithCategory = Word & { category: 'important' | 'medium' };
+
 type Props = {
   importantWords: Word[];
   mediumWords: Word[];
@@ -18,7 +20,15 @@ export default function WordsListClient({ importantWords, mediumWords }: Props) 
   const inputRef = useRef<HTMLInputElement>(null);
   const pageSize = 20;
 
-  const currentList = activeTab === 'medium' ? mediumWords : importantWords;
+  const { importantWithCategory, mediumWithCategory, allWithCategory } = useMemo(() => {
+    const imp = importantWords.map(w => ({ ...w, category: 'important' as const }));
+    const med = mediumWords.map(w => ({ ...w, category: 'medium' as const }));
+    return {
+      importantWithCategory: imp,
+      mediumWithCategory: med,
+      allWithCategory: [...imp, ...med]
+    };
+  }, [importantWords, mediumWords]);
 
   const handleQueryChange = (e: ChangeEvent<HTMLInputElement>) => {
     const nextQuery = e.target.value;
@@ -34,14 +44,17 @@ export default function WordsListClient({ importantWords, mediumWords }: Props) 
 
   const handleTabChange = (tab: TabId) => {
     setActiveTab(tab);
+    setQuery(""); // タブ切り替え時に検索をクリア
     setPage(1);
   };
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return currentList;
-    return currentList.filter((w) => w.term.toLowerCase().startsWith(q));
-  }, [currentList, query]);
+    if (!q) {
+      return activeTab === 'important' ? importantWithCategory : mediumWithCategory;
+    }
+    return allWithCategory.filter((w) => w.term.toLowerCase().startsWith(q));
+  }, [query, activeTab, importantWithCategory, mediumWithCategory, allWithCategory]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
   const currentPage = Math.min(page, totalPages);
@@ -51,7 +64,11 @@ export default function WordsListClient({ importantWords, mediumWords }: Props) 
   return (
     <section className={styles.gridSection}>
       <div className={styles.introSection}>
-        {activeTab === 'important' ? (
+        {query ? (
+          <div>
+             <h2 className={styles.levelTitle}>検索結果: {filtered.length}件</h2>
+          </div>
+        ) : activeTab === 'important' ? (
           <div>
             <h2 className={styles.levelTitle}>最重要単語（TOEIC 600点レベル）</h2>
             <p className={styles.levelDescription}>
@@ -78,7 +95,7 @@ export default function WordsListClient({ importantWords, mediumWords }: Props) 
             value={query}
             onChange={handleQueryChange}
             className={styles.searchInput}
-            placeholder="単語を検索..."
+            placeholder="全単語から検索..."
             aria-label="単語検索"
           />
           {query && (
@@ -138,7 +155,14 @@ export default function WordsListClient({ importantWords, mediumWords }: Props) 
             href={`/words/${word.slug}`}
             className={styles.wordCard}
           >
-            <span className={styles.wordText}>{word.term}</span>
+            <div className={styles.wordCardHeader}>
+              <span className={styles.wordText}>{word.term}</span>
+              {query && (
+                <span className={`${styles.categoryBadge} ${word.category === 'important' ? styles.badgeImportant : styles.badgeMedium}`}>
+                  {word.category === 'important' ? '重要' : '中級'}
+                </span>
+              )}
+            </div>
             <span className={styles.wordMeta}>クリックしてAIによる解説を見る</span>
           </Link>
         ))}
