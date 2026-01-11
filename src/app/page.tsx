@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   description:
     "2026年最新版。TOEIC 600点突破に必須の頻出単語から730点 800点レベルの中級単語までを網羅。AIによる詳細な解説と例文で、効率よくスコアアップを目指せます。",
   alternates: {
-    canonical: "https://toeic-words.com/",
+    canonical: "https://www.toeic-words.com/",
   },
 };
 
@@ -24,7 +24,7 @@ export default function Home() {
     name: "TOEIC重要単語集",
     description: "TOEIC頻出の重要単語をAI解説、AI例文で効率よく学べる",
     alternateName: ["TOEIC重要単語", "TOEIC Words"],
-    url: "https://toeic-words.com/",
+    url: "https://www.toeic-words.com/",
     inLanguage: "ja-JP",
   };
 

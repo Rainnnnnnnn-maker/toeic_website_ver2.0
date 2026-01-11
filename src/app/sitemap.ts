@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { getAllWords } from "@/data/words";
 
-const BASE_URL = "https://toeic-words.com";
+const BASE_URL = "https://www.toeic-words.com";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date();

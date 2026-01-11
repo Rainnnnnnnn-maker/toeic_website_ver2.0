@@ -76,7 +76,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title,
       description,
       type: "article",
-      url: `https://toeic-words.com/words/${slug}`,
+      url: `https://www.toeic-words.com/words/${slug}`,
+    },
+    alternates: {
+      canonical: `https://www.toeic-words.com/words/${slug}`,
     },
     twitter: {
       card: "summary",
@@ -116,13 +119,13 @@ export default async function WordPage({ params }: PageProps) {
         "@type": "ListItem",
         "position": 1,
         "name": "TOP",
-        "item": "https://toeic-words.com/"
+        "item": "https://www.toeic-words.com/"
       },
       {
         "@type": "ListItem",
         "position": 2,
         "name": word,
-        "item": `https://toeic-words.com/words/${word}`
+        "item": `https://www.toeic-words.com/words/${word}`
       }
     ]
   });
@@ -134,7 +137,7 @@ export default async function WordPage({ params }: PageProps) {
       "@type": "DefinedTerm",
       "name": detail.word,
       "description": detail.japaneseTranslation,
-      "inDefinedTermSet": "https://toeic-words.com",
+      "inDefinedTermSet": "https://www.toeic-words.com",
       "termCode": detail.word
     });
   }

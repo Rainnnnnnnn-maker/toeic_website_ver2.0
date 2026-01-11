@@ -5,7 +5,7 @@ export const metadata = {
 	title: "英単語学習",
 	description: "ランダムに表示される英単語を学習します。",
 	alternates: {
-		canonical: "/study",
+		canonical: "https://www.toeic-words.com/study",
 	},
 };
 

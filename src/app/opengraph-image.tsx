@@ -16,7 +16,7 @@ export default async function Image() {
   const title = "TOEIC 重要単語集";
   const subtitle = "2026年版";
   const tagline = "LEVEL UP YOUR SCORE";
-  const domain = "toeic-words.com";
+  const domain = "www.toeic-words.com";
   
   // Only load characters that are actually used
   const textToLoad = title + subtitle + tagline + domain + " ";
