@@ -676,7 +676,6 @@ respectively
 response
 restore
 restrict
-resume
 retain
 retire
 retreat
