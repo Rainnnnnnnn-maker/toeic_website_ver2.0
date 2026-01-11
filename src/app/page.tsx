@@ -1,8 +1,18 @@
 import Link from "next/link";
 import Script from "next/script";
+import type { Metadata } from "next";
 import styles from "./page.module.css";
 import { getImportantWords, getMediumWords } from "@/data/words";
 import WordsListClient from "./WordsListClient";
+
+export const metadata: Metadata = {
+  title: "2026年版 TOEIC単語 - 600点・730点レベル",
+  description:
+    "2026年最新版。TOEIC 600点突破に必須の頻出単語から730点・800点レベルの中級単語までを網羅。AIによる詳細な解説と例文で、効率よくスコアアップを目指せます。",
+  alternates: {
+    canonical: "https://toeic-words.com/",
+  },
+};
 
 export default function Home() {
   const importantWords = getImportantWords();
