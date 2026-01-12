@@ -7,10 +7,10 @@ import WordsListClient from "./WordsListClient";
 
 export const metadata: Metadata = {
   title: {
-    absolute: "TOEIC単語【2026年最新】600点・730点・800点レベル別重要単語集",
+    absolute: "TOEIC重要単語【2026年最新】600点・730点・800点レベル別",
   },
   description:
-    "2026年最新版。TOEIC 600点突破に必須の頻出単語から730点 800点レベルの中級単語までを網羅。AIによる詳細な解説と例文で、効率よくスコアアップを目指せます。",
+    "【2026年最新】TOEIC重要単語・Web単語帳。600点突破に必須の頻出単語から730点・800点レベルの中級単語までを網羅。AIによる詳細な解説と例文で、効率よくスコアアップを目指せます。",
   alternates: {
     canonical: "https://www.toeic-words.com/",
   },
@@ -25,7 +25,7 @@ export default function Home() {
     "@type": "WebSite",
     name: "TOEIC重要単語集",
     description: "TOEIC頻出の重要単語をAI解説、AI例文で効率よく学べる",
-    alternateName: ["TOEIC重要単語", "TOEIC Words"],
+    alternateName: ["TOEIC重要単語", "TOEIC Words", "TOEIC単語帳"],
     url: "https://www.toeic-words.com/",
     inLanguage: "ja-JP",
   };
@@ -41,7 +41,7 @@ export default function Home() {
         <header className={styles.header}>
           <div className={styles.headerContent}>
             <p className={styles.tagline}>LEVEL UP YOUR SCORE</p>
-            <h1 className={styles.title}>【2026年最新】TOEIC 重要単語集</h1>
+            <h1 className={styles.title}>【2026年最新】TOEIC 重要単語</h1>
             <p className={styles.subtitle}>
               頻出単語を効率よく学習して、スコアアップを目指しましょう。
             </p>
