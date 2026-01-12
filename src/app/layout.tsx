@@ -24,7 +24,9 @@ export const metadata: Metadata = {
   },
   description: "TOEIC頻出の重要単語をAI解説、AI例文で効率よく学べる",
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+    ],
     apple: "/apple-icon.png",
   },
   robots: {
