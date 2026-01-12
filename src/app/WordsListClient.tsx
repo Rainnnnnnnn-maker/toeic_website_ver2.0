@@ -126,6 +126,14 @@ export default function WordsListClient({ importantWords, mediumWords }: Props) 
         <div className={styles.pagination}>
           <button
             className={styles.pageButton}
+            onClick={() => setPage(1)}
+            disabled={currentPage === 1}
+            aria-label="最初のページ"
+          >
+            最初
+          </button>
+          <button
+            className={styles.pageButton}
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={currentPage === 1}
             aria-label="前のページ"
@@ -142,6 +150,14 @@ export default function WordsListClient({ importantWords, mediumWords }: Props) 
             aria-label="次のページ"
           >
             次へ
+          </button>
+          <button
+            className={styles.pageButton}
+            onClick={() => setPage(totalPages)}
+            disabled={currentPage >= totalPages}
+            aria-label="最後のページ"
+          >
+            最後
           </button>
         </div>
       </div>
