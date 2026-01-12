@@ -6,7 +6,9 @@ import { getImportantWords, getMediumWords } from "@/data/words";
 import WordsListClient from "./WordsListClient";
 
 export const metadata: Metadata = {
-  title: "2026年版 TOEIC単語 - 600点 730点 800点レベル",
+  title: {
+    absolute: "TOEIC単語【2026年最新】600点・730点・800点レベル別重要単語集",
+  },
   description:
     "2026年最新版。TOEIC 600点突破に必須の頻出単語から730点 800点レベルの中級単語までを網羅。AIによる詳細な解説と例文で、効率よくスコアアップを目指せます。",
   alternates: {
@@ -39,7 +41,7 @@ export default function Home() {
         <header className={styles.header}>
           <div className={styles.headerContent}>
             <p className={styles.tagline}>LEVEL UP YOUR SCORE</p>
-            <h1 className={styles.title}>2026年版 TOEIC 重要単語集</h1>
+            <h1 className={styles.title}>【2026年最新】TOEIC 重要単語集</h1>
             <p className={styles.subtitle}>
               頻出単語を効率よく学習して、スコアアップを目指しましょう。
             </p>

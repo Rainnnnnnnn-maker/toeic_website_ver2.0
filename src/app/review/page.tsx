@@ -5,7 +5,7 @@ export const metadata = {
   title: "復習モード",
   description: "お気に入り登録した単語を重点的に復習します。",
   alternates: {
-    canonical: "/review",
+    canonical: "https://www.toeic-words.com/review",
   },
 };
 

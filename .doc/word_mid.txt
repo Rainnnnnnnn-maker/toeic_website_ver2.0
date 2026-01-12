@@ -1,6 +1,7 @@
 ability
 abridged
 abundant
+abundance
 acclaimed
 accommodate
 accommodation
@@ -133,6 +134,7 @@ compartment
 compatible
 compete
 competitive
+compensation
 compile
 complaint
 complement
@@ -176,6 +178,7 @@ craftspeople
 crate
 credential
 crew
+criteria
 critical
 crucial
 cuisine
@@ -332,6 +335,7 @@ generally
 generous
 glance
 glove
+gratitude
 guideline
 hallway
 hang
@@ -478,6 +482,7 @@ numerous
 nutritious
 object
 objectionable
+obligation
 observe
 obstruct
 obvious
@@ -503,6 +508,7 @@ outdated
 outgoing
 outlet
 outline
+outreach
 outstanding
 overall
 overcome
@@ -525,7 +531,7 @@ pastry
 patent
 patiently
 patio
-patron
+patronage
 pavement
 paycheck
 payment
@@ -637,6 +643,7 @@ recommendation
 recur
 redeemable
 reduce
+referral
 reflect
 refrain
 refreshment
@@ -645,6 +652,7 @@ regard
 regret
 regularly
 reimburse
+reimbursement
 reject
 related
 relatively

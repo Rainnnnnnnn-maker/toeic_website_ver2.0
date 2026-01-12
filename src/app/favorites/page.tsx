@@ -8,6 +8,9 @@ import ReviewModeButton from "../ReviewModeButton";
 export const metadata: Metadata = {
   title: "お気に入り単語",
   description: "登録したお気に入り単語の一覧",
+  alternates: {
+    canonical: "https://www.toeic-words.com/favorites",
+  },
 };
 
 export default function FavoritesPage() {
