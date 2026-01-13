@@ -139,7 +139,7 @@ export default async function Image({ params }: { params: Promise<{ word: string
             fontWeight: 500,
           }}
         >
-          toeic-words.com
+          www.toeic-words.com
         </div>
       </div>
     ),
