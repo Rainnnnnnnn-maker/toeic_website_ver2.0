@@ -14,12 +14,16 @@ export async function POST(request: Request) {
     return Response.json({ error: "Invalid request body" }, { status: 400 });
   }
 
-  // Guard: Check if the word exists in our whitelist
-  // We check case-insensitive match since the whitelist logic uses slugs
-  const wordEntry = getWordBySlug(body.text.toLowerCase());
-  if (!wordEntry) {
-    return Response.json({ error: "Word not allowed" }, { status: 400 });
+  // Guard: Validate input length instead of whitelist to allow sentences
+  if (body.text.length > 500) {
+    return Response.json({ error: "Text too long" }, { status: 400 });
   }
+
+  // NOTE: We removed the getWordBySlug check to allow sentence synthesis.
+  // const wordEntry = getWordBySlug(body.text.toLowerCase());
+  // if (!wordEntry) {
+  //   return Response.json({ error: "Word not allowed" }, { status: 400 });
+  // }
 
   try {
     const ttsResponse = await fetch(
