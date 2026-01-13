@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import styles from './study.module.css';
 import type { Word } from '@/data/words';
+import { fetchWordDetail } from './actions';
 
 type Props = {
   words: Word[];
@@ -85,6 +86,10 @@ export default function StudyClient({
   const [countdownValue, setCountdownValue] = useState<number | null>(null);
   const [countdownKey, setCountdownKey] = useState(0);
   const countdownTimeoutsRef = useRef<number[]>([]);
+  const [showHintButton, setShowHintButton] = useState(false);
+  const [hintExample, setHintExample] = useState<string | null>(null);
+  const [isFlipped, setIsFlipped] = useState(false);
+  const [isLoadingHint, setIsLoadingHint] = useState(false);
 
   const wordBySlug = useMemo(() => {
     const map = new Map<string, Word>();
@@ -100,6 +105,7 @@ export default function StudyClient({
     }
     countdownTimeoutsRef.current = [];
     setCountdownValue(null);
+    setShowHintButton(false);
   }, []);
 
   const startCountdown = useCallback(() => {
@@ -109,6 +115,10 @@ export default function StudyClient({
     countdownTimeoutsRef.current = [];
 
     setCountdownValue(3);
+    setShowHintButton(false);
+    setHintExample(null);
+    setIsFlipped(false);
+    setIsLoadingHint(false);
     setCountdownKey((k) => k + 1);
 
     const t2 = window.setTimeout(() => {
@@ -125,6 +135,7 @@ export default function StudyClient({
     }, 3000);
     const th = window.setTimeout(() => {
       setCountdownValue(null);
+      setShowHintButton(true);
     }, 3060);
 
     countdownTimeoutsRef.current = [t2, t1, t0, th];
@@ -248,6 +259,50 @@ export default function StudyClient({
     router.push(`/words/${currentWord.slug}`);
   };
 
+  const handleHint = async () => {
+    if (!currentWord) return;
+    
+    setShowHintButton(false);
+    setIsFlipped(true);
+    setIsLoadingHint(true);
+    
+    try {
+      const detail = await fetchWordDetail(currentWord.slug);
+      if (detail && detail.toeicExamples && detail.toeicExamples.length > 0) {
+        setHintExample(detail.toeicExamples[0].english);
+      } else {
+        setHintExample("No example available.");
+      }
+    } catch (e) {
+      console.error(e);
+      setHintExample("Failed to load example.");
+    } finally {
+      setIsLoadingHint(false);
+    }
+  };
+
+  const renderExample = () => {
+    if (!hintExample) return null;
+    if (!currentWord) return <p className={styles.exampleText}>{hintExample}</p>;
+
+    const word = currentWord.term;
+    // Split by the word (case insensitive)
+    const parts = hintExample.split(new RegExp(`(${word})`, 'gi'));
+
+    return (
+      <p className={styles.exampleText}>
+        <span className={styles.sampleLabel}>Sample:</span>
+        {parts.map((part, i) => 
+          part.toLowerCase() === word.toLowerCase() ? (
+            <span key={i} className={styles.highlightedWord}>{part}</span>
+          ) : (
+            <span key={i}>{part}</span>
+          )
+        )}
+      </p>
+    );
+  };
+
   if (!currentWord) {
     return (
       <div className={styles.page}>
@@ -272,14 +327,32 @@ export default function StudyClient({
         </header>
 
         <section className={styles.cardSection}>
-          <div className={styles.wordCard}>
-            <span className={styles.wordText}>{currentWord.term}</span>
+          <div className={`${styles.wordCard} ${isFlipped ? styles.flipped : ''}`}>
+            {!isFlipped ? (
+              <span className={styles.wordText}>{currentWord.term}</span>
+            ) : (
+              <div className={styles.flippedContent}>
+                <span className={styles.wordText}>{currentWord.term}</span>
+                {isLoadingHint ? (
+                  <p className={styles.loadingText}>Loading hint...</p>
+                ) : (
+                  renderExample()
+                )}
+              </div>
+            )}
           </div>
           {countdownValue !== null && (
             <div className={styles.countdownOverlay} aria-hidden="true">
               <div key={countdownKey} className={styles.countdownBubble}>
                 {countdownValue}
               </div>
+            </div>
+          )}
+          {showHintButton && !isFlipped && (
+            <div className={styles.hintOverlay}>
+              <button onClick={handleHint} className={styles.hintButton}>
+                ヒント
+              </button>
             </div>
           )}
         </section>
