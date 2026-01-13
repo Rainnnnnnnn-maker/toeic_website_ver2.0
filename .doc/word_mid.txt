@@ -386,6 +386,7 @@ interact
 intermission
 interrupt
 introductory
+invaluable
 investigate
 invest
 invitation
@@ -626,6 +627,7 @@ prove
 purely
 pursue
 purveyor
+punctual
 qualification
 qualify
 questionnaire
