@@ -240,11 +240,10 @@ export default function StudyClient({
     }
   }, [currentWord, rememberedSlugs, forgottenSlugs, storageKey]);
 
-  // Prefetching is disabled to reduce ISR writes/usage
-  // useEffect(() => {
-  //   if (!currentWord) return;
-  //   router.prefetch(`/words/${currentWord.slug}`);
-  // }, [currentWord, router]);
+  useEffect(() => {
+    if (!currentWord) return;
+    router.prefetch(`/words/${currentWord.slug}`);
+  }, [currentWord, router]);
 
   const handleRemembered = () => {
     if (!currentWord) return;
