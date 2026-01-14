@@ -20,11 +20,11 @@ export default function manifest(): MetadataRoute.Manifest {
         sizes: 'any',
         type: 'image/svg+xml',
       },
-      {
-        src: '/favicon.ico',
-        sizes: 'any',
-        type: 'image/x-icon',
-      },
+      // {
+      //   src: '/favicon.ico',
+      //   sizes: 'any',
+      //   type: 'image/x-icon',
+      // },
       {
         src: '/apple-icon.png',
         sizes: '96x96',
