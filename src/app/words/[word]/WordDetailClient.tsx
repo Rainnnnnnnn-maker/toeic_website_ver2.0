@@ -15,8 +15,8 @@ type Props = {
 type State = {
   audioUrl?: string;
   audioLoading: boolean;
-  sentenceAudioUrls: Record<number, string>;
-  sentenceAudioLoading: number | null;
+  sentenceAudioUrls: Record<string, string>;
+  sentenceAudioLoading: string | null;
 };
 
 export function WordDetailClient({ initialData, linkedWords = {} }: Props) {
@@ -79,14 +79,14 @@ export function WordDetailClient({ initialData, linkedWords = {} }: Props) {
     }
   }
 
-  async function handlePlaySentenceAudio(text: string, index: number) {
-    if (state.sentenceAudioUrls[index]) {
-      const audio = new Audio(state.sentenceAudioUrls[index]);
+  async function handlePlaySentenceAudio(text: string, id: string) {
+    if (state.sentenceAudioUrls[id]) {
+      const audio = new Audio(state.sentenceAudioUrls[id]);
       audio.play();
       return;
     }
 
-    setState((prev) => ({ ...prev, sentenceAudioLoading: index }));
+    setState((prev) => ({ ...prev, sentenceAudioLoading: id }));
 
     try {
       const response = await fetch("/api/tts", {
@@ -111,7 +111,7 @@ export function WordDetailClient({ initialData, linkedWords = {} }: Props) {
 
       setState((prev) => ({
         ...prev,
-        sentenceAudioUrls: { ...prev.sentenceAudioUrls, [index]: audioUrl },
+        sentenceAudioUrls: { ...prev.sentenceAudioUrls, [id]: audioUrl },
         sentenceAudioLoading: null,
       }));
 
@@ -227,8 +227,59 @@ export function WordDetailClient({ initialData, linkedWords = {} }: Props) {
                     {d.grammarPattern && (
                       <p style={{ color: "#6b7280" }}>文型：{d.grammarPattern}</p>
                     )}
-                    <p className={styles.exampleSentence}>{d.example}</p>
-                    <p className={styles.exampleTranslation}>{d.exampleJapanese}</p>
+                    <div style={{ display: "flex", alignItems: "flex-start", gap: "8px" }}>
+                      <p className={styles.exampleSentence} style={{ margin: 0 }}>{d.example}</p>
+                      <button
+                        type="button"
+                        className={styles.audioButton}
+                        onClick={() => handlePlaySentenceAudio(d.example, `meaning-${idx}-detail-${d.number}`)}
+                        disabled={state.sentenceAudioLoading === `meaning-${idx}-detail-${d.number}`}
+                        aria-label="例文を再生"
+                        style={{ marginTop: "4px", flexShrink: 0 }}
+                      >
+                        <span
+                          className={styles.audioIcon}
+                          style={{ width: "22px", height: "22px", fontSize: "14px" }}
+                        >
+                          {state.sentenceAudioLoading === `meaning-${idx}-detail-${d.number}` ? (
+                            <svg
+                              className={styles.spinner}
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              width="14"
+                              height="14"
+                            >
+                              <circle
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                stroke="currentColor"
+                                strokeWidth="4"
+                                style={{ opacity: 0.25 }}
+                              ></circle>
+                              <path
+                                fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                style={{ opacity: 0.75 }}
+                              ></path>
+                            </svg>
+                          ) : (
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              viewBox="0 0 24 24"
+                              fill="currentColor"
+                              width="14"
+                              height="14"
+                            >
+                              <path d="M13.5 4.06c0-1.336-1.616-2.005-2.56-1.06l-4.5 4.5H4.508c-1.141 0-2.318.664-2.66 1.905A9.76 9.76 0 001.5 12c0 .898.121 1.768.35 2.595.341 1.24 1.518 1.905 2.659 1.905h1.93l4.5 4.5c.945.945 2.561.276 2.561-1.06V4.06zM18.584 5.106a.75.75 0 011.06 0c3.808 3.807 3.808 9.98 0 13.788a.75.75 0 11-1.06-1.06 8.25 8.25 0 000-11.668.75.75 0 010-1.06z" />
+                              <path d="M15.932 7.757a.75.75 0 011.061 0 6 6 0 010 8.486.75.75 0 01-1.06-1.061 4.5 4.5 0 000-6.364.75.75 0 010-1.06z" />
+                            </svg>
+                          )}
+                        </span>
+                      </button>
+                    </div>
+                    <p className={styles.exampleTranslation} style={{ marginTop: "4px" }}>{d.exampleJapanese}</p>
                     <p style={{ color: "#6b7280" }}>
                       場面：{d.context}／頻度：{d.frequency}
                     </p>
@@ -307,8 +358,8 @@ export function WordDetailClient({ initialData, linkedWords = {} }: Props) {
                   <button
                     type="button"
                     className={styles.audioButton}
-                    onClick={() => handlePlaySentenceAudio(ex.english, i)}
-                    disabled={state.sentenceAudioLoading === i}
+                    onClick={() => handlePlaySentenceAudio(ex.english, `toeic-${i}`)}
+                    disabled={state.sentenceAudioLoading === `toeic-${i}`}
                     aria-label="例文を再生"
                     style={{ marginTop: "4px", flexShrink: 0 }}
                   >
@@ -316,7 +367,7 @@ export function WordDetailClient({ initialData, linkedWords = {} }: Props) {
                       className={styles.audioIcon}
                       style={{ width: "22px", height: "22px", fontSize: "14px" }}
                     >
-                      {state.sentenceAudioLoading === i ? (
+                      {state.sentenceAudioLoading === `toeic-${i}` ? (
                         <svg
                           className={styles.spinner}
                           xmlns="http://www.w3.org/2000/svg"
