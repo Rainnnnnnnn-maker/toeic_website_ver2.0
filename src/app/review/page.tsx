@@ -9,8 +9,8 @@ export const metadata = {
   },
 };
 
-export default function ReviewPage() {
-  const allWords = getAllWords();
+export default async function ReviewPage() {
+  const allWords = await getAllWords();
 
   return <ReviewWrapper allWords={allWords} />;
 }

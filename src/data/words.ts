@@ -1,71 +1,99 @@
-import fs from "node:fs";
-import path from "node:path";
+import { list } from "@vercel/blob";
+import { unstable_cache } from "next/cache";
 
 export type Word = {
   slug: string;
   term: string;
 };
 
-function loadWordsFromFile(filename: string): Word[] {
-  const filePath = path.join(process.cwd(), ".doc", filename);
-  if (!fs.existsSync(filePath)) {
-    console.warn(`Word file not found: ${filename}`);
-    return [];
-  }
-  const content = fs.readFileSync(filePath, "utf-8");
-  const seen = new Set<string>();
-  const lines = content.split(/\r?\n/);
-  const words: Word[] = [];
-  for (const raw of lines) {
-    const term = raw.trim();
-    if (!term) continue;
-    const slug = term.toLowerCase();
-    if (seen.has(slug)) continue;
-    seen.add(slug);
-    words.push({ slug, term });
-  }
-  return words;
+type WordData = {
+  important: Word[];
+  medium: Word[];
+  allWords: Word[];
+};
+
+// Cached function to fetch and parse words
+const getWordsFromBlob = unstable_cache(
+  async (): Promise<WordData> => {
+    // 1. List files to find the URLs
+    // Note: If you have many files, you might need pagination, but for now we assume simple usage.
+    const { blobs } = await list({ token: process.env.BLOB_READ_WRITE_TOKEN });
+    
+    // 2. Helper to fetch and parse
+    const loadWords = async (filename: string): Promise<Word[]> => {
+      // Find blob ending with filename (to handle potential folders or prefixes)
+      const blob = blobs.find(b => b.pathname.endsWith(filename));
+      if (!blob) {
+        console.warn(`Blob not found for: ${filename}`);
+        return [];
+      }
+      
+      try {
+        const res = await fetch(blob.url);
+        if (!res.ok) {
+            console.warn(`Failed to fetch blob: ${blob.url}`);
+            return [];
+        }
+        const text = await res.text();
+        
+        const seen = new Set<string>();
+        const lines = text.split(/\r?\n/);
+        const words: Word[] = [];
+        
+        for (const raw of lines) {
+            const term = raw.trim();
+            if (!term) continue;
+            const slug = term.toLowerCase();
+            if (seen.has(slug)) continue;
+            seen.add(slug);
+            words.push({ slug, term });
+        }
+        return words;
+      } catch (e) {
+        console.error(`Error loading words from blob ${filename}:`, e);
+        return [];
+      }
+    };
+
+    const [important, medium] = await Promise.all([
+      loadWords("words-file/word.txt"),
+      loadWords("words-file/word_mid.txt")
+    ]);
+
+    const allWordsMap = new Map<string, Word>();
+    [...important, ...medium].forEach(w => {
+        if (!allWordsMap.has(w.slug)) {
+            allWordsMap.set(w.slug, w);
+        }
+    });
+    const allWords = Array.from(allWordsMap.values());
+
+    return {
+        important,
+        medium,
+        allWords,
+    };
+  },
+  ["word-list-blob-v1"], // Cache key
+  { revalidate: 3600 } // Cache for 1 hour
+);
+
+export async function getAllWords(): Promise<Word[]> {
+  const data = await getWordsFromBlob();
+  return data.allWords;
 }
 
-const IMPORTANT_WORDS: Word[] = [];
-const MEDIUM_WORDS: Word[] = [];
-let ALL_WORDS_MAP: Map<string, Word> | null = null;
-let ALL_WORDS: Word[] | null = null;
-
-function ensureWordsLoaded() {
-  if (ALL_WORDS_MAP) return;
-
-  const important = loadWordsFromFile("word.txt");
-  const medium = loadWordsFromFile("word_mid.txt");
-  
-  IMPORTANT_WORDS.push(...important);
-  MEDIUM_WORDS.push(...medium);
-
-  ALL_WORDS_MAP = new Map<string, Word>();
-  [...important, ...medium].forEach(w => {
-    if (!ALL_WORDS_MAP!.has(w.slug)) {
-      ALL_WORDS_MAP!.set(w.slug, w);
-    }
-  });
-  ALL_WORDS = Array.from(ALL_WORDS_MAP.values());
+export async function getImportantWords(): Promise<Word[]> {
+  const data = await getWordsFromBlob();
+  return data.important;
 }
 
-export function getAllWords() {
-  ensureWordsLoaded();
-  return ALL_WORDS!;
+export async function getMediumWords(): Promise<Word[]> {
+  const data = await getWordsFromBlob();
+  return data.medium;
 }
 
-export function getImportantWords() {
-  ensureWordsLoaded();
-  return IMPORTANT_WORDS;
-}
-
-export function getMediumWords() {
-  ensureWordsLoaded();
-  return MEDIUM_WORDS;
-}
-
-export function getWordBySlug(slug: string) {
-  ensureWordsLoaded();
-  return ALL_WORDS_MAP!.get(slug);
+export async function getWordBySlug(slug: string): Promise<Word | undefined> {
+  const data = await getWordsFromBlob();
+  return data.allWords.find(w => w.slug === slug);
 }

@@ -20,8 +20,8 @@ type PageProps = {
   }>;
 };
 
-export function generateStaticParams() {
-  const words = getAllWords();
+export async function generateStaticParams() {
+  const words = await getAllWords();
   
   // すべての単語をビルド時に生成する（SSG）
   // これにより、Bot等のアクセスによるISR Usage（Function実行）を削減できる。
@@ -42,7 +42,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { word: slug } = await params;
   
   // 基本情報の取得（同期・高速）
-  const wordEntry = getWordBySlug(slug);
+  const wordEntry = await getWordBySlug(slug);
   if (!wordEntry) {
     return {
       title: "単語が見つかりません | TOEIC重要単語",
@@ -93,7 +93,7 @@ export default async function WordPage({ params }: PageProps) {
 
   // 存在しない単語の場合は404ページへ遷移
   // __build_placeholder__ はビルド用ダミーパスなので除外
-  if (word !== "__build_placeholder__" && !getWordBySlug(word)) {
+  if (word !== "__build_placeholder__" && !(await getWordBySlug(word))) {
     notFound();
   }
   
@@ -190,8 +190,9 @@ async function WordDetailFetcher({ word }: { word: string }) {
   });
 
   // 存在確認とマッピング
+  const allWords = await getAllWords();
   candidates.forEach(term => {
-    const found = getWordBySlug(term.toLowerCase());
+    const found = allWords.find(w => w.slug === term.toLowerCase());
     if (found) {
       linkedWords[term] = found.slug;
     }

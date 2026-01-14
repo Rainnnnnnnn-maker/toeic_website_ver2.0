@@ -3,7 +3,7 @@ import { getAllWords } from "@/data/words";
 import styles from "../word-detail.module.css";
 
 export default async function WordNavigation({ currentSlug }: { currentSlug: string }) {
-  const allWords = getAllWords();
+  const allWords = await getAllWords();
   const currentIndex = allWords.findIndex((w) => w.slug === currentSlug);
   const prevWord = currentIndex > 0 ? allWords[currentIndex - 1] : null;
   const nextWord = currentIndex >= 0 && currentIndex < allWords.length - 1 ? allWords[currentIndex + 1] : null;

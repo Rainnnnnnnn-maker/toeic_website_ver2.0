@@ -16,9 +16,9 @@ export const metadata: Metadata = {
   },
 };
 
-export default function Home() {
-  const importantWords = getImportantWords();
-  const mediumWords = getMediumWords();
+export default async function Home() {
+  const importantWords = await getImportantWords();
+  const mediumWords =  await getMediumWords();
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -48,10 +48,10 @@ export default function Home() {
           </div>
           <div className={styles.ctaGroup}>
             <Link href="/study" className={styles.ctaButton}>
-              <span className={styles.ctaButtonLabel}>学習モード</span>
+              <span className={styles.ctaButtonLabel}>学習モード開始</span>
             </Link>
             <Link href="/favorites" className={styles.secondaryButton}>
-              <span className={styles.ctaButtonLabel}>お気に入り</span>
+              <span className={styles.ctaButtonLabel}>お気に入り単語</span>
             </Link>
           </div>
         </header>
