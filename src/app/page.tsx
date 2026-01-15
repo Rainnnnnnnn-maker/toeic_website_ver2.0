@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     absolute: "TOEIC重要単語【2026年最新】600点・730点・800点レベル別",
   },
   description:
-    "【2026年最新】TOEIC重要単語・Web単語帳。600点突破に必須の頻出単語から730点・800点レベルの中級単語までを網羅。AIによる詳細な解説と例文で、効率よくスコアアップを目指せます。",
+    "【2026年最新】TOEIC重要単語・Web単語帳。リモートワークやオンライン会議など最新の出題傾向を反映した頻出単語を網羅。AIによる詳細解説と例文で、600点・730点・800点突破を効率よくサポートします。",
   alternates: {
     canonical: "https://www.toeic-words.com/",
   },
@@ -58,6 +58,18 @@ export default async function Home() {
         <WordsListClient importantWords={importantWords} mediumWords={mediumWords} />
         
         <section className={styles.seoSection}>
+          <article className={styles.seoArticle}>
+            <h2 className={styles.seoTitle}>2026年最新のTOEIC出題傾向と単語</h2>
+            <p className={styles.seoText}>
+              近年のTOEIC L&Rテストでは、ビジネス環境の変化に伴い「リモートワーク」「オンライン会議」「チャットツール」に関連する語彙の出題頻度が増加しています。
+              また、従来のオフィスワークだけでなく、ハイブリッドワークや柔軟な働き方を示唆する文脈も増えています。
+            </p>
+            <p className={styles.seoText}>
+              本サイトの「重要単語」リストは、こうした最新のトレンドを踏まえ、スコアアップに直結する頻出語彙を厳選しています。
+              古い単語帳ではカバーしきれない現代的なビジネス英語表現を、AIによる最新の例文とともに学習できます。
+            </p>
+          </article>
+
           <article className={styles.seoArticle}>
             <h2 className={styles.seoTitle}>TOEIC単語の効率的な覚え方</h2>
             <p className={styles.seoText}>
