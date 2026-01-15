@@ -53,3 +53,7 @@ debug.log
 
 #word doc
 src/app/__doc__/*
+
+#trae doc
+.trae/*
+!.trae/技術ドキュメント.md
