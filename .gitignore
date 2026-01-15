@@ -50,3 +50,6 @@ __tests__/
 
 #debug log
 debug.log
+
+#word doc
+src/app/__doc__/*
