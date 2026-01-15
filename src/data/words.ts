@@ -1,3 +1,4 @@
+import "server-only";
 import { list } from "@vercel/blob";
 import { unstable_cache } from "next/cache";
 
