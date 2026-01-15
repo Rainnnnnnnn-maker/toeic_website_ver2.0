@@ -75,7 +75,7 @@ const getWordsFromBlob = unstable_cache(
     };
   },
   ["word-list-blob-v1"], // Cache key
-  { revalidate: 3600 } // Cache for 1 hour
+  { revalidate: 10800 } // Cache for 3 hours
 );
 
 export async function getAllWords(): Promise<Word[]> {
