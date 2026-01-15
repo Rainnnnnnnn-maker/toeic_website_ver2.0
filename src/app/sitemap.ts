@@ -3,7 +3,7 @@ import { getAllWords } from "@/data/words";
 
 const BASE_URL = "https://www.toeic-words.com";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const lastModified = new Date();
 
   const staticRoutes: MetadataRoute.Sitemap = [
@@ -21,7 +21,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
-  const wordRoutes: MetadataRoute.Sitemap = getAllWords().map((w) => ({
+  const allWords = await getAllWords();
+  const wordRoutes: MetadataRoute.Sitemap = allWords.map((w) => ({
     url: `${BASE_URL}/words/${w.slug}`,
     lastModified,
     changeFrequency: "yearly",

@@ -13,8 +13,8 @@ export const metadata: Metadata = {
   },
 };
 
-export default function FavoritesPage() {
-  const allWords = getAllWords();
+export default async function FavoritesPage() {
+  const allWords = await getAllWords();
 
   return (
     <div className={styles.page}>

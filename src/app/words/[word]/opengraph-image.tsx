@@ -14,7 +14,7 @@ export const contentType = "image/png";
 
 export default async function Image({ params }: { params: Promise<{ word: string }> }) {
   const { word } = await params;
-  const wordEntry = getWordBySlug(word);
+  const wordEntry = await getWordBySlug(word);
   
   // If word doesn't exist, return default image (or handle error)
   if (!wordEntry) {

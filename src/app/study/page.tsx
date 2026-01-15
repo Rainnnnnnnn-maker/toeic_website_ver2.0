@@ -9,8 +9,8 @@ export const metadata = {
 	},
 };
 
-export default function StudyPage() {
-  const words = getAllWords();
+export default async function StudyPage() {
+  const words = await getAllWords();
 
   return <StudyClient words={words} />;
 }

@@ -245,7 +245,7 @@ async function fetchWordDetailFromGemini(term: string): Promise<WordDetails> {
 
 // Internal function to fetch data (Redis -> Gemini -> Redis)
 async function getWordDetailInternal(slug: string): Promise<WordDetails | null> {
-  const entry = getWordBySlug(slug);
+  const entry = await getWordBySlug(slug);
   if (!entry) return null;
 
   // 1. Try Upstash Redis first (L2 Cache)
