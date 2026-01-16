@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import styles from "../page.module.css";
+import styles from "../../../app/page.module.css";
 import { useFavorites } from "@/context/FavoritesContext";
 import type { Word } from "@/data/words";
 

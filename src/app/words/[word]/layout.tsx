@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import styles from "./word-detail.module.css";
-import WordNavigation from "./components/WordNavigation";
+import styles from "@/components/features/words/word-detail.module.css";
+import WordNavigation from "@/components/features/words/WordNavigation";
 
 export default async function WordLayout({
   children,

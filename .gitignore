@@ -52,7 +52,7 @@ __tests__/
 debug.log
 
 #word doc
-src/app/__doc__/*
+__doc__/*
 
 #trae doc
 .trae/*

@@ -1,4 +1,4 @@
-import styles from "./word-detail.module.css";
+import styles from "@/components/features/words/word-detail.module.css";
 
 export default function Loading() {
   return (

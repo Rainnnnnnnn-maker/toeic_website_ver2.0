@@ -1,5 +1,5 @@
 import { getAllWords } from "@/data/words";
-import StudyClient from "./StudyClient";
+import StudyClient from "@/components/features/study/StudyClient";
 import Script from "next/script";
 
 export const metadata = {

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getAllWords } from "@/data/words";
-import styles from "../word-detail.module.css";
+import styles from "./word-detail.module.css";
 
 export default async function WordNavigation({ currentSlug }: { currentSlug: string }) {
   const allWords = await getAllWords();

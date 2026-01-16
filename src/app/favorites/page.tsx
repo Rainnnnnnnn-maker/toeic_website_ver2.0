@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { getAllWords } from "@/data/words";
-import FavoritesListClient from "./FavoritesListClient";
+import FavoritesListClient from "@/components/features/favorites/FavoritesListClient";
 import styles from "../page.module.css";
 import type { Metadata } from "next";
-import ReviewModeButton from "../ReviewModeButton";
+import ReviewModeButton from "@/components/features/review/ReviewModeButton";
 import Script from "next/script";
 
 export const metadata: Metadata = {

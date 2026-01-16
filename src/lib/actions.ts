@@ -281,7 +281,7 @@ async function getWordDetailInternal(slug: string): Promise<WordDetails | null> 
 export async function getWordDetail(slug: string) {
   "use cache";
   cacheTag("word-detail");
-  cacheLife("max");
+  cacheLife("weeks");
 
   return getWordDetailInternal(slug);
 }

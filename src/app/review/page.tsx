@@ -1,5 +1,5 @@
 import { getAllWords } from "@/data/words";
-import ReviewWrapper from "./ReviewWrapper";
+import ReviewWrapper from "@/components/features/review/ReviewWrapper";
 
 export const metadata = {
   title: "復習モード",

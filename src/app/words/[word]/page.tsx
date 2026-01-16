@@ -6,11 +6,11 @@ import dynamic from "next/dynamic";
 import { Metadata } from "next";
 import { getWordBySlug, getAllWords } from "@/data/words";
 import { getWordDetail, type WordDetails } from "@/lib/actions";
-import styles from "./word-detail.module.css";
+import styles from "@/components/features/words/word-detail.module.css";
 import Loading from "./loading";
 
 const WordDetailClient = dynamic(
-  () => import("./WordDetailClient").then((m) => m.WordDetailClient),
+  () => import("@/components/features/words/WordDetailClient").then((m) => m.WordDetailClient),
   { ssr: true } // Client ComponentでもSSR有効化
 );
 

@@ -3,7 +3,7 @@ import Script from "next/script";
 import type { Metadata } from "next";
 import styles from "./page.module.css";
 import { getImportantWords, getMediumWords } from "@/data/words";
-import WordsListClient from "./WordsListClient";
+import WordsListClient from "@/components/features/words/WordsListClient";
 
 export const metadata: Metadata = {
   title: {

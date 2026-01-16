@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import styles from './study.module.css';
 import type { Word } from '@/data/words';
-import { fetchWordDetail } from './actions';
+import { fetchWordDetail } from '../../../app/study/actions';
 
 type Props = {
   words: Word[];
