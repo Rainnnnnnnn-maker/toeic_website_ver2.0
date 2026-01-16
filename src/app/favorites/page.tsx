@@ -4,6 +4,7 @@ import FavoritesListClient from "./FavoritesListClient";
 import styles from "../page.module.css";
 import type { Metadata } from "next";
 import ReviewModeButton from "../ReviewModeButton";
+import Script from "next/script";
 
 export const metadata: Metadata = {
   title: "お気に入り単語",
@@ -16,8 +17,32 @@ export const metadata: Metadata = {
 export default async function FavoritesPage() {
   const allWords = await getAllWords();
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "TOP",
+        "item": "https://www.toeic-words.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "お気に入り単語",
+        "item": "https://www.toeic-words.com/favorites"
+      }
+    ]
+  };
+
   return (
     <div className={styles.page}>
+      <Script
+        id="json-ld-breadcrumb"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <main className={styles.main}>
         <header className={styles.header}>
           <div className={styles.headerContent}>

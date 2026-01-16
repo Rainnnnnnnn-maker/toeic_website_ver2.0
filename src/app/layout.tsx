@@ -71,14 +71,6 @@ export const viewport: Viewport = {
 	initialScale: 1,
 };
 
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  name: "TOEIC重要単語",
-  alternateName: ["TOEIC重要単語集", "toeic-words.com"],
-  url: "https://www.toeic-words.com",
-};
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -87,10 +79,6 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
         <FavoritesProvider>{children}</FavoritesProvider>
         <Analytics />
         <SpeedInsights />

@@ -1,5 +1,6 @@
 import { getAllWords } from "@/data/words";
 import StudyClient from "./StudyClient";
+import Script from "next/script";
 
 export const metadata = {
 	title: "Webで使えるTOEIC単語帳 | 英単語学習モード",
@@ -12,5 +13,33 @@ export const metadata = {
 export default async function StudyPage() {
   const words = await getAllWords();
 
-  return <StudyClient words={words} />;
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "TOP",
+        "item": "https://www.toeic-words.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "学習モード",
+        "item": "https://www.toeic-words.com/study"
+      }
+    ]
+  };
+
+  return (
+    <>
+      <Script
+        id="json-ld-breadcrumb"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <StudyClient words={words} />
+    </>
+  );
 }
