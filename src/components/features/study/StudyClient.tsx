@@ -91,17 +91,18 @@ const AutoResizingText = ({ text, className, style }: { text: string, className?
     // If parent is not available or has 0 width (hidden), skip
     if (!parent || parent.clientWidth === 0) return;
 
-    // Reset font size
-    el.style.fontSize = '';
+    // Force styles to allow accurate measurement of natural width
+    // We override class styles that might constrain width or show ellipsis
+    el.style.maxWidth = 'none';
+    el.style.overflow = 'visible';
+    el.style.textOverflow = 'clip';
     el.style.whiteSpace = 'nowrap';
     
     let size = 48; // default from css
+    el.style.fontSize = `${size}px`;
     
     // Let's use a safe margin.
     const maxWidth = parent.clientWidth - 10; 
-    
-    // Apply initial size
-    el.style.fontSize = `${size}px`;
 
     while (el.scrollWidth > maxWidth && size > 16) {
       size -= 2;
@@ -112,6 +113,10 @@ const AutoResizingText = ({ text, className, style }: { text: string, className?
     if (el.scrollWidth > maxWidth) {
        el.style.whiteSpace = 'normal';
        el.style.wordBreak = 'break-word';
+       el.style.maxWidth = '100%';
+    } else {
+       // Fits! Ensure no ellipsis by keeping overflow visible, but constrain width just in case.
+       el.style.maxWidth = '100%';
     }
   }, [text]);
 
