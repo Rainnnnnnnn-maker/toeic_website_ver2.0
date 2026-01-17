@@ -71,6 +71,63 @@ function removeValue(values: string[], value: string): string[] {
   return values.filter((v) => v !== value);
 }
 
+// Helper for audio
+const playAudio = (text: string) => {
+  if (typeof window === 'undefined' || !window.speechSynthesis) return;
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = 'en-US'; // Default to English US
+  window.speechSynthesis.speak(utterance);
+};
+
+// AutoResizingText Component
+const AutoResizingText = ({ text, className, style }: { text: string, className?: string, style?: React.CSSProperties }) => {
+  const ref = useRef<HTMLSpanElement>(null);
+  
+  const adjustSize = useCallback(() => {
+    const el = ref.current;
+    if (!el) return;
+    
+    const parent = el.parentElement;
+    // If parent is not available or has 0 width (hidden), skip
+    if (!parent || parent.clientWidth === 0) return;
+
+    // Reset font size
+    el.style.fontSize = '';
+    el.style.whiteSpace = 'nowrap';
+    
+    let size = 48; // default from css
+    
+    // Let's use a safe margin.
+    const maxWidth = parent.clientWidth - 10; 
+    
+    // Apply initial size
+    el.style.fontSize = `${size}px`;
+
+    while (el.scrollWidth > maxWidth && size > 16) {
+      size -= 2;
+      el.style.fontSize = `${size}px`;
+    }
+    
+    // If still overflowing, allow wrap
+    if (el.scrollWidth > maxWidth) {
+       el.style.whiteSpace = 'normal';
+       el.style.wordBreak = 'break-word';
+    }
+  }, [text]);
+
+  useEffect(() => {
+    adjustSize();
+  }, [adjustSize]);
+
+  useEffect(() => {
+    const handleResize = () => adjustSize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [adjustSize]);
+
+  return <span ref={ref} className={className} style={style}>{text}</span>;
+};
+
 export default function StudyClient({ 
   words, 
   storageKey = DEFAULT_STORAGE_KEY,
@@ -114,31 +171,28 @@ export default function StudyClient({
     }
     countdownTimeoutsRef.current = [];
 
-    setCountdownValue(3);
+    // Count down from 2
+    setCountdownValue(2);
     setShowHintButton(false);
     setHintExample(null);
     setIsFlipped(false);
     setIsLoadingHint(false);
     setCountdownKey((k) => k + 1);
 
-    const t2 = window.setTimeout(() => {
-      setCountdownValue(2);
-      setCountdownKey((k) => k + 1);
-    }, 1000);
     const t1 = window.setTimeout(() => {
       setCountdownValue(1);
       setCountdownKey((k) => k + 1);
-    }, 2000);
+    }, 1000);
     const t0 = window.setTimeout(() => {
       setCountdownValue(0);
       setCountdownKey((k) => k + 1);
-    }, 3000);
+    }, 2000);
     const th = window.setTimeout(() => {
       setCountdownValue(null);
       setShowHintButton(true);
-    }, 3060);
+    }, 2060); // 2s + 60ms
 
-    countdownTimeoutsRef.current = [t2, t1, t0, th];
+    countdownTimeoutsRef.current = [t1, t0, th];
   }, []);
 
   const pickRandomWord = useCallback(() => {
@@ -283,23 +337,45 @@ export default function StudyClient({
 
   const renderExample = () => {
     if (!hintExample) return null;
-    if (!currentWord) return <p className={styles.exampleText}>{hintExample}</p>;
+    
+    const renderContent = () => {
+      if (!currentWord) return <p className={styles.exampleText}>{hintExample}</p>;
 
-    const word = currentWord.term;
-    // Split by the word (case insensitive)
-    const parts = hintExample.split(new RegExp(`(${word})`, 'gi'));
+      const word = currentWord.term;
+      // Split by the word (case insensitive)
+      const parts = hintExample.split(new RegExp(`(${word})`, 'gi'));
+
+      return (
+        <p className={styles.exampleText}>
+          <span className={styles.sampleLabel}>Sample:</span>
+          {parts.map((part, i) => 
+            part.toLowerCase() === word.toLowerCase() ? (
+              <span key={i} className={styles.highlightedWord}>{part}</span>
+            ) : (
+              <span key={i}>{part}</span>
+            )
+          )}
+          <button 
+            className={styles.audioButton} 
+            onClick={() => playAudio(hintExample)}
+            aria-label="Play sample audio"
+            style={{ marginLeft: '8px', verticalAlign: 'middle' }}
+          >
+            <span className={styles.audioIcon}>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
+                <path d="M13.5 4.06c0-1.336-1.616-2.005-2.56-1.06l-4.5 4.5H4.508c-1.141 0-2.318.664-2.66 1.905A9.76 9.76 0 001.5 12c0 .898.121 1.768.35 2.595.341 1.24 1.518 1.905 2.659 1.905h1.93l4.5 4.5c.945.945 2.561.276 2.561-1.06V4.06zM18.584 5.106a.75.75 0 011.06 0c3.808 3.807 3.808 9.98 0 13.788a.75.75 0 11-1.06-1.06 8.25 8.25 0 000-11.668.75.75 0 010-1.06z" />
+                <path d="M15.932 7.757a.75.75 0 011.061 0 6 6 0 010 8.486.75.75 0 01-1.06-1.061 4.5 4.5 0 000-6.364.75.75 0 010-1.06z" />
+              </svg>
+            </span>
+          </button>
+        </p>
+      );
+    };
 
     return (
-      <p className={styles.exampleText}>
-        <span className={styles.sampleLabel}>Sample:</span>
-        {parts.map((part, i) => 
-          part.toLowerCase() === word.toLowerCase() ? (
-            <span key={i} className={styles.highlightedWord}>{part}</span>
-          ) : (
-            <span key={i}>{part}</span>
-          )
-        )}
-      </p>
+      <div className={styles.exampleContainer}>
+        {renderContent()}
+      </div>
     );
   };
 
@@ -329,12 +405,33 @@ export default function StudyClient({
         <section className={styles.cardSection}>
           <div className={`${styles.wordCard} ${isFlipped ? styles.flipped : ''}`}>
             {!isFlipped ? (
-              <span className={styles.wordText}>{currentWord.term}</span>
+              <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+                <AutoResizingText text={currentWord.term} className={styles.wordText} />
+              </div>
             ) : (
               <div className={styles.flippedContent}>
-                <span className={styles.wordText}>{currentWord.term}</span>
+                <div className={styles.wordRow}>
+                  <div style={{ minWidth: 0, display: 'flex', justifyContent: 'center' }}>
+                    <AutoResizingText text={currentWord.term} className={styles.wordText} style={{ marginBottom: 0 }} />
+                  </div>
+                  <button 
+                    className={styles.audioButton} 
+                    onClick={() => playAudio(currentWord.term)}
+                    aria-label="Play word audio"
+                  >
+                    <span className={styles.audioIcon}>
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
+                        <path d="M13.5 4.06c0-1.336-1.616-2.005-2.56-1.06l-4.5 4.5H4.508c-1.141 0-2.318.664-2.66 1.905A9.76 9.76 0 001.5 12c0 .898.121 1.768.35 2.595.341 1.24 1.518 1.905 2.659 1.905h1.93l4.5 4.5c.945.945 2.561.276 2.561-1.06V4.06zM18.584 5.106a.75.75 0 011.06 0c3.808 3.807 3.808 9.98 0 13.788a.75.75 0 11-1.06-1.06 8.25 8.25 0 000-11.668.75.75 0 010-1.06z" />
+                        <path d="M15.932 7.757a.75.75 0 011.061 0 6 6 0 010 8.486.75.75 0 01-1.06-1.061 4.5 4.5 0 000-6.364.75.75 0 010-1.06z" />
+                      </svg>
+                    </span>
+                  </button>
+                </div>
                 {isLoadingHint ? (
-                  <p className={styles.loadingText}>Loading hint...</p>
+                  <div className={styles.exampleContainer}>
+                    <div className={`${styles.skeleton} ${styles.skeletonText}`} />
+                    <div className={`${styles.skeleton} ${styles.skeletonText} ${styles.skeletonTextShort}`} />
+                  </div>
                 ) : (
                   renderExample()
                 )}

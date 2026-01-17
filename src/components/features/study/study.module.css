@@ -148,6 +148,10 @@
   color: #111827;
   text-align: center;
   margin-bottom: 12px;
+  white-space: nowrap; /* Prevent wrapping initially for auto-resize calculation */
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .controls {
@@ -275,6 +279,14 @@
   }
 }
 
+.exampleContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+}
+
 .exampleText {
   font-size: 20px;
   color: #374151;
@@ -284,11 +296,15 @@
   max-width: 90%;
 }
 
+.sampleHeader {
+  display: none;
+}
+
 .sampleLabel {
   color: #059669; /* emerald-600 to match nice green */
   font-weight: 800;
-  margin-right: 8px;
   font-size: 1.1em;
+  margin-right: 8px;
 }
 
 .highlightedWord {
@@ -307,8 +323,96 @@
   color: #9ca3af;
 }
 
+.wordRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 100%;
+}
+
+.audioButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  vertical-align: middle;
+}
+
+.audioButton:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .audioButton:not(:disabled):hover .audioIcon {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.audioIcon {
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.06);
+  color: #5780d8;
+  font-size: 18px;
+  line-height: 1;
+  transition: transform 0.16s ease, box-shadow 0.16s ease;
+}
+
 @media (max-width: 480px) {
   .hintOverlay {
     padding: 10px;
   }
+}
+
+/* Skeleton Loading */
+.skeleton {
+  background-color: #f3f4f6;
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0,
+    rgba(255, 255, 255, 0.2) 20%,
+    rgba(255, 255, 255, 0.5) 60%,
+    rgba(255, 255, 255, 0)
+  );
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.skeletonText {
+  height: 20px;
+  width: 80%;
+  margin: 0 auto 8px;
+}
+
+.skeletonTextShort {
+  width: 60%;
 }
