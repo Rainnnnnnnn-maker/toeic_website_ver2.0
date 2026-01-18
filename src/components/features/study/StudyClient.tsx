@@ -232,6 +232,12 @@ export default function StudyClient({
     if (typeof window === 'undefined') return;
 
     const onPageShow = (event: PageTransitionEvent) => {
+      // 戻るボタンでの遷移時、もし既にヒントボタンが表示されている(showHintButton=true)か、
+      // カードが裏返っている(isFlipped=true)場合は、状態をリセットしない。
+      // これにより、BFCacheで復元された場合でもヒントボタンの状態を維持する。
+      if (showHintButton || isFlipped) {
+        return;
+      }
       if (event.persisted || getNavigationType() === 'back_forward') {
         clearCountdown();
       }
@@ -240,9 +246,9 @@ export default function StudyClient({
     window.addEventListener('pageshow', onPageShow);
     return () => {
       window.removeEventListener('pageshow', onPageShow);
-      clearCountdown();
+      // clearCountdown(); // コンポーネントのアンマウント時にクリアすると戻るボタンで戻った時に消えてしまうため削除
     };
-  }, [clearCountdown]);
+  }, [clearCountdown, showHintButton, isFlipped]);
 
   useEffect(() => {
     if (initializedRef.current) return;
@@ -273,6 +279,7 @@ export default function StudyClient({
               setCurrentWord(word);
               setRememberedSlugs(uniqueStrings(persisted.rememberedSlugs));
               setForgottenSlugs(uniqueStrings(persisted.forgottenSlugs));
+              setShowHintButton(true);
               return;
             }
           }
