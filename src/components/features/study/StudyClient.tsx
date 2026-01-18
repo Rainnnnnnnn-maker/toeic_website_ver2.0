@@ -3,6 +3,8 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { Star } from 'lucide-react';
+import { useFavorites } from '@/context/FavoritesContext';
 import styles from './study.module.css';
 import type { Word } from '@/data/words';
 import { fetchWordDetail } from '../../../app/study/actions';
@@ -141,6 +143,7 @@ export default function StudyClient({
   backLinkText = DEFAULT_BACK_LINK_TEXT
 }: Props) {
   const router = useRouter();
+  const { isFavorite, toggleFavorite } = useFavorites();
   const [currentWord, setCurrentWord] = useState<Word | null>(null);
   const [rememberedSlugs, setRememberedSlugs] = useState<string[]>([]);
   const [forgottenSlugs, setForgottenSlugs] = useState<string[]>([]);
@@ -454,6 +457,34 @@ export default function StudyClient({
             <div className={styles.hintOverlay}>
               <button onClick={handleHint} className={styles.hintButton}>
                 ヒント
+              </button>
+            </div>
+          )}
+          {isFlipped && (
+            <div className={styles.favoriteOverlay}>
+              <button
+                onClick={() => currentWord && toggleFavorite(currentWord.slug)}
+                className={styles.favoriteButton}
+                aria-label={
+                  currentWord && isFavorite(currentWord.slug)
+                    ? 'お気に入りから削除'
+                    : 'お気に入りに追加'
+                }
+              >
+                <Star
+                  size={24}
+                  fill={
+                    currentWord && isFavorite(currentWord.slug)
+                      ? '#FFC107'
+                      : 'none'
+                  }
+                  color={
+                    currentWord && isFavorite(currentWord.slug)
+                      ? '#FFC107'
+                      : '#94a3b8'
+                  }
+                  strokeWidth={2}
+                />
               </button>
             </div>
           )}
