@@ -77,7 +77,7 @@ export default function FavoritesListClient({ allWords }: { allWords: Word[] }) 
         {current.map((word) => (
           <Link
             key={word.slug}
-            href={`/words/${word.slug}`}
+            href={`/words/${word.slug}?from=favorites`}
             className={styles.wordCard}
           >
             <span className={styles.wordText}>{word.term}</span>
