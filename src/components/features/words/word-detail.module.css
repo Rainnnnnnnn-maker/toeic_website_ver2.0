@@ -404,7 +404,7 @@
 }
 
 .skeleton {
-  background: #f3f4f6;
+  background: #e0f2fe;
   border-radius: 8px;
   position: relative;
   overflow: hidden;
@@ -475,7 +475,7 @@
   position: relative;
   overflow: hidden;
   border-radius: 999px;
-  background: #e5e7eb;
+  background: #bae6fd;
 }
 
 .wordSkeleton {
