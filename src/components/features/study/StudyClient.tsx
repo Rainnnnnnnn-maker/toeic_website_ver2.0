@@ -7,7 +7,7 @@ import { Star } from 'lucide-react';
 import { useFavorites } from '@/context/FavoritesContext';
 import styles from './study.module.css';
 import type { Word } from '@/data/words';
-import { fetchWordDetail } from '../../../app/study/actions';
+import { fetchWordDetail } from '@/app/study/actions';
 
 type Props = {
   words: Word[];

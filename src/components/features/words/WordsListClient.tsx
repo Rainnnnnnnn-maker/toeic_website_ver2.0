@@ -2,7 +2,7 @@
 import { useMemo, useState, useRef } from "react";
 import type { ChangeEvent } from "react";
 import Link from "next/link";
-import styles from "../../../app/page.module.css";
+import styles from "@/app/page.module.css";
 import type { Word } from "@/data/words";
 import TabNavigation, { TabId } from "@/components/TabNavigation";
 

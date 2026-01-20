@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getAllWords } from "@/data/words";
 import FavoritesListClient from "@/components/features/favorites/FavoritesListClient";
-import styles from "../page.module.css";
+import styles from "@/app/page.module.css";
 import type { Metadata } from "next";
 import ReviewModeButton from "@/components/features/review/ReviewModeButton";
 import Script from "next/script";

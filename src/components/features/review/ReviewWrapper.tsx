@@ -3,9 +3,9 @@
 import { useMemo } from "react";
 import Link from "next/link";
 import { useFavorites } from "@/context/FavoritesContext";
-import StudyClient from "../study/StudyClient";
+import StudyClient from "@/components/features/study/StudyClient";
 import type { Word } from "@/data/words";
-import styles from "../study/study.module.css"; // Reuse study styles
+import styles from "@/components/features/study/study.module.css"; // Reuse study styles
 
 type Props = {
   allWords: Word[];

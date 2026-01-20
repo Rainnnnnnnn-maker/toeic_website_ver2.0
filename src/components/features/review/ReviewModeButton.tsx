@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useFavorites } from "@/context/FavoritesContext";
-import styles from "../../../app/page.module.css";
+import styles from "@/app/page.module.css";
 
 export default function ReviewModeButton() {
   const { favorites } = useFavorites();
