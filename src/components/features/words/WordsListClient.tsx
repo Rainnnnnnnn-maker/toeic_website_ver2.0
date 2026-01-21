@@ -1,6 +1,6 @@
  'use client';
 import { useMemo, useState, useRef } from "react";
-import type { ChangeEvent } from "react";
+import type { ChangeEvent, KeyboardEvent } from "react";
 import Link from "next/link";
 import styles from "@/app/page.module.css";
 import type { Word } from "@/data/words";
@@ -34,6 +34,12 @@ export default function WordsListClient({ importantWords, mediumWords }: Props) 
     const nextQuery = e.target.value;
     setQuery(nextQuery);
     setPage(1);
+  };
+
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Escape') {
+      handleClear();
+    }
   };
 
   const handleClear = () => {
@@ -94,6 +100,7 @@ export default function WordsListClient({ importantWords, mediumWords }: Props) 
             ref={inputRef}
             value={query}
             onChange={handleQueryChange}
+            onKeyDown={handleKeyDown}
             className={styles.searchInput}
             placeholder="全単語から検索..."
             aria-label="単語検索"
