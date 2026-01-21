@@ -370,6 +370,13 @@
   align-items: center;
   margin-top: 8px;
   flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+@media (min-width: 640px) {
+  .ctaGroup {
+    justify-content: flex-start;
+  }
 }
 
 .secondaryButton {
