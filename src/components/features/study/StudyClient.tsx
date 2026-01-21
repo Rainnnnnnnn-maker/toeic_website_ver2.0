@@ -156,6 +156,9 @@ export default function StudyClient({
   const [isFlipped, setIsFlipped] = useState(false);
   const [isLoadingHint, setIsLoadingHint] = useState(false);
 
+  const mediumWords = useMemo(() => words.filter(w => w.level === 'medium'), [words]);
+  const importantWords = useMemo(() => words.filter(w => w.level === 'important'), [words]);
+
   const wordBySlug = useMemo(() => {
     const map = new Map<string, Word>();
     for (const w of words) {
@@ -210,13 +213,19 @@ export default function StudyClient({
       startCountdown();
     }
 
-    let nextWord;
+    let nextWord: Word;
     let safetyCounter = 0;
     
     // 現在の単語と同じ場合は再抽選する（リストが2つ以上ある場合のみ）
     do {
-      const randomIndex = Math.floor(Math.random() * words.length);
-      nextWord = words[randomIndex];
+      let pool = words;
+      // 重み付け: medium(80%), important(20%)
+      if (mediumWords.length > 0 && importantWords.length > 0) {
+        pool = Math.random() < 0.8 ? mediumWords : importantWords;
+      }
+
+      const randomIndex = Math.floor(Math.random() * pool.length);
+      nextWord = pool[randomIndex];
       safetyCounter++;
     } while (
       words.length > 1 && 
@@ -226,7 +235,7 @@ export default function StudyClient({
     );
 
     setCurrentWord(nextWord);
-  }, [startCountdown, words, currentWord]);
+  }, [startCountdown, words, currentWord, mediumWords, importantWords]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;

@@ -7,6 +7,7 @@ import path from "node:path";
 export type Word = {
   slug: string;
   term: string;
+  level: 'important' | 'medium';
 };
 
 type WordData = {
@@ -15,7 +16,7 @@ type WordData = {
   allWords: Word[];
 };
 
-function parseWords(text: string): Word[] {
+function parseWords(text: string, level: 'important' | 'medium'): Word[] {
   const seen = new Set<string>();
   const lines = text.split(/\r?\n/);
   const words: Word[] = [];
@@ -26,7 +27,7 @@ function parseWords(text: string): Word[] {
     const slug = term.toLowerCase();
     if (seen.has(slug)) continue;
     seen.add(slug);
-    words.push({ slug, term });
+    words.push({ slug, term, level });
   }
   return words;
 }
@@ -48,18 +49,18 @@ function buildWordData(important: Word[], medium: Word[]): WordData {
 }
 
 async function getWordsLocal(): Promise<WordData> {
-  const loadWords = (filename: string): Word[] => {
+  const loadWords = (filename: string, level: 'important' | 'medium'): Word[] => {
     const filePath = path.join(process.cwd(), "__doc__", filename);
     if (!fs.existsSync(filePath)) {
       console.warn(`Local word file not found: ${filePath}`);
       return [];
     }
     const text = fs.readFileSync(filePath, "utf-8");
-    return parseWords(text);
+    return parseWords(text, level);
   };
 
-  const important = loadWords("word.txt");
-  const medium = loadWords("word_mid.txt");
+  const important = loadWords("word.txt", "important");
+  const medium = loadWords("word_mid.txt", "medium");
 
   return buildWordData(important, medium);
 }
@@ -67,7 +68,7 @@ async function getWordsLocal(): Promise<WordData> {
 async function getWordsBlob(): Promise<WordData> {
   const { blobs } = await list({ token: process.env.BLOB_READ_WRITE_TOKEN });
 
-  const loadWords = async (filename: string): Promise<Word[]> => {
+  const loadWords = async (filename: string, level: 'important' | 'medium'): Promise<Word[]> => {
     // Find blob ending with filename (to handle potential folders or prefixes)
     const blob = blobs.find(b => b.pathname.endsWith(filename));
     if (!blob) {
@@ -82,7 +83,7 @@ async function getWordsBlob(): Promise<WordData> {
         return [];
       }
       const text = await res.text();
-      return parseWords(text);
+      return parseWords(text, level);
     } catch (e) {
       console.error(`Error loading words from blob ${filename}:`, e);
       return [];
@@ -90,8 +91,8 @@ async function getWordsBlob(): Promise<WordData> {
   };
 
   const [important, medium] = await Promise.all([
-    loadWords("words-file/word.txt"),
-    loadWords("words-file/word_mid.txt")
+    loadWords("words-file/word.txt", "important"),
+    loadWords("words-file/word_mid.txt", "medium")
   ]);
 
   return buildWordData(important, medium);
