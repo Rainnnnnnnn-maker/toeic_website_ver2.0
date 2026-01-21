@@ -39,7 +39,7 @@ A comprehensive web application for learning essential TOEIC vocabulary, featuri
 
 1.  **Clone the repository**
     ```bash
-    git clone <repository-url>
+    git clone https://github.com/Rainnnnnnnn-maker/toeic_website_ver2.0.git
     cd toeic_website_ver2.0
     ```
 
