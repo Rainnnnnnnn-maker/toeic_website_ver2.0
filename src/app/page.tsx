@@ -25,7 +25,7 @@ export default async function Home() {
     "@type": "WebSite",
     name: "TOEIC重要単語",
     description: "TOEIC頻出の重要単語をAI解説、AI例文で効率よく学べる",
-    alternateName: ["TOEIC重要単語集", "TOEIC Words", "TOEIC単語帳"],
+    alternateName: ["TOEIC重要単語", "TOEIC Words", "TOEIC単語帳"],
     url: "https://www.toeic-words.com/",
     inLanguage: "ja-JP",
   };

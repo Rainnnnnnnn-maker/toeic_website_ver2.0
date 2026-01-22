@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.toeic-words.com"),
-  applicationName: "TOEIC重要単語集",
+  applicationName: "TOEIC重要単語",
   title: {
     default: "TOEIC重要単語",
     template: "%s | TOEIC重要単語",
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
     title: "TOEIC重要単語",
     description: "TOEIC頻出の重要単語をAI解説、AI例文で効率よく学べる",
     url: "https://www.toeic-words.com",
-    siteName: "TOEIC重要単語集",
+    siteName: "TOEIC重要単語",
     locale: "ja_JP",
     type: "website",
     images: [
