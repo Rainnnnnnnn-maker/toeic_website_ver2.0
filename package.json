@@ -29,5 +29,8 @@
     "eslint-config-next": "^16.1.0",
     "typescript": "^5",
     "vitest": "^4.0.15"
+  },
+  "overrides": {
+    "undici": "^6.23.0"
   }
 }
