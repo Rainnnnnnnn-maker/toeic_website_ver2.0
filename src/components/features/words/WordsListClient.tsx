@@ -6,8 +6,6 @@ import styles from "@/app/page.module.css";
 import type { Word } from "@/data/words";
 import TabNavigation, { TabId } from "@/components/TabNavigation";
 
-type WordWithCategory = Word & { category: 'important' | 'medium' };
-
 type Props = {
   importantWords: Word[];
   mediumWords: Word[];

@@ -1,5 +1,4 @@
 import "server-only";
-import { getWordBySlug } from "@/data/words";
 
 export async function POST(request: Request) {
   const apiKey = process.env.TTS_API_KEY;

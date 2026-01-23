@@ -120,7 +120,7 @@ const AutoResizingText = ({ text, className, style }: { text: string, className?
        // Fits! Ensure no ellipsis by keeping overflow visible, but constrain width just in case.
        el.style.maxWidth = '100%';
     }
-  }, [text]);
+  }, []);
 
   useEffect(() => {
     adjustSize();
