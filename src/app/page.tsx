@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import styles from "./page.module.css";
 import { getImportantWords, getMediumWords } from "@/data/words";
 import WordsListClient from "@/components/features/words/WordsListClient";
+import { SnsShareButtons } from "@/components/common/SnsShareButtons";
 
 export const metadata: Metadata = {
   title: {
@@ -38,6 +39,12 @@ export default async function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <main className={styles.main}>
+        <div style={{ display: "flex", justifyContent: "flex-end" }}>
+          <SnsShareButtons
+            url="https://www.toeic-words.com/"
+            title="【2026年最新】TOEIC 重要単語 | 頻出単語を効率よく学習"
+          />
+        </div>
         <header className={styles.header}>
           <div className={styles.headerContent}>
             <p className={styles.tagline}>LEVEL UP YOUR SCORE</p>

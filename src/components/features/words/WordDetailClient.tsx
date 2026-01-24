@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { Star } from "lucide-react";
 import { useFavorites } from "@/context/FavoritesContext";
 import styles from "./word-detail.module.css";
 import type { WordDetails } from "@/lib/actions";
+import { SnsShareButtons } from "@/components/common/SnsShareButtons";
 
 type Props = {
   initialData: WordDetails;
@@ -27,8 +29,10 @@ export function WordDetailClient({ initialData, linkedWords = {} }: Props) {
     sentenceAudioLoading: null,
   });
   const [skeletonVisible, setSkeletonVisible] = useState(true);
+  const [shareContainer, setShareContainer] = useState<HTMLElement | null>(null);
 
   useEffect(() => {
+    setShareContainer(document.getElementById("word-nav-share-container"));
     const id = window.setTimeout(() => {
       setSkeletonVisible(false);
     }, 300);
@@ -139,9 +143,18 @@ export function WordDetailClient({ initialData, linkedWords = {} }: Props) {
   }
 
   return (
-    <div className={styles.detailContainer}>
-      <div className={styles.headerRow}>
-        <div>
+    <>
+      {shareContainer &&
+        createPortal(
+          <SnsShareButtons
+            url={`https://www.toeic-words.com/words/${data.word}`}
+            title={`${data.word}の意味「${data.japaneseTranslation}」 | TOEIC重要単語`}
+          />,
+          shareContainer
+        )}
+      <div className={styles.detailContainer}>
+        <div className={styles.headerRow}>
+          <div>
           <h1 className={styles.wordHeading}>{data.word}</h1>
           {data.pronunciation && (
             <div className={styles.pronRow}>
@@ -413,6 +426,7 @@ export function WordDetailClient({ initialData, linkedWords = {} }: Props) {
           </div>
         </section>
       )}
-    </div>
+      </div>
+    </>
   );
 }

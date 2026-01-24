@@ -58,6 +58,7 @@ export default function WordNavigationClient({
           </p>
           <h2 className={styles.pageTitle}>AIによる単語の詳細解説</h2>
         </div>
+        <div id="word-nav-share-container" className={styles.shareContainer} />
       </header>
 
       <nav className={styles.navRow} aria-label="単語ナビゲーション">

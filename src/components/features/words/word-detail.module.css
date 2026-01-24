@@ -22,6 +22,12 @@
   align-items: flex-start;
 }
 
+.shareContainer {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
 .navRow {
   display: flex;
   justify-content: space-between;
