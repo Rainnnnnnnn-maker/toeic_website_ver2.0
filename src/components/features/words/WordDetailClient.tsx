@@ -26,6 +26,7 @@ export function WordDetailClient({ initialData, linkedWords = {} }: Props) {
   const [shareContainer, setShareContainer] = useState<HTMLElement | null>(null);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setShareContainer(document.getElementById("word-nav-share-container"));
   }, []);
 
