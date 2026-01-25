@@ -7,6 +7,7 @@ import { Metadata } from "next";
 import { getWordBySlug, getAllWords } from "@/data/words";
 import { getWordDetail, type WordDetails } from "@/lib/actions";
 import styles from "@/components/features/words/word-detail.module.css";
+import { generateWordDetailJsonLd } from "@/lib/json-ld";
 import Loading from "./loading";
 
 const WordDetailClient = dynamic(
@@ -32,11 +33,6 @@ export async function generateStaticParams() {
   // 万が一単語が取得できない場合はダミーを返し、オンデマンドISRとする
   return [{ word: "__build_placeholder__" }];
 }
-
-// データ取得をPromise化するためのラッパー（利用しない）
-// async function fetchWord(slug: string) {
-//   return getWordBySlug(slug);
-// }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { word: slug } = await params;
@@ -84,6 +80,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       card: "summary",
       title,
       description,
+      
     },
   };
 }
@@ -96,62 +93,16 @@ export default async function WordPage({ params }: PageProps) {
   if (word !== "__build_placeholder__" && !(await getWordBySlug(word))) {
     notFound();
   }
-  
-  // 構造化データのための詳細情報取得
-  // generateMetadataでも呼ばれているが、Next.jsのRequest Memoizationにより再利用されるはず
-  // ただし、getWordDetail自体はキャッシュ関数なので、2回呼んでもコストは低い
-  let detail: WordDetails | null = null;
-  try {
-    detail = await getWordDetail(word);
-  } catch (e) {
-    console.error(`Failed to fetch word detail for slug "${word}"`, e);
-  }
 
-  const jsonLd = [];
-
-  // BreadcrumbList
-  jsonLd.push({
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    "itemListElement": [
-      {
-        "@type": "ListItem",
-        "position": 1,
-        "name": "TOP",
-        "item": "https://www.toeic-words.com/"
-      },
-      {
-        "@type": "ListItem",
-        "position": 2,
-        "name": word,
-        "item": `https://www.toeic-words.com/words/${word}`
-      }
-    ]
-  });
-
-  // DefinedTerm (if details are available)
-  if (detail) {
-    jsonLd.push({
-      "@context": "https://schema.org",
-      "@type": "DefinedTerm",
-      "name": detail.word,
-      "description": detail.japaneseTranslation,
-      "inDefinedTermSet": "https://www.toeic-words.com",
-      "termCode": detail.word
-    });
-  }
+  // 親コンポーネントではデータ取得を待機せず、Suspense境界内で取得させることで
+  // ストリーミングレンダリング（スケルトン表示）を有効にする。
+  // generateMetadataで一度待機するため、TTFB自体は変わらないが、
+  // HTMLボディのレンダリングは非同期に行われる。
 
   return (
-    <>
-      <Script
-        id="json-ld-structured-data"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-      <Suspense fallback={<Loading />}>
-        <WordDetailFetcher word={word} />
-      </Suspense>
-    </>
+    <Suspense fallback={<Loading />}>
+      <WordDetailFetcher word={word} />
+    </Suspense>
   );
 }
 
@@ -160,16 +111,26 @@ async function WordDetailFetcher({ word }: { word: string }) {
   // データがない場合は生成処理が走る（L2: Redis -> L3: Gemini）
   const detailData = await getWordDetail(word);
 
+  // データ取得後にJSON-LDを生成（ストリーミングの一部として送信）
+  const jsonLd = generateWordDetailJsonLd(word, detailData);
+
   if (!detailData) {
     return (
-      <div className={styles.detailContainer}>
-        <p className={styles.errorText}>
-          データの取得に失敗しました。時間をおいて再度お試しください。
-        </p>
-        <Link href="/" className={styles.retryButton}>
-          一覧へ戻る
-        </Link>
-      </div>
+      <>
+        <Script
+          id="json-ld-structured-data"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+        <div className={styles.detailContainer}>
+          <p className={styles.errorText}>
+            データの取得に失敗しました。時間をおいて再度お試しください。
+          </p>
+          <Link href="/" className={styles.retryButton}>
+            一覧へ戻る
+          </Link>
+        </div>
+      </>
     );
   }
 
@@ -191,12 +152,25 @@ async function WordDetailFetcher({ word }: { word: string }) {
 
   // 存在確認とマッピング
   const allWords = await getAllWords();
+  
+  // 配列検索からMap検索へ最適化 (O(N*M) -> O(N+M))
+  const allWordsMap = new Set(allWords.map(w => w.slug));
+
   candidates.forEach(term => {
-    const found = allWords.find(w => w.slug === term.toLowerCase());
-    if (found) {
-      linkedWords[term] = found.slug;
+    const slug = term.toLowerCase();
+    if (allWordsMap.has(slug)) {
+      linkedWords[term] = slug;
     }
   });
 
-  return <WordDetailClient initialData={detailData} linkedWords={linkedWords} />;
+  return (
+    <>
+      <Script
+        id="json-ld-structured-data"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <WordDetailClient initialData={detailData} linkedWords={linkedWords} />
+    </>
+  );
 }
