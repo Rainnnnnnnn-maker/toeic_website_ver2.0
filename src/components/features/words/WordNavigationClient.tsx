@@ -6,6 +6,7 @@ import { useFavorites } from "@/context/FavoritesContext";
 import { useMemo } from "react";
 import styles from "./word-detail.module.css";
 import type { Word } from "@/data/words";
+import { useShareTarget } from "@/context/ShareTargetContext";
 
 export default function WordNavigationClient({
   allWords,
@@ -17,6 +18,7 @@ export default function WordNavigationClient({
   const searchParams = useSearchParams();
   const isFromFavorites = searchParams.get("from") === "favorites";
   const { favorites } = useFavorites();
+  const { setShareTarget } = useShareTarget();
 
   const navigationList = useMemo(() => {
     if (isFromFavorites) {
@@ -57,7 +59,11 @@ export default function WordNavigationClient({
         </p>
         <div className={styles.headerRow}>
           <h2 className={styles.pageTitle}>AI単語解説</h2>
-          <div id="word-nav-share-container" className={styles.shareContainer} />
+          <div
+            id="word-nav-share-container"
+            className={styles.shareContainer}
+            ref={setShareTarget}
+          />
         </div>
       </header>
 

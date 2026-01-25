@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { Star } from "lucide-react";
@@ -9,6 +8,7 @@ import styles from "./word-detail.module.css";
 import type { WordDetails } from "@/lib/actions";
 import { SnsShareButtons } from "@/components/features/sns/SnsShareButtons";
 import { useTTS } from "@/hooks/useTTS";
+import { useShareTarget } from "@/context/ShareTargetContext";
 
 type Props = {
   initialData: WordDetails;
@@ -23,12 +23,7 @@ export function WordDetailClient({ initialData, linkedWords = {} }: Props) {
     handlePlayAudio,
     handlePlaySentenceAudio
   } = useTTS();
-  const [shareContainer, setShareContainer] = useState<HTMLElement | null>(null);
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setShareContainer(document.getElementById("word-nav-share-container"));
-  }, []);
+  const { shareTarget } = useShareTarget();
 
   const data = initialData;
 
@@ -36,13 +31,13 @@ export function WordDetailClient({ initialData, linkedWords = {} }: Props) {
 
   return (
     <>
-      {shareContainer &&
+      {shareTarget &&
         createPortal(
           <SnsShareButtons
             url={`https://www.toeic-words.com/words/${data.word}`}
             title={`${data.word}の意味「${data.japaneseTranslation}」 | TOEIC重要単語`}
           />,
-          shareContainer
+          shareTarget
         )}
       <div className={styles.detailContainer}>
         <div className={styles.headerRow}>
