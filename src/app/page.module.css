@@ -37,7 +37,7 @@
 }
 
 .title {
-  font-size: 28px;
+  font-size: 22px;
   line-height: 1.3;
   color: #0f172a;
 }
@@ -172,7 +172,8 @@
   border: 1px solid #d1d5db;
   border-radius: 12px;
   padding: 12px 14px;
-  padding-right: 40px; /* Make space for clear button */
+  padding-right: 40px;
+  /* Make space for clear button */
   font-size: 14px;
   background: rgba(255, 255, 255, 0.9);
   transition: border-color 0.18s ease, box-shadow 0.18s ease;
@@ -190,14 +191,16 @@
   border: none;
   padding: 4px;
   cursor: pointer;
-  color: #9ca3af; /* Gray-400 */
+  color: #9ca3af;
+  /* Gray-400 */
   border-radius: 50%;
   transition: all 0.2s ease;
 }
 
 .clearButton:hover {
   background-color: #f3f4f6;
-  color: #6b7280; /* Gray-500 */
+  color: #6b7280;
+  /* Gray-500 */
 }
 
 .clearButton:focus-visible {
@@ -245,9 +248,9 @@
 }
 
 .wordGrid {
-	display: grid;
-	grid-template-columns: minmax(0, 1fr);
-	gap: 12px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
 }
 
 .wordCard {
@@ -307,18 +310,18 @@
 }
 
 @media (min-width: 480px) {
-	.wordGrid {
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-	}
+  .wordGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (min-width: 640px) {
-	.page {
-		padding: 48px 24px;
-	}
+  .page {
+    padding: 48px 24px;
+  }
 
   .title {
-    font-size: 32px;
+    font-size: 26px;
   }
 
   .header {
@@ -341,9 +344,9 @@
     margin-right: 10px;
   }
 
-		.pagination {
-			margin-left: auto;
-		}
+  .pagination {
+    margin-left: auto;
+  }
 }
 
 @media (min-width: 1024px) {
@@ -351,19 +354,19 @@
     padding: 32px 32px 64px;
   }
 
-		.title {
-			font-size: 36px;
-		}
+  .title {
+    font-size: 28px;
+  }
 
-		.wordGrid {
-			grid-template-columns: repeat(3, minmax(0, 1fr));
-		}
+  .wordGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 @media (min-width: 1280px) {
-	.wordGrid {
-		grid-template-columns: repeat(4, minmax(0, 1fr));
-	}
+  .wordGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
 }
 
 .ctaGroup {

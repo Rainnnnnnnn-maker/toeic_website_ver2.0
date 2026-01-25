@@ -1,6 +1,13 @@
 "use client";
 
-import { XIcon, FacebookIcon } from "react-share";
+import {
+  XIcon,
+  FacebookIcon,
+  LineIcon,
+  // HatenaIcon,
+  LineShareButton,
+  // HatenaShareButton,
+} from "react-share";
 
 type Props = {
   url: string;
@@ -30,10 +37,11 @@ export const SnsShareButtons = ({ url, title, className, style }: Props) => {
         href={twitterShareUrl}
         target="_blank"
         rel="noopener noreferrer"
-        aria-label="Twitterでシェア"
+        aria-label="Xでシェア"
       >
         <XIcon size={32} round />
       </a>
+
       <a
         href={facebookShareUrl}
         target="_blank"
@@ -42,6 +50,14 @@ export const SnsShareButtons = ({ url, title, className, style }: Props) => {
       >
         <FacebookIcon size={32} round />
       </a>
+
+      <LineShareButton url={url} title={title} aria-label="LINEでシェア">
+        <LineIcon size={32} round />
+      </LineShareButton>
+
+      {/* <HatenaShareButton url={url} title={title} aria-label="はてなブックマークでシェア">
+        <HatenaIcon size={32} round />
+      </HatenaShareButton> */}
     </div>
   );
 };

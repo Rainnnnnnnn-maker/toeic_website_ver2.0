@@ -7,7 +7,7 @@ import { Star } from "lucide-react";
 import { useFavorites } from "@/context/FavoritesContext";
 import styles from "./word-detail.module.css";
 import type { WordDetails } from "@/lib/actions";
-import { SnsShareButtons } from "@/components/common/SnsShareButtons";
+import { SnsShareButtons } from "@/components/features/sns/SnsShareButtons";
 
 type Props = {
   initialData: WordDetails;

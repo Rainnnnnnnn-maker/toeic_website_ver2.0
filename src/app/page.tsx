@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import styles from "./page.module.css";
 import { getImportantWords, getMediumWords } from "@/data/words";
 import WordsListClient from "@/components/features/words/WordsListClient";
-import { SnsShareButtons } from "@/components/common/SnsShareButtons";
+import { SnsShareButtons } from "@/components/features/sns/SnsShareButtons";
 
 export const metadata: Metadata = {
   title: {
