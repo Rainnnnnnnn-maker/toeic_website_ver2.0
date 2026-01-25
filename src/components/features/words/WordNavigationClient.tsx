@@ -41,24 +41,24 @@ export default function WordNavigationClient({
 
   return (
     <>
-      <header className={styles.headerRow}>
-        <div>
-          <p className={styles.breadcrumb}>
-            {isFromFavorites ? (
-              <Link href="/favorites" className={styles.breadcrumbLink}>
-                お気に入り
-              </Link>
-            ) : (
-              <Link href="/" className={styles.breadcrumbLink}>
-                単語一覧
-              </Link>
-            )}
-            <span className={styles.breadcrumbSeparator}>/</span>
-            <span className={styles.breadcrumbCurrent}>{term}</span>
-          </p>
-          <h2 className={styles.pageTitle}>AIによる単語の詳細解説</h2>
+      <header>
+        <p className={styles.breadcrumb}>
+          {isFromFavorites ? (
+            <Link href="/favorites" className={styles.breadcrumbLink}>
+              お気に入り
+            </Link>
+          ) : (
+            <Link href="/" className={styles.breadcrumbLink}>
+              単語一覧
+            </Link>
+          )}
+          <span className={styles.breadcrumbSeparator}>/</span>
+          <span className={styles.breadcrumbCurrent}>{term}</span>
+        </p>
+        <div className={styles.headerRow}>
+          <h2 className={styles.pageTitle}>AI単語解説</h2>
+          <div id="word-nav-share-container" className={styles.shareContainer} />
         </div>
-        <div id="word-nav-share-container" className={styles.shareContainer} />
       </header>
 
       <nav className={styles.navRow} aria-label="単語ナビゲーション">

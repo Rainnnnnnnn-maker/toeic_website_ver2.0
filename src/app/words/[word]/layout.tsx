@@ -17,18 +17,18 @@ export default async function WordLayout({
       <main className={styles.main}>
         <Suspense
           fallback={
-            <div className={styles.headerRow}>
-              <div>
-                <p className={styles.breadcrumb}>
-                  <Link href="/" className={styles.breadcrumbLink}>
-                    単語一覧
-                  </Link>
-                  <span className={styles.breadcrumbSeparator}>/</span>
-                  <span className={styles.breadcrumbCurrent}>...</span>
-                </p>
-                <h2 className={styles.pageTitle}>AIによる単語の詳細解説</h2>
+            <header>
+              <p className={styles.breadcrumb}>
+                <Link href="/" className={styles.breadcrumbLink}>
+                  単語一覧
+                </Link>
+                <span className={styles.breadcrumbSeparator}>/</span>
+                <span className={styles.breadcrumbCurrent}>...</span>
+              </p>
+              <div className={styles.headerRow}>
+                <h2 className={styles.pageTitle}>AI単語解説</h2>
               </div>
-            </div>
+            </header>
           }
         >
           <WordNavigation currentSlug={word} />
