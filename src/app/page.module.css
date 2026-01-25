@@ -17,6 +17,16 @@
   position: relative;
 }
 
+.snsContainer {
+  margin-bottom: -8px;
+}
+
+@media (min-width: 640px) {
+  .snsContainer {
+    margin-bottom: 0;
+  }
+}
+
 .header {
   display: flex;
   flex-direction: column;

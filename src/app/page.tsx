@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 
 export default async function Home() {
   const importantWords = await getImportantWords();
-  const mediumWords =  await getMediumWords();
+  const mediumWords = await getMediumWords();
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -39,7 +39,7 @@ export default async function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <main className={styles.main}>
-        <div style={{ display: "flex", justifyContent: "flex-end" }}>
+        <div className={styles.snsContainer} style={{ display: "flex", justifyContent: "flex-end" }}>
           <SnsShareButtons
             url="https://www.toeic-words.com/"
             title="【2026年最新】TOEIC 重要単語 | 頻出単語を効率よく学習"
@@ -63,7 +63,7 @@ export default async function Home() {
           </div>
         </header>
         <WordsListClient importantWords={importantWords} mediumWords={mediumWords} />
-        
+
         <section className={styles.seoSection}>
           <article className={styles.seoArticle}>
             <h2 className={styles.seoTitle}>2026年最新のTOEIC出題傾向と単語</h2>
