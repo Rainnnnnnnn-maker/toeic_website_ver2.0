@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { Star } from "lucide-react";
@@ -8,142 +8,30 @@ import { useFavorites } from "@/context/FavoritesContext";
 import styles from "./word-detail.module.css";
 import type { WordDetails } from "@/lib/actions";
 import { SnsShareButtons } from "@/components/features/sns/SnsShareButtons";
+import { useTTS } from "@/hooks/useTTS";
 
 type Props = {
   initialData: WordDetails;
   linkedWords?: Record<string, string>;
 };
 
-type State = {
-  audioUrl?: string;
-  audioLoading: boolean;
-  sentenceAudioUrls: Record<string, string>;
-  sentenceAudioLoading: string | null;
-};
-
 export function WordDetailClient({ initialData, linkedWords = {} }: Props) {
   const { isFavorite, toggleFavorite } = useFavorites();
-  const [state, setState] = useState<State>({
-    audioLoading: false,
-    sentenceAudioUrls: {},
-    sentenceAudioLoading: null,
-  });
+  const {
+    audioLoading,
+    sentenceAudioLoading,
+    handlePlayAudio,
+    handlePlaySentenceAudio
+  } = useTTS();
   const [shareContainer, setShareContainer] = useState<HTMLElement | null>(null);
-
-  // Audio control
-  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     setShareContainer(document.getElementById("word-nav-share-container"));
-
-    // Cleanup audio on unmount
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
-      }
-    };
   }, []);
 
   const data = initialData;
 
-  const playAudio = (url: string) => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-    }
-    const audio = new Audio(url);
-    audioRef.current = audio;
 
-    // Reset ref when ended to allow garbage collection if needed, though mostly for cleanup consistency
-    audio.onended = () => {
-      if (audioRef.current === audio) {
-        audioRef.current = null;
-      }
-    };
-
-    audio.play().catch(e => console.error("Audio play failed", e));
-  };
-
-  async function handlePlayAudio() {
-    if (state.audioUrl) {
-      playAudio(state.audioUrl);
-      return;
-    }
-
-    setState((prev) => ({ ...prev, audioLoading: true }));
-
-    try {
-      const response = await fetch("/api/tts", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ text: data.word }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to synthesize speech");
-      }
-
-      const json = (await response.json()) as { audioContent?: string };
-
-      if (!json.audioContent) {
-        throw new Error("Missing audio content in response");
-      }
-
-      const audioUrl = `data:audio/mp3;base64,${json.audioContent}`;
-
-      setState((prev) => ({ ...prev, audioUrl, audioLoading: false }));
-
-      playAudio(audioUrl);
-    } catch {
-      setState((prev) => ({ ...prev, audioLoading: false }));
-      alert("音声の生成に失敗しました。時間をおいて再度お試しください。");
-    }
-  }
-
-  async function handlePlaySentenceAudio(text: string, id: string) {
-    if (state.sentenceAudioUrls[id]) {
-      playAudio(state.sentenceAudioUrls[id]);
-      return;
-    }
-
-    setState((prev) => ({ ...prev, sentenceAudioLoading: id }));
-
-    try {
-      const response = await fetch("/api/tts", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ text }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to synthesize speech");
-      }
-
-      const json = (await response.json()) as { audioContent?: string };
-
-      if (!json.audioContent) {
-        throw new Error("Missing audio content in response");
-      }
-
-      const audioUrl = `data:audio/mp3;base64,${json.audioContent}`;
-
-      setState((prev) => ({
-        ...prev,
-        sentenceAudioUrls: { ...prev.sentenceAudioUrls, [id]: audioUrl },
-        sentenceAudioLoading: null,
-      }));
-
-      playAudio(audioUrl);
-    } catch {
-      setState((prev) => ({ ...prev, sentenceAudioLoading: null }));
-      alert("音声の生成に失敗しました。時間をおいて再度お試しください。");
-    }
-  }
 
   return (
     <>
@@ -165,12 +53,12 @@ export function WordDetailClient({ initialData, linkedWords = {} }: Props) {
                 <button
                   type="button"
                   className={styles.audioButton}
-                  onClick={handlePlayAudio}
-                  disabled={state.audioLoading}
+                  onClick={() => handlePlayAudio(data.word)}
+                  disabled={audioLoading}
                   aria-label="発音を再生"
                 >
                   <span className={styles.audioIcon}>
-                    {state.audioLoading ? (
+                    {audioLoading ? (
                       <svg
                         className={styles.spinner}
                         xmlns="http://www.w3.org/2000/svg"
@@ -185,12 +73,13 @@ export function WordDetailClient({ initialData, linkedWords = {} }: Props) {
                           r="10"
                           stroke="currentColor"
                           strokeWidth="4"
-                          style={{ opacity: 0.25 }}
+                          className={styles.spinnerBase}
                         ></circle>
                         <path
                           fill="currentColor"
                           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                           style={{ opacity: 0.75 }}
+                          className={styles.spinnerPath}
                         ></path>
                       </svg>
                     ) : (
@@ -227,7 +116,7 @@ export function WordDetailClient({ initialData, linkedWords = {} }: Props) {
 
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>日本語の意味（品詞別）</h2>
-          <div className={styles.sectionBody} style={{ marginBottom: "12px" }}>
+          <div className={`${styles.sectionBody} ${styles.marginBottom12}`}>
             <p>
               <strong>意味</strong>：{data.japaneseTranslation}
             </p>
@@ -236,28 +125,26 @@ export function WordDetailClient({ initialData, linkedWords = {} }: Props) {
             <div key={idx} className={styles.sectionBody}>
               <p><strong>{m.partOfSpeech}</strong>：{m.meaning}</p>
               {m.detailedMeanings.length > 0 && (
-                <div style={{ marginTop: 6 }}>
+                <div className={styles.marginTop6}>
                   {m.detailedMeanings.map((d) => (
-                    <div key={d.number} style={{ marginBottom: 8 }}>
+                    <div key={d.number} className={styles.marginBottom8}>
                       <p>【{d.number}】{d.definition}</p>
                       {d.grammarPattern && (
-                        <p style={{ color: "#6b7280" }}>文型：{d.grammarPattern}</p>
+                        <p className={styles.metaText}>文型：{d.grammarPattern}</p>
                       )}
-                      <div style={{ display: "flex", alignItems: "flex-start", gap: "8px" }}>
-                        <p className={styles.exampleSentence} style={{ margin: 0 }}>{d.example}</p>
+                      <div className={styles.flexStartGap8}>
+                        <p className={`${styles.exampleSentence} ${styles.noMargin}`}>{d.example}</p>
                         <button
                           type="button"
-                          className={styles.audioButton}
+                          className={`${styles.audioButton} ${styles.exampleAudioButton}`}
                           onClick={() => handlePlaySentenceAudio(d.example, `meaning-${idx}-detail-${d.number}`)}
-                          disabled={state.sentenceAudioLoading === `meaning-${idx}-detail-${d.number}`}
+                          disabled={sentenceAudioLoading === `meaning-${idx}-detail-${d.number}`}
                           aria-label="例文を再生"
-                          style={{ marginTop: "4px", flexShrink: 0 }}
                         >
                           <span
-                            className={styles.audioIcon}
-                            style={{ width: "22px", height: "22px", fontSize: "14px" }}
+                            className={`${styles.audioIcon} ${styles.smallAudioIcon}`}
                           >
-                            {state.sentenceAudioLoading === `meaning-${idx}-detail-${d.number}` ? (
+                            {sentenceAudioLoading === `meaning-${idx}-detail-${d.number}` ? (
                               <svg
                                 className={styles.spinner}
                                 xmlns="http://www.w3.org/2000/svg"
@@ -272,12 +159,12 @@ export function WordDetailClient({ initialData, linkedWords = {} }: Props) {
                                   r="10"
                                   stroke="currentColor"
                                   strokeWidth="4"
-                                  style={{ opacity: 0.25 }}
+                                  className={styles.spinnerBase}
                                 ></circle>
                                 <path
                                   fill="currentColor"
                                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                  style={{ opacity: 0.75 }}
+                                  className={styles.spinnerPath}
                                 ></path>
                               </svg>
                             ) : (
@@ -295,8 +182,8 @@ export function WordDetailClient({ initialData, linkedWords = {} }: Props) {
                           </span>
                         </button>
                       </div>
-                      <p className={styles.exampleTranslation} style={{ marginTop: "4px" }}>{d.exampleJapanese}</p>
-                      <p style={{ color: "#6b7280" }}>
+                      <p className={`${styles.exampleTranslation} ${styles.marginTop4}`}>{d.exampleJapanese}</p>
+                      <p className={styles.metaText}>
                         場面：{d.context}／頻度：{d.frequency}
                       </p>
                       {d.synonyms?.length > 0 && (
@@ -321,7 +208,7 @@ export function WordDetailClient({ initialData, linkedWords = {} }: Props) {
               {data.wordForms.map((wf, i) => (
                 <li key={`${wf.form}-${i}`} className={styles.pill}>
                   {wf.form}
-                  <span style={{ marginLeft: 6, fontSize: "14px", color: "#6b7280" }}>
+                  <span className={styles.wordFormType}>
                     （{wf.type}）
                   </span>
                 </li>
@@ -366,24 +253,22 @@ export function WordDetailClient({ initialData, linkedWords = {} }: Props) {
             <h2 className={styles.sectionTitle}>{data.word}のTOEIC例文（AI例文）</h2>
             <div className={styles.sectionBody}>
               {data.toeicExamples.map((ex, i) => (
-                <div key={i} style={{ marginBottom: i < data.toeicExamples.length - 1 ? 12 : 0 }}>
-                  <div style={{ display: "flex", alignItems: "flex-start", gap: "8px" }}>
-                    <p className={styles.exampleSentence} style={{ margin: 0 }}>
+                <div key={i} className={i < data.toeicExamples.length - 1 ? styles.exampleRow : styles.exampleRowLast}>
+                  <div className={styles.flexStartGap8}>
+                    <p className={`${styles.exampleSentence} ${styles.noMargin}`}>
                       {ex.english}
                     </p>
                     <button
                       type="button"
-                      className={styles.audioButton}
+                      className={`${styles.audioButton} ${styles.exampleAudioButton}`}
                       onClick={() => handlePlaySentenceAudio(ex.english, `toeic-${i}`)}
-                      disabled={state.sentenceAudioLoading === `toeic-${i}`}
+                      disabled={sentenceAudioLoading === `toeic-${i}`}
                       aria-label="例文を再生"
-                      style={{ marginTop: "4px", flexShrink: 0 }}
                     >
                       <span
-                        className={styles.audioIcon}
-                        style={{ width: "22px", height: "22px", fontSize: "14px" }}
+                        className={`${styles.audioIcon} ${styles.smallAudioIcon}`}
                       >
-                        {state.sentenceAudioLoading === `toeic-${i}` ? (
+                        {sentenceAudioLoading === `toeic-${i}` ? (
                           <svg
                             className={styles.spinner}
                             xmlns="http://www.w3.org/2000/svg"
@@ -398,12 +283,12 @@ export function WordDetailClient({ initialData, linkedWords = {} }: Props) {
                               r="10"
                               stroke="currentColor"
                               strokeWidth="4"
-                              style={{ opacity: 0.25 }}
+                              className={styles.spinnerBase}
                             ></circle>
                             <path
                               fill="currentColor"
                               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                              style={{ opacity: 0.75 }}
+                              className={styles.spinnerPath}
                             ></path>
                           </svg>
                         ) : (
@@ -421,7 +306,7 @@ export function WordDetailClient({ initialData, linkedWords = {} }: Props) {
                       </span>
                     </button>
                   </div>
-                  <p className={styles.exampleTranslation} style={{ marginTop: "4px" }}>
+                  <p className={`${styles.exampleTranslation} ${styles.marginTop4}`}>
                     {ex.japanese}
                   </p>
                 </div>

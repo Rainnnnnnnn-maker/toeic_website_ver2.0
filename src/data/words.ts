@@ -1,6 +1,7 @@
 import "server-only";
 import { list } from "@vercel/blob";
 import { unstable_cache } from "next/cache";
+import { cache } from "react";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -110,22 +111,27 @@ const getWordsData = unstable_cache(
   { revalidate: process.env.NODE_ENV === 'development' ? 3600 : 3600 * 24 * 7 } // Cache for 7 days in prod, 1 hour in dev
 );
 
+// Memoize the data fetching within the same request lifecycle
+const getWordsDataCached = cache(async () => {
+  return await getWordsData();
+});
+
 export async function getAllWords(): Promise<Word[]> {
-  const data = await getWordsData();
+  const data = await getWordsDataCached();
   return data.allWords;
 }
 
 export async function getImportantWords(): Promise<Word[]> {
-  const data = await getWordsData();
+  const data = await getWordsDataCached();
   return data.important;
 }
 
 export async function getMediumWords(): Promise<Word[]> {
-  const data = await getWordsData();
+  const data = await getWordsDataCached();
   return data.medium;
 }
 
 export async function getWordBySlug(slug: string): Promise<Word | undefined> {
-  const data = await getWordsData();
+  const data = await getWordsDataCached();
   return data.allWords.find(w => w.slug === slug);
 }
