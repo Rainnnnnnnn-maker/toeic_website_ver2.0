@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 
 type TTSState = {
     audioUrl?: string;
+    cachedWord?: string;
     audioLoading: boolean;
     sentenceAudioUrls: Record<string, string>;
     sentenceAudioLoading: string | null;
@@ -47,8 +48,8 @@ export function useTTS() {
             playAudio(currentAudioUrl);
             return;
         }
-        // If we already have it in state, play it (though usually it's passed as prop if available)
-        if (state.audioUrl) {
+        // If we already have it in state for the SAME word, play it
+        if (state.audioUrl && state.cachedWord === word) {
             playAudio(state.audioUrl);
             return;
         }
@@ -68,13 +69,18 @@ export function useTTS() {
             if (!json.audioContent) throw new Error("Missing audio content");
 
             const audioUrl = `data:audio/mp3;base64,${json.audioContent}`;
-            setState((prev) => ({ ...prev, audioUrl, audioLoading: false }));
+            setState((prev) => ({ 
+                ...prev, 
+                audioUrl, 
+                cachedWord: word,
+                audioLoading: false 
+            }));
             playAudio(audioUrl);
         } catch {
             setState((prev) => ({ ...prev, audioLoading: false }));
             alert("音声の生成に失敗しました。時間をおいて再度お試しください。");
         }
-    }, [state.audioUrl, playAudio]);
+    }, [state.audioUrl, state.cachedWord, playAudio]);
 
     const handlePlaySentenceAudio = useCallback(async (text: string, id: string) => {
         if (state.sentenceAudioUrls[id]) {

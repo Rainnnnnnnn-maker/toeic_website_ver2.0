@@ -381,13 +381,13 @@ export default function StudyClient({
           )}
           <button 
             className={styles.audioButton} 
-            onClick={() => handlePlaySentenceAudio(hintExample, 'hint-example')}
-            disabled={sentenceAudioLoading === 'hint-example'}
+            onClick={() => handlePlaySentenceAudio(hintExample, `hint-example-${currentWord?.slug}`)}
+            disabled={sentenceAudioLoading === `hint-example-${currentWord?.slug}`}
             aria-label="Play sample audio"
             style={{ marginLeft: '8px', verticalAlign: 'middle' }}
           >
             <span className={styles.audioIcon}>
-              {sentenceAudioLoading === 'hint-example' ? (
+              {sentenceAudioLoading === `hint-example-${currentWord?.slug}` ? (
                 <Loader2 className={styles.spinner} size={14} />
               ) : (
                 <Volume2 size={14} />
