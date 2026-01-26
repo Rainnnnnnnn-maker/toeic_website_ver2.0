@@ -4,6 +4,7 @@ import type { ChangeEvent, KeyboardEvent } from "react";
 import Link from "next/link";
 import styles from "@/app/page.module.css";
 import type { Word } from "@/data/words";
+import { X } from "lucide-react";
 import TabNavigation, { TabId } from "@/components/TabNavigation";
 
 type Props = {
@@ -110,21 +111,7 @@ export default function WordsListClient({ importantWords, mediumWords }: Props) 
               aria-label="検索条件をクリア"
               type="button"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-                stroke="currentColor"
-                width="16"
-                height="16"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
+              <X size={16} />
             </button>
           )}
         </div>

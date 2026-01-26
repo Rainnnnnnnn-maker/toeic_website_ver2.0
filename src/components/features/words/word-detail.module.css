@@ -271,14 +271,6 @@
   font-size: 14px;
 }
 
-.spinnerBase {
-  opacity: 0.25;
-}
-
-.spinnerPath {
-  opacity: 0.75;
-}
-
 .wordFormType {
   margin-left: 6px;
   font-size: 14px;
