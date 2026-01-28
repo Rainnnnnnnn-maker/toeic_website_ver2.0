@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     default: "TOEIC重要単語",
     template: "%s | TOEIC重要単語",
   },
-  description: "TOEIC頻出の重要単語をAI解説、AI例文で効率よく学べる",
+  description: "【完全無料】TOEIC重要単語をAIが徹底解説！頻出単語を効率的に学習してスコアアップ。例文・類義語・発音も完備。",
   icons: {
     icon: [
       { url: "/icon.png", type: "image/png", sizes: "96x96" },
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "TOEIC重要単語",
-    description: "TOEIC頻出の重要単語をAI解説、AI例文で効率よく学べる",
+    description: "【完全無料】TOEIC重要単語をAIが徹底解説！頻出単語を効率的に学習してスコアアップ。例文・類義語・発音も完備。",
     url: "https://www.toeic-words.com",
     siteName: "TOEIC重要単語",
     locale: "ja_JP",
@@ -61,14 +61,14 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "TOEIC重要単語",
-    description: "TOEIC頻出の重要単語をAI解説、AI例文で効率よく学べる",
+    description: "【完全無料】TOEIC重要単語をAIが徹底解説！頻出単語を効率的に学習してスコアアップ。例文・類義語・発音も完備。",
     images: ["/opengraph-image"],
   },
 };
 
 export const viewport: Viewport = {
-	width: "device-width",
-	initialScale: 1,
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({

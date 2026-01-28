@@ -30,8 +30,16 @@ export function generateWordDetailJsonLd(word: string, detail: WordDetails | nul
       "@type": "DefinedTerm",
       "name": detail.word,
       "description": detail.japaneseTranslation,
-      "inDefinedTermSet": "https://www.toeic-words.com",
-      "termCode": detail.word
+      "inDefinedTermSet": {
+        "@type": "DefinedTermSet",
+        "name": "TOEIC重要単語",
+        "url": "https://www.toeic-words.com"
+      },
+      "termCode": detail.word,
+      "identifier": detail.word,
+      "inLanguage": "en",
+      "educationalUse": "TOEIC L&R テスト対策",
+      "learningResourceType": "vocabulary"
     });
   }
 

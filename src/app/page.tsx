@@ -8,10 +8,10 @@ import { SnsShareButtons } from "@/components/features/sns/SnsShareButtons";
 
 export const metadata: Metadata = {
   title: {
-    absolute: "TOEIC重要単語【2026年最新】600点・730点・800点レベル別",
+    absolute: "TOEIC 重要単語【2026年最新】600点・730点・800点突破｜AI解説付き無料単語帳",
   },
   description:
-    "【2026年最新】TOEIC重要単語・Web単語帳。リモートワークやオンライン会議など最新の出題傾向を反映した頻出単語を網羅。AIによる詳細解説と例文で、600点・730点・800点突破を効率よくサポートします。",
+    "【完全無料】TOEIC重要単語をAIが徹底解説！2026年最新の出題傾向（リモートワーク・オンライン会議）を反映。600点・730点・800点レベル別に厳選した頻出単語で効率的にスコアアップ。例文・類義語・発音も完備。",
   alternates: {
     canonical: "https://www.toeic-words.com/",
   },
@@ -21,14 +21,39 @@ export default async function Home() {
   const importantWords = await getImportantWords();
   const mediumWords = await getMediumWords();
 
-  const jsonLd = {
+  // WebSite構造化データ
+  const websiteJsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: "TOEIC重要単語",
-    description: "TOEIC頻出の重要単語をAI解説、AI例文で効率よく学べる",
+    description: "【完全無料】TOEIC重要単語をAIが徹底解説！頻出単語を効率的に学習してスコアアップ。",
     alternateName: ["TOEIC重要単語", "TOEIC Words", "TOEIC単語帳"],
     url: "https://www.toeic-words.com/",
     inLanguage: "ja-JP",
+  };
+
+  // BreadcrumbList構造化データ
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "ホーム",
+        item: "https://www.toeic-words.com/",
+      },
+    ],
+  };
+
+  // EducationalOrganization構造化データ
+  const educationalJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "EducationalOrganization",
+    name: "TOEIC重要単語",
+    description: "TOEIC L&Rテスト対策のための無料オンライン単語学習サービス",
+    url: "https://www.toeic-words.com/",
+    educationalCredentialAwarded: "TOEIC L&R スコアアップ",
   };
 
   return (
@@ -36,7 +61,17 @@ export default async function Home() {
       <Script
         id="ldjson-website"
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+      />
+      <Script
+        id="ldjson-breadcrumb"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      <Script
+        id="ldjson-educational"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(educationalJsonLd) }}
       />
       <main className={styles.main}>
         <div className={styles.snsContainer} style={{ display: "flex", justifyContent: "flex-end" }}>
@@ -73,7 +108,9 @@ export default async function Home() {
             </p>
             <p className={styles.seoText}>
               本サイトの「重要単語」リストは、こうした最新のトレンドを踏まえ、スコアアップに直結する頻出語彙を厳選しています。
-              古い単語帳ではカバーしきれない現代的なビジネス英語表現を、AIによる最新の例文とともに学習できます。
+              例えば、<Link href="/words/accommodate">accommodate</Link>（対応する）や<Link href="/words/negotiate">negotiate</Link>（交渉する）、
+              <Link href="/words/implement">implement</Link>（実施する）などのビジネス英語の重要単語を、
+              古い単語帳ではカバーしきれない現代的なビジネス英語表現とともに、AIによる最新の例文で学習できます。
             </p>
           </article>
 
