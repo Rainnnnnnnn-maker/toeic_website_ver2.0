@@ -12,6 +12,7 @@ export const metadata: Metadata = {
   },
   description:
     "【完全無料】TOEIC重要単語をAIが徹底解説！2026年最新の出題傾向（リモートワーク・オンライン会議）を反映。600点・730点・800点レベル別に厳選した頻出単語で効率的にスコアアップ。例文・類義語・発音も完備。",
+  keywords: ["TOEIC 重要単語", "TOEIC 単語帳", "TOEIC 頻出単語", "2026年", "最新", "無料", "アプリ", "600点", "730点", "800点"],
   alternates: {
     canonical: "https://www.toeic-words.com/",
   },
@@ -101,13 +102,13 @@ export default async function Home() {
 
         <section className={styles.seoSection}>
           <article className={styles.seoArticle}>
-            <h2 className={styles.seoTitle}>2026年最新のTOEIC出題傾向と単語</h2>
+            <h2 className={styles.seoTitle}>2026年最新のTOEIC重要単語と出題傾向</h2>
             <p className={styles.seoText}>
               近年のTOEIC L&Rテストでは、ビジネス環境の変化に伴い「リモートワーク」「オンライン会議」「チャットツール」に関連する語彙の出題頻度が増加しています。
               また、従来のオフィスワークだけでなく、ハイブリッドワークや柔軟な働き方を示唆する文脈も増えています。
             </p>
             <p className={styles.seoText}>
-              本サイトの「重要単語」リストは、こうした最新のトレンドを踏まえ、スコアアップに直結する頻出語彙を厳選しています。
+              本サイトの「TOEIC重要単語」リストは、こうした最新のトレンドを踏まえ、スコアアップに直結する頻出語彙を厳選しています。
               例えば、<Link href="/words/accommodate">accommodate</Link>（対応する）や<Link href="/words/negotiate">negotiate</Link>（交渉する）、
               <Link href="/words/implement">implement</Link>（実施する）などのビジネス英語の重要単語を、
               古い単語帳ではカバーしきれない現代的なビジネス英語表現とともに、AIによる最新の例文で学習できます。
@@ -115,15 +116,15 @@ export default async function Home() {
           </article>
 
           <article className={styles.seoArticle}>
-            <h2 className={styles.seoTitle}>TOEIC単語の効率的な覚え方</h2>
+            <h2 className={styles.seoTitle}>TOEIC重要単語の効率的な覚え方</h2>
             <p className={styles.seoText}>
-              TOEICスコアアップの鍵は、頻出単語（重要単語）を確実にマスターすることです。
+              TOEICスコアアップの鍵は、試験に出る「TOEIC重要単語」を確実にマスターすることです。
               単に英単語と日本語訳を丸暗記するのではなく、実際の例文の中でどのように使われるかを理解することが重要です。
               本サイトでは、AIを活用して各単語の詳細な意味の解説、語形変化、類義語、ニュアンス、そして例文を提供しています。
             </p>
             <ul className={styles.seoList}>
               <li className={styles.seoListItem}>
-                <strong>コロケーション（語の組み合わせ）を意識する：</strong> 単語は単独ではなく、他の語とセットで使われることが多いです。例文を通じて自然なつながりを学びましょう。
+                <strong>コロケーション（語の組み合わせ）を意識する：</strong> 重要単語は単独ではなく、他の語とセットで使われることが多いです。例文を通じて自然なつながりを学びましょう。
               </li>
               <li className={styles.seoListItem}>
                 <strong>類義語との違いを理解する：</strong> 似た意味の単語の使い分けが問われることがあります。微妙なニュアンスの違いを押さえましょう。
@@ -135,10 +136,10 @@ export default async function Home() {
           </article>
 
           <article className={styles.seoArticle}>
-            <h2 className={styles.seoTitle}>目標スコア別重要単語の選び方</h2>
+            <h2 className={styles.seoTitle}>目標スコア別 TOEIC重要単語の選び方</h2>
             <p className={styles.seoText}>
-              現在のスコアや目標に応じて、優先して覚えるべき単語は異なります。
-              まずは「重要単語」から始め、基礎を固めた上で「中級単語」へとステップアップすることをおすすめします。
+              現在のスコアや目標に応じて、優先して覚えるべき重要単語は異なります。
+              まずは基礎となる「最重要単語」から始め、基礎を固めた上で「中級単語」へとステップアップすることをおすすめします。
             </p>
             <p className={styles.seoText}>
               TOEIC 600点を目指す方は、頻繁に使われる基本的な最重要単語を確実に抑えましょう。

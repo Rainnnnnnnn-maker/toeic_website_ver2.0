@@ -23,6 +23,7 @@ export const metadata: Metadata = {
     template: "%s | TOEIC重要単語",
   },
   description: "【完全無料】TOEIC重要単語をAIが徹底解説！頻出単語を効率的に学習してスコアアップ。例文・類義語・発音も完備。",
+  keywords: ["TOEIC", "重要単語", "頻出単語", "英単語", "学習", "アプリ", "無料", "600点", "730点", "800点", "AI解説"],
   icons: {
     icon: [
       { url: "/icon.png", type: "image/png", sizes: "96x96" },
