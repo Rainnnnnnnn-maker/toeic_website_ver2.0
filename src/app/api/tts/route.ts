@@ -1,6 +1,24 @@
 import "server-only";
 
 export async function POST(request: Request) {
+  // Security Check: Verify Custom Header
+  const sourceHeader = request.headers.get("X-App-Source");
+  if (sourceHeader !== "toeic-client") {
+    return Response.json({ error: "Unauthorized source" }, { status: 403 });
+  }
+
+  // Security Check: Verify Origin/Referer
+  const origin = request.headers.get("origin");
+  const referer = request.headers.get("referer");
+  const host = request.headers.get("host");
+
+  if (host) {
+    const allowed = (origin && origin.includes(host)) || (referer && referer.includes(host));
+    if (!allowed) {
+      return Response.json({ error: "Unauthorized origin" }, { status: 403 });
+    }
+  }
+
   const apiKey = process.env.TTS_API_KEY;
 
   if (!apiKey) {

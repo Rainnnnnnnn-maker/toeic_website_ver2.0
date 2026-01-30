@@ -59,7 +59,10 @@ export function useTTS() {
         try {
             const response = await fetch("/api/tts", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-App-Source": "toeic-client",
+                },
                 body: JSON.stringify({ text: word }),
             });
 
@@ -93,7 +96,10 @@ export function useTTS() {
         try {
             const response = await fetch("/api/tts", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-App-Source": "toeic-client",
+                },
                 body: JSON.stringify({ text }),
             });
 
