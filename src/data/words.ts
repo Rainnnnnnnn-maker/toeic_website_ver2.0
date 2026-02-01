@@ -107,8 +107,11 @@ const getWordsData = unstable_cache(
     }
     return getWordsBlob();
   },
-  ["word-list-blob-v1"], // Cache key
-  { revalidate: process.env.NODE_ENV === 'development' ? 3600 : 3600 * 24 * 7 } // Cache for 7 days in prod, 1 hour in dev
+  ["word-list-blob-v2"], // Cache key
+  { 
+    revalidate: process.env.NODE_ENV === 'development' ? 3600 : 3600 * 24 * 7,
+    tags: ['word-data']
+  } // Cache for 7 days in prod, 1 hour in dev
 );
 
 // Memoize the data fetching within the same request lifecycle
