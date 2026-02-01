@@ -7,9 +7,19 @@ import { useFavorites } from "@/context/FavoritesContext";
 import type { Word } from "@/data/words";
 
 export default function FavoritesListClient({ allWords }: { allWords: Word[] }) {
-  const { favorites } = useFavorites();
+  const { favorites, clearFavorites } = useFavorites();
   const [page, setPage] = useState(1);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
   const pageSize = 20;
+
+  const handleClearClick = () => {
+    setShowConfirmModal(true);
+  };
+
+  const confirmClear = () => {
+    clearFavorites();
+    setShowConfirmModal(false);
+  };
 
   const favoriteWords = useMemo(() => {
     const favSet = new Set(favorites);
@@ -48,7 +58,14 @@ export default function FavoritesListClient({ allWords }: { allWords: Word[] }) 
 
   return (
     <section className={styles.gridSection}>
-      <div className={styles.controlsRow}>
+      <div className={styles.favoritesControls}>
+        <button
+          onClick={handleClearClick}
+          className={styles.pageButton}
+          aria-label="お気に入りをクリア"
+        >
+          クリア
+        </button>
         <div style={{ flex: 1 }}></div> {/* Spacer to align pagination to right or center if needed */}
         <div className={styles.pagination}>
           <button
@@ -87,6 +104,30 @@ export default function FavoritesListClient({ allWords }: { allWords: Word[] }) 
           </Link>
         ))}
       </div>
+
+      {showConfirmModal && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalContent}>
+            <h3 className={styles.modalTitle}>確認</h3>
+            <p className={styles.modalDescription}>
+              お気に入り単語をすべて削除してもよろしいですか？
+              <br />
+              この操作は取り消せません。
+            </p>
+            <div className={styles.modalActions}>
+              <button
+                onClick={() => setShowConfirmModal(false)}
+                className={styles.cancelButton}
+              >
+                キャンセル
+              </button>
+              <button onClick={confirmClear} className={styles.dangerButton}>
+                削除する
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

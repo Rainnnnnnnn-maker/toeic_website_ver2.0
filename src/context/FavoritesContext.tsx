@@ -14,6 +14,7 @@ type FavoritesContextType = {
   addFavorite: (slug: string) => void;
   removeFavorite: (slug: string) => void;
   toggleFavorite: (slug: string) => void;
+  clearFavorites: () => void;
   isFavorite: (slug: string) => boolean;
 };
 
@@ -74,6 +75,10 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
     []
   );
 
+  const clearFavorites = useCallback(() => {
+    setFavorites([]);
+  }, []);
+
   const isFavorite = useCallback(
     (slug: string) => {
       return favorites.includes(slug);
@@ -88,6 +93,7 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
         addFavorite,
         removeFavorite,
         toggleFavorite,
+        clearFavorites,
         isFavorite,
       }}
     >
