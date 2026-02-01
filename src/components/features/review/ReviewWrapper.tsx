@@ -15,8 +15,10 @@ export default function ReviewWrapper({ allWords }: Props) {
   const { favorites } = useFavorites();
 
   const favoriteWords = useMemo(() => {
-    const favSet = new Set(favorites);
-    return allWords.filter((w) => favSet.has(w.slug));
+    const wordsMap = new Map(allWords.map((w) => [w.slug, w]));
+    return favorites
+      .map((slug) => wordsMap.get(slug))
+      .filter((w): w is Word => w !== undefined);
   }, [allWords, favorites]);
 
   if (favoriteWords.length === 0) {
