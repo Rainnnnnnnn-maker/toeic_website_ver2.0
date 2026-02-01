@@ -68,6 +68,7 @@ export default function ReviewWrapper({ allWords }: Props) {
       pageTitle="復習モード"
       backLink="/favorites"
       backLinkText="お気に入りへ戻る"
+      order="sequential"
     />
   );
 }

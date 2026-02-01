@@ -16,6 +16,7 @@ type Props = {
   pageTitle?: string;
   backLink?: string;
   backLinkText?: string;
+  order?: 'random' | 'sequential';
 };
 
 type PersistedStudyStateV1 = {
@@ -133,7 +134,8 @@ export default function StudyClient({
   storageKey = DEFAULT_STORAGE_KEY,
   pageTitle = DEFAULT_PAGE_TITLE,
   backLink = DEFAULT_BACK_LINK,
-  backLinkText = DEFAULT_BACK_LINK_TEXT
+  backLinkText = DEFAULT_BACK_LINK_TEXT,
+  order = 'random'
 }: Props) {
   const router = useRouter();
   const { isFavorite, toggleFavorite } = useFavorites();
@@ -214,28 +216,39 @@ export default function StudyClient({
     }
 
     let nextWord: Word;
-    let safetyCounter = 0;
-    
-    // 現在の単語と同じ場合は再抽選する（リストが2つ以上ある場合のみ）
-    do {
-      let pool = words;
-      // 重み付け: medium(80%), important(20%)
-      if (mediumWords.length > 0 && importantWords.length > 0) {
-        pool = Math.random() < 0.8 ? mediumWords : importantWords;
-      }
 
-      const randomIndex = Math.floor(Math.random() * pool.length);
-      nextWord = pool[randomIndex];
-      safetyCounter++;
-    } while (
-      words.length > 1 && 
-      currentWord && 
-      nextWord.slug === currentWord.slug && 
-      safetyCounter < 10
-    );
+    if (order === 'sequential') {
+      if (!currentWord) {
+        nextWord = words[0];
+      } else {
+        const currentIndex = words.findIndex(w => w.slug === currentWord.slug);
+        const nextIndex = (currentIndex + 1) % words.length;
+        nextWord = words[nextIndex];
+      }
+    } else {
+      let safetyCounter = 0;
+      
+      // 現在の単語と同じ場合は再抽選する（リストが2つ以上ある場合のみ）
+      do {
+        let pool = words;
+        // 重み付け: medium(80%), important(20%)
+        if (mediumWords.length > 0 && importantWords.length > 0) {
+          pool = Math.random() < 0.8 ? mediumWords : importantWords;
+        }
+
+        const randomIndex = Math.floor(Math.random() * pool.length);
+        nextWord = pool[randomIndex];
+        safetyCounter++;
+      } while (
+        words.length > 1 && 
+        currentWord && 
+        nextWord.slug === currentWord.slug && 
+        safetyCounter < 10
+      );
+    }
 
     setCurrentWord(nextWord);
-  }, [startCountdown, words, currentWord, mediumWords, importantWords]);
+  }, [startCountdown, words, currentWord, mediumWords, importantWords, order]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
