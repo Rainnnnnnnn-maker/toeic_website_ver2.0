@@ -61,6 +61,7 @@ A comprehensive web application for learning essential TOEIC vocabulary, featuri
     | `UPSTASH_REDIS_REST_URL` | Upstash Redis REST URL. |
     | `UPSTASH_REDIS_REST_TOKEN` | Upstash Redis REST Token. |
     | `BLOB_READ_WRITE_TOKEN` | Vercel Blob Token (for fetching word lists in production). |
+    | `REVALIDATION_TOKEN` | Secret token for validating ISR revalidation requests. |
     | `WORD_CACHE_TTL_DAYS` | (Optional) Cache duration in days (default: 30). |
 
 4.  **Data Setup (Local Development)**
@@ -85,6 +86,18 @@ A comprehensive web application for learning essential TOEIC vocabulary, featuri
 - `npm run start`: Starts the production server.
 - `npm run lint`: Runs ESLint.
 - `npm run test`: Runs tests using Vitest (Note: Manual testing is the primary strategy for this project).
+
+## 🔄 API Endpoints
+
+### Revalidate Word Data
+Triggers on-demand revalidation for cached word lists (tag: `word-data`). Useful when updating word lists in Vercel Blob.
+
+- **Endpoint**: `GET /api/revalidate/words`
+- **Authentication**: Requires `token` query parameter matching `REVALIDATION_TOKEN`.
+- **Usage**:
+  ```bash
+  curl "https://<your-site>/api/revalidate/words?token=<REVALIDATION_TOKEN>"
+  ```
 
 ## 📂 Project Structure
 
