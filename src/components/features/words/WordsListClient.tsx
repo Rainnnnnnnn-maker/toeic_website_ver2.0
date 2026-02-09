@@ -58,6 +58,21 @@ export default function WordsListClient({ importantWords, mediumWords }: Props) 
     if (!q) {
       return activeTab === 'important' ? importantWithCategory : mediumWithCategory;
     }
+
+    // ワイルドカード検索 (*) のサポート
+    if (q.includes('*')) {
+      try {
+        // 特殊文字をエスケープし、* を .* に置換
+        // 注意: エスケープ対象に * も含めることで、後続の replace で確実に .* に変換できるようにする
+        const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const pattern = escaped.replace(/\\\*/g, '.*');
+        const regex = new RegExp(`^${pattern}$`, 'i');
+        return allWithCategory.filter((w) => regex.test(w.term));
+      } catch (e) {
+        return [];
+      }
+    }
+
     return allWithCategory.filter((w) => w.term.toLowerCase().startsWith(q));
   }, [query, activeTab, importantWithCategory, mediumWithCategory, allWithCategory]);
 
