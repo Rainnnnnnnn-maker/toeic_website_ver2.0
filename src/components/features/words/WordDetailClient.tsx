@@ -19,8 +19,10 @@ export function WordDetailClient({ initialData, linkedWords = {} }: Props) {
   const { isFavorite, toggleFavorite } = useFavorites();
   const {
     audioLoading,
+    japaneseAudioLoading,
     sentenceAudioLoading,
     handlePlayAudio,
+    handlePlayJapaneseAudio,
     handlePlaySentenceAudio
   } = useTTS();
   const { shareTarget } = useShareTarget();
@@ -117,7 +119,26 @@ export function WordDetailClient({ initialData, linkedWords = {} }: Props) {
                           </span>
                         </button>
                       </div>
-                      <p className={`${styles.exampleTranslation} ${styles.marginTop4}`}>{d.exampleJapanese}</p>
+                      <div className={styles.flexStartGap8}>
+                        <p className={`${styles.exampleTranslation} ${styles.marginTop4} ${styles.noMargin}`}>{d.exampleJapanese}</p>
+                        <button
+                          type="button"
+                          className={`${styles.audioButton} ${styles.exampleAudioButton}`}
+                          onClick={() => handlePlaySentenceAudio(d.exampleJapanese, `meaning-${idx}-detail-${d.number}-ja`, "ja")}
+                          disabled={sentenceAudioLoading === `meaning-${idx}-detail-${d.number}-ja`}
+                          aria-label="日本語訳を再生"
+                        >
+                          <span
+                            className={`${styles.audioIcon} ${styles.smallAudioIcon}`}
+                          >
+                            {sentenceAudioLoading === `meaning-${idx}-detail-${d.number}-ja` ? (
+                              <Loader2 className={styles.spinner} size={14} />
+                            ) : (
+                              <Volume2 size={14} />
+                            )}
+                          </span>
+                        </button>
+                      </div>
                       <p className={styles.metaText}>
                         場面：{d.context}／頻度：{d.frequency}
                       </p>
@@ -211,9 +232,28 @@ export function WordDetailClient({ initialData, linkedWords = {} }: Props) {
                       </span>
                     </button>
                   </div>
-                  <p className={`${styles.exampleTranslation} ${styles.marginTop4}`}>
-                    {ex.japanese}
-                  </p>
+                  <div className={styles.flexStartGap8}>
+                    <p className={`${styles.exampleTranslation} ${styles.marginTop4} ${styles.noMargin}`}>
+                      {ex.japanese}
+                    </p>
+                    <button
+                      type="button"
+                      className={`${styles.audioButton} ${styles.exampleAudioButton}`}
+                      onClick={() => handlePlaySentenceAudio(ex.japanese, `toeic-${i}-ja`, "ja")}
+                      disabled={sentenceAudioLoading === `toeic-${i}-ja`}
+                      aria-label="日本語訳を再生"
+                    >
+                      <span
+                        className={`${styles.audioIcon} ${styles.smallAudioIcon}`}
+                      >
+                        {sentenceAudioLoading === `toeic-${i}-ja` ? (
+                          <Loader2 className={styles.spinner} size={14} />
+                        ) : (
+                          <Volume2 size={14} />
+                        )}
+                      </span>
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
