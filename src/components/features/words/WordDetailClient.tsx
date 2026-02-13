@@ -19,10 +19,8 @@ export function WordDetailClient({ initialData, linkedWords = {} }: Props) {
   const { isFavorite, toggleFavorite } = useFavorites();
   const {
     audioLoading,
-    japaneseAudioLoading,
     sentenceAudioLoading,
     handlePlayAudio,
-    handlePlayJapaneseAudio,
     handlePlaySentenceAudio
   } = useTTS();
   const { shareTarget } = useShareTarget();
