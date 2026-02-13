@@ -4,9 +4,6 @@ type TTSState = {
     audioUrl?: string;
     cachedWord?: string;
     audioLoading: boolean;
-    japaneseAudioUrl?: string;
-    cachedJapaneseText?: string;
-    japaneseAudioLoading: boolean;
     sentenceAudioUrls: Record<string, string>;
     sentenceAudioLoading: string | null;
 };
@@ -14,7 +11,6 @@ type TTSState = {
 export function useTTS() {
     const [state, setState] = useState<TTSState>({
         audioLoading: false,
-        japaneseAudioLoading: false,
         sentenceAudioUrls: {},
         sentenceAudioLoading: null,
     });
@@ -47,7 +43,7 @@ export function useTTS() {
         audio.play().catch((e) => console.error("Audio play failed", e));
     }, []);
 
-    const handlePlayAudio = useCallback(async (word: string, currentAudioUrl?: string, language: string = "en") => {
+    const handlePlayAudio = useCallback(async (word: string, currentAudioUrl?: string) => {
         if (currentAudioUrl) {
             playAudio(currentAudioUrl);
             return;
@@ -67,7 +63,7 @@ export function useTTS() {
                     "Content-Type": "application/json",
                     "X-App-Source": "toeic-client",
                 },
-                body: JSON.stringify({ text: word, language }),
+                body: JSON.stringify({ text: word }),
             });
 
             if (!response.ok) throw new Error("Failed to synthesize speech");
@@ -76,11 +72,11 @@ export function useTTS() {
             if (!json.audioContent) throw new Error("Missing audio content");
 
             const audioUrl = `data:audio/mp3;base64,${json.audioContent}`;
-            setState((prev) => ({
-                ...prev,
-                audioUrl,
+            setState((prev) => ({ 
+                ...prev, 
+                audioUrl, 
                 cachedWord: word,
-                audioLoading: false
+                audioLoading: false 
             }));
             playAudio(audioUrl);
         } catch {
@@ -89,45 +85,7 @@ export function useTTS() {
         }
     }, [state.audioUrl, state.cachedWord, playAudio]);
 
-    const handlePlayJapaneseAudio = useCallback(async (text: string) => {
-        // If we already have it in state for the SAME text, play it
-        if (state.japaneseAudioUrl && state.cachedJapaneseText === text) {
-            playAudio(state.japaneseAudioUrl);
-            return;
-        }
-
-        setState((prev) => ({ ...prev, japaneseAudioLoading: true }));
-
-        try {
-            const response = await fetch("/api/tts", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-App-Source": "toeic-client",
-                },
-                body: JSON.stringify({ text, language: "ja" }),
-            });
-
-            if (!response.ok) throw new Error("Failed to synthesize speech");
-
-            const json = (await response.json()) as { audioContent?: string };
-            if (!json.audioContent) throw new Error("Missing audio content");
-
-            const audioUrl = `data:audio/mp3;base64,${json.audioContent}`;
-            setState((prev) => ({
-                ...prev,
-                japaneseAudioUrl: audioUrl,
-                cachedJapaneseText: text,
-                japaneseAudioLoading: false
-            }));
-            playAudio(audioUrl);
-        } catch {
-            setState((prev) => ({ ...prev, japaneseAudioLoading: false }));
-            alert("音声の生成に失敗しました。時間をおいて再度お試しください。");
-        }
-    }, [state.japaneseAudioUrl, state.cachedJapaneseText, playAudio]);
-
-    const handlePlaySentenceAudio = useCallback(async (text: string, id: string, language: string = "en") => {
+    const handlePlaySentenceAudio = useCallback(async (text: string, id: string) => {
         if (state.sentenceAudioUrls[id]) {
             playAudio(state.sentenceAudioUrls[id]);
             return;
@@ -142,7 +100,7 @@ export function useTTS() {
                     "Content-Type": "application/json",
                     "X-App-Source": "toeic-client",
                 },
-                body: JSON.stringify({ text, language }),
+                body: JSON.stringify({ text }),
             });
 
             if (!response.ok) throw new Error("Failed to synthesize speech");
@@ -166,7 +124,6 @@ export function useTTS() {
     return {
         ...state,
         handlePlayAudio,
-        handlePlayJapaneseAudio,
         handlePlaySentenceAudio,
     };
 }
