@@ -75,6 +75,10 @@ function removeValue(values: string[], value: string): string[] {
   return values.filter((v) => v !== value);
 }
 
+function escapeRegExp(string: string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 // AutoResizingText Component
 const AutoResizingText = ({ text, className, style }: { text: string, className?: string, style?: React.CSSProperties }) => {
   const ref = useRef<HTMLSpanElement>(null);
@@ -379,19 +383,20 @@ export default function StudyClient({
       if (!currentWord) return <p className={styles.exampleText}>{hintExample}</p>;
 
       const word = currentWord.term;
-      // Split by the word (case insensitive)
-      const parts = hintExample.split(new RegExp(`(${word})`, 'gi'));
+      const escapedWord = escapeRegExp(word);
+      const parts = hintExample.split(new RegExp(`(\\b${escapedWord}\\w*)`, 'gi'));
 
       return (
         <p className={styles.exampleText}>
           <span className={styles.sampleLabel}>Sample:</span>
-          {parts.map((part, i) => 
-            part.toLowerCase() === word.toLowerCase() ? (
+          {parts.map((part, i) => {
+            const isMatch = new RegExp(`^${escapedWord}\\w*$`, 'i').test(part);
+            return isMatch ? (
               <span key={i} className={styles.highlightedWord}>{part}</span>
             ) : (
               <span key={i}>{part}</span>
-            )
-          )}
+            );
+          })}
           <button 
             className={styles.audioButton} 
             onClick={() => handlePlaySentenceAudio(hintExample, `hint-example-${currentWord?.slug}`)}
