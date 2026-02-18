@@ -10,24 +10,27 @@ import TabNavigation, { TabId } from "@/components/common/TabNavigation";
 type Props = {
   importantWords: Word[];
   mediumWords: Word[];
+  highWords: Word[];
 };
 
-export default function WordsListClient({ importantWords, mediumWords }: Props) {
+export default function WordsListClient({ importantWords, mediumWords, highWords }: Props) {
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
   const [activeTab, setActiveTab] = useState<TabId>('important');
   const inputRef = useRef<HTMLInputElement>(null);
   const pageSize = 20;
 
-  const { importantWithCategory, mediumWithCategory, allWithCategory } = useMemo(() => {
+  const { importantWithCategory, mediumWithCategory, highWithCategory, allWithCategory } = useMemo(() => {
     const imp = importantWords.map(w => ({ ...w, category: 'important' as const }));
     const med = mediumWords.map(w => ({ ...w, category: 'medium' as const }));
+    const high = highWords.map(w => ({ ...w, category: 'high' as const }));
     return {
       importantWithCategory: imp,
       mediumWithCategory: med,
-      allWithCategory: [...imp, ...med]
+      highWithCategory: high,
+      allWithCategory: [...imp, ...med, ...high]
     };
-  }, [importantWords, mediumWords]);
+  }, [importantWords, mediumWords, highWords]);
 
   const handleQueryChange = (e: ChangeEvent<HTMLInputElement>) => {
     const nextQuery = e.target.value;
@@ -56,7 +59,9 @@ export default function WordsListClient({ importantWords, mediumWords }: Props) 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) {
-      return activeTab === 'important' ? importantWithCategory : mediumWithCategory;
+      if (activeTab === 'important') return importantWithCategory;
+      if (activeTab === 'medium') return mediumWithCategory;
+      return highWithCategory;
     }
 
     // ワイルドカード検索 (*) のサポート
@@ -74,7 +79,7 @@ export default function WordsListClient({ importantWords, mediumWords }: Props) 
     }
 
     return allWithCategory.filter((w) => w.term.toLowerCase().startsWith(q));
-  }, [query, activeTab, importantWithCategory, mediumWithCategory, allWithCategory]);
+  }, [query, activeTab, importantWithCategory, mediumWithCategory, highWithCategory, allWithCategory]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
   const currentPage = Math.min(page, totalPages);
@@ -96,12 +101,20 @@ export default function WordsListClient({ importantWords, mediumWords }: Props) 
               まずはこのリストを完璧にすることで、スコアアップを目指しましょう。
             </p>
           </div>
-        ) : (
+        ) : activeTab === 'medium' ? (
           <div>
             <h2 className={styles.levelTitle}>中級単語（TOEIC 730〜800点レベル）</h2>
             <p className={styles.levelDescription}>
               さらなるスコアアップを目指すための応用単語です。
               やや難易度の高い単語ですが、Part 5、Part 6、Part 7の問題対策としても有効です。
+            </p>
+          </div>
+        ) : (
+          <div>
+            <h2 className={styles.levelTitle}>高難易度単語（TOEIC 800点以上レベル）</h2>
+            <p className={styles.levelDescription}>
+              800点以上の高スコアを目指すための上級単語です。
+              Part 7の長文読解や、より高度なビジネス表現に対応するための語彙力を強化します。
             </p>
           </div>
         )}
@@ -181,8 +194,13 @@ export default function WordsListClient({ importantWords, mediumWords }: Props) 
             <div className={styles.wordCardHeader}>
               <span className={styles.wordText}>{word.term}</span>
               {query && (
-                <span className={`${styles.categoryBadge} ${word.category === 'important' ? styles.badgeImportant : styles.badgeMedium}`}>
-                  {word.category === 'important' ? '重要' : '中級'}
+                <span className={`${styles.categoryBadge} ${
+                  word.category === 'important' ? styles.badgeImportant : 
+                  word.category === 'medium' ? styles.badgeMedium : 
+                  styles.badgeHigh
+                }`}>
+                  {word.category === 'important' ? '重要' : 
+                   word.category === 'medium' ? '中級' : '上級'}
                 </span>
               )}
             </div>

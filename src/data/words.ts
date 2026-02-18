@@ -8,16 +8,17 @@ import path from "node:path";
 export type Word = {
   slug: string;
   term: string;
-  level: 'important' | 'medium';
+  level: 'important' | 'medium' | 'high';
 };
 
 type WordData = {
   important: Word[];
   medium: Word[];
+  high: Word[];
   allWords: Word[];
 };
 
-function parseWords(text: string, level: 'important' | 'medium'): Word[] {
+function parseWords(text: string, level: 'important' | 'medium' | 'high'): Word[] {
   const seen = new Set<string>();
   const lines = text.split(/\r?\n/);
   const words: Word[] = [];
@@ -33,9 +34,9 @@ function parseWords(text: string, level: 'important' | 'medium'): Word[] {
   return words;
 }
 
-function buildWordData(important: Word[], medium: Word[]): WordData {
+function buildWordData(important: Word[], medium: Word[], high: Word[]): WordData {
   const allWordsMap = new Map<string, Word>();
-  [...important, ...medium].forEach(w => {
+  [...important, ...medium, ...high].forEach(w => {
     if (!allWordsMap.has(w.slug)) {
       allWordsMap.set(w.slug, w);
     }
@@ -45,12 +46,13 @@ function buildWordData(important: Word[], medium: Word[]): WordData {
   return {
     important,
     medium,
+    high,
     allWords,
   };
 }
 
 async function getWordsLocal(): Promise<WordData> {
-  const loadWords = (filename: string, level: 'important' | 'medium'): Word[] => {
+  const loadWords = (filename: string, level: 'important' | 'medium' | 'high'): Word[] => {
     const filePath = path.join(process.cwd(), "__doc__", filename);
     if (!fs.existsSync(filePath)) {
       console.warn(`Local word file not found: ${filePath}`);
@@ -62,14 +64,15 @@ async function getWordsLocal(): Promise<WordData> {
 
   const important = loadWords("word.txt", "important");
   const medium = loadWords("word_mid.txt", "medium");
+  const high = loadWords("word_high.txt", "high");
 
-  return buildWordData(important, medium);
+  return buildWordData(important, medium, high);
 }
 
 async function getWordsBlob(): Promise<WordData> {
   const { blobs } = await list({ token: process.env.BLOB_READ_WRITE_TOKEN });
 
-  const loadWords = async (filename: string, level: 'important' | 'medium'): Promise<Word[]> => {
+  const loadWords = async (filename: string, level: 'important' | 'medium' | 'high'): Promise<Word[]> => {
     // Find blob ending with filename (to handle potential folders or prefixes)
     const blob = blobs.find(b => b.pathname.endsWith(filename));
     if (!blob) {
@@ -91,12 +94,13 @@ async function getWordsBlob(): Promise<WordData> {
     }
   };
 
-  const [important, medium] = await Promise.all([
+  const [important, medium, high] = await Promise.all([
     loadWords("words-file/word.txt", "important"),
-    loadWords("words-file/word_mid.txt", "medium")
+    loadWords("words-file/word_mid.txt", "medium"),
+    loadWords("words-file/word_high.txt", "high")
   ]);
 
-  return buildWordData(important, medium);
+  return buildWordData(important, medium, high);
 }
 
 // Cached function to fetch and parse words
@@ -132,6 +136,11 @@ export async function getImportantWords(): Promise<Word[]> {
 export async function getMediumWords(): Promise<Word[]> {
   const data = await getWordsDataCached();
   return data.medium;
+}
+
+export async function getHighWords(): Promise<Word[]> {
+  const data = await getWordsDataCached();
+  return data.high;
 }
 
 export async function getWordBySlug(slug: string): Promise<Word | undefined> {
