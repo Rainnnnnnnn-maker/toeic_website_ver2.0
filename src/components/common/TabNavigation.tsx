@@ -19,7 +19,7 @@ interface TabNavigationProps {
 const TABS: Tab[] = [
   { id: 'important', label: '重要単語', status: 'active' },
   { id: 'medium', label: '中難易度単語', status: 'active' },
-  { id: 'high', label: '高難易度単語', status: 'coming_soon' },
+  { id: 'high', label: '高難易度単語', status: 'active' },
 ];
 
 export default function TabNavigation({ activeTab, onTabChange }: TabNavigationProps) {
