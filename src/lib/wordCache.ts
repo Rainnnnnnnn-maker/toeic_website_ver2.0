@@ -1,5 +1,5 @@
 import "server-only";
-import type { WordDetails } from "@/lib/actions";
+import type { WordDetails } from "@/types/word";
 import { getRedis } from "./upstash";
 
 export function cacheKeyForWord(word: string): string {

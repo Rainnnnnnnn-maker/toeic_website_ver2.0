@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Star, Volume2, Loader2 } from "lucide-react";
 import { useFavorites } from "@/context/FavoritesContext";
 import styles from "./word-detail.module.css";
-import type { WordDetails } from "@/lib/actions";
+import type { WordDetails } from "@/types/word";
 import { SnsShareButtons } from "@/components/features/sns/SnsShareButtons";
 import { useTTS } from "@/hooks/useTTS";
 import { useShareTarget } from "@/context/ShareTargetContext";

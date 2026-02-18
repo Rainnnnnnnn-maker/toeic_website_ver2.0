@@ -2,7 +2,7 @@ import Link from "next/link";
 import Script from "next/script";
 import type { Metadata } from "next";
 import styles from "./page.module.css";
-import { getImportantWords, getMediumWords } from "@/data/words";
+import { getImportantWords, getMediumWords, getHighWords } from "@/data/words";
 import WordsListClient from "@/components/features/words/WordsListClient";
 import { SnsShareButtons } from "@/components/features/sns/SnsShareButtons";
 
@@ -21,6 +21,7 @@ export const metadata: Metadata = {
 export default async function Home() {
   const importantWords = await getImportantWords();
   const mediumWords = await getMediumWords();
+  const highWords = await getHighWords();
 
   // WebSite構造化データ
   const websiteJsonLd = {
@@ -98,7 +99,7 @@ export default async function Home() {
             </Link>
           </div>
         </header>
-        <WordsListClient importantWords={importantWords} mediumWords={mediumWords} />
+        <WordsListClient importantWords={importantWords} mediumWords={mediumWords} highWords={highWords} />
 
         <section className={styles.seoSection}>
           <article className={styles.seoArticle}>

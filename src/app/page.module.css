@@ -309,6 +309,11 @@
   color: #6b21a8;
 }
 
+.badgeHigh {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
 .wordText {
   font-size: 18px;
   font-weight: 600;

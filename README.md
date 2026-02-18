@@ -102,7 +102,9 @@ Triggers on-demand revalidation for cached word lists (tag: `word-data`). Useful
 ## 📂 Project Structure
 
 - `src/app`: Next.js App Router pages and API routes.
-- `src/components`: React components, organized by feature.
-- `src/lib`: Utility functions, API clients (Gemini, Redis), and server actions.
+- `src/actions`: Server Actions for data mutations and fetching.
+- `src/components`: React components, organized by feature (`features/`) and common UI (`common/`).
+- `src/lib`: Utility functions and API clients (Gemini, Redis).
+- `src/types`: TypeScript type definitions.
 - `src/data`: Data fetching logic (Local vs Blob switching).
 - `__doc__`: Local storage for word lists during development.
