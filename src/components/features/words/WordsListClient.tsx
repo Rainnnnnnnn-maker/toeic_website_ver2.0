@@ -5,7 +5,7 @@ import Link from "next/link";
 import styles from "@/app/page.module.css";
 import type { Word } from "@/data/words";
 import { X } from "lucide-react";
-import TabNavigation, { TabId } from "@/components/TabNavigation";
+import TabNavigation, { TabId } from "@/components/common/TabNavigation";
 
 type Props = {
   importantWords: Word[];

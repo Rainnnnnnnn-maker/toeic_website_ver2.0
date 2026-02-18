@@ -1,6 +1,6 @@
 'use server';
 
-import { getWordDetail } from "@/lib/actions";
+import { getWordDetail } from "@/actions/word";
 
 export async function fetchWordDetail(slug: string) {
   try {

@@ -1,4 +1,4 @@
-import { WordDetails } from "@/lib/actions";
+import type { WordDetails } from "@/types/word";
 
 export function generateWordDetailJsonLd(word: string, detail: WordDetails | null) {
   const jsonLd = [];
