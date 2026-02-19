@@ -400,7 +400,7 @@ export default function StudyClient({
       const parts = hintExample.split(new RegExp(`(\\b${escapedWord}\\w*)`, 'gi'));
 
       return (
-        <p className={styles.exampleText}>
+        <div className={styles.exampleText}>
           <span className={styles.sampleLabel}>Sample:</span>
           {parts.map((part, i) => {
             const isMatch = new RegExp(`^${escapedWord}\\w*$`, 'i').test(part);
@@ -415,7 +415,7 @@ export default function StudyClient({
             onClick={() => handlePlaySentenceAudio(hintExample, `hint-example-${currentWord?.slug}`)}
             disabled={sentenceAudioLoading === `hint-example-${currentWord?.slug}`}
             aria-label="Play sample audio"
-            style={{ marginLeft: '8px', verticalAlign: 'middle' }}
+            style={{ marginLeft: '8px', verticalAlign: 'middle', display: 'inline-flex' }}
           >
             <span className={styles.audioIcon}>
               {sentenceAudioLoading === `hint-example-${currentWord?.slug}` ? (
@@ -425,7 +425,7 @@ export default function StudyClient({
               )}
             </span>
           </button>
-        </p>
+        </div>
       );
     };
 
