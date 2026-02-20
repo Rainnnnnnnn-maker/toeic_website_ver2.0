@@ -47,23 +47,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
-  // 詳細情報の取得（非同期・キャッシュor生成）
-  // SEOのために、可能な限り詳細情報を含める
-  let detail: WordDetails | null = null;
-  try {
-    detail = await getWordDetail(slug);
-  } catch (error) {
-    console.error(`Failed to fetch word detail for metadata (${slug}):`, error);
-    // エラー時は基本情報のみでフォールバック
-  }
+  // 詳細情報の取得（getWordDetail）を削除し、ここで待機しないようにする
+  // これによりSuspense（ローディング）が即座に動作し、UXが向上する
 
-  const title = detail
-    ? `${detail.word}のTOEIC品詞・AI例文・例文・意味「${detail.japaneseTranslation}」 | TOEIC重要単語`
-    : `${wordEntry.term} | TOEIC重要単語`;
-
-  const description = detail
-    ? `TOEIC重要単語「${detail.word}」の意味は「${detail.japaneseTranslation}」。${detail.nuance || ""} 例文: ${detail.toeicExamples[0]?.english} - ${detail.toeicExamples[0]?.japanese}`
-    : `TOEIC頻出単語「${wordEntry.term}」の意味と使い方をAIが解説。効率よく学習してスコアアップを目指しましょう。`;
+  const title = `${wordEntry.term} | TOEIC重要単語`;
+  const description = `TOEIC頻出単語「${wordEntry.term}」の意味と使い方をAIが解説。効率よく学習してスコアアップを目指しましょう。`;
 
   return {
     title,
