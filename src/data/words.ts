@@ -114,7 +114,7 @@ const getWordsData = unstable_cache(
   ["word-list-blob-v2"], // Cache key
   { 
     revalidate: process.env.NODE_ENV === 'development' ? 3600 : 3600 * 24 * 7,
-    tags: ['word-data']
+    tags: ['word-data'] // Tag for revalidation in Next.js cache.If changed, revalidate API route (/api/revalidate/words) with the same tag.
   } // Cache for 7 days in prod, 1 hour in dev
 );
 
