@@ -184,6 +184,47 @@
   width: 100%;
 }
 
+.searchTooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  margin-bottom: 8px;
+  background-color: rgba(148, 163, 184, 0.3);
+  color: #1e293b;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  white-space: nowrap;
+  z-index: 10;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.searchTooltipVisible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.searchTooltip::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 24px;
+  width: 8px;
+  height: 8px;
+  background-color: rgba(148, 163, 184, 0.3);
+  transform: rotate(45deg);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+}
+
 .searchInput {
   width: 100%;
   flex: 1;

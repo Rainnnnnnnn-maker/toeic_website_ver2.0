@@ -17,6 +17,7 @@ export default function WordsListClient({ importantWords, mediumWords, highWords
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
   const [activeTab, setActiveTab] = useState<TabId>('important');
+  const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const pageSize = 20;
 
@@ -123,10 +124,15 @@ export default function WordsListClient({ importantWords, mediumWords, highWords
       <TabNavigation activeTab={activeTab} onTabChange={handleTabChange} />
       <div className={styles.controlsRow}>
         <div className={styles.searchContainer}>
+          <div className={`${styles.searchTooltip} ${isFocused && !query ? styles.searchTooltipVisible : ''}`}>
+            💡 ワイルドカード（*）検索が利用可能です
+          </div>
           <input
             ref={inputRef}
             value={query}
             onChange={handleQueryChange}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
             onKeyDown={handleKeyDown}
             className={styles.searchInput}
             placeholder="全単語から検索..."
