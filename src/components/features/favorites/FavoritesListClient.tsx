@@ -22,11 +22,12 @@ export default function FavoritesListClient({ allWords }: { allWords: Word[] }) 
   };
 
   const favoriteWords = useMemo(() => {
-    const favSet = new Set(favorites);
-    // 元の順序を維持したい場合は allWords をフィルタリング
-    // 追加順にしたい場合は favorites を map して検索するが、
-    // ここではリストの順序（アルファベット順など元の順序）を維持する方針とする
-    return allWords.filter((w) => favSet.has(w.slug));
+    const wordMap = new Map(allWords.map((w) => [w.slug, w]));
+    // お気に入り追加順（逆順：最新が先頭）で表示
+    return [...favorites]
+      .reverse()
+      .map((slug) => wordMap.get(slug))
+      .filter((w): w is Word => w !== undefined);
   }, [allWords, favorites]);
 
   const totalPages = Math.max(1, Math.ceil(favoriteWords.length / pageSize));
