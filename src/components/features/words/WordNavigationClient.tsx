@@ -22,9 +22,12 @@ export default function WordNavigationClient({
 
   const navigationList = useMemo(() => {
     if (isFromFavorites) {
-      const favSet = new Set(favorites);
-      // allWordsの順序を維持してフィルタリング
-      return allWords.filter((w) => favSet.has(w.slug));
+      const wordMap = new Map(allWords.map((w) => [w.slug, w]));
+      // お気に入り一覧と同じ順序（最新が先頭）にする
+      return [...favorites]
+        .reverse()
+        .map((slug) => wordMap.get(slug))
+        .filter((w): w is Word => w !== undefined);
     }
     return allWords;
   }, [allWords, favorites, isFromFavorites]);
