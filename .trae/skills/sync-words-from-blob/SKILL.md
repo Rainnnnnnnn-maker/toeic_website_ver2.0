@@ -17,7 +17,7 @@ description: "Vercel Blobから単語ファイルをダウンロードし、ロ�
     *   プロジェクトルートに一時的な Node.js スクリプト（例: `sync-blob.mjs`）を作成します。
     *   スクリプト内で以下の処理を実装します:
         1.  `.env.local` から環境変数を読み込みます（正規表現での簡易パースを推奨）。
-        2.  `@vercel/blob` の `list` メソッドを使用して、`words-file/word.txt` と `words-file/word_mid.txt` の情報を取得します。
+        2.20.  `@vercel/blob` の `list` メソッドを使用して、`words-file/word.txt`、`words-file/word_mid.txt`、`words-file/word_high.txt` の情報を取得します。
         3.  `fetch` を使用してファイルの内容をダウンロードします。
         4.  ローカルの `__doc__/word.txt` と `__doc__/word_mid.txt` を読み込み、ダウンロードした内容と比較します。
         5.  差異がある場合:
@@ -53,7 +53,7 @@ if (!process.env.BLOB_READ_WRITE_TOKEN) {
 }
 
 const DOC_DIR = path.resolve(process.cwd(), '__doc__');
-const TARGET_FILES = ['word.txt', 'word_mid.txt'];
+const TARGET_FILES = ['word.txt', 'word_mid.txt', 'word_high.txt'];
 const PREFIX = 'words-file/';
 
 async function main() {
