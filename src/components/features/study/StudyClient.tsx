@@ -364,7 +364,8 @@ export default function StudyClient({
     if (!currentWord) return;
     setForgottenSlugs((prev) => addUnique(prev, currentWord.slug));
     setRememberedSlugs((prev) => removeValue(prev, currentWord.slug));
-    router.push(`/words/${currentWord.slug}`);
+    const query = backLink === '/favorites' ? '?from=favorites' : '';
+    router.push(`/words/${currentWord.slug}${query}`);
   };
 
   const handleHint = async () => {
