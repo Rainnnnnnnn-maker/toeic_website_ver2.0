@@ -70,6 +70,36 @@ async function getWordsLocal(): Promise<WordData> {
 }
 
 async function getWordsBlob(): Promise<WordData> {
+  // Check for direct URLs in environment variables to avoid List operations
+  const importantUrl = process.env.BLOB_URL_IMPORTANT;
+  const mediumUrl = process.env.BLOB_URL_MEDIUM;
+  const highUrl = process.env.BLOB_URL_HIGH;
+
+  if (importantUrl && mediumUrl && highUrl) {
+    const loadWordsDirect = async (url: string, level: 'important' | 'medium' | 'high'): Promise<Word[]> => {
+      try {
+        const res = await fetch(url);
+        if (!res.ok) {
+          console.warn(`Failed to fetch blob from URL: ${url}`);
+          return [];
+        }
+        const text = await res.text();
+        return parseWords(text, level);
+      } catch (e) {
+        console.error(`Error loading words from URL ${url}:`, e);
+        return [];
+      }
+    };
+
+    const [important, medium, high] = await Promise.all([
+      loadWordsDirect(importantUrl, "important"),
+      loadWordsDirect(mediumUrl, "medium"),
+      loadWordsDirect(highUrl, "high")
+    ]);
+
+    return buildWordData(important, medium, high);
+  }
+
   const { blobs } = await list({ token: process.env.BLOB_READ_WRITE_TOKEN });
 
   const loadWords = async (filename: string, level: 'important' | 'medium' | 'high'): Promise<Word[]> => {
