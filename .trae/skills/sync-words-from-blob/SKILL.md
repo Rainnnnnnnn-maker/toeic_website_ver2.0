@@ -10,20 +10,24 @@ description: "Vercel Blobから単語ファイルをダウンロードし、ロ�
 ## 実行手順
 
 1.  **環境変数の確認**:
-    *   `.env.local` ファイルから `BLOB_READ_WRITE_TOKEN` を読み込みます。
-    *   `BLOB_READ_WRITE_TOKEN` が設定されていない場合は、ユーザーに設定を促し、処理を中断します。
+    *   `.env.local` ファイルから `BLOB_URL_IMPORTANT`, `BLOB_URL_MEDIUM`, `BLOB_URL_HIGH` または `BLOB_READ_WRITE_TOKEN` を読み込みます。
+    *   直接URL（`BLOB_URL_*`）が設定されている場合はそれを使用し、設定されていない場合は `BLOB_READ_WRITE_TOKEN` を使用して一覧取得を行います。
+    *   どちらも利用できない場合はエラー終了します。
 
 2.  **スクリプトの作成と実行**:
     *   プロジェクトルートに一時的な Node.js スクリプト（例: `sync-blob.mjs`）を作成します。
     *   スクリプト内で以下の処理を実装します:
-        1.  `.env.local` から環境変数を読み込みます（正規表現での簡易パースを推奨）。
-        2.20.  `@vercel/blob` の `list` メソッドを使用して、`words-file/word.txt`、`words-file/word_mid.txt`、`words-file/word_high.txt` の情報を取得します。
-        3.  `fetch` を使用してファイルの内容をダウンロードします。
-        4.  ローカルの `__doc__/word.txt` と `__doc__/word_mid.txt` を読み込み、ダウンロードした内容と比較します。
-        5.  差異がある場合:
+        1.  `.env.local` から環境変数を読み込みます。
+        2.  `BLOB_URL_IMPORTANT`, `BLOB_URL_MEDIUM`, `BLOB_URL_HIGH` が全て存在する場合:
+            *   それぞれのURLをダウンロード対象とします。
+        3.  上記が存在しない場合:
+            *   `@vercel/blob` の `list` メソッドを使用してファイル情報を取得し、ダウンロード対象とします。
+        4.  `fetch` を使用してファイルの内容をダウンロードします。
+        5.  ローカルの `__doc__/word.txt` 等を読み込み、ダウンロードした内容と比較します。
+        6.  差異がある場合:
             *   ファイルを上書き保存します。
-            *   `__doc__` フォルダ内に `change_log_yyyymmddhhmiss.log` を作成し、変更内容（ファイル名、更新日時など）を書き込みます。
-        6.  差異がない場合:
+            *   `__doc__` フォルダ内に `change_log_yyyymmddhhmiss.log` を作成し、変更内容を記録します。
+        7.  差異がない場合:
             *   「変更なし」とログに出力します。
 
 3.  **クリーンアップ**:
@@ -36,24 +40,29 @@ import { list } from '@vercel/blob';
 import fs from 'fs';
 import path from 'path';
 
-// .env.local からトークンを読み込む簡易実装
+// .env.local から環境変数を読み込む簡易実装
 const envPath = path.resolve(process.cwd(), '.env.local');
 if (fs.existsSync(envPath)) {
   const envContent = fs.readFileSync(envPath, 'utf-8');
-  // 引用符や空白に対応する正規表現
-  const match = envContent.match(/BLOB_READ_WRITE_TOKEN=["']?([^"'\n]+)["']?/);
-  if (match) {
-    process.env.BLOB_READ_WRITE_TOKEN = match[1].trim();
-  }
-}
-
-if (!process.env.BLOB_READ_WRITE_TOKEN) {
-  console.error('Error: BLOB_READ_WRITE_TOKEN not found in .env.local');
-  process.exit(1);
+  const loadEnv = (key) => {
+    const regex = new RegExp(`${key}=["']?([^"'\n]+)["']?`);
+    const match = envContent.match(regex);
+    if (match) {
+      process.env[key] = match[1].trim();
+    }
+  };
+  loadEnv('BLOB_READ_WRITE_TOKEN');
+  loadEnv('BLOB_URL_IMPORTANT');
+  loadEnv('BLOB_URL_MEDIUM');
+  loadEnv('BLOB_URL_HIGH');
 }
 
 const DOC_DIR = path.resolve(process.cwd(), '__doc__');
-const TARGET_FILES = ['word.txt', 'word_mid.txt', 'word_high.txt'];
+const TARGET_FILES = [
+  { name: 'word.txt', env: 'BLOB_URL_IMPORTANT', key: 'words-file/word.txt' },
+  { name: 'word_mid.txt', env: 'BLOB_URL_MEDIUM', key: 'words-file/word_mid.txt' },
+  { name: 'word_high.txt', env: 'BLOB_URL_HIGH', key: 'words-file/word_high.txt' }
+];
 const PREFIX = 'words-file/';
 
 async function main() {
@@ -63,48 +72,69 @@ async function main() {
       fs.mkdirSync(DOC_DIR, { recursive: true });
     }
 
-    console.log('Fetching blob list...');
-    // prefixでフィルタリングしてリスト取得
-    const { blobs } = await list({ prefix: PREFIX, limit: 100 });
+    let downloadTargets = [];
+    const importantUrl = process.env.BLOB_URL_IMPORTANT;
+    const mediumUrl = process.env.BLOB_URL_MEDIUM;
+    const highUrl = process.env.BLOB_URL_HIGH;
+
+    // Check if direct URLs are available (all or nothing logic similar to src/data/words.ts)
+    if (importantUrl && mediumUrl && highUrl) {
+      console.log('Using direct Blob URLs from environment variables...');
+      downloadTargets = TARGET_FILES.map(f => ({
+        name: f.name,
+        url: process.env[f.env]
+      }));
+    } else {
+      // Fallback to list()
+      if (!process.env.BLOB_READ_WRITE_TOKEN) {
+        console.error('Error: BLOB_READ_WRITE_TOKEN not found (and direct URLs are missing)');
+        process.exit(1);
+      }
+
+      console.log('Fetching blob list...');
+      // prefixでフィルタリングしてリスト取得
+      const { blobs } = await list({ prefix: PREFIX, limit: 100, token: process.env.BLOB_READ_WRITE_TOKEN });
+      
+      downloadTargets = TARGET_FILES.map(f => {
+        const blob = blobs.find(b => b.pathname === f.key);
+        if (!blob) {
+            console.warn(`Warning: Blob not found for ${f.key}`);
+            return null;
+        }
+        return {
+            name: f.name,
+            url: blob.url
+        };
+      }).filter(Boolean);
+    }
 
     let hasChanges = false;
     let logContent = `Update Log: ${new Date().toISOString()}\n\n`;
 
-    for (const fileName of TARGET_FILES) {
-      const blobKey = PREFIX + fileName;
-      // パスが一致するものを探す
-      const blob = blobs.find(b => b.pathname === blobKey);
-
-      if (!blob) {
-        console.warn(`Warning: Blob not found for ${blobKey}`);
-        continue;
-      }
-
-      console.log(`Downloading ${blobKey} from ${blob.url}...`);
-      const response = await fetch(blob.url);
+    for (const target of downloadTargets) {
+      console.log(`Downloading ${target.name} from ${target.url}...`);
+      const response = await fetch(target.url);
       if (!response.ok) {
-        console.error(`Failed to download ${blobKey}: ${response.statusText}`);
+        console.error(`Failed to download ${target.name}: ${response.statusText}`);
         continue;
       }
       const newContent = await response.text();
       
-      const localFilePath = path.join(DOC_DIR, fileName);
+      const localFilePath = path.join(DOC_DIR, target.name);
       let oldContent = '';
       if (fs.existsSync(localFilePath)) {
         oldContent = fs.readFileSync(localFilePath, 'utf-8');
       }
 
-      // 改行コードの違いを無視して比較するために normalize する場合もありますが、
-      // ここでは完全一致で比較します。
       if (newContent !== oldContent) {
-        console.log(`Updating ${fileName}...`);
+        console.log(`Updating ${target.name}...`);
         fs.writeFileSync(localFilePath, newContent, 'utf-8');
         hasChanges = true;
-        logContent += `Updated: ${fileName}\n`;
-        logContent += `Blob URL: ${blob.url}\n`;
+        logContent += `Updated: ${target.name}\n`;
+        logContent += `Blob URL: ${target.url}\n`;
         logContent += `Size: ${newContent.length} bytes\n\n`;
       } else {
-        console.log(`No changes for ${fileName}`);
+        console.log(`No changes for ${target.name}`);
       }
     }
 
