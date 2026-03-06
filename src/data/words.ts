@@ -51,6 +51,21 @@ function buildWordData(important: Word[], medium: Word[], high: Word[]): WordDat
   };
 }
 
+function stringToSeed(str: string): number {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  return Math.abs(hash);
+}
+
+function getSeededRandom(seed: number): number {
+  const x = Math.sin(seed) * 10000;
+  return x - Math.floor(x);
+}
+
 async function getWordsLocal(): Promise<WordData> {
   const loadWords = (filename: string, level: 'important' | 'medium' | 'high'): Word[] => {
     const filePath = path.join(process.cwd(), "__doc__", filename);
@@ -198,12 +213,29 @@ export async function getRelatedWords(currentSlug: string, count: number = 5): P
 
   const taken = new Set<number>();
   const limit = Math.min(count, len);
+  let seed = stringToSeed(currentSlug);
 
   while(result.length < limit) {
-    const idx = Math.floor(Math.random() * len);
+    const randomVal = getSeededRandom(seed++);
+    const idx = Math.floor(randomVal * len);
+    
     if(!taken.has(idx)) {
        taken.add(idx);
        result.push(candidates[idx]);
+    } else {
+        // Prevent infinite loop if random generator is poor or we are unlucky
+        // Just linearly search for next available slot
+        let found = false;
+        for(let i = 1; i < len; i++) {
+            const nextIdx = (idx + i) % len;
+            if(!taken.has(nextIdx)) {
+                taken.add(nextIdx);
+                result.push(candidates[nextIdx]);
+                found = true;
+                break;
+            }
+        }
+        if(!found) break; // Should not happen if len >= limit
     }
   }
   return result;
