@@ -8,6 +8,7 @@ import {
   useCallback,
   ReactNode,
 } from "react";
+import { sendGAEvent } from "@next/third-parties/google";
 
 type FavoritesContextType = {
   favorites: string[];
@@ -67,8 +68,10 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
     (slug: string) => {
       setFavorites((prev) => {
         if (prev.includes(slug)) {
+          sendGAEvent("event", "favorite_toggle", { action: "remove", word: slug });
           return prev.filter((item) => item !== slug);
         }
+        sendGAEvent("event", "favorite_toggle", { action: "add", word: slug });
         return [...prev, slug];
       });
     },
