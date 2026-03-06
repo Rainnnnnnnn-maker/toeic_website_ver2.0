@@ -1,0 +1,7 @@
+- [x] `audio_play` event is sent when word audio is played.
+- [x] `audio_play` event is sent when sentence audio is played.
+- [x] `favorite_toggle` event is sent when adding a favorite.
+- [x] `favorite_toggle` event is sent when removing a favorite.
+- [x] `share` event is sent when clicking Twitter share.
+- [x] `share` event is sent when clicking Facebook share.
+- [x] `share` event is sent when clicking LINE share.

@@ -10,6 +10,7 @@ import {
   // HatenaShareButton,
   // HatenaIcon,
 } from "react-share";
+import { sendGAEvent } from "@next/third-parties/google";
 
 type Props = {
   url: string;
@@ -20,6 +21,7 @@ type Props = {
 
 export const SnsShareButtons = ({ url, title, className, style }: Props) => {
   const handleTwitterClick = () => {
+    sendGAEvent("event", "share", { method: "twitter", url });
     const twitterUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(
       url
     )}&text=${encodeURIComponent(title)}`;
@@ -27,10 +29,18 @@ export const SnsShareButtons = ({ url, title, className, style }: Props) => {
   };
 
   const handleFacebookClick = () => {
+    sendGAEvent("event", "share", { method: "facebook", url });
     const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
       url
     )}`;
     window.open(facebookUrl, "_blank", "noopener,noreferrer");
+  };
+
+  const handleLineClick = () => {
+    sendGAEvent("event", "share", { method: "line", url });
+    // LineShareButton handles the window.open internally, but we can't easily intercept it without preventing default.
+    // However, react-share's buttons don't expose an onClick that runs *before* opening.
+    // Actually, react-share buttons accept onClick.
   };
 
   return (
@@ -59,7 +69,11 @@ export const SnsShareButtons = ({ url, title, className, style }: Props) => {
         <FacebookIcon size={32} round />
       </FacebookShareButton>
 
-      <LineShareButton url={url} title={title}>
+      <LineShareButton
+        url={url}
+        title={title}
+        onClick={() => sendGAEvent("event", "share", { method: "line", url })}
+      >
         <LineIcon size={32} round />
       </LineShareButton>
 

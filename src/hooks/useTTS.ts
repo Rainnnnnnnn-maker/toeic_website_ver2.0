@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import { sendGAEvent } from "@next/third-parties/google";
 
 type TTSState = {
     audioUrl?: string;
@@ -64,11 +65,13 @@ export function useTTS() {
     const handlePlayAudio = useCallback(async (word: string, currentAudioUrl?: string, language: string = "en") => {
         if (currentAudioUrl) {
             playAudio(currentAudioUrl);
+            sendGAEvent("event", "audio_play", { type: "word", word: word, language });
             return;
         }
         // If we already have it in state for the SAME word, play it
         if (state.audioUrl && state.cachedWord === word) {
             playAudio(state.audioUrl);
+            sendGAEvent("event", "audio_play", { type: "word", word: word, language });
             return;
         }
 
@@ -83,6 +86,7 @@ export function useTTS() {
                 audioLoading: false
             }));
             playAudio(audioUrl);
+            sendGAEvent("event", "audio_play", { type: "word", word: word, language });
         } catch {
             setState((prev) => ({ ...prev, audioLoading: false }));
             alert("音声の生成に失敗しました。時間をおいて再度お試しください。");
@@ -92,6 +96,7 @@ export function useTTS() {
     const handlePlaySentenceAudio = useCallback(async (text: string, id: string, language: string = "en") => {
         if (state.sentenceAudioUrls[id]) {
             playAudio(state.sentenceAudioUrls[id]);
+            sendGAEvent("event", "audio_play", { type: "sentence", id, language });
             return;
         }
 
@@ -105,6 +110,7 @@ export function useTTS() {
                 sentenceAudioLoading: null,
             }));
             playAudio(audioUrl);
+            sendGAEvent("event", "audio_play", { type: "sentence", id, language });
         } catch {
             setState((prev) => ({ ...prev, sentenceAudioLoading: null }));
             alert("音声の生成に失敗しました。時間をおいて再度お試しください。");
