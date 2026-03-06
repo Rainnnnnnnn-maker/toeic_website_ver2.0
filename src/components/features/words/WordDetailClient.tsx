@@ -6,6 +6,7 @@ import { Star, Volume2, Loader2 } from "lucide-react";
 import { useFavorites } from "@/context/FavoritesContext";
 import styles from "./word-detail.module.css";
 import type { WordDetails } from "@/types/word";
+import type { Word } from "@/data/words";
 import { SnsShareButtons } from "@/components/features/sns/SnsShareButtons";
 import { useTTS } from "@/hooks/useTTS";
 import { useShareTarget } from "@/context/ShareTargetContext";
@@ -13,9 +14,10 @@ import { useShareTarget } from "@/context/ShareTargetContext";
 type Props = {
   initialData: WordDetails;
   linkedWords?: Record<string, string>;
+  relatedWords?: Word[];
 };
 
-export function WordDetailClient({ initialData, linkedWords = {} }: Props) {
+export function WordDetailClient({ initialData, linkedWords = {}, relatedWords = [] }: Props) {
   const { isFavorite, toggleFavorite } = useFavorites();
   const {
     audioLoading,
@@ -143,7 +145,18 @@ export function WordDetailClient({ initialData, linkedWords = {} }: Props) {
                       {d.synonyms?.length > 0 && (
                         <div className={styles.pillList}>
                           {d.synonyms.map((s) => (
-                            <span key={s} className={styles.pill}>{s}</span>
+                            <span key={s} className={styles.pill}>
+                              {linkedWords[s] ? (
+                                <Link
+                                  href={`/words/${linkedWords[s]}`}
+                                  className={styles.wordLink}
+                                >
+                                  {s}
+                                </Link>
+                              ) : (
+                                s
+                              )}
+                            </span>
                           ))}
                         </div>
                       )}
@@ -255,6 +268,21 @@ export function WordDetailClient({ initialData, linkedWords = {} }: Props) {
                 </div>
               ))}
             </div>
+          </section>
+        )}
+
+        {relatedWords && relatedWords.length > 0 && (
+          <section className={styles.section}>
+            <h2 className={styles.sectionTitle}>同じレベルの単語</h2>
+            <ul className={styles.pillList}>
+              {relatedWords.map((w) => (
+                <li key={w.slug} className={styles.pill}>
+                  <Link href={`/words/${w.slug}`} className={styles.wordLink}>
+                    {w.term}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </section>
         )}
       </div>

@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import Script from "next/script";
 import dynamic from "next/dynamic";
 import { Metadata } from "next";
-import { getWordBySlug, getAllWords } from "@/data/words";
+import { getWordBySlug, getAllWords, getRelatedWords } from "@/data/words";
 import { getWordDetail } from "@/actions/word";
 import type { WordDetails } from "@/types/word";
 import styles from "@/components/features/words/word-detail.module.css";
@@ -126,6 +126,9 @@ async function WordDetailFetcher({ word }: { word: string }) {
   // 内部リンク用のマッピングを作成
   const linkedWords: Record<string, string> = {};
   
+  // 関連単語の取得
+  const relatedWords = await getRelatedWords(word, 5);
+  
   // チェック対象の単語リスト
   const candidates = new Set<string>();
   
@@ -159,7 +162,7 @@ async function WordDetailFetcher({ word }: { word: string }) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <WordDetailClient initialData={detailData} linkedWords={linkedWords} />
+      <WordDetailClient initialData={detailData} linkedWords={linkedWords} relatedWords={relatedWords} />
     </>
   );
 }

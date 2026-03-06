@@ -58,6 +58,38 @@ export default async function Home() {
     educationalCredentialAwarded: "TOEIC L&R スコアアップ",
   };
 
+  // FAQPage構造化データ
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "2026年最新のTOEIC重要単語と出題傾向は？",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "近年のTOEIC L&Rテストでは、ビジネス環境の変化に伴い「リモートワーク」「オンライン会議」「チャットツール」に関連する語彙の出題頻度が増加しています。また、従来のオフィスワークだけでなく、ハイブリッドワークや柔軟な働き方を示唆する文脈も増えています。"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "TOEIC重要単語の効率的な覚え方は？",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "単に英単語と日本語訳を丸暗記するのではなく、実際の例文の中でどのように使われるかを理解することが重要です。コロケーション（語の組み合わせ）を意識し、類義語との違いを理解し、音声とセットで覚えることが効果的です。"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "目標スコア別のTOEIC重要単語の選び方は？",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "現在のスコアや目標に応じて、優先して覚えるべき重要単語は異なります。まずは基礎となる「最重要単語」から始め、基礎を固めた上で「中級単語」へとステップアップすることをおすすめします。600点を目指す方は最重要単語を、それ以上を目指す方はより難しい単語を学習しましょう。"
+        }
+      }
+    ]
+  };
+
   return (
     <div className={styles.page}>
       <Script
@@ -74,6 +106,11 @@ export default async function Home() {
         id="ldjson-educational"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(educationalJsonLd) }}
+      />
+      <Script
+        id="ldjson-faq"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
       <main className={styles.main}>
         <div className={styles.snsContainer} style={{ display: "flex", justifyContent: "flex-end" }}>

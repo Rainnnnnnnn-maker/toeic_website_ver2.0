@@ -1,4 +1,4 @@
-- [ ] GA4 script is present in `<head>` (or body) when `NEXT_PUBLIC_GA_ID` is set.
-- [ ] Word Detail page shows "関連単語" section at the bottom.
-- [ ] Synonyms in "詳細な意味" are clickable links (if they exist in DB).
-- [ ] Home page has `FAQPage` structured data.
+- [x] GA4 script is present in `<head>` (or body) when `NEXT_PUBLIC_GA_ID` is set.
+- [x] Word Detail page shows "関連単語" section at the bottom.
+- [x] Synonyms in "詳細な意味" are clickable links (if they exist in DB).
+- [x] Home page has `FAQPage` structured data.

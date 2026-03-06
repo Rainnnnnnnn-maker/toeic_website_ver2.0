@@ -177,3 +177,34 @@ export async function getWordBySlug(slug: string): Promise<Word | undefined> {
   const data = await getWordsDataCached();
   return data.allWords.find(w => w.slug === slug);
 }
+
+export async function getRelatedWords(currentSlug: string, count: number = 5): Promise<Word[]> {
+  const currentWord = await getWordBySlug(currentSlug);
+  if (!currentWord) return [];
+
+  const data = await getWordsDataCached();
+  let candidates: Word[] = [];
+
+  if (currentWord.level === 'important') candidates = data.important;
+  else if (currentWord.level === 'medium') candidates = data.medium;
+  else candidates = data.high;
+
+  // Filter out current word
+  candidates = candidates.filter(w => w.slug !== currentSlug);
+
+  const result: Word[] = [];
+  const len = candidates.length;
+  if (len === 0) return [];
+
+  const taken = new Set<number>();
+  const limit = Math.min(count, len);
+
+  while(result.length < limit) {
+    const idx = Math.floor(Math.random() * len);
+    if(!taken.has(idx)) {
+       taken.add(idx);
+       result.push(candidates[idx]);
+    }
+  }
+  return result;
+}
