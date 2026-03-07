@@ -6,10 +6,12 @@ import dynamic from "next/dynamic";
 import { Metadata } from "next";
 import { getWordBySlug, getAllWords, getRelatedWords } from "@/data/words";
 import { getWordDetail } from "@/actions/word";
-import type { WordDetails } from "@/types/word";
 import styles from "@/components/features/words/word-detail.module.css";
 import { generateWordDetailJsonLd } from "@/lib/json-ld";
 import Loading from "./loading";
+
+// Vercel Hobbyプランの制限対策 (60秒)
+export const maxDuration = 60;
 
 const WordDetailClient = dynamic(
   () => import("@/components/features/words/WordDetailClient").then((m) => m.WordDetailClient),
