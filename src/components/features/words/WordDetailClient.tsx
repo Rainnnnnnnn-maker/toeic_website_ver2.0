@@ -273,7 +273,7 @@ export function WordDetailClient({ initialData, linkedWords = {}, relatedWords =
 
         {relatedWords && relatedWords.length > 0 && (
           <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>同じレベルの単語</h2>
+            <h2 className={styles.sectionTitle}>同レベル単語</h2>
             <ul className={styles.pillList}>
               {relatedWords.map((w) => (
                 <li key={w.slug} className={styles.pill}>
