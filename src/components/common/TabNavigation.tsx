@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import styles from './TabNavigation.module.css';
 
 export type TabId = 'important' | 'medium' | 'high';
 
@@ -43,9 +42,9 @@ export default function TabNavigation({ activeTab, onTabChange }: TabNavigationP
   };
 
   return (
-    <div className={styles.container}>
-      <div className={styles.tabsScrollContainer}>
-        <div className={styles.tabsList} role="tablist">
+    <div className="w-full flex flex-col gap-2 relative">
+      <div className="w-full overflow-x-auto p-1 -m-1 [&::-webkit-scrollbar]:hidden [scrollbar-width:none] [-ms-overflow-style:none]">
+        <div className="flex gap-2 min-w-min" role="tablist">
           {TABS.map((tab) => {
             const isActive = activeTab === tab.id;
             const isInactive = tab.status === 'coming_soon';
@@ -57,15 +56,21 @@ export default function TabNavigation({ activeTab, onTabChange }: TabNavigationP
                 aria-selected={isActive}
                 aria-disabled={isInactive}
                 className={`
-                  ${styles.tabButton} 
-                  ${isActive ? styles.activeTab : ''} 
-                  ${isInactive ? styles.inactiveTab : ''}
+                  relative flex items-center justify-center px-4 py-2.5 rounded-xl border text-sm font-semibold whitespace-nowrap transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-blue-300/50 group
+                  ${isActive 
+                    ? 'text-blue-600 bg-blue-50 border-blue-200 shadow-[0_2px_8px_rgba(15,23,42,0.06)]' 
+                    : 'bg-transparent border-transparent text-gray-500'}
+                  ${isInactive 
+                    ? 'opacity-60 bg-gray-100 cursor-not-allowed hover:bg-gray-200' 
+                    : ''}
                 `}
                 onClick={() => handleTabClick(tab)}
               >
                 {tab.label}
                 {isInactive && (
-                  <span className={styles.tooltip}>近日実装予定</span>
+                  <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-[11px] rounded pointer-events-none opacity-0 transition-opacity duration-200 whitespace-nowrap z-10 group-hover:opacity-100">
+                    近日実装予定
+                  </span>
                 )}
               </button>
             );
@@ -73,7 +78,10 @@ export default function TabNavigation({ activeTab, onTabChange }: TabNavigationP
         </div>
       </div>
 
-      <div className={`${styles.toast} ${toastMessage ? styles.toastVisible : ''}`}>
+      <div className={`
+        fixed bottom-6 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-full text-sm font-medium shadow-lg transition-all duration-300 z-50 pointer-events-none
+        ${toastMessage ? 'translate-y-0 opacity-100' : 'translate-y-5 opacity-0'}
+      `}>
         {toastMessage}
       </div>
     </div>

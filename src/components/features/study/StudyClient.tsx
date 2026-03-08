@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Star, Volume2, Loader2 } from 'lucide-react';
 import { useFavorites } from '@/context/FavoritesContext';
-import styles from './study.module.css';
 import type { Word } from '@/data/words';
 import { fetchWordDetail } from '@/app/study/actions';
 import { useTTS } from '@/hooks/useTTS';
@@ -394,33 +393,33 @@ export default function StudyClient({
     if (!hintExample) return null;
     
     const renderContent = () => {
-      if (!currentWord) return <p className={styles.exampleText}>{hintExample}</p>;
+      if (!currentWord) return <p className="text-xl text-gray-700 text-center leading-[1.6] font-medium max-w-[90%]">{hintExample}</p>;
 
       const word = currentWord.term;
       const escapedWord = escapeRegExp(word);
       const parts = hintExample.split(new RegExp(`(\\b${escapedWord}\\w*)`, 'gi'));
 
       return (
-        <div className={styles.exampleText}>
-          <span className={styles.sampleLabel}>Sample:</span>
+        <div className="text-xl text-gray-700 text-center leading-[1.6] font-medium max-w-[90%]">
+          <span className="text-emerald-600 font-extrabold text-[1.1em] mr-2">Sample:</span>
           {parts.map((part, i) => {
             const isMatch = new RegExp(`^${escapedWord}\\w*$`, 'i').test(part);
             return isMatch ? (
-              <span key={i} className={styles.highlightedWord}>{part}</span>
+              <span key={i} className="text-gray-900 font-extrabold underline decoration-amber-300 decoration-[3px] bg-amber-200/30 px-[2px] rounded-[2px]">{part}</span>
             ) : (
               <span key={i}>{part}</span>
             );
           })}
           <button 
-            className={styles.audioButton} 
+            className="inline-flex items-center justify-center p-0 border-none bg-transparent cursor-pointer align-middle disabled:opacity-70 disabled:cursor-default ml-2 group" 
             onClick={() => handlePlaySentenceAudio(hintExample, `hint-example-${currentWord?.slug}`)}
             disabled={sentenceAudioLoading === `hint-example-${currentWord?.slug}`}
             aria-label="Play sample audio"
             style={{ marginLeft: '8px', verticalAlign: 'middle', display: 'inline-flex' }}
           >
-            <span className={styles.audioIcon}>
+            <span className="w-[26px] h-[26px] rounded-full inline-flex items-center justify-center bg-gray-100 text-[#5780d8] text-lg leading-none transition-all duration-160 group-hover:translate-y-[-1px] group-hover:shadow-md">
               {sentenceAudioLoading === `hint-example-${currentWord?.slug}` ? (
-                <Loader2 className={styles.spinner} size={14} />
+                <Loader2 className="animate-spin" size={14} />
               ) : (
                 <Volume2 size={14} />
               )}
@@ -431,7 +430,7 @@ export default function StudyClient({
     };
 
     return (
-      <div className={styles.exampleContainer}>
+      <div className="flex flex-col items-center gap-1 w-full">
         {renderContent()}
       </div>
     );
@@ -439,48 +438,48 @@ export default function StudyClient({
 
   if (!currentWord) {
     return (
-      <div className={styles.page}>
-        <div className={styles.main}>
-          <p className={styles.subtitle}>読み込み中...</p>
+      <div className="min-h-screen w-full flex justify-center items-center py-8 px-4 bg-[radial-gradient(circle_at_top,#e0f2fe_0,#f9fafb_45%,#ffffff_100%)]">
+        <div className="w-full max-w-[600px] flex flex-col gap-8 items-center">
+          <p className="text-sm leading-[1.6] text-gray-500">読み込み中...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <header className={styles.header}>
-          <Link href={backLink} className={styles.backButton}>
+    <div className="min-h-screen w-full flex justify-center items-center py-8 px-4 bg-[radial-gradient(circle_at_top,#e0f2fe_0,#f9fafb_45%,#ffffff_100%)] sm:py-12 sm:px-6">
+      <main className="w-full max-w-[600px] flex flex-col gap-8 items-center">
+        <header className="flex flex-col gap-3 text-center w-full items-center relative">
+          <Link href={backLink} className="absolute right-0 -top-4 inline-flex items-center justify-center gap-2 px-[26px] py-[14px] min-h-[44px] bg-gradient-to-br from-[#726ece] to-[#1eabed] text-white rounded-full font-semibold text-[15px] tracking-[0.04em] no-underline transition-all duration-160 shadow-[0_12px_30px_rgba(15,23,42,0.28)] z-10 hover:-translate-y-px hover:scale-[1.02] hover:brightness-105 hover:shadow-[0_18px_40px_rgba(15,23,42,0.32)] active:translate-y-0 active:scale-99 active:shadow-[0_8px_20px_rgba(15,23,42,0.22)] focus-visible:outline-none focus-visible:shadow-[0_0_0_3px_rgba(191,219,254,0.9),0_12px_30px_rgba(15,23,42,0.28)]">
             {backLinkText}
           </Link>
-          <h1 className={styles.title}>{pageTitle}</h1>
-          <p className={styles.subtitle}>
+          <h1 className="text-[28px] leading-[1.3] text-slate-900 font-bold mt-12 sm:text-[32px]">{pageTitle}</h1>
+          <p className="text-sm leading-[1.6] text-gray-500">
             表示された単語を知っていますか？
           </p>
         </header>
 
-        <section className={styles.cardSection}>
-          <div className={`${styles.wordCard} ${isFlipped ? styles.flipped : ''}`}>
+        <section className="w-full perspective-[1000px] relative">
+          <div className={`flex flex-col justify-center items-center px-6 py-12 rounded-3xl bg-white/95 border border-gray-200 shadow-[0_10px_25px_rgba(15,23,42,0.08)] transition-all duration-300 min-h-[225px] ${isFlipped ? 'animate-flipIn' : ''}`}>
             {!isFlipped ? (
               <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-                <AutoResizingText text={currentWord.term} className={styles.wordText} />
+                <AutoResizingText text={currentWord.term} className="text-5xl font-bold text-gray-900 text-center mb-3 whitespace-nowrap max-w-full overflow-hidden text-ellipsis" />
               </div>
             ) : (
-              <div className={styles.flippedContent}>
-                <div className={styles.wordRow}>
+              <div className="flex flex-col items-center gap-4 w-full animate-flipIn">
+                <div className="flex items-center justify-center gap-3 w-full max-w-full">
                   <div style={{ minWidth: 0, display: 'flex', justifyContent: 'center' }}>
-                    <AutoResizingText text={currentWord.term} className={styles.wordText} style={{ marginBottom: 0 }} />
+                    <AutoResizingText text={currentWord.term} className="text-5xl font-bold text-gray-900 text-center mb-0 whitespace-nowrap max-w-full overflow-hidden text-ellipsis" style={{ marginBottom: 0 }} />
                   </div>
                   <button 
-                    className={styles.audioButton} 
+                    className="inline-flex items-center justify-center p-0 border-none bg-transparent cursor-pointer disabled:opacity-70 disabled:cursor-default align-middle group" 
                     onClick={() => currentWord && handlePlayAudio(currentWord.term)}
                     disabled={audioLoading}
                     aria-label="Play word audio"
                   >
-                    <span className={styles.audioIcon}>
+                    <span className="w-[26px] h-[26px] rounded-full inline-flex items-center justify-center bg-gray-100 text-[#5780d8] text-lg leading-none transition-all duration-160 group-hover:translate-y-[-1px] group-hover:shadow-md">
                       {audioLoading ? (
-                        <Loader2 className={styles.spinner} size={14} />
+                        <Loader2 className="animate-spin" size={14} />
                       ) : (
                         <Volume2 size={14} />
                       )}
@@ -488,9 +487,9 @@ export default function StudyClient({
                   </button>
                 </div>
                 {isLoadingHint ? (
-                  <div className={styles.exampleContainer}>
-                    <div className={`${styles.skeleton} ${styles.skeletonText}`} />
-                    <div className={`${styles.skeleton} ${styles.skeletonText} ${styles.skeletonTextShort}`} />
+                  <div className="flex flex-col items-center gap-1 w-full">
+                    <div className="h-5 w-[80%] mx-auto mb-2 bg-blue-100 rounded relative overflow-hidden after:content-[''] after:absolute after:inset-0 after:-translate-x-full after:animate-shimmer after:bg-gradient-to-r after:from-transparent after:via-white/50 after:to-transparent" />
+                    <div className="h-5 w-[60%] mx-auto mb-2 bg-blue-100 rounded relative overflow-hidden after:content-[''] after:absolute after:inset-0 after:-translate-x-full after:animate-shimmer after:bg-gradient-to-r after:from-transparent after:via-white/50 after:to-transparent" />
                   </div>
                 ) : (
                   renderExample()
@@ -499,24 +498,24 @@ export default function StudyClient({
             )}
           </div>
           {countdownValue !== null && (
-            <div className={styles.countdownOverlay} aria-hidden="true">
-              <div key={countdownKey} className={styles.countdownBubble}>
+            <div className="absolute inset-0 flex items-start justify-end p-3.5 pointer-events-none sm:p-2.5" aria-hidden="true">
+              <div key={countdownKey} className="inline-block text-[clamp(34px,9.5vw,46px)] font-extrabold text-red-500 drop-shadow-[0_10px_28px_rgba(15,23,42,0.18)] opacity-0 animate-countdownPop translate-y-1 scale-90">
                 {countdownValue}
               </div>
             </div>
           )}
           {showHintButton && !isFlipped && (
-            <div className={styles.hintOverlay}>
-              <button onClick={handleHint} className={styles.hintButton}>
+            <div className="absolute inset-0 flex items-start justify-end p-3.5 pointer-events-none z-20 sm:p-2.5">
+              <button onClick={handleHint} className="pointer-events-auto px-4 py-2 bg-gray-100 text-gray-600 border border-gray-300 rounded-full text-sm font-semibold cursor-pointer transition-all duration-200 shadow-sm hover:bg-gray-200 hover:text-gray-800 hover:-translate-y-px">
                 ヒント
               </button>
             </div>
           )}
           {isFlipped && (
-            <div className={styles.favoriteOverlay}>
+            <div className="absolute inset-0 flex items-start justify-end p-3.5 pointer-events-none z-20 sm:p-2.5">
               <button
                 onClick={() => currentWord && toggleFavorite(currentWord.slug)}
-                className={styles.favoriteButton}
+                className="pointer-events-auto inline-flex items-center justify-center w-11 h-11 rounded-full border border-gray-200 bg-white text-slate-500 cursor-pointer transition-all duration-200 shadow-sm shrink-0 hover:bg-slate-50 hover:border-slate-300 hover:-translate-y-px hover:shadow-md active:translate-y-0"
                 aria-label={
                   currentWord && isFavorite(currentWord.slug)
                     ? 'お気に入りから削除'
@@ -542,23 +541,23 @@ export default function StudyClient({
           )}
         </section>
 
-        <section className={styles.controls}>
+        <section className="flex gap-6 w-full justify-center mt-0">
           <button 
-            className={`${styles.actionButton} ${styles.rememberButton}`}
+            className="flex flex-col items-center justify-center gap-2 w-[120px] h-[120px] rounded-full border-none cursor-pointer transition-all duration-200 shadow-sm bg-green-200 text-green-900 border-2 border-green-300 hover:bg-green-300 hover:-translate-y-0.5 hover:shadow-md active:translate-y-0"
             onClick={handleRemembered}
             aria-label="覚えている"
           >
-            <span className={styles.buttonIcon}>💡</span>
-            <span className={styles.buttonLabel}>覚えている</span>
+            <span className="text-[32px] font-bold">💡</span>
+            <span className="text-sm font-semibold">覚えている</span>
           </button>
           
           <button 
-            className={`${styles.actionButton} ${styles.forgotButton}`}
+            className="flex flex-col items-center justify-center gap-2 w-[120px] h-[120px] rounded-full border-none cursor-pointer transition-all duration-200 shadow-sm bg-red-200 text-red-900 border-2 border-red-300 hover:bg-red-300 hover:-translate-y-0.5 hover:shadow-md active:translate-y-0"
             onClick={handleForgot}
             aria-label="覚えていない"
           >
-            <span className={styles.buttonIcon}>❔</span>
-            <span className={styles.buttonLabel}>覚えていない</span>
+            <span className="text-[32px] font-bold">❔</span>
+            <span className="text-sm font-semibold">覚えていない</span>
           </button>
         </section>
       </main>

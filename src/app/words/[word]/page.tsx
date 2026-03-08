@@ -6,7 +6,6 @@ import dynamic from "next/dynamic";
 import { Metadata } from "next";
 import { getWordBySlug, getAllWords, getRelatedWords } from "@/data/words";
 import { getWordDetail } from "@/actions/word";
-import styles from "@/components/features/words/word-detail.module.css";
 import { generateWordDetailJsonLd } from "@/lib/json-ld";
 import Loading from "./loading";
 
@@ -113,11 +112,11 @@ async function WordDetailFetcher({ word }: { word: string }) {
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        <div className={styles.detailContainer}>
-          <p className={styles.errorText}>
+        <div className="mt-0 p-5 bg-white/96 rounded-[20px] border border-gray-200 shadow-[0_18px_40px_rgba(15,23,42,0.08)] relative flex flex-col gap-4">
+          <p className="text-red-500 text-lg font-medium mb-6">
             データの取得に失敗しました。時間をおいて再度お試しください。
           </p>
-          <Link href="/" className={styles.retryButton}>
+          <Link href="/" className="inline-flex py-2.5 px-5 bg-indigo-600 text-white rounded-lg font-medium transition-colors duration-200 hover:bg-indigo-700">
             一覧へ戻る
           </Link>
         </div>

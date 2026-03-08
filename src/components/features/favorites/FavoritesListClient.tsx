@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import styles from "@/app/page.module.css";
 import { useFavorites } from "@/context/FavoritesContext";
 import type { Word } from "@/data/words";
 
@@ -39,18 +38,18 @@ export default function FavoritesListClient({ allWords }: { allWords: Word[] }) 
 
   if (favoriteWords.length === 0) {
     return (
-      <div style={{ textAlign: "center", padding: "60px 0", color: "#64748b" }}>
-        <p style={{ fontSize: "18px", fontWeight: 500, marginBottom: "12px" }}>
+      <div className="text-center py-16 text-slate-500">
+        <p className="text-lg font-medium mb-3">
           お気に入りの単語はまだありません
         </p>
-        <p style={{ fontSize: "14px", lineHeight: "1.6" }}>
+        <p className="text-sm leading-[1.6]">
           単語詳細ページの星マーク（☆）をクリックすると、
           <br />
           ここにリストとして保存されます。
         </p>
-        <div style={{ marginTop: "32px" }}>
-          <Link href="/" className={styles.ctaButton}>
-            単語を探しに行く
+        <div className="mt-8">
+          <Link href="/" className="inline-flex items-center justify-center gap-2 px-[26px] py-[14px] min-h-[44px] bg-gradient-to-br from-[#726ece] to-[#1eabed] text-white rounded-full font-semibold text-[15px] tracking-[0.04em] no-underline transition-all duration-160 shadow-[0_12px_30px_rgba(15,23,42,0.28)] hover:-translate-y-px hover:scale-[1.02] hover:brightness-105 hover:shadow-[0_18px_40px_rgba(15,23,42,0.32)] active:translate-y-0 active:scale-99 active:shadow-[0_8px_20px_rgba(15,23,42,0.22)] focus-visible:outline-none focus-visible:shadow-[0_0_0_3px_rgba(191,219,254,0.9),0_12px_30px_rgba(15,23,42,0.28)]">
+            <span className="inline-flex items-center">単語を探しに行く</span>
           </Link>
         </div>
       </div>
@@ -58,30 +57,29 @@ export default function FavoritesListClient({ allWords }: { allWords: Word[] }) 
   }
 
   return (
-    <section className={styles.gridSection}>
-      <div className={styles.favoritesControls}>
+    <section className="flex flex-col gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <button
           onClick={handleClearClick}
-          className={styles.pageButton}
+          className="px-3 py-2 rounded-[10px] border border-gray-200 bg-white text-gray-900 text-[13px] transition-all duration-180 hover:bg-gray-100 hover:border-gray-300 hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
           aria-label="お気に入りをクリア"
         >
           クリア
         </button>
-        <div style={{ flex: 1 }}></div> {/* Spacer to align pagination to right or center if needed */}
-        <div className={styles.pagination}>
+        <div className="flex items-center gap-2.5 ml-auto">
           <button
-            className={styles.pageButton}
+            className="px-3 py-2 rounded-[10px] border border-gray-200 bg-white text-gray-900 text-[13px] transition-all duration-180 hover:bg-gray-100 hover:border-gray-300 hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={currentPage === 1}
             aria-label="前のページ"
           >
             前へ
           </button>
-          <span className={styles.pageInfo}>
+          <span className="text-[13px] text-gray-500">
             {currentPage} / {totalPages}
           </span>
           <button
-            className={styles.pageButton}
+            className="px-3 py-2 rounded-[10px] border border-gray-200 bg-white text-gray-900 text-[13px] transition-all duration-180 hover:bg-gray-100 hover:border-gray-300 hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={currentPage >= totalPages}
             aria-label="次のページ"
@@ -91,15 +89,15 @@ export default function FavoritesListClient({ allWords }: { allWords: Word[] }) 
         </div>
       </div>
 
-      <div className={styles.wordGrid}>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {current.map((word) => (
           <Link
             key={word.slug}
             href={`/words/${word.slug}?from=favorites`}
-            className={styles.wordCard}
+            className="flex flex-col gap-2 p-4 bg-white rounded-xl border border-slate-200 no-underline transition-all duration-200 shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:-translate-y-0.5 hover:shadow-md hover:border-slate-300"
           >
-            <span className={styles.wordText}>{word.term}</span>
-            <span className={styles.wordMeta}>
+            <span className="text-lg font-semibold text-gray-900">{word.term}</span>
+            <span className="mt-2 text-[11px] text-gray-400">
               クリックしてAIによる解説を見る
             </span>
           </Link>
@@ -107,22 +105,25 @@ export default function FavoritesListClient({ allWords }: { allWords: Word[] }) 
       </div>
 
       {showConfirmModal && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modalContent}>
-            <h3 className={styles.modalTitle}>確認</h3>
-            <p className={styles.modalDescription}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 transform transition-all animate-in zoom-in-95 duration-200">
+            <h3 className="text-lg font-bold text-gray-900 mb-2">確認</h3>
+            <p className="text-sm text-gray-600 mb-6 leading-relaxed">
               お気に入り単語をすべて削除してもよろしいですか？
               <br />
               この操作は取り消せません。
             </p>
-            <div className={styles.modalActions}>
+            <div className="flex gap-3 justify-end">
               <button
                 onClick={() => setShowConfirmModal(false)}
-                className={styles.cancelButton}
+                className="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors"
               >
                 キャンセル
               </button>
-              <button onClick={confirmClear} className={styles.dangerButton}>
+              <button 
+                onClick={confirmClear} 
+                className="px-4 py-2 rounded-lg text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition-colors shadow-sm"
+              >
                 削除する
               </button>
             </div>
