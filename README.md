@@ -22,10 +22,11 @@ A comprehensive web application for learning essential TOEIC vocabulary, featuri
 
 - **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
 - **Language**: [TypeScript](https://www.typescriptlang.org/)
-- **UI**: React 19, Tailwind CSS (via globals.css), Lucide React
+- **UI**: React 19, [Tailwind CSS v3.4](https://tailwindcss.com/) (Utility-first CSS), Lucide React
 - **AI**: Google Gemini (`@google/generative-ai`)
 - **Database / Cache**: Upstash Redis (`@upstash/redis`)
 - **Storage**: Vercel Blob (`@vercel/blob`) - for word lists
+- **Analytics**: Google Analytics 4 (via `@next/third-parties`)
 - **Deployment**: Vercel
 
 ## 🏁 Getting Started
@@ -63,6 +64,7 @@ A comprehensive web application for learning essential TOEIC vocabulary, featuri
     | `BLOB_READ_WRITE_TOKEN` | Vercel Blob Token (for fetching word lists in production). |
     | `REVALIDATION_TOKEN` | Secret token for validating ISR revalidation requests. |
     | `WORD_CACHE_TTL_DAYS` | (Optional) Cache duration in days (default: 30). |
+| `NEXT_PUBLIC_GA_ID` | Google Analytics 4 Measurement ID (G-XXXXXXXXXX). |
 
 4.  **Data Setup (Local Development)**
     For local development, the app reads word lists from the `__doc__` directory by default.
