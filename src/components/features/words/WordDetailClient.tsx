@@ -2,7 +2,7 @@
 
 import { createPortal } from "react-dom";
 import Link from "next/link";
-import { Star, Volume2, Loader2 } from "lucide-react";
+import { Star, Volume2, Loader2, ArrowUpRight } from "lucide-react";
 import { useFavorites } from "@/context/FavoritesContext";
 import type { WordDetails } from "@/types/word";
 import type { Word } from "@/data/words";
@@ -38,142 +38,137 @@ export function WordDetailClient({ initialData, linkedWords = {}, relatedWords =
           />,
           shareTarget
         )}
-      <div className="mt-0 p-5 bg-white rounded-[20px] border border-gray-200 shadow-[0_18px_40px_rgba(15,23,42,0.08)] relative flex flex-col gap-4">
-        <div className="flex justify-between gap-4 items-end">
+      <div className="mt-0 p-4 bg-white rounded-xl border border-gray-100 shadow-sm relative flex flex-col gap-3 sm:p-5">
+        <div className="flex justify-between gap-3 items-end border-b border-gray-100 pb-3">
           <div>
-            <h1 className="text-2xl text-slate-900 font-bold tracking-[0.01em] sm:text-[28px] lg:text-[34px]">{data.word}</h1>
+            <h1 className="text-2xl text-slate-900 font-bold tracking-tight sm:text-3xl">{data.word}</h1>
             {data.pronunciation && (
-              <div className="mt-1 inline-flex items-center gap-2.5">
-                <p className="mt-0 text-base text-gray-700 font-mono bg-gray-100 border border-gray-200 rounded-lg inline-block px-2 py-1">{data.pronunciation}</p>
+              <div className="mt-1.5 inline-flex items-center gap-2">
+                <span className="text-sm text-gray-600 font-mono bg-gray-50 border border-gray-200 rounded px-1.5 py-0.5">{data.pronunciation}</span>
                 <button
                   type="button"
-                  className="inline-flex items-center justify-center p-0 border-none bg-transparent cursor-pointer disabled:opacity-70 disabled:cursor-default group"
+                  className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                   onClick={() => handlePlayAudio(data.word)}
                   disabled={audioLoading}
                   aria-label="発音を再生"
                 >
-                  <span className="w-[26px] h-[26px] rounded-full inline-flex items-center justify-center bg-gray-100 text-[#5780d8] text-lg leading-none transition-all duration-160 group-hover:translate-y-[-1px] group-hover:shadow-md">
-                    {audioLoading ? (
-                      <Loader2 className="animate-spin" size={16} />
-                    ) : (
-                      <Volume2 size={16} />
-                    )}
-                  </span>
+                  {audioLoading ? <Loader2 className="animate-spin" size={12} /> : <Volume2 size={12} />}
                 </button>
               </div>
             )}
           </div>
           <button
             onClick={() => toggleFavorite(data.word)}
-            className="inline-flex items-center justify-center w-11 h-11 rounded-full border border-gray-200 bg-white text-slate-500 cursor-pointer transition-all duration-200 shadow-sm shrink-0 hover:bg-slate-50 hover:border-slate-300 hover:-translate-y-px hover:shadow-md active:translate-y-0"
+            className="inline-flex items-center justify-center w-9 h-9 rounded-full border border-gray-200 bg-white text-slate-400 transition-all hover:text-amber-400 hover:border-amber-200 hover:bg-amber-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
             aria-label={isFavorite(data.word) ? "お気に入りから削除" : "お気に入りに追加"}
-            title={isFavorite(data.word) ? "お気に入りから削除" : "お気に入りに追加"}
           >
             <Star
-              size={24}
-              fill={isFavorite(data.word) ? "#FFC107" : "none"}
-              color={isFavorite(data.word) ? "#FFC107" : "#94a3b8"}
+              size={18}
+              fill={isFavorite(data.word) ? "#F59E0B" : "none"}
+              color={isFavorite(data.word) ? "#F59E0B" : "currentColor"}
               strokeWidth={2}
             />
           </button>
         </div>
 
-        <section className="flex flex-col gap-2.5">
-          <h2 className="text-[15px] tracking-[0.12em] uppercase text-gray-500 border-b border-gray-200 pb-1.5">日本語の意味（品詞別）</h2>
-          <div className="text-[17px] leading-[1.8] text-gray-900 mb-3">
-            <p>
-              <strong className="inline-block px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-800 text-sm font-semibold mr-1.5">意味</strong>：{data.japaneseTranslation}
+        <section className="flex flex-col gap-2">
+          <h2 className="text-xs font-bold tracking-wider uppercase text-slate-500 flex items-center gap-1.5">
+            <span className="w-0.5 h-2.5 bg-indigo-500 rounded-full"></span>
+            意味・解説
+          </h2>
+          
+          <div className="bg-slate-50 rounded-lg p-3 border border-slate-100">
+             <p className="text-base text-slate-900 font-medium">
+              <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded text-xs font-bold bg-slate-200 text-slate-700 mr-1.5">主要</span>
+              {data.japaneseTranslation}
             </p>
           </div>
-          {data.meanings.map((m, idx) => (
-            <div key={idx} className="text-[17px] leading-[1.8] text-gray-900">
-              <p><strong className="inline-block px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-800 text-sm font-semibold mr-1.5">{m.partOfSpeech}</strong>：{m.meaning}</p>
-              {m.detailedMeanings.length > 0 && (
-                <div className="mt-1.5">
-                  {m.detailedMeanings.map((d) => (
-                    <div key={d.number} className="mb-2">
-                      <p>【{d.number}】{d.definition}</p>
-                      {d.grammarPattern && (
-                        <p className="text-gray-500">文型：{d.grammarPattern}</p>
-                      )}
-                      <div className="flex items-start gap-2">
-                        <p className="text-lg leading-[1.8] text-slate-900 font-medium m-0">{d.example}</p>
-                        <button
-                          type="button"
-                          className="inline-flex items-center justify-center p-0 border-none bg-transparent cursor-pointer disabled:opacity-70 disabled:cursor-default group mt-1 shrink-0"
-                          onClick={() => handlePlaySentenceAudio(d.example, `meaning-${idx}-detail-${d.number}`)}
-                          disabled={sentenceAudioLoading === `meaning-${idx}-detail-${d.number}`}
-                          aria-label="例文を再生"
-                        >
-                          <span
-                            className="w-[22px] h-[22px] rounded-full inline-flex items-center justify-center bg-gray-100 text-[#5780d8] text-sm leading-none transition-all duration-160 group-hover:translate-y-[-1px] group-hover:shadow-md"
-                          >
-                            {sentenceAudioLoading === `meaning-${idx}-detail-${d.number}` ? (
-                              <Loader2 className="animate-spin" size={14} />
-                            ) : (
-                              <Volume2 size={14} />
-                            )}
-                          </span>
-                        </button>
-                      </div>
-                      <div className="flex items-start gap-2">
-                        <p className="mt-1 text-base text-gray-700 border-l-[3px] border-blue-300 pl-2.5 bg-gradient-to-r from-blue-300/12 to-transparent rounded-md m-0">{d.exampleJapanese}</p>
-                        <button
-                          type="button"
-                          className="inline-flex items-center justify-center p-0 border-none bg-transparent cursor-pointer disabled:opacity-70 disabled:cursor-default group mt-1 shrink-0"
-                          onClick={() => handlePlaySentenceAudio(d.exampleJapanese, `meaning-${idx}-detail-${d.number}-ja`, "ja")}
-                          disabled={sentenceAudioLoading === `meaning-${idx}-detail-${d.number}-ja`}
-                          aria-label="日本語訳を再生"
-                        >
-                          <span
-                            className="w-[22px] h-[22px] rounded-full inline-flex items-center justify-center bg-gray-100 text-[#5780d8] text-sm leading-none transition-all duration-160 group-hover:translate-y-[-1px] group-hover:shadow-md"
-                          >
-                            {sentenceAudioLoading === `meaning-${idx}-detail-${d.number}-ja` ? (
-                              <Loader2 className="animate-spin" size={14} />
-                            ) : (
-                              <Volume2 size={14} />
-                            )}
-                          </span>
-                        </button>
-                      </div>
-                      <p className="text-gray-500">
-                        場面：{d.context}／頻度：{d.frequency}
-                      </p>
-                      {d.synonyms?.length > 0 && (
-                        <div className="flex flex-wrap gap-2 list-none m-0 p-0">
-                          {d.synonyms.map((s) => (
-                            <span key={s} className="px-3 py-1.5 rounded-full bg-gray-100 text-gray-700 text-sm border border-gray-200">
-                              {linkedWords[s] ? (
-                                <Link
-                                  href={`/words/${linkedWords[s]}`}
-                                  className="underline decoration-2 underline-offset-2 cursor-pointer transition-all duration-200 inline-block text-blue-600 font-bold bg-blue-50 border-blue-200 hover:text-blue-700 hover:bg-blue-100 hover:border-blue-300 hover:-translate-y-px"
-                                >
-                                  {s}
-                                </Link>
-                              ) : (
-                                s
-                              )}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  ))}
+
+          <div className="flex flex-col gap-3">
+            {data.meanings.map((m, idx) => (
+              <div key={idx} className="flex flex-col gap-1.5">
+                <div className="flex items-center gap-1.5">
+                  <span className="px-1.5 py-0.5 rounded-md bg-indigo-50 text-indigo-700 text-xs font-bold border border-indigo-100">
+                    {m.partOfSpeech}
+                  </span>
+                  <span className="text-sm text-slate-900 font-medium">{m.meaning}</span>
                 </div>
-              )}
-            </div>
-          ))}
+                
+                {m.detailedMeanings.length > 0 && (
+                  <div className="pl-1.5 border-l-2 border-slate-100 ml-0.5 flex flex-col gap-3">
+                    {m.detailedMeanings.map((d) => (
+                      <div key={d.number} className="pl-2.5 flex flex-col gap-1.5">
+                        <div className="flex flex-col gap-0.5">
+                          <p className="text-sm text-slate-600 font-medium">
+                            <span className="text-slate-400 mr-1.5">#{d.number}</span>
+                            {d.definition}
+                          </p>
+                          {d.grammarPattern && (
+                            <p className="text-xs text-slate-400">文型: {d.grammarPattern}</p>
+                          )}
+                        </div>
+
+                        <div className="bg-white rounded-lg border border-slate-200 p-2.5 shadow-sm">
+                          <div className="flex items-start gap-1.5 mb-1.5">
+                            <button
+                              type="button"
+                              className="mt-0.5 text-blue-500 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded p-0.5 -ml-0.5"
+                              onClick={() => handlePlaySentenceAudio(d.example, `meaning-${idx}-detail-${d.number}`)}
+                              disabled={sentenceAudioLoading === `meaning-${idx}-detail-${d.number}`}
+                              aria-label="例文を再生"
+                            >
+                              {sentenceAudioLoading === `meaning-${idx}-detail-${d.number}` ? (
+                                <Loader2 className="animate-spin" size={12} />
+                              ) : (
+                                <Volume2 size={12} />
+                              )}
+                            </button>
+                            <p className="text-sm text-slate-900 leading-relaxed font-medium">{d.example}</p>
+                          </div>
+                          <div className="flex items-start gap-1.5 border-t border-slate-100 pt-1.5">
+                             <button
+                              type="button"
+                              className="mt-0.5 text-slate-400 hover:text-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 rounded p-0.5 -ml-0.5"
+                              onClick={() => handlePlaySentenceAudio(d.exampleJapanese, `meaning-${idx}-detail-${d.number}-ja`, "ja")}
+                              disabled={sentenceAudioLoading === `meaning-${idx}-detail-${d.number}-ja`}
+                              aria-label="日本語訳を再生"
+                            >
+                              {sentenceAudioLoading === `meaning-${idx}-detail-${d.number}-ja` ? (
+                                <Loader2 className="animate-spin" size={12} />
+                              ) : (
+                                <Volume2 size={12} />
+                              )}
+                            </button>
+                            <p className="text-xs text-slate-600 leading-relaxed">{d.exampleJapanese}</p>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-wrap gap-1.5 text-xs">
+                          <span className="text-slate-400">場面: {d.context}</span>
+                          <span className="text-slate-300">|</span>
+                          <span className="text-slate-400">頻度: {d.frequency}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
         </section>
 
         {data.wordForms.length > 0 && (
-          <section className="flex flex-col gap-2.5">
-            <h2 className="text-[15px] tracking-[0.12em] uppercase text-gray-500 border-b border-gray-200 pb-1.5">語形変化</h2>
-            <ul className="flex flex-wrap gap-2 list-none m-0 p-0">
+          <section className="flex flex-col gap-2">
+            <h2 className="text-xs font-bold tracking-wider uppercase text-slate-500 flex items-center gap-1.5">
+              <span className="w-0.5 h-2.5 bg-blue-500 rounded-full"></span>
+              語形変化
+            </h2>
+            <ul className="flex flex-wrap gap-1.5 list-none m-0 p-0">
               {data.wordForms.map((wf, i) => (
-                <li key={`${wf.form}-${i}`} className="px-3 py-1.5 rounded-full bg-gray-100 text-gray-700 text-sm border border-gray-200">
-                  {wf.form}
-                  <span className="ml-1.5 text-sm text-gray-500">
-                    （{wf.type}）
+                <li key={`${wf.form}-${i}`} className="px-2 py-1 rounded bg-slate-50 text-slate-700 text-sm border border-slate-200 flex items-center gap-1.5">
+                  <span className="font-medium">{wf.form}</span>
+                  <span className="text-xs text-slate-400 bg-white px-1 rounded border border-slate-100">
+                    {wf.type}
                   </span>
                 </li>
               ))}
@@ -182,20 +177,26 @@ export function WordDetailClient({ initialData, linkedWords = {}, relatedWords =
         )}
 
         {data.synonyms.length > 0 && (
-          <section className="flex flex-col gap-2.5">
-            <h2 className="text-[15px] tracking-[0.12em] uppercase text-gray-500 border-b border-gray-200 pb-1.5">類義語</h2>
-            <ul className="flex flex-wrap gap-2 list-none m-0 p-0">
+          <section className="flex flex-col gap-2">
+            <h2 className="text-xs font-bold tracking-wider uppercase text-slate-500 flex items-center gap-1.5">
+              <span className="w-0.5 h-2.5 bg-green-500 rounded-full"></span>
+              類義語
+            </h2>
+            <ul className="flex flex-wrap gap-1.5 list-none m-0 p-0">
               {data.synonyms.map((s, i) => (
-                <li key={i} className="px-3 py-1.5 rounded-full bg-gray-100 text-gray-700 text-sm border border-gray-200">
+                <li key={i} className="text-sm">
                   {linkedWords[s] ? (
                     <Link
                       href={`/words/${linkedWords[s]}`}
-                      className="underline decoration-2 underline-offset-2 cursor-pointer transition-all duration-200 inline-block text-blue-600 font-bold bg-blue-50 border-blue-200 hover:text-blue-700 hover:bg-blue-100 hover:border-blue-300 hover:-translate-y-px"
+                      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-green-50 text-green-700 border border-green-200 hover:bg-green-100 hover:border-green-300 transition-all shadow-sm group"
                     >
-                      {s}
+                      <span className="font-medium">{s}</span>
+                      <ArrowUpRight size={12} className="opacity-50 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
                     </Link>
                   ) : (
-                    s
+                    <span className="inline-flex items-center px-2 py-1 rounded bg-slate-50 text-slate-600 border border-slate-200">
+                      {s}
+                    </span>
                   )}
                 </li>
               ))}
@@ -204,63 +205,57 @@ export function WordDetailClient({ initialData, linkedWords = {}, relatedWords =
         )}
 
         {data.nuance && (
-          <section className="flex flex-col gap-2.5">
-            <h2 className="text-[15px] tracking-[0.12em] uppercase text-gray-500 border-b border-gray-200 pb-1.5">ニュアンス</h2>
-            <div className="text-[17px] leading-[1.8] text-gray-900">
-              <p>{data.nuance}</p>
+          <section className="flex flex-col gap-2">
+            <h2 className="text-xs font-bold tracking-wider uppercase text-slate-500 flex items-center gap-1.5">
+              <span className="w-0.5 h-2.5 bg-amber-500 rounded-full"></span>
+              ニュアンス
+            </h2>
+            <div className="bg-amber-50/50 rounded-lg p-3 border border-amber-100/50">
+              <p className="text-sm text-slate-700 leading-relaxed">{data.nuance}</p>
             </div>
           </section>
         )}
 
         {data.toeicExamples.length > 0 && (
-          <section className="flex flex-col gap-2.5">
-            <h2 className="text-[15px] tracking-[0.12em] uppercase text-gray-500 border-b border-gray-200 pb-1.5">{data.word}のTOEIC例文（AI例文）</h2>
-            <div className="text-[17px] leading-[1.8] text-gray-900">
+          <section className="flex flex-col gap-2">
+            <h2 className="text-xs font-bold tracking-wider uppercase text-slate-500 flex items-center gap-1.5">
+              <span className="w-0.5 h-2.5 bg-purple-500 rounded-full"></span>
+              {data.word}のTOEIC例文
+            </h2>
+            <div className="flex flex-col gap-2">
               {data.toeicExamples.map((ex, i) => (
-                <div key={i} className={i < data.toeicExamples.length - 1 ? "mb-3" : "mb-0"}>
-                  <div className="flex items-start gap-2">
-                    <p className="text-lg leading-[1.8] text-slate-900 font-medium m-0">
-                      {ex.english}
-                    </p>
+                <div key={i} className="bg-slate-50 rounded-lg p-2.5 border border-slate-100">
+                  <div className="flex items-start gap-1.5 mb-1.5">
                     <button
                       type="button"
-                      className="inline-flex items-center justify-center p-0 border-none bg-transparent cursor-pointer disabled:opacity-70 disabled:cursor-default group mt-1 shrink-0"
+                      className="mt-0.5 text-purple-500 hover:text-purple-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 rounded p-0.5 -ml-0.5"
                       onClick={() => handlePlaySentenceAudio(ex.english, `toeic-${i}`)}
                       disabled={sentenceAudioLoading === `toeic-${i}`}
                       aria-label="例文を再生"
                     >
-                      <span
-                        className="w-[22px] h-[22px] rounded-full inline-flex items-center justify-center bg-gray-100 text-[#5780d8] text-sm leading-none transition-all duration-160 group-hover:translate-y-[-1px] group-hover:shadow-md"
-                      >
-                        {sentenceAudioLoading === `toeic-${i}` ? (
-                          <Loader2 className="animate-spin" size={14} />
-                        ) : (
-                          <Volume2 size={14} />
-                        )}
-                      </span>
+                      {sentenceAudioLoading === `toeic-${i}` ? (
+                        <Loader2 className="animate-spin" size={14} />
+                      ) : (
+                        <Volume2 size={14} />
+                      )}
                     </button>
+                    <p className="text-sm text-slate-900 leading-relaxed font-medium">{ex.english}</p>
                   </div>
-                  <div className="flex items-start gap-2">
-                    <p className="mt-1 text-base text-gray-700 border-l-[3px] border-blue-300 pl-2.5 bg-gradient-to-r from-blue-300/12 to-transparent rounded-md m-0">
-                      {ex.japanese}
-                    </p>
+                  <div className="flex items-start gap-1.5 border-t border-slate-200/50 pt-1.5">
                     <button
                       type="button"
-                      className="inline-flex items-center justify-center p-0 border-none bg-transparent cursor-pointer disabled:opacity-70 disabled:cursor-default group mt-1 shrink-0"
+                      className="mt-0.5 text-slate-400 hover:text-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 rounded p-0.5 -ml-0.5"
                       onClick={() => handlePlaySentenceAudio(ex.japanese, `toeic-${i}-ja`, "ja")}
                       disabled={sentenceAudioLoading === `toeic-${i}-ja`}
                       aria-label="日本語訳を再生"
                     >
-                      <span
-                        className="w-[22px] h-[22px] rounded-full inline-flex items-center justify-center bg-gray-100 text-[#5780d8] text-sm leading-none transition-all duration-160 group-hover:translate-y-[-1px] group-hover:shadow-md"
-                      >
-                        {sentenceAudioLoading === `toeic-${i}-ja` ? (
-                          <Loader2 className="animate-spin" size={14} />
-                        ) : (
-                          <Volume2 size={14} />
-                        )}
-                      </span>
+                      {sentenceAudioLoading === `toeic-${i}-ja` ? (
+                        <Loader2 className="animate-spin" size={14} />
+                      ) : (
+                        <Volume2 size={14} />
+                      )}
                     </button>
+                    <p className="text-xs text-slate-600 leading-relaxed">{ex.japanese}</p>
                   </div>
                 </div>
               ))}
@@ -269,13 +264,17 @@ export function WordDetailClient({ initialData, linkedWords = {}, relatedWords =
         )}
 
         {relatedWords && relatedWords.length > 0 && (
-          <section className="flex flex-col gap-2.5">
-            <h2 className="text-[15px] tracking-[0.12em] uppercase text-gray-500 border-b border-gray-200 pb-1.5">同レベル単語</h2>
-            <ul className="flex flex-wrap gap-2 list-none m-0 p-0">
+          <section className="flex flex-col gap-2">
+            <h2 className="text-xs font-bold tracking-wider uppercase text-slate-500 flex items-center gap-1.5">
+              <span className="w-0.5 h-2.5 bg-teal-500 rounded-full"></span>
+              同レベル単語
+            </h2>
+            <ul className="flex flex-wrap gap-1.5 list-none m-0 p-0">
               {relatedWords.map((w) => (
-                <li key={w.slug} className="px-3 py-1.5 rounded-full bg-gray-100 text-gray-700 text-sm border border-gray-200">
-                  <Link href={`/words/${w.slug}`} className="underline decoration-2 underline-offset-2 cursor-pointer transition-all duration-200 inline-block text-blue-600 font-bold bg-blue-50 border-blue-200 hover:text-blue-700 hover:bg-blue-100 hover:border-blue-300 hover:-translate-y-px">
-                    {w.term}
+                <li key={w.slug}>
+                  <Link href={`/words/${w.slug}`} className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-white text-slate-700 text-sm border border-slate-200 hover:border-blue-300 hover:text-blue-600 hover:shadow-md transition-all shadow-sm group">
+                    <span className="font-medium">{w.term}</span>
+                    <ArrowUpRight size={12} className="text-slate-400 group-hover:text-blue-500 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
                   </Link>
                 </li>
               ))}
