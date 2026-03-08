@@ -127,7 +127,7 @@ async function WordDetailFetcher({ word }: { word: string }) {
   // 内部リンク用のマッピングを作成
   const linkedWords: Record<string, string> = {};
   
-  // 関連単語の取得
+  // 関連単語の取得（同レベル単語取得）
   const relatedWords = await getRelatedWords(word, 5);
   
   // チェック対象の単語リスト

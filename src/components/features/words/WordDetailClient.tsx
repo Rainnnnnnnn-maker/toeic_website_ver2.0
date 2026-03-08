@@ -267,7 +267,7 @@ export function WordDetailClient({ initialData, linkedWords = {}, relatedWords =
           <section className="flex flex-col gap-2">
             <h2 className="text-xs font-bold tracking-wider uppercase text-slate-500 flex items-center gap-1.5">
               <span className="w-0.5 h-2.5 bg-teal-500 rounded-full"></span>
-              同レベル単語
+              同レベル単語（以下単語の意味覚えていますか）
             </h2>
             <ul className="flex flex-wrap gap-1.5 list-none m-0 p-0">
               {relatedWords.map((w) => (

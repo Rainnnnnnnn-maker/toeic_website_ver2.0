@@ -1,4 +1,5 @@
 import "server-only";
+import { connection } from "next/server";
 import { list } from "@vercel/blob";
 import { unstable_cache } from "next/cache";
 import { cache } from "react";
@@ -51,20 +52,6 @@ function buildWordData(important: Word[], medium: Word[], high: Word[]): WordDat
   };
 }
 
-function stringToSeed(str: string): number {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    const char = str.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash; // Convert to 32bit integer
-  }
-  return Math.abs(hash);
-}
-
-function getSeededRandom(seed: number): number {
-  const x = Math.sin(seed) * 10000;
-  return x - Math.floor(x);
-}
 
 async function getWordsLocal(): Promise<WordData> {
   const loadWords = (filename: string, level: 'important' | 'medium' | 'high'): Word[] => {
@@ -194,6 +181,7 @@ export async function getWordBySlug(slug: string): Promise<Word | undefined> {
 }
 
 export async function getRelatedWords(currentSlug: string, count: number = 5): Promise<Word[]> {
+  await connection();
   const currentWord = await getWordBySlug(currentSlug);
   if (!currentWord) return [];
 
@@ -207,35 +195,19 @@ export async function getRelatedWords(currentSlug: string, count: number = 5): P
   // Filter out current word
   candidates = candidates.filter(w => w.slug !== currentSlug);
 
-  const result: Word[] = [];
   const len = candidates.length;
   if (len === 0) return [];
 
-  const taken = new Set<number>();
   const limit = Math.min(count, len);
-  let seed = stringToSeed(currentSlug);
+  const result: Word[] = [];
+  const taken = new Set<number>();
 
   while(result.length < limit) {
-    const randomVal = getSeededRandom(seed++);
-    const idx = Math.floor(randomVal * len);
+    const idx = Math.floor(Math.random() * len);
     
     if(!taken.has(idx)) {
        taken.add(idx);
        result.push(candidates[idx]);
-    } else {
-        // Prevent infinite loop if random generator is poor or we are unlucky
-        // Just linearly search for next available slot
-        let found = false;
-        for(let i = 1; i < len; i++) {
-            const nextIdx = (idx + i) % len;
-            if(!taken.has(nextIdx)) {
-                taken.add(nextIdx);
-                result.push(candidates[nextIdx]);
-                found = true;
-                break;
-            }
-        }
-        if(!found) break; // Should not happen if len >= limit
     }
   }
   return result;
