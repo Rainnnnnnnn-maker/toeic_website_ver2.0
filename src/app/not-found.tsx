@@ -1,84 +1,29 @@
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 
 export const metadata = {
-	title: "ページが見つかりません",
-	robots: { index: false, follow: false },
+  title: "ページが見つかりません",
+  robots: { index: false, follow: false },
 };
 
 export default function NotFound() {
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        width: "100%",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        padding: "32px 16px",
-        background:
-          "radial-gradient(circle at top, #fee2e2 0, #f9fafb 45%, #ffffff 100%)",
-      }}
-    >
-      <main
-        style={{
-          width: "100%",
-          maxWidth: 480,
-          textAlign: "center",
-          padding: "24px 20px 28px",
-          borderRadius: 20,
-          background: "rgba(255, 255, 255, 0.96)",
-          border: "1px solid #e5e7eb",
-          boxShadow: "0 18px 40px rgba(15, 23, 42, 0.08)",
-        }}
-      >
-        <p
-          style={{
-            fontSize: 13,
-            letterSpacing: "0.12em",
-            textTransform: "uppercase",
-            color: "#9ca3af",
-            marginBottom: 8,
-          }}
-        >
+    <div className="min-h-screen w-full flex items-center justify-center px-4 py-8 bg-[radial-gradient(circle_at_top,_#fee2e2_0,_#f9fafb_45%,_#ffffff_100%)]">
+      <main className="w-full max-w-[480px] text-center px-5 py-6 pb-7 rounded-[20px] bg-white/96 border border-gray-200 shadow-[0_18px_40px_rgba(15,23,42,0.08)] backdrop-blur-sm">
+        <p className="text-[13px] tracking-widest uppercase text-gray-400 mb-2 font-medium">
           404 Not Found
         </p>
-        <h1
-          style={{
-            fontSize: 24,
-            lineHeight: 1.4,
-            color: "#111827",
-            marginBottom: 8,
-          }}
-        >
+        <h1 className="text-2xl leading-snug text-gray-900 mb-2 font-bold">
           ページが見つかりません
         </h1>
-        <p
-          style={{
-            fontSize: 14,
-            lineHeight: 1.6,
-            color: "#4b5563",
-            marginBottom: 24,
-          }}
-        >
+        <p className="text-sm leading-relaxed text-gray-600 mb-6">
           URL が間違っているか、ページが移動または削除された可能性があります。
         </p>
         <Link
           href="/"
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 8,
-            padding: "10px 16px",
-            borderRadius: 999,
-            border: "1px solid #d1d5db",
-            background:
-              "linear-gradient(135deg, #eff6ff 0, #dbeafe 40%, #bfdbfe 100%)",
-            color: "#1f2937",
-            fontSize: 14,
-            fontWeight: 600,
-          }}
+          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-full border border-gray-300 bg-gradient-to-br from-blue-50 via-blue-100 to-blue-200 text-gray-800 text-sm font-semibold hover:shadow-md hover:translate-y-[-1px] transition-all duration-200 active:scale-95"
         >
+          <ArrowLeft size={16} />
           トップページに戻る
         </Link>
       </main>
