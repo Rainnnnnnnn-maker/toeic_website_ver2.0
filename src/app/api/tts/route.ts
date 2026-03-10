@@ -39,8 +39,10 @@ export async function POST(request: Request) {
   // Determine language and voice settings
   const language = body.language === "ja" ? "ja" : "en";
   const voiceConfig = language === "ja"
-    ? { languageCode: "ja-JP", name: "ja-JP-Standard-A" }
-    : { languageCode: "en-US", name: "en-US-Standard-A" };
+    // ? { languageCode: "ja-JP", name: "ja-JP-Standard-A" }
+    ? { languageCode: "ja-JP", name: "ja-JP-Neural2-B" }
+    // : { languageCode: "en-US", name: "en-US-Standard-A" };
+    : { languageCode: "en-US", name: "en-US-Chirp-HD-F" };
 
   // NOTE: We removed the getWordBySlug check to allow sentence synthesis.
   // const wordEntry = getWordBySlug(body.text.toLowerCase());
