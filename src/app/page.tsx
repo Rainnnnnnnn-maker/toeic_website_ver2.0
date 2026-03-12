@@ -139,16 +139,17 @@ export default async function Home() {
 
         <section className="mt-12 pt-12 border-t border-slate-200 flex flex-col gap-8">
           <article className="flex flex-col gap-4">
-            <h2 className="text-xl font-bold text-slate-800 mb-2">2026年最新のTOEIC重要単語と出題傾向</h2>
+            <h2 className="text-xl font-bold text-slate-800 mb-2">2026年のTOEIC頻出語を、今のビジネス英語で効率よく。</h2>
             <p className="text-[15px] leading-[1.8] text-slate-600">
-              近年のTOEIC L&Rテストでは、ビジネス環境の変化に伴い「リモートワーク」「オンライン会議」「チャットツール」に関連する語彙の出題頻度が増加しています。
-              また、従来のオフィスワークだけでなく、ハイブリッドワークや柔軟な働き方を示唆する文脈も増えています。
+              近年のTOEIC L&Rテストでは、リモートワーク、オンライン会議、チャットツール、AIなど、
+              現代のビジネス環境を反映した語彙や表現がますます重要になっています。
             </p>
             <p className="text-[15px] leading-[1.8] text-slate-600">
-              本サイトの「TOEIC重要単語」リストは、こうした最新のトレンドを踏まえ、スコアアップに直結する頻出語彙を厳選しています。
+              本サイトの「TOEIC重要単語」リストでは、そうした最新の出題傾向を踏まえた頻出語彙を厳選。
               例えば、<Link href="/words/accommodate" className="text-blue-600 font-bold hover:underline">accommodate</Link>（対応する）や<Link href="/words/negotiate" className="text-blue-600 font-bold hover:underline">negotiate</Link>（交渉する）、
-              <Link href="/words/implement" className="text-blue-600 font-bold hover:underline">implement</Link>（実施する）などのビジネス英語の重要単語を、
-              古い単語帳ではカバーしきれない現代的なビジネス英語表現とともに、AIによる最新の例文で学習できます。
+              <Link href="/words/implement" className="text-blue-600 font-bold hover:underline">implement</Link>（実施する）など、スコアアップに直結する重要語を、
+              実践的な例文とともにわかりやすく学べます。
+              古い単語帳だけでは補いにくい、今のTOEICに合ったビジネス英語を、このサイトで効率よく身につけましょう。
             </p>
           </article>
 
