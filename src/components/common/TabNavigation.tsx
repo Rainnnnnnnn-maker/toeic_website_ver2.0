@@ -42,9 +42,9 @@ export default function TabNavigation({ activeTab, onTabChange }: TabNavigationP
   };
 
   return (
-    <div className="w-full flex flex-col gap-2 relative">
+    <div className="w-full flex flex-col gap-1.5 relative">
       <div className="w-full overflow-x-auto p-1 -m-1 [&::-webkit-scrollbar]:hidden [scrollbar-width:none] [-ms-overflow-style:none]">
-        <div className="flex gap-2 min-w-min" role="tablist">
+        <div className="flex gap-1.5 min-w-min" role="tablist">
           {TABS.map((tab) => {
             const isActive = activeTab === tab.id;
             const isInactive = tab.status === 'coming_soon';
@@ -56,7 +56,7 @@ export default function TabNavigation({ activeTab, onTabChange }: TabNavigationP
                 aria-selected={isActive}
                 aria-disabled={isInactive}
                 className={`
-                  relative flex items-center justify-center px-4 py-2.5 rounded-xl border text-sm font-semibold whitespace-nowrap transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-blue-300/50 group
+                  relative flex items-center justify-center px-3 py-1.5 rounded-lg border text-xs font-semibold whitespace-nowrap transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-blue-300/50 group
                   ${isActive 
                     ? 'text-blue-600 bg-blue-50 border-blue-200 shadow-[0_2px_8px_rgba(15,23,42,0.06)]' 
                     : 'bg-transparent border-transparent text-gray-500'}
@@ -68,7 +68,7 @@ export default function TabNavigation({ activeTab, onTabChange }: TabNavigationP
               >
                 {tab.label}
                 {isInactive && (
-                  <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-[11px] rounded pointer-events-none opacity-0 transition-opacity duration-200 whitespace-nowrap z-10 group-hover:opacity-100">
+                  <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-[10px] rounded pointer-events-none opacity-0 transition-opacity duration-200 whitespace-nowrap z-10 group-hover:opacity-100">
                     近日実装予定
                   </span>
                 )}
