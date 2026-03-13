@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { FavoritesProvider } from "@/context/FavoritesContext";
+import { Footer } from "@/components/common/Footer";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -81,7 +82,12 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <FavoritesProvider>{children}</FavoritesProvider>
+        <FavoritesProvider>
+          <div className="flex min-h-screen flex-col">
+            <div className="flex-1">{children}</div>
+            <Footer />
+          </div>
+        </FavoritesProvider>
         <Analytics />
         <SpeedInsights />
         {process.env.NEXT_PUBLIC_GA_ID && (
