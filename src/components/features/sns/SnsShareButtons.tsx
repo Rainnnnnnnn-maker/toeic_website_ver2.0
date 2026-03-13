@@ -72,7 +72,7 @@ export const SnsShareButtons = ({ url, title, className, style }: Props) => {
       <LineShareButton
         url={url}
         title={title}
-        onClick={() => sendGAEvent("event", "share", { method: "line", url })}
+        onClick={handleLineClick}
       >
         <LineIcon size={32} round />
       </LineShareButton>

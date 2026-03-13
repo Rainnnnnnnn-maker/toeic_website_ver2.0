@@ -73,7 +73,7 @@ export default function WordsListClient({ importantWords, mediumWords, highWords
         const pattern = escaped.replace(/\\\*/g, '.*');
         const regex = new RegExp(`^${pattern}$`, 'i');
         return allWithCategory.filter((w) => regex.test(w.term));
-      } catch (e) {
+      } catch {
         return [];
       }
     }
