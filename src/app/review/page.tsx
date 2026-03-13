@@ -7,6 +7,9 @@ export const metadata = {
   alternates: {
     canonical: "https://www.toeic-words.com/review",
   },
+  robots: {
+    index: false,
+  },
 };
 
 export default async function ReviewPage() {

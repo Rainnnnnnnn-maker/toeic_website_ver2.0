@@ -11,6 +11,9 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "https://www.toeic-words.com/favorites",
   },
+  robots: {
+    index: false,
+  },
 };
 
 export default async function FavoritesPage() {

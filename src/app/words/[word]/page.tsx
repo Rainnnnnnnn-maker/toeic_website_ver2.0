@@ -53,24 +53,36 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const title = `${wordEntry.term} | TOEIC重要単語`;
   const description = `TOEIC頻出単語「${wordEntry.term}」の意味と使い方をAIが解説。効率よく学習してスコアアップを目指しましょう。`;
+  const url = `https://www.toeic-words.com/words/${slug}`;
+  const images = [
+    {
+      url: `/words/${slug}/opengraph-image`,
+      width: 1200,
+      height: 630,
+      alt: `${wordEntry.term} - TOEIC重要単語`,
+    },
+  ];
 
   return {
-    title,
+    title: {
+      absolute: title,
+    },
     description,
     openGraph: {
       title,
       description,
       type: "article",
-      url: `https://www.toeic-words.com/words/${slug}`,
+      url,
+      images,
     },
     alternates: {
-      canonical: `https://www.toeic-words.com/words/${slug}`,
+      canonical: url,
     },
     twitter: {
-      card: "summary",
+      card: "summary_large_image",
       title,
       description,
-      
+      images,
     },
   };
 }
