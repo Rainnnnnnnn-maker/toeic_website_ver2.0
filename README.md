@@ -10,12 +10,13 @@ A comprehensive web application for learning essential TOEIC vocabulary, featuri
     - **L1**: Next.js Data Cache for instant access.
     - **L2**: **Upstash Redis** for persistent, shared caching across users.
     - **L3**: On-demand AI generation for missing words.
-- **Pronunciation Support**: High-quality audio via **Google Cloud Text-to-Speech**.
+- **Pronunciation Support**: High-quality audio via **Google Cloud Text-to-Speech** (supports both words and sentences).
 - **Study Modes**:
     - **List View**: Browse words by importance (Important / Medium).
     - **Study Mode**: Flashcard-style learning with tracking (Remembered / Not Remembered).
     - **Review Mode**: Focus on words marked as favorites.
 - **Favorites**: Save difficult words for later review (persisted in local storage).
+- **Social Share**: Share word details via Twitter, Facebook, and LINE.
 - **Responsive Design**: Optimized for desktop and mobile devices.
 
 ## 🛠️ Tech Stack
@@ -23,6 +24,7 @@ A comprehensive web application for learning essential TOEIC vocabulary, featuri
 - **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
 - **Language**: [TypeScript](https://www.typescriptlang.org/)
 - **UI**: React 19, [Tailwind CSS v3.4](https://tailwindcss.com/) (Utility-first CSS), Lucide React
+- **Social**: react-share
 - **AI**: Google Gemini (`@google/generative-ai`)
 - **Database / Cache**: Upstash Redis (`@upstash/redis`)
 - **Storage**: Vercel Blob (`@vercel/blob`) - for word lists
@@ -101,6 +103,15 @@ Triggers on-demand revalidation for cached word lists (tag: `word-data`). Useful
   curl "https://<your-site>/api/revalidate/words?token=<REVALIDATION_TOKEN>"
   ```
 
+### Text-to-Speech
+Generates audio for words or sentences.
+
+- **Endpoint**: `POST /api/tts`
+- **Headers**:
+    - `Content-Type: application/json`
+    - `X-App-Source: toeic-client`
+- **Body**: `{ "text": "word or sentence", "language": "en" | "ja" }`
+
 ## 📂 Project Structure
 
 - `src/app`: Next.js App Router pages and API routes.
@@ -109,4 +120,5 @@ Triggers on-demand revalidation for cached word lists (tag: `word-data`). Useful
 - `src/lib`: Utility functions and API clients (Gemini, Redis).
 - `src/types`: TypeScript type definitions.
 - `src/data`: Data fetching logic (Local vs Blob switching).
+- `src/hooks`: Custom React hooks (e.g., useTTS).
 - `__doc__`: Local storage for word lists during development.
