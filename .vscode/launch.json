@@ -5,6 +5,7 @@
       "name": "Next.js: dev (server)",
       "type": "node",
       "request": "launch",
+      "autoAttachChildProcesses": true,
       "cwd": "${workspaceFolder}",
       "runtimeExecutable": "node",
       "runtimeArgs": [
@@ -26,6 +27,7 @@
       "type": "node",
       "request": "attach",
       "port": 9229,
+      "autoAttachChildProcesses": true,
       "skipFiles": [
         "<node_internals>/**"
       ]
