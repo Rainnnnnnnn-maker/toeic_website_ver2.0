@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { Star, Volume2, Loader2 } from 'lucide-react';
 import { useFavorites } from '@/context/FavoritesContext';
 import type { Word } from '@/data/words';
-import { fetchWordDetail } from '@/app/study/actions';
+import { fetchWordDetail } from '@/actions/word';
 import { useTTS } from '@/hooks/useTTS';
 
 type Props = {

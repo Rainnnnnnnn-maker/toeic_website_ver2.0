@@ -5,7 +5,7 @@ import Script from "next/script";
 import dynamic from "next/dynamic";
 import { Metadata } from "next";
 import { getWordBySlug, getAllWords, getRelatedWords } from "@/data/words";
-import { getWordDetail } from "@/actions/word";
+import { getWordDetail } from "@/data/word-detail";
 import { generateWordDetailJsonLd } from "@/lib/json-ld";
 import Loading from "./loading";
 

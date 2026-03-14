@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 import { getWordBySlug } from "@/data/words";
-import { getWordDetail } from "@/actions/word";
+import { getWordDetail } from "@/data/word-detail";
 import { loadGoogleFont } from "@/lib/og-utils";
 
 export const alt = "TOEIC重要単語";
