@@ -112,6 +112,7 @@ async function WordDetailFetcher({ word }: { word: string }) {
   // Server Component内でデータを取得（L1 Cache: Next.js Data Cache）
   // データがない場合は生成処理が走る（L2: Redis -> L3: Gemini）
   const detailData = await getWordDetail(word);
+  const wordEntry = await getWordBySlug(word);
 
   // データ取得後にJSON-LDを生成（ストリーミングの一部として送信）
   const jsonLd = generateWordDetailJsonLd(word, detailData);
@@ -175,7 +176,12 @@ async function WordDetailFetcher({ word }: { word: string }) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <WordDetailClient initialData={detailData} linkedWords={linkedWords} relatedWords={relatedWords} />
+      <WordDetailClient 
+        initialData={detailData} 
+        linkedWords={linkedWords} 
+        relatedWords={relatedWords} 
+        level={wordEntry?.level}
+      />
     </>
   );
 }

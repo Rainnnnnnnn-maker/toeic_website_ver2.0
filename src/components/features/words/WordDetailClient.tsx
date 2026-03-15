@@ -14,9 +14,10 @@ type Props = {
   initialData: WordDetails;
   linkedWords?: Record<string, string>;
   relatedWords?: Word[];
+  level?: 'important' | 'medium' | 'high';
 };
 
-export function WordDetailClient({ initialData, linkedWords = {}, relatedWords = [] }: Props) {
+export function WordDetailClient({ initialData, linkedWords = {}, relatedWords = [], level }: Props) {
   const { isFavorite, toggleFavorite } = useFavorites();
   const {
     audioLoading,
@@ -41,7 +42,19 @@ export function WordDetailClient({ initialData, linkedWords = {}, relatedWords =
       <div className="mt-0 p-4 bg-white rounded-xl border border-gray-100 shadow-sm relative flex flex-col gap-3 sm:p-5">
         <div className="flex justify-between gap-3 items-end border-b border-gray-100 pb-3">
           <div>
-            <h1 className="text-2xl text-slate-900 font-bold tracking-tight sm:text-3xl">{data.word}</h1>
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl text-slate-900 font-bold tracking-tight sm:text-3xl">{data.word}</h1>
+              {level && (
+                <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-semibold whitespace-nowrap transform -translate-y-1 ${
+                  level === 'important' ? 'bg-blue-100 text-blue-800' : 
+                  level === 'medium' ? 'bg-purple-100 text-purple-800' : 
+                  'bg-red-100 text-red-800'
+                }`}>
+                  {level === 'important' ? '重要' : 
+                   level === 'medium' ? '中級' : '上級'}
+                </span>
+              )}
+            </div>
             {data.pronunciation && (
               <div className="mt-1.5 inline-flex items-center gap-2">
                 <span className="text-sm text-gray-600 font-mono bg-gray-50 border border-gray-200 rounded px-1.5 py-0.5">{data.pronunciation}</span>
