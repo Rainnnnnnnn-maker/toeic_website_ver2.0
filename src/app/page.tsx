@@ -127,11 +127,11 @@ export default async function Home() {
             </p>
           </div>
           <div className="flex gap-4 items-center mt-2 flex-wrap justify-end sm:justify-start">
-            <Link href="/study" className="inline-flex items-center justify-center gap-2 px-[26px] py-[14px] min-h-[44px] bg-gradient-to-br from-[#726ece] to-[#1eabed] text-white rounded-full font-semibold text-[15px] tracking-[0.04em] no-underline transition-all duration-160 shadow-[0_12px_30px_rgba(15,23,42,0.28)] hover:-translate-y-px hover:scale-[1.02] hover:brightness-105 hover:shadow-[0_18px_40px_rgba(15,23,42,0.32)] active:translate-y-0 active:scale-99 active:shadow-[0_8px_20px_rgba(15,23,42,0.22)] focus-visible:outline-none focus-visible:shadow-[0_0_0_3px_rgba(191,219,254,0.9),0_12px_30px_rgba(15,23,42,0.28)]">
-              <span className="inline-flex items-center">学習モード開始</span>
+            <Link href="/study" className="inline-flex items-center justify-center gap-2 px-4 py-2 min-h-[36px] bg-blue-50 text-blue-700 border-2 border-blue-600 rounded-lg font-bold text-sm tracking-wide no-underline transition-all duration-200 hover:bg-blue-100 hover:-translate-y-0.5 active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500">
+              <span className="inline-flex items-center">学習モード</span>
             </Link>
-            <Link href="/favorites" className="inline-flex items-center justify-center gap-2 px-[26px] py-[14px] min-h-[44px] bg-gradient-to-br from-[#f59e0b] to-[#d97706] text-white rounded-full font-semibold text-[15px] tracking-[0.04em] no-underline transition-all duration-160 shadow-[0_12px_30px_rgba(217,119,6,0.28)] hover:-translate-y-px hover:scale-[1.02] hover:brightness-105 hover:shadow-[0_18px_40px_rgba(217,119,6,0.32)] active:translate-y-0 active:scale-99 active:shadow-[0_8px_20px_rgba(217,119,6,0.22)] focus-visible:outline-none focus-visible:shadow-[0_0_0_3px_rgba(253,186,116,0.9),0_12px_30px_rgba(217,119,6,0.28)]">
-              <span className="inline-flex items-center">お気に入り単語</span>
+            <Link href="/favorites" className="inline-flex items-center justify-center gap-2 px-4 py-2 min-h-[36px] bg-amber-50 text-amber-700 border-2 border-amber-500 rounded-lg font-bold text-sm tracking-wide no-underline transition-all duration-200 hover:bg-amber-100 hover:-translate-y-0.5 active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-amber-500">
+              <span className="inline-flex items-center">お気に入り</span>
             </Link>
           </div>
         </header>

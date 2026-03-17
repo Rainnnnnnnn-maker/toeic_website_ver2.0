@@ -25,7 +25,7 @@ export default function ReviewWrapper({ allWords }: Props) {
       <div className="min-h-screen w-full flex justify-center items-center py-8 px-4 bg-[radial-gradient(circle_at_top,#e0f2fe_0,#f9fafb_45%,#ffffff_100%)] sm:py-12 sm:px-6">
         <main className="w-full max-w-[600px] flex flex-col gap-8 items-center">
           <header className="flex flex-col gap-3 text-center w-full items-center relative">
-            <Link href="/favorites" className="absolute right-0 -top-4 inline-flex items-center justify-center gap-2 px-[26px] py-[14px] min-h-[44px] bg-gradient-to-br from-[#726ece] to-[#1eabed] text-white rounded-full font-semibold text-[15px] tracking-[0.04em] no-underline transition-all duration-160 shadow-[0_12px_30px_rgba(15,23,42,0.28)] z-10 hover:-translate-y-px hover:scale-[1.02] hover:brightness-105 hover:shadow-[0_18px_40px_rgba(15,23,42,0.32)] active:translate-y-0 active:scale-99 active:shadow-[0_8px_20px_rgba(15,23,42,0.22)] focus-visible:outline-none focus-visible:shadow-[0_0_0_3px_rgba(191,219,254,0.9),0_12px_30px_rgba(15,23,42,0.28)]">
+            <Link href="/favorites" className="absolute right-0 -top-4 inline-flex items-center justify-center gap-2 px-4 py-2 min-h-[36px] bg-slate-50 text-slate-700 border-2 border-slate-700 rounded-lg font-bold text-sm tracking-wide no-underline transition-all duration-200 z-10 hover:bg-slate-100 hover:-translate-y-0.5 active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-slate-500">
               お気に入りへ戻る
             </Link>
             <h1 className="text-[28px] leading-[1.3] text-slate-900 font-bold mt-12 sm:text-[32px]">復習モード</h1>
@@ -40,8 +40,8 @@ export default function ReviewWrapper({ allWords }: Props) {
               お気に入りに登録してから復習モードをご利用ください。
             </p>
             <div className="mt-8">
-              <Link href="/" className="inline-flex items-center justify-center gap-2 px-[26px] py-[14px] min-h-[44px] bg-gradient-to-br from-[#726ece] to-[#1eabed] text-white rounded-full font-semibold text-[15px] tracking-[0.04em] no-underline transition-all duration-160 shadow-[0_12px_30px_rgba(15,23,42,0.28)] hover:-translate-y-px hover:scale-[1.02] hover:brightness-105 hover:shadow-[0_18px_40px_rgba(15,23,42,0.32)] active:translate-y-0 active:scale-99 active:shadow-[0_8px_20px_rgba(15,23,42,0.22)] focus-visible:outline-none focus-visible:shadow-[0_0_0_3px_rgba(191,219,254,0.9),0_12px_30px_rgba(15,23,42,0.28)]">
-                単語を探しに行く
+              <Link href="/" className="inline-flex items-center justify-center gap-2 px-4 py-2 min-h-[36px] bg-blue-50 text-blue-700 border-2 border-blue-600 rounded-lg font-bold text-sm tracking-wide no-underline transition-all duration-200 hover:bg-blue-100 hover:-translate-y-0.5 active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500">
+                単語を探す
               </Link>
             </div>
           </div>

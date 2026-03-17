@@ -49,15 +49,15 @@ export default async function FavoritesPage() {
         <header className="flex flex-col gap-5 sm:flex-row sm:justify-between sm:items-start">
           <div className="flex flex-col gap-3 sm:max-w-[60%]">
             <p className="text-xs tracking-[0.12em] uppercase text-slate-500">YOUR COLLECTION</p>
-            <h1 className="text-[22px] leading-[1.3] text-slate-900 sm:text-[26px] lg:text-[28px]">お気に入り単語</h1>
+            <h1 className="text-[22px] leading-[1.3] text-slate-900 font-bold sm:text-[26px] lg:text-[28px]">お気に入り単語</h1>
             <p className="text-sm leading-[1.6] text-gray-500">
               学習中に気になった単語を復習しましょう。
             </p>
           </div>
           <div className="flex gap-4 items-center mt-2 flex-wrap justify-end sm:justify-start">
             <ReviewModeButton />
-            <Link href="/" className="inline-flex items-center justify-center gap-2 px-[26px] py-[14px] min-h-[44px] bg-gradient-to-br from-[#f59e0b] to-[#d97706] text-white rounded-full font-semibold text-[15px] tracking-[0.04em] no-underline transition-all duration-160 shadow-[0_12px_30px_rgba(217,119,6,0.28)] hover:-translate-y-px hover:scale-[1.02] hover:brightness-105 hover:shadow-[0_18px_40px_rgba(217,119,6,0.32)] active:translate-y-0 active:scale-99 active:shadow-[0_8px_20px_rgba(217,119,6,0.22)] focus-visible:outline-none focus-visible:shadow-[0_0_0_3px_rgba(253,186,116,0.9),0_12px_30px_rgba(217,119,6,0.28)]">
-              単語一覧へ戻る
+            <Link href="/" className="inline-flex items-center justify-center gap-2 px-4 py-2 min-h-[36px] bg-slate-50 text-slate-700 border-2 border-slate-700 rounded-lg font-bold text-sm tracking-wide no-underline transition-all duration-200 hover:bg-slate-100 hover:-translate-y-0.5 active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-slate-500">
+              単語一覧
             </Link>
           </div>
         </header>
