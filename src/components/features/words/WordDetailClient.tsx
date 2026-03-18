@@ -122,37 +122,37 @@ export function WordDetailClient({ initialData, linkedWords = {}, relatedWords =
                         </div>
 
                         <div className="bg-white rounded-lg border border-slate-200 p-2.5 shadow-sm">
-                          <div className="flex items-start gap-1.5 mb-1.5">
+                          <div className="flex items-start gap-2 mb-2">
                             <button
                               type="button"
-                              className="mt-0.5 text-blue-500 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded p-0.5 -ml-0.5"
+                              className="shrink-0 inline-flex items-center justify-center p-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-md transition-colors border border-blue-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                               onClick={() => handlePlaySentenceAudio(d.example, `meaning-${idx}-detail-${d.number}`)}
                               disabled={sentenceAudioLoading === `meaning-${idx}-detail-${d.number}`}
                               aria-label="例文を再生"
                             >
                               {sentenceAudioLoading === `meaning-${idx}-detail-${d.number}` ? (
-                                <Loader2 className="animate-spin" size={12} />
+                                <Loader2 className="animate-spin" size={14} />
                               ) : (
-                                <Volume2 size={12} />
+                                <Volume2 size={14} />
                               )}
                             </button>
-                            <p className="text-sm text-slate-900 leading-relaxed font-medium">{d.example}</p>
+                            <p className="text-sm text-slate-900 leading-relaxed font-medium mt-0.5">{d.example}</p>
                           </div>
-                          <div className="flex items-start gap-1.5 border-t border-slate-100 pt-1.5">
+                          <div className="flex items-start gap-2 border-t border-slate-100 pt-2">
                              <button
                               type="button"
-                              className="mt-0.5 text-slate-400 hover:text-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 rounded p-0.5 -ml-0.5"
+                              className="shrink-0 inline-flex items-center justify-center p-1.5 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-md transition-colors border border-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500"
                               onClick={() => handlePlaySentenceAudio(d.exampleJapanese, `meaning-${idx}-detail-${d.number}-ja`, "ja")}
                               disabled={sentenceAudioLoading === `meaning-${idx}-detail-${d.number}-ja`}
                               aria-label="日本語訳を再生"
                             >
                               {sentenceAudioLoading === `meaning-${idx}-detail-${d.number}-ja` ? (
-                                <Loader2 className="animate-spin" size={12} />
+                                <Loader2 className="animate-spin" size={14} />
                               ) : (
-                                <Volume2 size={12} />
+                                <Volume2 size={14} />
                               )}
                             </button>
-                            <p className="text-xs text-slate-600 leading-relaxed">{d.exampleJapanese}</p>
+                            <p className="text-xs text-slate-600 leading-relaxed mt-0.5">{d.exampleJapanese}</p>
                           </div>
                         </div>
 
@@ -238,10 +238,10 @@ export function WordDetailClient({ initialData, linkedWords = {}, relatedWords =
             <div className="flex flex-col gap-2">
               {data.toeicExamples.map((ex, i) => (
                 <div key={i} className="bg-slate-50 rounded-lg p-2.5 border border-slate-100">
-                  <div className="flex items-start gap-1.5 mb-1.5">
+                  <div className="flex items-start gap-2 mb-2">
                     <button
                       type="button"
-                      className="mt-0.5 text-purple-500 hover:text-purple-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 rounded p-0.5 -ml-0.5"
+                      className="shrink-0 inline-flex items-center justify-center p-1.5 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-md transition-colors border border-purple-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
                       onClick={() => handlePlaySentenceAudio(ex.english, `toeic-${i}`)}
                       disabled={sentenceAudioLoading === `toeic-${i}`}
                       aria-label="例文を再生"
@@ -252,12 +252,12 @@ export function WordDetailClient({ initialData, linkedWords = {}, relatedWords =
                         <Volume2 size={14} />
                       )}
                     </button>
-                    <p className="text-sm text-slate-900 leading-relaxed font-medium">{ex.english}</p>
+                    <p className="text-sm text-slate-900 leading-relaxed font-medium mt-0.5">{ex.english}</p>
                   </div>
-                  <div className="flex items-start gap-1.5 border-t border-slate-200/50 pt-1.5">
+                  <div className="flex items-start gap-2 border-t border-slate-200/50 pt-2">
                     <button
                       type="button"
-                      className="mt-0.5 text-slate-400 hover:text-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 rounded p-0.5 -ml-0.5"
+                      className="shrink-0 inline-flex items-center justify-center p-1.5 bg-white hover:bg-slate-50 text-slate-600 rounded-md transition-colors border border-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500"
                       onClick={() => handlePlaySentenceAudio(ex.japanese, `toeic-${i}-ja`, "ja")}
                       disabled={sentenceAudioLoading === `toeic-${i}-ja`}
                       aria-label="日本語訳を再生"
@@ -268,7 +268,7 @@ export function WordDetailClient({ initialData, linkedWords = {}, relatedWords =
                         <Volume2 size={14} />
                       )}
                     </button>
-                    <p className="text-xs text-slate-600 leading-relaxed">{ex.japanese}</p>
+                    <p className="text-xs text-slate-600 leading-relaxed mt-0.5">{ex.japanese}</p>
                   </div>
                 </div>
               ))}
