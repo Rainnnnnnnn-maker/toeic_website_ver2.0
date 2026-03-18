@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import WordNavigation from "@/components/features/words/WordNavigation";
 import { ShareTargetProvider } from "@/context/ShareTargetContext";
+import { ChevronLeft } from "lucide-react";
 
 export default async function WordLayout({
   children,
@@ -18,13 +19,17 @@ export default async function WordLayout({
         <main className="w-full max-w-[960px] flex flex-col gap-6">
           <Suspense
             fallback={
-              <header>
-                <div className="inline-flex items-center gap-1.5 text-lg tracking-[0.12em] uppercase text-gray-500 mb-2 whitespace-nowrap">
-                  <Link href="/" className="text-indigo-600 no-underline text-2xl font-semibold">
+              <header className="flex flex-col gap-4">
+                <div className="flex items-center gap-3 whitespace-nowrap overflow-x-auto pb-1 -mb-1">
+                  <Link 
+                    href="/" 
+                    className="group inline-flex items-center justify-center gap-1.5 h-10 px-4 bg-white border border-gray-200 rounded-full text-slate-600 text-[15px] font-semibold no-underline transition-all duration-200 shadow-sm select-none hover:bg-gray-50 hover:border-gray-300 hover:text-slate-900 hover:-translate-y-px hover:shadow-md active:translate-y-0 active:shadow-sm"
+                  >
+                    <ChevronLeft size={18} className="transition-transform group-hover:-translate-x-0.5 text-slate-400 group-hover:text-slate-600" />
                     単語一覧
                   </Link>
-                  <span className="mx-0.5">/</span>
-                  <span className="text-gray-700">...</span>
+                  <span className="text-slate-300 text-lg">/</span>
+                  <span className="text-slate-700 text-lg font-bold tracking-wide uppercase">...</span>
                 </div>
                 <div className="flex justify-between gap-4 items-end">
                   <h2 className="text-xl leading-[1.4] text-slate-900 tracking-[0.02em]">AI単語解説</h2>
