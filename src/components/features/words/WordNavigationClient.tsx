@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useFavorites } from "@/context/FavoritesContext";
-import { useMemo, useRef } from "react";
+import { useMemo, useState } from "react";
 import type { Word } from "@/data/words";
 import { useShareTarget } from "@/context/ShareTargetContext";
 import { ChevronLeft } from "lucide-react";
@@ -33,29 +33,41 @@ export default function WordNavigationClient({
   }, [allWords, favorites, isFromFavorites]);
 
   const currentIndex = navigationList.findIndex((w) => w.slug === currentSlug);
-  let prevWord: Word | null = currentIndex > 0 ? navigationList[currentIndex - 1] : null;
-  let nextWord: Word | null =
+  const computedPrevWord: Word | null = currentIndex > 0 ? navigationList[currentIndex - 1] : null;
+  const computedNextWord: Word | null =
     currentIndex >= 0 && currentIndex < navigationList.length - 1
       ? navigationList[currentIndex + 1]
       : null;
 
-  const validNavRef = useRef<{ slug: string; prev: Word | null; next: Word | null }>({
+  const [fallbackNav, setFallbackNav] = useState<{ slug: string; prev: Word | null; next: Word | null }>({
     slug: currentSlug,
-    prev: null,
-    next: null,
+    prev: computedPrevWord,
+    next: computedNextWord,
   });
 
   if (currentIndex !== -1) {
-    validNavRef.current = { slug: currentSlug, prev: prevWord, next: nextWord };
-  } else if (validNavRef.current.slug === currentSlug) {
-    // お気に入りから外された等で currentIndex が -1 になった場合、直前の有効な値を使用
-    prevWord = validNavRef.current.prev;
-    nextWord = validNavRef.current.next;
-  } else {
-    // slugが変わり、かつお気に入りに存在しない場合（直接URLアクセスなど）
-    prevWord = null;
-    nextWord = null;
-    validNavRef.current = { slug: currentSlug, prev: null, next: null };
+    if (
+      fallbackNav.slug !== currentSlug ||
+      fallbackNav.prev !== computedPrevWord ||
+      fallbackNav.next !== computedNextWord
+    ) {
+      setFallbackNav({ slug: currentSlug, prev: computedPrevWord, next: computedNextWord });
+    }
+  }
+
+  let prevWord = computedPrevWord;
+  let nextWord = computedNextWord;
+
+  if (currentIndex === -1) {
+    if (fallbackNav.slug === currentSlug) {
+      // お気に入りから外された等で currentIndex が -1 になった場合、直前の有効な値を使用
+      prevWord = fallbackNav.prev;
+      nextWord = fallbackNav.next;
+    } else {
+      // slugが変わり、かつお気に入りに存在しない場合（直接URLアクセスなど）
+      prevWord = null;
+      nextWord = null;
+    }
   }
 
   const entry = allWords.find((w) => w.slug === currentSlug);
