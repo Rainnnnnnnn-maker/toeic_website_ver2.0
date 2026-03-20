@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useFavorites } from "@/context/FavoritesContext";
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 import type { Word } from "@/data/words";
 import { useShareTarget } from "@/context/ShareTargetContext";
 import { ChevronLeft } from "lucide-react";
@@ -33,11 +33,30 @@ export default function WordNavigationClient({
   }, [allWords, favorites, isFromFavorites]);
 
   const currentIndex = navigationList.findIndex((w) => w.slug === currentSlug);
-  const prevWord = currentIndex > 0 ? navigationList[currentIndex - 1] : null;
-  const nextWord =
+  let prevWord: Word | null = currentIndex > 0 ? navigationList[currentIndex - 1] : null;
+  let nextWord: Word | null =
     currentIndex >= 0 && currentIndex < navigationList.length - 1
       ? navigationList[currentIndex + 1]
       : null;
+
+  const validNavRef = useRef<{ slug: string; prev: Word | null; next: Word | null }>({
+    slug: currentSlug,
+    prev: null,
+    next: null,
+  });
+
+  if (currentIndex !== -1) {
+    validNavRef.current = { slug: currentSlug, prev: prevWord, next: nextWord };
+  } else if (validNavRef.current.slug === currentSlug) {
+    // お気に入りから外された等で currentIndex が -1 になった場合、直前の有効な値を使用
+    prevWord = validNavRef.current.prev;
+    nextWord = validNavRef.current.next;
+  } else {
+    // slugが変わり、かつお気に入りに存在しない場合（直接URLアクセスなど）
+    prevWord = null;
+    nextWord = null;
+    validNavRef.current = { slug: currentSlug, prev: null, next: null };
+  }
 
   const entry = allWords.find((w) => w.slug === currentSlug);
   const term = entry?.term || currentSlug;
