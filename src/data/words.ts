@@ -1,7 +1,7 @@
 import "server-only";
 import { connection } from "next/server";
 import { list } from "@vercel/blob";
-import { unstable_cache } from "next/cache";
+import { cacheTag, cacheLife } from "next/cache";
 import { cache } from "react";
 import fs from "node:fs";
 import path from "node:path";
@@ -136,19 +136,16 @@ async function getWordsBlob(): Promise<WordData> {
 }
 
 // Cached function to fetch and parse words
-const getWordsData = unstable_cache(
-  async (): Promise<WordData> => {
-    if (process.env.NODE_ENV === "development") {
-      return getWordsLocal();
-    }
-    return getWordsBlob();
-  },
-  ["word-list-blob-v2"], // Cache key
-  { 
-    revalidate: process.env.NODE_ENV === 'development' ? false : 3600 * 24 * 7,
-    tags: ['word-data'] // Tag for revalidation in Next.js cache.If changed, revalidate API route (/api/revalidate/words) with the same tag.
-  } // Cache for 7 days in prod, 1 hour in dev
-);
+async function getWordsData(): Promise<WordData> {
+  'use cache';
+  cacheTag('word-data');
+  cacheLife('weeks');
+
+  if (process.env.NODE_ENV === "development") {
+    return getWordsLocal();
+  }
+  return getWordsBlob();
+}
 
 // Memoize the data fetching within the same request lifecycle
 const getWordsDataCached = cache(async () => {
