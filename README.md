@@ -97,7 +97,7 @@ A comprehensive web application for learning essential TOEIC vocabulary, featuri
 
 ## 🔄 API Endpoints
 
-### Revalidate Word Data
+### Revalidate Word List Data
 
 Triggers on-demand revalidation for cached word lists (tag: `word-list`). Useful when updating word lists in Vercel Blob.
 
@@ -107,6 +107,19 @@ Triggers on-demand revalidation for cached word lists (tag: `word-list`). Useful
 
   ```bash
   curl "https://<your-site>/api/revalidate/words?token=<REVALIDATION_TOKEN>"
+  ```
+
+### Revalidate Specific Word Details
+
+Clears both L1 (Next.js Data Cache) and L2 (Upstash Redis) caches for a specific word, forcing a fresh AI generation on the next request.
+
+- **Endpoint**: `GET /api/revalidate/word`
+- **Authentication**: Requires `token` query parameter matching `REVALIDATION_TOKEN`.
+- **Parameters**: `slug` (The word to revalidate)
+- **Usage**:
+
+  ```bash
+  curl "https://<your-site>/api/revalidate/word?token=<REVALIDATION_TOKEN>&slug=additional"
   ```
 
 ### Text-to-Speech
