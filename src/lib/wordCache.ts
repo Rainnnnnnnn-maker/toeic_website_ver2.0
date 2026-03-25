@@ -44,3 +44,9 @@ export async function setWordDetails(word: string, data: WordDetails): Promise<v
   const json = JSON.stringify(data);
   await redis.set(key, json, { ex: ttlSeconds() });
 }
+
+export async function deleteWordDetails(word: string): Promise<void> {
+  const redis = getRedis();
+  const key = cacheKeyForWord(word);
+  await redis.del(key);
+}
