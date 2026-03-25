@@ -42,9 +42,9 @@ export default function TabNavigation({ activeTab, onTabChange }: TabNavigationP
   };
 
   return (
-    <div className="w-full flex flex-col gap-1.5 relative">
+    <div className="w-full flex flex-col gap-1.5 relative mb-2">
       <div className="w-full overflow-x-auto p-1 -m-1 [&::-webkit-scrollbar]:hidden [scrollbar-width:none] [-ms-overflow-style:none]">
-        <div className="flex gap-1.5 min-w-min" role="tablist">
+        <div className="flex gap-2 min-w-min" role="tablist">
           {TABS.map((tab) => {
             const isActive = activeTab === tab.id;
             const isInactive = tab.status === 'coming_soon';
@@ -56,12 +56,12 @@ export default function TabNavigation({ activeTab, onTabChange }: TabNavigationP
                 aria-selected={isActive}
                 aria-disabled={isInactive}
                 className={`
-                  relative flex items-center justify-center px-3 py-1.5 rounded-lg border text-xs font-semibold whitespace-nowrap transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-blue-300/50 group
+                  relative flex items-center justify-center px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg border text-xs sm:text-sm font-bold whitespace-nowrap transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1 group
                   ${isActive 
-                    ? 'text-blue-600 bg-blue-50 border-blue-200 shadow-[0_2px_8px_rgba(15,23,42,0.06)]' 
-                    : 'bg-transparent border-transparent text-gray-500'}
+                    ? 'text-emerald-700 bg-emerald-50 border-emerald-300 shadow-sm' 
+                    : 'text-slate-600 bg-white border-emerald-100 shadow-sm hover:bg-emerald-50/50 hover:border-emerald-200 hover:text-emerald-800'}
                   ${isInactive 
-                    ? 'opacity-60 bg-gray-100 cursor-not-allowed hover:bg-gray-200' 
+                    ? 'opacity-60 bg-slate-100 cursor-not-allowed hover:bg-slate-100 hover:border-slate-200 text-slate-400 shadow-none' 
                     : ''}
                 `}
                 onClick={() => handleTabClick(tab)}
