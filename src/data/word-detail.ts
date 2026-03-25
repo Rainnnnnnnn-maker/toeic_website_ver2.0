@@ -219,7 +219,8 @@ async function getWordDetailInternal(slug: string): Promise<WordDetails | null> 
 // Exported cached function (L1 Cache: Next.js Data Cache)
 export async function getWordDetail(slug: string) {
   "use cache";
-  cacheTag("word-detail");
+  // 個別の単語詳細パージ用タグと、全体パージ用タグを付与
+  cacheTag(`word-detail-${slug}`, "word-detail");
   cacheLife("weeks");
 
   return getWordDetailInternal(slug);

@@ -138,7 +138,7 @@ async function getWordsBlob(): Promise<WordData> {
 // Cached function to fetch and parse words
 async function getWordsData(): Promise<WordData> {
   'use cache';
-  cacheTag('word-data');
+  cacheTag('word-list');
   cacheLife('weeks');
 
   if (process.env.NODE_ENV === "development") {

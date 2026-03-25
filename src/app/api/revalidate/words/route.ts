@@ -16,6 +16,6 @@ export async function GET(request: NextRequest) {
   // maxを指定すると、データはstale（古い）とマークされ、
   // 次のリクエストではstaleなデータを返しつつバックグラウンドで再取得します（stale-while-revalidate）。
   // 即時反映が必要な場合は { expire: 0 } を使用しますが、通常は 'max' が推奨されます。
-  revalidateTag('word-data', 'max');
+  revalidateTag('word-list', 'max');
   return NextResponse.json({ revalidated: true, now: Date.now() });
 }

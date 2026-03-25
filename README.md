@@ -99,7 +99,7 @@ A comprehensive web application for learning essential TOEIC vocabulary, featuri
 
 ### Revalidate Word Data
 
-Triggers on-demand revalidation for cached word lists (tag: `word-data`). Useful when updating word lists in Vercel Blob.
+Triggers on-demand revalidation for cached word lists (tag: `word-list`). Useful when updating word lists in Vercel Blob.
 
 - **Endpoint**: `GET /api/revalidate/words`
 - **Authentication**: Requires `token` query parameter matching `REVALIDATION_TOKEN`.
