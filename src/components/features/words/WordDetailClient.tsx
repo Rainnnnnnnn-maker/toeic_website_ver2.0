@@ -170,6 +170,18 @@ export function WordDetailClient({ initialData, linkedWords = {}, relatedWords =
           </div>
         </section>
 
+        {data.nuance && (
+          <section className="flex flex-col gap-2">
+            <h2 className="text-xs font-bold tracking-wider uppercase text-slate-500 flex items-center gap-1.5">
+              <span className="w-0.5 h-2.5 bg-amber-500 rounded-full"></span>
+              ニュアンス
+            </h2>
+            <div className="bg-amber-50/50 rounded-lg p-3 border border-amber-100/50">
+              <p className="text-sm text-slate-700 leading-relaxed">{data.nuance}</p>
+            </div>
+          </section>
+        )}
+
         {data.wordForms.length > 0 && (
           <section className="flex flex-col gap-2">
             <h2 className="text-xs font-bold tracking-wider uppercase text-slate-500 flex items-center gap-1.5">
@@ -214,18 +226,6 @@ export function WordDetailClient({ initialData, linkedWords = {}, relatedWords =
                 </li>
               ))}
             </ul>
-          </section>
-        )}
-
-        {data.nuance && (
-          <section className="flex flex-col gap-2">
-            <h2 className="text-xs font-bold tracking-wider uppercase text-slate-500 flex items-center gap-1.5">
-              <span className="w-0.5 h-2.5 bg-amber-500 rounded-full"></span>
-              ニュアンス
-            </h2>
-            <div className="bg-amber-50/50 rounded-lg p-3 border border-amber-100/50">
-              <p className="text-sm text-slate-700 leading-relaxed">{data.nuance}</p>
-            </div>
           </section>
         )}
 
