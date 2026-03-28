@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useFavorites } from "@/context/FavoritesContext";
 import type { Word } from "@/data/words";
+import { ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight } from "lucide-react";
 
 export default function FavoritesListClient({ allWords }: { allWords: Word[] }) {
   const { favorites, clearFavorites } = useFavorites();
@@ -66,25 +67,45 @@ export default function FavoritesListClient({ allWords }: { allWords: Word[] }) 
         >
           クリア
         </button>
-        <div className="flex items-center gap-2.5 ml-auto">
+        <div className="flex items-center gap-1.5 ml-auto">
           <button
-            className="px-3 py-2 rounded-[10px] border border-gray-200 bg-white text-gray-900 text-[13px] transition-all duration-180 hover:bg-gray-100 hover:border-gray-300 hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-1.5 flex items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 transition-all duration-180 hover:bg-gray-100 hover:text-gray-900 hover:border-gray-300 hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={() => setPage(1)}
+            disabled={currentPage === 1}
+            aria-label="最初のページ"
+            title="最初のページ"
+          >
+            <ChevronsLeft size={16} />
+          </button>
+          <button
+            className="p-1.5 flex items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 transition-all duration-180 hover:bg-gray-100 hover:text-gray-900 hover:border-gray-300 hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={currentPage === 1}
             aria-label="前のページ"
+            title="前のページ"
           >
-            前へ
+            <ChevronLeft size={16} />
           </button>
-          <span className="text-[13px] text-gray-500">
+          <span className="text-xs text-gray-500 min-w-[3rem] text-center font-medium">
             {currentPage} / {totalPages}
           </span>
           <button
-            className="px-3 py-2 rounded-[10px] border border-gray-200 bg-white text-gray-900 text-[13px] transition-all duration-180 hover:bg-gray-100 hover:border-gray-300 hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-1.5 flex items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 transition-all duration-180 hover:bg-gray-100 hover:text-gray-900 hover:border-gray-300 hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={currentPage >= totalPages}
             aria-label="次のページ"
+            title="次のページ"
           >
-            次へ
+            <ChevronRight size={16} />
+          </button>
+          <button
+            className="p-1.5 flex items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 transition-all duration-180 hover:bg-gray-100 hover:text-gray-900 hover:border-gray-300 hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={() => setPage(totalPages)}
+            disabled={currentPage >= totalPages}
+            aria-label="最後のページ"
+            title="最後のページ"
+          >
+            <ChevronsRight size={16} />
           </button>
         </div>
       </div>

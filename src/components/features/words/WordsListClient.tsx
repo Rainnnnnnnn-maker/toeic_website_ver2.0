@@ -3,7 +3,7 @@ import { useMemo, useState, useRef } from "react";
 import type { ChangeEvent, KeyboardEvent } from "react";
 import Link from "next/link";
 import type { Word } from "@/data/words";
-import { X } from "lucide-react";
+import { X, ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight } from "lucide-react";
 import TabNavigation, { TabId } from "@/components/common/TabNavigation";
 
 type Props = {
@@ -149,41 +149,45 @@ export default function WordsListClient({ importantWords, mediumWords, highWords
             </button>
           )}
         </div>
-        <div className="flex items-center gap-2 sm:ml-auto">
+        <div className="flex items-center gap-1.5 sm:ml-auto">
           <button
-            className="px-2.5 py-1.5 rounded-lg border border-gray-200 bg-white text-gray-900 text-xs transition-all duration-180 hover:bg-gray-100 hover:border-gray-300 hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-1.5 flex items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 transition-all duration-180 hover:bg-gray-100 hover:text-gray-900 hover:border-gray-300 hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={() => setPage(1)}
             disabled={currentPage === 1}
             aria-label="最初のページ"
+            title="最初のページ"
           >
-            最初
+            <ChevronsLeft size={16} />
           </button>
           <button
-            className="px-2.5 py-1.5 rounded-lg border border-gray-200 bg-white text-gray-900 text-xs transition-all duration-180 hover:bg-gray-100 hover:border-gray-300 hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-1.5 flex items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 transition-all duration-180 hover:bg-gray-100 hover:text-gray-900 hover:border-gray-300 hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={currentPage === 1}
             aria-label="前のページ"
+            title="前のページ"
           >
-            前へ
+            <ChevronLeft size={16} />
           </button>
-          <span className="text-xs text-gray-500 min-w-[3rem] text-center">
+          <span className="text-xs text-gray-500 min-w-[3rem] text-center font-medium">
             {currentPage} / {totalPages}
           </span>
           <button
-            className="px-2.5 py-1.5 rounded-lg border border-gray-200 bg-white text-gray-900 text-xs transition-all duration-180 hover:bg-gray-100 hover:border-gray-300 hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-1.5 flex items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 transition-all duration-180 hover:bg-gray-100 hover:text-gray-900 hover:border-gray-300 hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={currentPage >= totalPages}
             aria-label="次のページ"
+            title="次のページ"
           >
-            次へ
+            <ChevronRight size={16} />
           </button>
           <button
-            className="px-2.5 py-1.5 rounded-lg border border-gray-200 bg-white text-gray-900 text-xs transition-all duration-180 hover:bg-gray-100 hover:border-gray-300 hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-1.5 flex items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 transition-all duration-180 hover:bg-gray-100 hover:text-gray-900 hover:border-gray-300 hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={() => setPage(totalPages)}
             disabled={currentPage >= totalPages}
             aria-label="最後のページ"
+            title="最後のページ"
           >
-            最後
+            <ChevronsRight size={16} />
           </button>
         </div>
       </div>
