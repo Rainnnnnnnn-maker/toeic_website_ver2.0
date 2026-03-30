@@ -177,6 +177,36 @@ export async function getWordBySlug(slug: string): Promise<Word | undefined> {
   return data.allWords.find(w => w.slug === slug);
 }
 
+function hashString(value: string): number {
+  let hash = 2166136261;
+  for (let i = 0; i < value.length; i += 1) {
+    hash ^= value.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  return hash >>> 0;
+}
+
+function getTodayKey(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+export async function getTodayRecommendedWords(limit: number = 5): Promise<Word[]> {
+  const data = await getWordsDataCached();
+  if (data.allWords.length === 0 || limit <= 0) {
+    return [];
+  }
+
+  const todayKey = getTodayKey();
+  const ordered = [...data.allWords].sort((a, b) => {
+    const aHash = hashString(`${todayKey}:${a.slug}`);
+    const bHash = hashString(`${todayKey}:${b.slug}`);
+    if (aHash === bHash) return a.slug.localeCompare(b.slug);
+    return aHash - bHash;
+  });
+
+  return ordered.slice(0, Math.min(limit, ordered.length));
+}
+
 export async function getRelatedWords(currentSlug: string, count: number = 5): Promise<Word[]> {
   await connection();
   const currentWord = await getWordBySlug(currentSlug);
