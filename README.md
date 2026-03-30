@@ -15,6 +15,10 @@ A comprehensive web application for learning essential TOEIC vocabulary, featuri
   - **List View**: Browse words by importance (Important / Medium).
   - **Study Mode**: Flashcard-style learning with tracking (Remembered / Not Remembered).
   - **Review Mode**: Focus on words marked as favorites.
+- **Today’s 5 Picks**:
+  - A compact “今日おすすめの5単語” section is shown on the TOP page.
+  - All 5 words are displayed directly in the TOP section without a separate “view all” button.
+  - Picks are determined by UTC date key + word slug hash, so the same day yields the same 5 words.
 - **Favorites**: Save difficult words for later review (persisted in local storage).
 - **Social Share**: Share word details via Twitter, Facebook, and LINE.
 - **Responsive Design**: Optimized for desktop and mobile devices.
