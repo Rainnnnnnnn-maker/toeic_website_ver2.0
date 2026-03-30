@@ -1,9 +1,11 @@
 import Link from "next/link";
 import Script from "next/script";
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { getImportantWords, getMediumWords, getHighWords } from "@/data/words";
 import WordsListClient from "@/components/features/words/WordsListClient";
 import { SnsShareButtons } from "@/components/features/sns/SnsShareButtons";
+import TodayRecommendedWordsClient from "@/components/features/words/TodayRecommendedWordsClient";
 
 export const metadata: Metadata = {
   title: {
@@ -135,6 +137,9 @@ export default async function Home() {
             </Link>
           </div>
         </header>
+        <Suspense fallback={<section className="bg-white/90 border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-[0_1px_2px_rgba(0,0,0,0.05)] animate-pulse h-[180px]" />}>
+          <TodayRecommendedWordsClient words={[...importantWords, ...mediumWords, ...highWords]} variant="preview" />
+        </Suspense>
         <WordsListClient importantWords={importantWords} mediumWords={mediumWords} highWords={highWords} />
 
         <section className="mt-12 pt-12 border-t border-slate-200 flex flex-col gap-8">
