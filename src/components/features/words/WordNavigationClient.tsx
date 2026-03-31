@@ -16,9 +16,30 @@ export default function WordNavigationClient({
   currentSlug: string;
 }) {
   const searchParams = useSearchParams();
-  const isFromFavorites = searchParams.get("from") === "favorites";
+  const from = searchParams.get("from");
+  const isFromFavorites = from === "favorites";
+  const isFromToday = from === "today";
   const { favorites } = useFavorites();
   const { setShareTarget } = useShareTarget();
+
+  const todayWords = useMemo(() => {
+    const todayKey = new Date().toISOString().slice(0, 10);
+    const hashString = (value: string) => {
+      let hash = 2166136261;
+      for (let i = 0; i < value.length; i += 1) {
+        hash ^= value.charCodeAt(i);
+        hash = Math.imul(hash, 16777619);
+      }
+      return hash >>> 0;
+    };
+    const ordered = [...allWords].sort((a, b) => {
+      const aHash = hashString(`${todayKey}:${a.slug}`);
+      const bHash = hashString(`${todayKey}:${b.slug}`);
+      if (aHash === bHash) return a.slug.localeCompare(b.slug);
+      return aHash - bHash;
+    });
+    return ordered.slice(0, Math.min(5, ordered.length));
+  }, [allWords]);
 
   const navigationList = useMemo(() => {
     if (isFromFavorites) {
@@ -29,8 +50,11 @@ export default function WordNavigationClient({
         .map((slug) => wordMap.get(slug))
         .filter((w): w is Word => w !== undefined);
     }
+    if (isFromToday) {
+      return todayWords;
+    }
     return allWords;
-  }, [allWords, favorites, isFromFavorites]);
+  }, [allWords, favorites, isFromFavorites, isFromToday, todayWords]);
 
   const currentIndex = navigationList.findIndex((w) => w.slug === currentSlug);
   const computedPrevWord: Word | null = currentIndex > 0 ? navigationList[currentIndex - 1] : null;
@@ -60,7 +84,7 @@ export default function WordNavigationClient({
 
   if (currentIndex === -1) {
     if (fallbackNav.slug === currentSlug) {
-      // お気に入りから外された等で currentIndex が -1 になった場合、直前の有効な値を使用
+      // リストから外れた等で currentIndex が -1 になった場合、直前の有効な値を使用
       prevWord = fallbackNav.prev;
       nextWord = fallbackNav.next;
     } else {
@@ -73,7 +97,7 @@ export default function WordNavigationClient({
   const entry = allWords.find((w) => w.slug === currentSlug);
   const term = entry?.term || currentSlug;
 
-  const querySuffix = isFromFavorites ? "?from=favorites" : "";
+  const querySuffix = isFromFavorites ? "?from=favorites" : isFromToday ? "?from=today" : "";
 
   return (
     <>
@@ -97,6 +121,11 @@ export default function WordNavigationClient({
             </Link>
           )}
           <span className="text-slate-300 text-lg">/</span>
+          {isFromToday && (
+            <span className="inline-flex items-center h-7 px-3 rounded-full bg-blue-50 text-blue-700 text-xs font-bold tracking-wide">
+              今日おすすめの単語
+            </span>
+          )}
           <span className="text-slate-700 text-lg font-bold tracking-wide uppercase">{term}</span>
         </div>
         <div className="flex justify-between gap-4 items-end">
