@@ -18,7 +18,25 @@ export async function GET() {
     <loc>${BASE_URL}/study</loc>
     <lastmod>${lastModified}</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>${BASE_URL}/favorites</loc>
+    <lastmod>${lastModified}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>${BASE_URL}/today-words</loc>
+    <lastmod>${lastModified}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>${BASE_URL}/review</loc>
+    <lastmod>${lastModified}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
   </url>
 `;
 
