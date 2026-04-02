@@ -6,6 +6,7 @@ import { deleteWordDetails } from '@/lib/wordCache';
 export async function GET(request: NextRequest) {
   const token = request.nextUrl.searchParams.get('token');
   const slug = request.nextUrl.searchParams.get('slug');
+  const clearUpstash = request.nextUrl.searchParams.get('upstash') === 'true';
   const secret = process.env.REVALIDATION_TOKEN;
 
   if (!secret || token !== secret) {
@@ -17,8 +18,10 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // 1. Upstash Redis (L2) のキャッシュを削除
-    await deleteWordDetails(slug);
+    // 1. Upstash Redis (L2) のキャッシュを削除 (upstash=true の場合のみ)
+    if (clearUpstash) {
+      await deleteWordDetails(slug);
+    }
 
     // 2. Next.js Data Cache (L1) をパージ
     const revalidateTagForWord = `word-detail-${slug}`;
