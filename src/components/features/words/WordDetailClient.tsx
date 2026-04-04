@@ -233,7 +233,7 @@ export function WordDetailClient({ initialData, linkedWords = {}, relatedWords =
           <section className="flex flex-col gap-2">
             <h2 className="text-xs font-bold tracking-wider uppercase text-slate-500 flex items-center gap-1.5">
               <span className="w-0.5 h-2.5 bg-purple-500 rounded-full"></span>
-              {data.word}のTOEIC例文
+              {data.word}のTOEIC例文(AI)
             </h2>
             <div className="flex flex-col gap-2">
               {data.toeicExamples.map((ex, i) => (
