@@ -502,16 +502,22 @@ export default function StudyClient({
             )}
           </div>
           {countdownValue !== null && (
-            <div className="absolute inset-0 flex items-start justify-end p-3.5 pointer-events-none sm:p-2.5" aria-hidden="true">
-              <div key={countdownKey} className="inline-block text-[clamp(34px,9.5vw,46px)] font-extrabold text-red-500 drop-shadow-[0_10px_28px_rgba(15,23,42,0.18)] opacity-0 animate-countdownPop translate-y-1 scale-90">
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-30" aria-hidden="true">
+              <div key={countdownKey} className={`inline-block text-[140px] leading-none font-black drop-shadow-lg animate-countdownCenter ${countdownValue === 2 ? 'text-amber-500/40' : 'text-red-500/40'}`}>
                 {countdownValue}
               </div>
             </div>
           )}
           {showHintButton && !isFlipped && (
             <div className="absolute inset-0 flex items-start justify-end p-3.5 pointer-events-none z-20 sm:p-2.5">
-              <button onClick={handleHint} className="pointer-events-auto px-4 py-2 bg-gray-100 text-gray-600 border border-gray-300 rounded-full text-sm font-semibold cursor-pointer transition-all duration-200 shadow-sm hover:bg-gray-200 hover:text-gray-800 hover:-translate-y-px">
-                ヒント
+              <button 
+                onClick={handleHint} 
+                className="pointer-events-auto relative flex items-center justify-center px-5 py-2.5 bg-white text-slate-700 border-2 border-amber-300 rounded-full text-sm font-bold cursor-pointer transition-all duration-200 shadow-[0_0_15px_rgba(251,191,36,0.3)] hover:bg-amber-50 hover:-translate-y-1 hover:shadow-[0_0_20px_rgba(251,191,36,0.5)] animate-hintPop overflow-hidden group"
+              >
+                <span className="relative z-10 flex items-center gap-1.5">
+                  <span className="animate-pulse text-base">💡</span> ヒントを見る
+                </span>
+                <div className="absolute inset-0 rounded-full bg-amber-200/30 animate-ping opacity-75"></div>
               </button>
             </div>
           )}
