@@ -20,6 +20,7 @@ export default function WordNavigationClient({
   const isFromFavorites = from === "favorites";
   const isFromToday = from === "today";
   const isFromStudy = from === "study";
+  const isFromReview = from === "review";
   const { favorites } = useFavorites();
   const { setShareTarget } = useShareTarget();
 
@@ -43,7 +44,7 @@ export default function WordNavigationClient({
   }, [allWords]);
 
   const navigationList = useMemo(() => {
-    if (isFromFavorites) {
+    if (isFromFavorites || isFromReview) {
       const wordMap = new Map(allWords.map((w) => [w.slug, w]));
       // お気に入り一覧と同じ順序（最新が先頭）にする
       return [...favorites]
@@ -55,7 +56,7 @@ export default function WordNavigationClient({
       return todayWords;
     }
     return allWords;
-  }, [allWords, favorites, isFromFavorites, isFromToday, todayWords]);
+  }, [allWords, favorites, isFromFavorites, isFromReview, isFromToday, todayWords]);
 
   const currentIndex = navigationList.findIndex((w) => w.slug === currentSlug);
   const computedPrevWord: Word | null = currentIndex > 0 ? navigationList[currentIndex - 1] : null;
@@ -98,7 +99,7 @@ export default function WordNavigationClient({
   const entry = allWords.find((w) => w.slug === currentSlug);
   const term = entry?.term || currentSlug;
 
-  const querySuffix = isFromFavorites ? "?from=favorites" : isFromToday ? "?from=today" : isFromStudy ? "?from=study" : "";
+  const querySuffix = isFromFavorites ? "?from=favorites" : isFromToday ? "?from=today" : isFromStudy ? "?from=study" : isFromReview ? "?from=review" : "";
 
   return (
     <>
@@ -119,6 +120,14 @@ export default function WordNavigationClient({
             >
               <ChevronLeft size={18} className="transition-transform group-hover:-translate-x-0.5 text-slate-400 group-hover:text-slate-600" />
               学習モード
+            </Link>
+          ) : isFromReview ? (
+            <Link 
+              href="/review" 
+              className="group inline-flex items-center justify-center gap-1.5 h-10 px-4 bg-white border border-gray-200 rounded-full text-slate-600 text-[15px] font-semibold no-underline transition-all duration-200 shadow-sm select-none hover:bg-gray-50 hover:border-gray-300 hover:text-slate-900 hover:-translate-y-px hover:shadow-md active:translate-y-0 active:shadow-sm"
+            >
+              <ChevronLeft size={18} className="transition-transform group-hover:-translate-x-0.5 text-slate-400 group-hover:text-slate-600" />
+              復習モード
             </Link>
           ) : (
             <Link 
