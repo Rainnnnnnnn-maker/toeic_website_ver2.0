@@ -19,6 +19,7 @@ export default function WordNavigationClient({
   const from = searchParams.get("from");
   const isFromFavorites = from === "favorites";
   const isFromToday = from === "today";
+  const isFromStudy = from === "study";
   const { favorites } = useFavorites();
   const { setShareTarget } = useShareTarget();
 
@@ -97,7 +98,7 @@ export default function WordNavigationClient({
   const entry = allWords.find((w) => w.slug === currentSlug);
   const term = entry?.term || currentSlug;
 
-  const querySuffix = isFromFavorites ? "?from=favorites" : isFromToday ? "?from=today" : "";
+  const querySuffix = isFromFavorites ? "?from=favorites" : isFromToday ? "?from=today" : isFromStudy ? "?from=study" : "";
 
   return (
     <>
@@ -110,6 +111,14 @@ export default function WordNavigationClient({
             >
               <ChevronLeft size={18} className="transition-transform group-hover:-translate-x-0.5 text-slate-400 group-hover:text-slate-600" />
               お気に入り
+            </Link>
+          ) : isFromStudy ? (
+            <Link 
+              href="/study" 
+              className="group inline-flex items-center justify-center gap-1.5 h-10 px-4 bg-white border border-gray-200 rounded-full text-slate-600 text-[15px] font-semibold no-underline transition-all duration-200 shadow-sm select-none hover:bg-gray-50 hover:border-gray-300 hover:text-slate-900 hover:-translate-y-px hover:shadow-md active:translate-y-0 active:shadow-sm"
+            >
+              <ChevronLeft size={18} className="transition-transform group-hover:-translate-x-0.5 text-slate-400 group-hover:text-slate-600" />
+              学習モード
             </Link>
           ) : (
             <Link 

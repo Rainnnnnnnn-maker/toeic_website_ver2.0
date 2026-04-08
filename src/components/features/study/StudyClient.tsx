@@ -349,8 +349,9 @@ export default function StudyClient({
 
   useEffect(() => {
     if (!currentWord) return;
-    router.prefetch(`/words/${currentWord.slug}`);
-  }, [currentWord, router]);
+    const query = backLink === '/favorites' ? '?from=favorites' : '?from=study';
+    router.prefetch(`/words/${currentWord.slug}${query}`);
+  }, [currentWord, router, backLink]);
 
   const handleRemembered = () => {
     if (!currentWord) return;
@@ -363,7 +364,7 @@ export default function StudyClient({
     if (!currentWord) return;
     setForgottenSlugs((prev) => addUnique(prev, currentWord.slug));
     setRememberedSlugs((prev) => removeValue(prev, currentWord.slug));
-    const query = backLink === '/favorites' ? '?from=favorites' : '';
+    const query = backLink === '/favorites' ? '?from=favorites' : '?from=study';
     router.push(`/words/${currentWord.slug}${query}`);
   };
 
