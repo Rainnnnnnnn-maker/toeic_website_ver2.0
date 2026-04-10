@@ -36,7 +36,7 @@ export default function ContactPage() {
             不具合の報告や機能のリクエストは、GitHubのIssueからお寄せください。
           </p>
           <a
-            href="https://github.com/rain-sk/toeic-website-ver2.0/issues"
+            href="https://github.com/Rainnnnnnnn-maker/toeic_website_ver2.0/issues"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 rounded-lg bg-black px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-black/80 dark:bg-white dark:text-black dark:hover:bg-white/80"
