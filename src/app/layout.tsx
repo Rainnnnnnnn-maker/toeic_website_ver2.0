@@ -5,6 +5,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { FavoritesProvider } from "@/context/FavoritesContext";
 import { Footer } from "@/components/common/Footer";
+import { CookieConsent } from "@/components/common/CookieConsent";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -94,6 +95,7 @@ export default function RootLayout({
             <div className="flex-1">{children}</div>
             <Footer />
           </div>
+          <CookieConsent />
         </FavoritesProvider>
         <Analytics />
         <SpeedInsights />

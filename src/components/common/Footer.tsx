@@ -13,14 +13,42 @@ export function Footer() {
 
   return (
     <footer className="border-t border-black/10 dark:border-white/10">
-      <div className="mx-auto flex max-w-5xl flex-col items-center gap-3 px-4 py-8 text-xs text-black/60 dark:text-white/60">
-        <Link
-          href="/"
-          className="underline underline-offset-4 hover:text-black/80 dark:hover:text-white/80"
-        >
-          トップへ
-        </Link>
-        <p>© {year ? `${year} ` : ""}TOEIC重要単語</p>
+      <div className="mx-auto max-w-5xl px-4 py-8">
+        <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs text-black/60 dark:text-white/60">
+          <Link
+            href="/"
+            className="underline underline-offset-4 hover:text-black/80 dark:hover:text-white/80"
+          >
+            トップ
+          </Link>
+          <Link
+            href="/about"
+            className="underline underline-offset-4 hover:text-black/80 dark:hover:text-white/80"
+          >
+            当サイトについて
+          </Link>
+          <Link
+            href="/privacy"
+            className="underline underline-offset-4 hover:text-black/80 dark:hover:text-white/80"
+          >
+            プライバシーポリシー
+          </Link>
+          <Link
+            href="/terms"
+            className="underline underline-offset-4 hover:text-black/80 dark:hover:text-white/80"
+          >
+            利用規約
+          </Link>
+          <Link
+            href="/contact"
+            className="underline underline-offset-4 hover:text-black/80 dark:hover:text-white/80"
+          >
+            お問い合わせ
+          </Link>
+        </div>
+        <p className="mt-4 text-center text-xs text-black/40 dark:text-white/40">
+          © {year ? `${year} ` : ""}TOEIC重要単語
+        </p>
       </div>
     </footer>
   );
