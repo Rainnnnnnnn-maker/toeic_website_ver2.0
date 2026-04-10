@@ -25,7 +25,7 @@ A comprehensive web application for learning essential TOEIC vocabulary, featuri
 
 ## 🛠️ Tech Stack
 
-- **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
+- **Framework**: [Next.js 16.2](https://nextjs.org/) (App Router)
 - **Language**: [TypeScript](https://www.typescriptlang.org/)
 - **UI**: React 19, [Tailwind CSS v3.4](https://tailwindcss.com/) (Utility-first CSS), Lucide React
 - **Social**: react-share
@@ -115,15 +115,17 @@ Triggers on-demand revalidation for cached word lists (tag: `word-list`). Useful
 
 ### Revalidate Specific Word Details
 
-Clears both L1 (Next.js Data Cache) and L2 (Upstash Redis) caches for a specific word, forcing a fresh AI generation on the next request.
+Clears L1 (Next.js Data Cache) for a specific word. To also clear L2 (Upstash Redis) cache, add the `upstash=true` parameter. This forces a fresh AI generation on the next request if both caches are cleared.
 
 - **Endpoint**: `GET /api/revalidate/word`
 - **Authentication**: Requires `token` query parameter matching `REVALIDATION_TOKEN`.
-- **Parameters**: `slug` (The word to revalidate)
+- **Parameters**: 
+  - `slug` (The word to revalidate)
+  - `upstash` (Optional, set to `true` to also clear Upstash Redis cache)
 - **Usage**:
 
   ```bash
-  curl "https://<your-site>/api/revalidate/word?token=<REVALIDATION_TOKEN>&slug=additional"
+  curl "https://<your-site>/api/revalidate/word?token=<REVALIDATION_TOKEN>&slug=additional&upstash=true"
   ```
 
 ### Text-to-Speech
