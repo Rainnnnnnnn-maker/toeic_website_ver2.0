@@ -191,7 +191,7 @@ export default async function Home() {
 
         <div className="flex justify-center">
           <Link href="/words" className="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-800 text-white rounded-lg font-semibold text-sm hover:bg-slate-900 transition-colors no-underline">
-            全{totalCount}語の一覧を見る →
+            全単語一覧 →
           </Link>
         </div>
 
