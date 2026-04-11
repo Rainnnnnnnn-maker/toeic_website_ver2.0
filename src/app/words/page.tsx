@@ -1,0 +1,222 @@
+import Link from "next/link";
+import Script from "next/script";
+import type { Metadata } from "next";
+import { getImportantWords, getMediumWords, getHighWords } from "@/data/words";
+import type { Word } from "@/data/words";
+
+export const metadata: Metadata = {
+  title: {
+    absolute: "TOEIC重要単語 一覧【2026年最新】全1,300語リスト | AI解説付き無料",
+  },
+  description:
+    "TOEIC頻出単語を全て一覧で確認できます。600点レベルの最重要単語372語・730〜800点の中級単語781語・800点以上の高難易度単語148語を収録。レベル別に整理された単語リストで効率的に学習。各単語をクリックするとAI解説・例文・発音を無料で確認できます。",
+  keywords: [
+    "TOEIC 重要単語 一覧",
+    "TOEIC 単語 リスト",
+    "TOEIC 頻出単語 一覧",
+    "TOEIC 600点 単語",
+    "TOEIC 730点 単語",
+    "TOEIC 800点 単語",
+    "英単語 一覧",
+    "2026年",
+    "無料",
+  ],
+  alternates: {
+    canonical: "https://www.toeic-words.com/words",
+  },
+};
+
+function groupByFirstLetter(words: Word[]): Record<string, Word[]> {
+  const groups: Record<string, Word[]> = {};
+  for (const word of words) {
+    const letter = word.term[0].toUpperCase();
+    if (!groups[letter]) groups[letter] = [];
+    groups[letter].push(word);
+  }
+  return groups;
+}
+
+type LevelSectionProps = {
+  title: string;
+  description: string;
+  words: Word[];
+  badgeClass: string;
+  badgeLabel: string;
+};
+
+function LevelSection({ title, description, words, badgeClass, badgeLabel }: LevelSectionProps) {
+  const groups = groupByFirstLetter(words);
+  const letters = Object.keys(groups).sort();
+
+  return (
+    <section className="flex flex-col gap-4">
+      <div className="flex flex-col gap-1">
+        <div className="flex items-center gap-2">
+          <h2 className="text-lg font-bold text-slate-800">{title}</h2>
+          <span className={`text-[11px] px-2 py-0.5 rounded-full font-semibold ${badgeClass}`}>
+            {badgeLabel} · {words.length}語
+          </span>
+        </div>
+        <p className="text-xs leading-relaxed text-slate-500">{description}</p>
+      </div>
+      <div className="flex flex-col gap-5">
+        {letters.map((letter) => (
+          <div key={letter}>
+            <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 border-b border-slate-100 pb-1">
+              {letter}
+            </div>
+            <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+              {groups[letter].map((word) => (
+                <Link
+                  key={word.slug}
+                  href={`/words/${word.slug}`}
+                  className="text-sm text-slate-700 font-medium px-2.5 py-1.5 rounded-md bg-white border border-slate-200 hover:border-blue-300 hover:text-blue-700 hover:bg-blue-50 transition-all duration-150 no-underline truncate"
+                >
+                  {word.term}
+                </Link>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+export default async function WordsListPage() {
+  const importantWords = await getImportantWords();
+  const mediumWords = await getMediumWords();
+  const highWords = await getHighWords();
+  const totalCount = importantWords.length + mediumWords.length + highWords.length;
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "ホーム", item: "https://www.toeic-words.com/" },
+      { "@type": "ListItem", position: 2, name: "単語一覧", item: "https://www.toeic-words.com/words" },
+    ],
+  };
+
+  const itemListJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "TOEIC重要単語 全一覧",
+    description: "TOEIC L&Rテストに頻出する重要単語の完全リスト（レベル別）",
+    numberOfItems: totalCount,
+    url: "https://www.toeic-words.com/words",
+    itemListElement: importantWords.slice(0, 50).map((w, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: w.term,
+      url: `https://www.toeic-words.com/words/${w.slug}`,
+    })),
+  };
+
+  return (
+    <div className="relative min-h-screen w-full flex justify-center py-8 px-4 bg-[radial-gradient(circle_at_top,#e0f2fe_0,#f9fafb_45%,#ffffff_100%)] sm:py-12 sm:px-6 lg:py-8 lg:px-8 lg:pb-16">
+      <Script
+        id="ldjson-breadcrumb"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      <Script
+        id="ldjson-itemlist"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
+      />
+      <main className="w-full max-w-[960px] flex flex-col gap-8">
+        {/* ヘッダー */}
+        <header className="flex flex-col gap-3">
+          <nav className="text-xs text-slate-400">
+            <Link href="/" className="hover:text-slate-600 no-underline">ホーム</Link>
+            <span className="mx-1.5">/</span>
+            <span className="text-slate-600">単語一覧</span>
+          </nav>
+          <h1 className="text-[22px] leading-[1.3] text-slate-900 font-bold sm:text-[26px]">
+            TOEIC重要単語 全一覧【2026年最新】
+          </h1>
+          <p className="text-sm leading-[1.7] text-slate-500 max-w-2xl">
+            TOEIC L&Rテストに頻出する重要単語を全{totalCount}語収録。レベル別（600点・730点・800点）に整理されており、各単語のAI解説・例文・類義語・発音を無料で確認できます。
+          </p>
+        </header>
+
+        {/* 統計バー */}
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="bg-white rounded-xl border border-slate-200 p-4 text-center shadow-sm">
+            <div className="text-2xl font-bold text-slate-800">{totalCount}</div>
+            <div className="text-xs text-slate-500 mt-0.5">収録単語数</div>
+          </div>
+          <div className="bg-blue-50 rounded-xl border border-blue-200 p-4 text-center shadow-sm">
+            <div className="text-2xl font-bold text-blue-700">{importantWords.length}</div>
+            <div className="text-xs text-blue-600 mt-0.5">最重要単語</div>
+          </div>
+          <div className="bg-purple-50 rounded-xl border border-purple-200 p-4 text-center shadow-sm">
+            <div className="text-2xl font-bold text-purple-700">{mediumWords.length}</div>
+            <div className="text-xs text-purple-600 mt-0.5">中級単語</div>
+          </div>
+          <div className="bg-red-50 rounded-xl border border-red-200 p-4 text-center shadow-sm">
+            <div className="text-2xl font-bold text-red-700">{highWords.length}</div>
+            <div className="text-xs text-red-600 mt-0.5">高難易度単語</div>
+          </div>
+        </div>
+
+        {/* クイックアクション */}
+        <div className="flex gap-3 flex-wrap">
+          <Link
+            href="/study"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors no-underline"
+          >
+            暗記モードで学習する
+          </Link>
+          <Link
+            href="/today-words"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-white text-slate-700 border border-slate-200 rounded-lg font-semibold text-sm hover:bg-slate-50 transition-colors no-underline"
+          >
+            今日のおすすめ5単語
+          </Link>
+        </div>
+
+        {/* 単語一覧セクション */}
+        <div className="flex flex-col gap-12">
+          <LevelSection
+            title="最重要単語（TOEIC 600点レベル）"
+            description="TOEICスコアアップのために最初に覚えるべき基礎単語。このリストを完璧にすることで600点突破を目指せます。ビジネス英語の基本となる動詞・名詞・形容詞を中心に厳選しています。"
+            words={importantWords}
+            badgeClass="bg-blue-100 text-blue-800"
+            badgeLabel="最重要"
+          />
+          <LevelSection
+            title="中級単語（TOEIC 730〜800点レベル）"
+            description="さらなるスコアアップを目指すための応用単語。Part 5・Part 6・Part 7の正答率向上に直結する語彙です。ビジネス文書・会議・交渉などのシーンで使われる中〜上級単語を収録しています。"
+            words={mediumWords}
+            badgeClass="bg-purple-100 text-purple-800"
+            badgeLabel="中級"
+          />
+          <LevelSection
+            title="高難易度単語（TOEIC 800点以上レベル）"
+            description="800点以上の高スコアを目指すための上級単語。Part 7の長文読解や高度なビジネス表現に対応するための語彙力強化に特化した単語リストです。"
+            words={highWords}
+            badgeClass="bg-red-100 text-red-800"
+            badgeLabel="上級"
+          />
+        </div>
+
+        {/* フッターCTA */}
+        <section className="mt-4 pt-8 border-t border-slate-200">
+          <h2 className="text-base font-bold text-slate-800 mb-3">TOEIC単語学習をさらに効率化</h2>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Link href="/study" className="flex flex-col gap-1 p-4 bg-white rounded-xl border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all no-underline">
+              <span className="text-sm font-bold text-slate-800">暗記テストモード</span>
+              <span className="text-xs text-slate-500">ランダム出題で効率的に単語を定着させましょう</span>
+            </Link>
+            <Link href="/today-words" className="flex flex-col gap-1 p-4 bg-white rounded-xl border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all no-underline">
+              <span className="text-sm font-bold text-slate-800">今日のおすすめ単語</span>
+              <span className="text-xs text-slate-500">毎日5語ずつスキマ時間に学習する習慣をつけよう</span>
+            </Link>
+          </div>
+        </section>
+      </main>
+    </div>
+  );
+}

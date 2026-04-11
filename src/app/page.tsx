@@ -59,36 +59,63 @@ export default async function Home() {
     educationalCredentialAwarded: "TOEIC L&R スコアアップ",
   };
 
+  const totalCount = importantWords.length + mediumWords.length + highWords.length;
+
   // FAQPage構造化データ
+  const faqEntries = [
+    {
+      name: "2026年最新のTOEIC重要単語と出題傾向は？",
+      text: "近年のTOEIC L&Rテストでは、ビジネス環境の変化に伴い「リモートワーク」「オンライン会議」「チャットツール」に関連する語彙の出題頻度が増加しています。また、従来のオフィスワークだけでなく、ハイブリッドワークや柔軟な働き方を示唆する文脈も増えています。"
+    },
+    {
+      name: "TOEIC重要単語の効率的な覚え方は？",
+      text: "単に英単語と日本語訳を丸暗記するのではなく、実際の例文の中でどのように使われるかを理解することが重要です。コロケーション（語の組み合わせ）を意識し、類義語との違いを理解し、音声とセットで覚えることが効果的です。"
+    },
+    {
+      name: "目標スコア別のTOEIC重要単語の選び方は？",
+      text: "現在のスコアや目標に応じて、優先して覚えるべき重要単語は異なります。まずは基礎となる「最重要単語」から始め、基礎を固めた上で「中級単語」へとステップアップすることをおすすめします。600点を目指す方は最重要単語を、それ以上を目指す方はより難しい単語を学習しましょう。"
+    },
+    {
+      name: "TOEIC重要単語は全部で何語覚えればいいですか？",
+      text: `当サイトでは合計${totalCount}語のTOEIC頻出単語を収録しています。内訳は最重要単語${importantWords.length}語（600点レベル）、中級単語${mediumWords.length}語（730〜800点レベル）、高難易度単語${highWords.length}語（800点以上レベル）です。目標スコアに合わせて、まずは最重要単語から取り組みましょう。`
+    },
+    {
+      name: "TOEIC単語学習は毎日何語ずつ進めればいい？",
+      text: "1日10〜20語を目安にするのが効果的です。新しい単語を覚えるだけでなく、前日・3日前・1週間前に学習した単語の復習も組み合わせましょう。「今日のおすすめ5単語」機能を活用すれば、スキマ時間にも無理なく毎日の学習習慣を続けられます。"
+    },
+    {
+      name: "TOEICで最も頻出する品詞は何ですか？",
+      text: "TOEICでは特に動詞と名詞が重要です。Part 5（短文穴埋め）では品詞問題が頻出し、語形変化（例: implement / implementation / implemented）の理解が問われます。各単語ページでは語形変化も掲載しているので、動詞・名詞・形容詞・副詞の形をセットで覚えましょう。"
+    },
+    {
+      name: "TOEICの単語学習はいつから始めるべき？",
+      text: "試験日の2〜3ヶ月前から本格的に取り組むのが理想です。ただし、日常的に英単語に触れる習慣をつけることが最も効果的です。通勤・通学時間などのスキマ時間を活用し、当サイトの「学習モード」や「今日のおすすめ単語」で毎日少しずつ進めましょう。"
+    },
+    {
+      name: "TOEIC単語帳アプリと当サイトの違いは？",
+      text: "当サイトはインストール不要でブラウザからすぐに使える完全無料のTOEIC単語学習サービスです。最大の特徴はAIによる詳細な単語解説です。単なる日本語訳だけでなく、語源・ニュアンス・コロケーション・TOEIC実践例文まで網羅しており、深い理解に基づく暗記をサポートします。"
+    },
+    {
+      name: "TOEIC 600点に必要な単語力は？",
+      text: `TOEIC 600点を目指すなら、まずは当サイトの最重要単語${importantWords.length}語を確実にマスターしましょう。これらはTOEIC全体で最も出現頻度が高い基礎単語です。リーディング・リスニング両方のパートで繰り返し登場するため、この層の単語を押さえるだけで大幅なスコアアップが期待できます。`
+    },
+    {
+      name: "TOEIC 800点以上を目指すには？",
+      text: `800点以上を目指す場合、最重要単語に加えて中級単語${mediumWords.length}語と高難易度単語${highWords.length}語もカバーする必要があります。特にPart 7の長文読解では、文脈から意味を推測する力が問われるため、単語の複数の意味や使い分けを理解することが重要です。当サイトのAI解説で各単語のニュアンスを深く学びましょう。`
+    },
+  ];
+
   const faqJsonLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    "mainEntity": [
-      {
-        "@type": "Question",
-        "name": "2026年最新のTOEIC重要単語と出題傾向は？",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "近年のTOEIC L&Rテストでは、ビジネス環境の変化に伴い「リモートワーク」「オンライン会議」「チャットツール」に関連する語彙の出題頻度が増加しています。また、従来のオフィスワークだけでなく、ハイブリッドワークや柔軟な働き方を示唆する文脈も増えています。"
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "TOEIC重要単語の効率的な覚え方は？",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "単に英単語と日本語訳を丸暗記するのではなく、実際の例文の中でどのように使われるかを理解することが重要です。コロケーション（語の組み合わせ）を意識し、類義語との違いを理解し、音声とセットで覚えることが効果的です。"
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "目標スコア別のTOEIC重要単語の選び方は？",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "現在のスコアや目標に応じて、優先して覚えるべき重要単語は異なります。まずは基礎となる「最重要単語」から始め、基礎を固めた上で「中級単語」へとステップアップすることをおすすめします。600点を目指す方は最重要単語を、それ以上を目指す方はより難しい単語を学習しましょう。"
-        }
+    "mainEntity": faqEntries.map(entry => ({
+      "@type": "Question",
+      "name": entry.name,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": entry.text,
       }
-    ]
+    })),
   };
 
   return (
@@ -142,6 +169,32 @@ export default async function Home() {
         </Suspense>
         <WordsListClient importantWords={importantWords} mediumWords={mediumWords} highWords={highWords} />
 
+        {/* 統計・数値セクション */}
+        <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="bg-white rounded-xl border border-slate-200 p-4 text-center shadow-sm">
+            <div className="text-2xl font-bold text-slate-800">{totalCount}</div>
+            <div className="text-xs text-slate-500 mt-0.5">収録単語数</div>
+          </div>
+          <div className="bg-blue-50 rounded-xl border border-blue-200 p-4 text-center shadow-sm">
+            <div className="text-2xl font-bold text-blue-700">{importantWords.length}</div>
+            <div className="text-xs text-blue-600 mt-0.5">最重要（600点）</div>
+          </div>
+          <div className="bg-purple-50 rounded-xl border border-purple-200 p-4 text-center shadow-sm">
+            <div className="text-2xl font-bold text-purple-700">{mediumWords.length}</div>
+            <div className="text-xs text-purple-600 mt-0.5">中級（730〜800点）</div>
+          </div>
+          <div className="bg-red-50 rounded-xl border border-red-200 p-4 text-center shadow-sm">
+            <div className="text-2xl font-bold text-red-700">{highWords.length}</div>
+            <div className="text-xs text-red-600 mt-0.5">上級（800点以上）</div>
+          </div>
+        </section>
+
+        <div className="flex justify-center">
+          <Link href="/words" className="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-800 text-white rounded-lg font-semibold text-sm hover:bg-slate-900 transition-colors no-underline">
+            全{totalCount}語の一覧を見る →
+          </Link>
+        </div>
+
         <section className="mt-12 pt-12 border-t border-slate-200 flex flex-col gap-8">
           <article className="flex flex-col gap-4">
             <h2 className="text-xl font-bold text-slate-800 mb-2">2026年のTOEIC頻出語を、今のビジネス英語で効率よく。</h2>
@@ -189,6 +242,24 @@ export default async function Home() {
               600点以上を目指す方は、より難しい単語をAIの解説を活用して、理解を深めながら覚えましょう。
             </p>
           </article>
+        </section>
+
+        {/* FAQ セクション */}
+        <section className="mt-12 pt-12 border-t border-slate-200 flex flex-col gap-6">
+          <h2 className="text-xl font-bold text-slate-800">TOEIC重要単語 よくある質問</h2>
+          <div className="flex flex-col gap-4">
+            {faqEntries.map((entry, i) => (
+              <details key={i} className="group bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                <summary className="flex items-center justify-between gap-3 px-5 py-4 cursor-pointer text-sm font-semibold text-slate-800 hover:bg-slate-50 transition-colors list-none [&::-webkit-details-marker]:hidden">
+                  <span>{entry.name}</span>
+                  <span className="text-slate-400 transition-transform duration-200 group-open:rotate-180 shrink-0">▼</span>
+                </summary>
+                <div className="px-5 pb-4 pt-0">
+                  <p className="text-sm leading-[1.8] text-slate-600">{entry.text}</p>
+                </div>
+              </details>
+            ))}
+          </div>
         </section>
       </main>
     </div>
