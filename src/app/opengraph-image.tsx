@@ -11,20 +11,11 @@ export const size = {
 
 export const contentType = "image/png";
 
-
 export default async function Image() {
-  const title = "TOEIC 重要単語集";
-  const subtitle = "2026年版";
-  const tagline = "LEVEL UP YOUR SCORE";
-  const domain = "www.toeic-words.com";
-  
-  // Only load characters that are actually used
-  const textToLoad = title + subtitle + tagline + domain + " ";
+  const textToLoad =
+    "TOEIC重要単語集LEVEL UP YOUR SCORE2026年版AI解説付き完全無料最重要単語中級単語上級単語www.toeic-words.com点 ";
 
-  const fontData = await loadGoogleFont(
-    "Noto+Sans+JP",
-    textToLoad
-  );
+  const fontData = await loadGoogleFont("Noto+Sans+JP", textToLoad);
 
   return new ImageResponse(
     (
@@ -34,79 +25,253 @@ export default async function Image() {
           height: "100%",
           display: "flex",
           flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          background: "radial-gradient(circle at center, #ccfbf1 0, #f9fafb 45%, #ffffff 100%)",
+          justifyContent: "space-between",
+          padding: "60px 80px",
+          background: "linear-gradient(135deg, #0f172a 0%, #1a1f6e 55%, #1e3a8a 100%)",
           fontFamily: '"Noto Sans JP", sans-serif',
+          position: "relative",
+          overflow: "hidden",
         }}
       >
+        {/* 装飾用サークル（右上） */}
+        <div
+          style={{
+            position: "absolute",
+            top: -120,
+            right: -120,
+            width: 480,
+            height: 480,
+            borderRadius: "50%",
+            background: "rgba(59, 130, 246, 0.14)",
+            display: "flex",
+          }}
+        />
+        {/* 装飾用サークル（左下） */}
+        <div
+          style={{
+            position: "absolute",
+            bottom: -100,
+            left: -100,
+            width: 360,
+            height: 360,
+            borderRadius: "50%",
+            background: "rgba(99, 102, 241, 0.12)",
+            display: "flex",
+          }}
+        />
+        {/* 装飾用サークル（右中） */}
+        <div
+          style={{
+            position: "absolute",
+            top: 180,
+            right: 80,
+            width: 180,
+            height: 180,
+            borderRadius: "50%",
+            background: "rgba(147, 197, 253, 0.06)",
+            border: "1px solid rgba(147, 197, 253, 0.1)",
+            display: "flex",
+          }}
+        />
+
+        {/* トップバー */}
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <div
+            style={{
+              background: "rgba(255, 255, 255, 0.1)",
+              border: "1px solid rgba(255, 255, 255, 0.18)",
+              borderRadius: 999,
+              padding: "8px 24px",
+              fontSize: 18,
+              color: "rgba(255, 255, 255, 0.75)",
+              letterSpacing: "0.06em",
+              fontWeight: 600,
+              display: "flex",
+            }}
+          >
+            AI解説付き · 完全無料
+          </div>
+        </div>
+
+        {/* メインコンテンツ */}
         <div
           style={{
             display: "flex",
             flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            background: "rgba(255, 255, 255, 0.96)",
-            padding: "60px 100px",
-            borderRadius: 40,
-            border: "1px solid #e5e7eb",
-            boxShadow: "0 18px 40px rgba(15, 23, 42, 0.08)",
+            gap: 14,
           }}
         >
+          {/* タグライン */}
           <div
             style={{
-              fontSize: 24,
-              letterSpacing: "0.2em",
-              color: "#6b7280",
-              marginBottom: 20,
-              fontWeight: 600,
-            }}
-          >
-            {tagline}
-          </div>
-          
-          <div
-            style={{
+              fontSize: 19,
+              letterSpacing: "0.28em",
+              color: "rgba(147, 197, 253, 0.85)",
+              fontWeight: 700,
               display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: 10,
             }}
           >
-            <div
-               style={{
-                fontSize: 32,
-                color: "#4f46e5",
-                fontWeight: 700,
-                background: "#eef2ff",
-                padding: "4px 20px",
-                borderRadius: 999,
-              }}
-            >
-              {subtitle}
-            </div>
+            LEVEL UP YOUR SCORE
+          </div>
+
+          {/* メインタイトル */}
+          <div
+            style={{
+              fontSize: 86,
+              fontWeight: 900,
+              color: "#ffffff",
+              lineHeight: 1.05,
+              display: "flex",
+              letterSpacing: "-0.01em",
+            }}
+          >
+            TOEIC 重要単語集
+          </div>
+
+          {/* サブタイトル */}
+          <div
+            style={{
+              fontSize: 26,
+              color: "rgba(199, 210, 254, 0.85)",
+              fontWeight: 600,
+              display: "flex",
+              letterSpacing: "0.04em",
+            }}
+          >
+            2026年版 · 最新
+          </div>
+        </div>
+
+        {/* ボトムバー */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "flex-end",
+            justifyContent: "space-between",
+          }}
+        >
+          {/* レベルバッジ */}
+          <div style={{ display: "flex", gap: 14 }}>
+            {/* 600点 最重要 */}
             <div
               style={{
-                fontSize: 80,
-                fontWeight: 900,
-                color: "#0f172a",
-                lineHeight: 1.1,
-                textAlign: "center",
+                background: "rgba(59, 130, 246, 0.22)",
+                border: "1px solid rgba(59, 130, 246, 0.5)",
+                borderRadius: 14,
+                padding: "12px 26px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 4,
               }}
             >
-              {title}
+              <div
+                style={{
+                  fontSize: 13,
+                  color: "rgba(147, 197, 253, 0.65)",
+                  letterSpacing: "0.08em",
+                  fontWeight: 600,
+                  display: "flex",
+                }}
+              >
+                TOEIC 600点
+              </div>
+              <div
+                style={{
+                  fontSize: 20,
+                  color: "#93c5fd",
+                  fontWeight: 700,
+                  display: "flex",
+                }}
+              >
+                最重要単語
+              </div>
+            </div>
+
+            {/* 730点 中級 */}
+            <div
+              style={{
+                background: "rgba(139, 92, 246, 0.22)",
+                border: "1px solid rgba(139, 92, 246, 0.5)",
+                borderRadius: 14,
+                padding: "12px 26px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 4,
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 13,
+                  color: "rgba(196, 181, 253, 0.65)",
+                  letterSpacing: "0.08em",
+                  fontWeight: 600,
+                  display: "flex",
+                }}
+              >
+                TOEIC 730点
+              </div>
+              <div
+                style={{
+                  fontSize: 20,
+                  color: "#c4b5fd",
+                  fontWeight: 700,
+                  display: "flex",
+                }}
+              >
+                中級単語
+              </div>
+            </div>
+
+            {/* 800点 上級 */}
+            <div
+              style={{
+                background: "rgba(239, 68, 68, 0.18)",
+                border: "1px solid rgba(239, 68, 68, 0.44)",
+                borderRadius: 14,
+                padding: "12px 26px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 4,
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 13,
+                  color: "rgba(252, 165, 165, 0.65)",
+                  letterSpacing: "0.08em",
+                  fontWeight: 600,
+                  display: "flex",
+                }}
+              >
+                TOEIC 800点
+              </div>
+              <div
+                style={{
+                  fontSize: 20,
+                  color: "#fca5a5",
+                  fontWeight: 700,
+                  display: "flex",
+                }}
+              >
+                上級単語
+              </div>
             </div>
           </div>
 
+          {/* ドメイン */}
           <div
             style={{
-              marginTop: 40,
               fontSize: 20,
-              color: "#94a3b8",
+              color: "rgba(148, 163, 184, 0.7)",
               fontWeight: 500,
+              letterSpacing: "0.02em",
+              display: "flex",
             }}
           >
-            {domain}
+            www.toeic-words.com
           </div>
         </div>
       </div>
