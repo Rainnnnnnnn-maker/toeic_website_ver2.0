@@ -14,9 +14,19 @@
   - [x] SubTask 3.2: Render "関連単語" (Related Words) section at the bottom of the word detail page.
   - [x] SubTask 3.3: Ensure synonyms in `detailedMeanings` (inside `WordDetailClient`) are also linked using `linkedWords` map.
 
-- [x] Task 4: FAQ Structured Data
-  - [x] SubTask 4.1: Create `faqJsonLd` object in `src/app/page.tsx` mapping the SEO content (Q&A style).
-  - [x] SubTask 4.2: Insert `Script` tag with JSON-LD in `Home` component.
+- [x] Task 4: FAQ Schema & Content Update
+  - [x] SubTask 4.1: `src/app/page.tsx` にユーザーの検索意図（総単語数、目標別学習法など）に直接回答するアコーディオン形式のFAQを追加する。
+  - [x] SubTask 4.2: `src/app/page.tsx` に `FAQPage` スキーマ（JSON-LD）を生成するロジックを実装し、拡充したFAQ内容を反映させる。
+  - [x] SubTask 4.3: SEOキーワード「TOEIC重要単語」を意識した見出し・テキストに調整する。
+
+- [x] Task 5: Words Index Page Creation
+  - [x] SubTask 5.1: `src/app/words/page.tsx` を新規作成する。
+  - [x] SubTask 5.2: 全1,300単語をレベル別（最重要・中級・上級）およびアルファベット順にグループ化して表示するUIを実装する。
+  - [x] SubTask 5.3: `ItemList` と `BreadcrumbList` の構造化データ（JSON-LD）を追加する。
+  - [x] SubTask 5.4: メタデータ（title, description, canonical）を「TOEIC重要単語」に最適化して設定する。
+
+- [x] Task 6: Final Review
+  - [x] SubTask 6.1: GA4のスクリプトが出力されているか確認する。
 
 # Task Dependencies
 - Task 3 depends on Task 2.

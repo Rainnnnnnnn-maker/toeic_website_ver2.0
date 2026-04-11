@@ -1,4 +1,8 @@
 - [x] GA4 script is present in `<head>` (or body) when `NEXT_PUBLIC_GA_ID` is set.
 - [x] Word Detail page shows "関連単語" section at the bottom.
 - [x] Synonyms in "詳細な意味" are clickable links (if they exist in DB).
-- [x] Home page has `FAQPage` structured data.
+- [x] トップページに `FAQPage` スキーマ（JSON-LD）が正しく出力されていること
+- [x] トップページのFAQアコーディオンが正しく表示・開閉できること
+- [x] `/words`（単語一覧インデックスページ）が正しく表示され、レベル別・アルファベット順に単語が並んでいること
+- [x] `/words` ページに `ItemList` と `BreadcrumbList` スキーマが出力されていること
+- [x] SEO検証ツール等でメタデータ（Title, Description, 構造化データ）のエラーが出ないこと
