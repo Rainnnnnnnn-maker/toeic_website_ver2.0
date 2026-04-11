@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Script from "next/script";
+import { Home, ChevronRight, BookOpen } from "lucide-react";
 import type { Metadata } from "next";
 import { getImportantWords, getMediumWords, getHighWords } from "@/data/words";
 import type { Word } from "@/data/words";
@@ -37,6 +38,7 @@ function groupByFirstLetter(words: Word[]): Record<string, Word[]> {
 }
 
 type LevelSectionProps = {
+  id: string;
   title: string;
   description: string;
   words: Word[];
@@ -44,12 +46,12 @@ type LevelSectionProps = {
   badgeLabel: string;
 };
 
-function LevelSection({ title, description, words, badgeClass, badgeLabel }: LevelSectionProps) {
+function LevelSection({ id, title, description, words, badgeClass, badgeLabel }: LevelSectionProps) {
   const groups = groupByFirstLetter(words);
   const letters = Object.keys(groups).sort();
 
   return (
-    <section className="flex flex-col gap-4">
+    <section id={id} className="flex flex-col gap-4 scroll-mt-8">
       <div className="flex flex-col gap-1">
         <div className="flex items-center gap-2">
           <h2 className="text-lg font-bold text-slate-800">{title}</h2>
@@ -128,10 +130,19 @@ export default async function WordsListPage() {
       <main className="w-full max-w-[960px] flex flex-col gap-8">
         {/* ヘッダー */}
         <header className="flex flex-col gap-3">
-          <nav className="text-xs text-slate-400">
-            <Link href="/" className="hover:text-slate-600 no-underline">ホーム</Link>
-            <span className="mx-1.5">/</span>
-            <span className="text-slate-600">単語一覧</span>
+          <nav className="flex items-center gap-1.5 text-sm mb-1">
+            <Link 
+              href="/" 
+              className="flex items-center gap-1 text-slate-500 hover:text-blue-600 hover:bg-blue-50 px-2 py-1 -ml-2 rounded-md transition-colors no-underline font-medium"
+            >
+              <Home className="w-4 h-4" />
+              ホーム
+            </Link>
+            <ChevronRight className="w-4 h-4 text-slate-400" />
+            <div className="flex items-center gap-1.5 text-slate-800 bg-white border border-slate-200 shadow-sm px-2.5 py-1 rounded-md font-semibold">
+              <BookOpen className="w-4 h-4 text-blue-600" />
+              単語一覧
+            </div>
           </nav>
           <h1 className="text-[22px] leading-[1.3] text-slate-900 font-bold sm:text-[26px]">
             TOEIC重要単語 全一覧【2026年最新】
@@ -143,22 +154,22 @@ export default async function WordsListPage() {
 
         {/* 統計バー */}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <div className="bg-white rounded-xl border border-slate-200 p-4 text-center shadow-sm">
+          <Link href="#section-important" className="bg-white rounded-xl border border-slate-200 p-4 text-center shadow-sm cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all duration-150 no-underline">
             <div className="text-2xl font-bold text-slate-800">{totalCount}</div>
             <div className="text-xs text-slate-500 mt-0.5">収録単語数</div>
-          </div>
-          <div className="bg-blue-50 rounded-xl border border-blue-200 p-4 text-center shadow-sm">
+          </Link>
+          <Link href="#section-important" className="bg-blue-50 rounded-xl border border-blue-200 p-4 text-center shadow-sm cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all duration-150 no-underline">
             <div className="text-2xl font-bold text-blue-700">{importantWords.length}</div>
             <div className="text-xs text-blue-600 mt-0.5">最重要単語</div>
-          </div>
-          <div className="bg-purple-50 rounded-xl border border-purple-200 p-4 text-center shadow-sm">
+          </Link>
+          <Link href="#section-medium" className="bg-purple-50 rounded-xl border border-purple-200 p-4 text-center shadow-sm cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all duration-150 no-underline">
             <div className="text-2xl font-bold text-purple-700">{mediumWords.length}</div>
             <div className="text-xs text-purple-600 mt-0.5">中級単語</div>
-          </div>
-          <div className="bg-red-50 rounded-xl border border-red-200 p-4 text-center shadow-sm">
+          </Link>
+          <Link href="#section-high" className="bg-red-50 rounded-xl border border-red-200 p-4 text-center shadow-sm cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all duration-150 no-underline">
             <div className="text-2xl font-bold text-red-700">{highWords.length}</div>
             <div className="text-xs text-red-600 mt-0.5">高難易度単語</div>
-          </div>
+          </Link>
         </div>
 
         {/* クイックアクション */}
@@ -180,6 +191,7 @@ export default async function WordsListPage() {
         {/* 単語一覧セクション */}
         <div className="flex flex-col gap-12">
           <LevelSection
+            id="section-important"
             title="最重要単語（TOEIC 600点レベル）"
             description="TOEICスコアアップのために最初に覚えるべき基礎単語。このリストを完璧にすることで600点突破を目指せます。ビジネス英語の基本となる動詞・名詞・形容詞を中心に厳選しています。"
             words={importantWords}
@@ -187,6 +199,7 @@ export default async function WordsListPage() {
             badgeLabel="最重要"
           />
           <LevelSection
+            id="section-medium"
             title="中級単語（TOEIC 730〜800点レベル）"
             description="さらなるスコアアップを目指すための応用単語。Part 5・Part 6・Part 7の正答率向上に直結する語彙です。ビジネス文書・会議・交渉などのシーンで使われる中〜上級単語を収録しています。"
             words={mediumWords}
@@ -194,6 +207,7 @@ export default async function WordsListPage() {
             badgeLabel="中級"
           />
           <LevelSection
+            id="section-high"
             title="高難易度単語（TOEIC 800点以上レベル）"
             description="800点以上の高スコアを目指すための上級単語。Part 7の長文読解や高度なビジネス表現に対応するための語彙力強化に特化した単語リストです。"
             words={highWords}
