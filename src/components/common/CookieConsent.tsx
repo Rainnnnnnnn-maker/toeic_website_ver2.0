@@ -32,7 +32,7 @@ export function CookieConsent() {
     <div className="fixed inset-x-0 bottom-0 z-50 border-t border-black/10 bg-white/95 p-4 shadow-lg backdrop-blur-sm dark:border-white/10 dark:bg-black/95">
       <div className="mx-auto flex max-w-5xl flex-col items-center gap-3 sm:flex-row sm:justify-between">
         <p className="text-center text-xs leading-relaxed text-black/70 dark:text-white/70 sm:text-left">
-          当サイトでは、サービスの改善や広告配信のためにCookieを使用しています。サイトの利用を続けることで、Cookieの使用に同意したものとみなします。詳しくは
+          当サイトでは、サービスの向上のためにCookieを使用しています。サイトの利用を続けることで、Cookieの使用に同意したものとみなします。詳しくは
           <Link
             href="/privacy"
             className="text-blue-600 underline hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
