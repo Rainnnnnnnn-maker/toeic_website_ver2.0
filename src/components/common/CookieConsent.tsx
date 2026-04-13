@@ -26,6 +26,11 @@ export function CookieConsent() {
     window.dispatchEvent(new StorageEvent("storage", { key: STORAGE_KEY }));
   }, []);
 
+  const handleDecline = useCallback(() => {
+    localStorage.setItem(STORAGE_KEY, "declined");
+    window.dispatchEvent(new StorageEvent("storage", { key: STORAGE_KEY }));
+  }, []);
+
   if (accepted) return null;
 
   return (
@@ -41,12 +46,20 @@ export function CookieConsent() {
           </Link>
           をご確認ください。
         </p>
-        <button
-          onClick={handleAccept}
-          className="shrink-0 rounded-lg bg-blue-600 px-6 py-2 text-xs font-medium text-white transition-colors hover:bg-blue-700"
-        >
-          同意する
-        </button>
+        <div className="flex shrink-0 gap-2">
+          <button
+            onClick={handleDecline}
+            className="rounded-lg border border-black/20 px-6 py-2 text-xs font-medium text-black/70 transition-colors hover:bg-black/5 dark:border-white/20 dark:text-white/70 dark:hover:bg-white/5"
+          >
+            同意しない
+          </button>
+          <button
+            onClick={handleAccept}
+            className="rounded-lg bg-blue-600 px-6 py-2 text-xs font-medium text-white transition-colors hover:bg-blue-700"
+          >
+            同意する
+          </button>
+        </div>
       </div>
     </div>
   );
