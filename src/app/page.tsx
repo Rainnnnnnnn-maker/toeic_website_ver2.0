@@ -195,55 +195,6 @@ export default async function Home() {
           </Link>
         </div>
 
-        <section className="mt-12 pt-12 border-t border-slate-200 flex flex-col gap-8">
-          <article className="flex flex-col gap-4">
-            <h2 className="text-xl font-bold text-slate-800 mb-2">2026年のTOEIC頻出語を、今のビジネス英語で効率よく。</h2>
-            <p className="text-[15px] leading-[1.8] text-slate-600">
-              近年のTOEIC L&Rテストでは、リモートワーク、オンライン会議、チャットツール、AIなど、
-              現代のビジネス環境を反映した語彙や表現がますます重要になっています。
-            </p>
-            <p className="text-[15px] leading-[1.8] text-slate-600">
-              本サイトの「TOEIC重要単語」リストでは、そうした最新の出題傾向を踏まえた頻出語彙を厳選。
-              例えば、<Link href="/words/accommodate" className="text-blue-600 font-bold hover:underline">accommodate</Link>（対応する）や<Link href="/words/negotiate" className="text-blue-600 font-bold hover:underline">negotiate</Link>（交渉する）、
-              <Link href="/words/implement" className="text-blue-600 font-bold hover:underline">implement</Link>（実施する）など、スコアアップに直結する重要語を、
-              実践的な例文とともにわかりやすく学べます。
-              古い単語帳だけでは補いにくい、今のTOEICに合ったビジネス英語を、このサイトで効率よく身につけましょう。
-            </p>
-          </article>
-
-          <article className="flex flex-col gap-4">
-            <h2 className="text-xl font-bold text-slate-800 mb-2">TOEIC重要単語の効率的な覚え方</h2>
-            <p className="text-[15px] leading-[1.8] text-slate-600">
-              TOEICスコアアップの鍵は、試験に出る「TOEIC重要単語」を確実にマスターすることです。
-              単に英単語と日本語訳を丸暗記するのではなく、実際の例文の中でどのように使われるかを理解することが重要です。
-              本サイトでは、AIを活用して各単語の詳細な意味の解説、語形変化、類義語、ニュアンス、そして例文を提供しています。
-            </p>
-            <ul className="list-disc pl-6 mt-2 flex flex-col gap-2">
-              <li className="text-[15px] leading-[1.6] text-slate-600">
-                <strong>コロケーション（語の組み合わせ）を意識する：</strong> 重要単語は単独ではなく、他の語とセットで使われることが多いです。例文を通じて自然なつながりを学びましょう。
-              </li>
-              <li className="text-[15px] leading-[1.6] text-slate-600">
-                <strong>類義語との違いを理解する：</strong> 似た意味の単語の使い分けが問われることがあります。微妙なニュアンスの違いを押さえましょう。
-              </li>
-              <li className="text-[15px] leading-[1.6] text-slate-600">
-                <strong>音声とセットで覚える：</strong> リスニング対策も兼ねて、正しい発音とアクセントを確認しながら学習を進めることが効果的です。
-              </li>
-            </ul>
-          </article>
-
-          <article className="flex flex-col gap-4">
-            <h2 className="text-xl font-bold text-slate-800 mb-2">目標スコア別 TOEIC重要単語の選び方</h2>
-            <p className="text-[15px] leading-[1.8] text-slate-600">
-              現在のスコアや目標に応じて、優先して覚えるべき重要単語は異なります。
-              まずは基礎となる「最重要単語」から始め、基礎を固めた上で「中級単語」へとステップアップすることをおすすめします。
-            </p>
-            <p className="text-[15px] leading-[1.8] text-slate-600">
-              TOEIC 600点を目指す方は、頻繁に使われる基本的な最重要単語を確実に抑えましょう。
-              600点以上を目指す方は、より難しい単語をAIの解説を活用して、理解を深めながら覚えましょう。
-            </p>
-          </article>
-        </section>
-
         {/* FAQ セクション */}
         <section className="mt-12 pt-12 border-t border-slate-200 flex flex-col gap-6">
           <h2 className="text-xl font-bold text-slate-800">TOEIC重要単語 よくある質問</h2>
