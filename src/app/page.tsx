@@ -33,6 +33,14 @@ export default async function Home() {
     alternateName: ["TOEIC重要単語", "TOEIC Words", "TOEIC単語帳"],
     url: "https://www.toeic-words.com/",
     inLanguage: "ja-JP",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: "https://www.toeic-words.com/words/{search_term_string}",
+      },
+      "query-input": "required name=search_term_string",
+    },
   };
 
   // BreadcrumbList構造化データ
@@ -194,6 +202,14 @@ export default async function Home() {
             全単語一覧 →
           </Link>
         </div>
+
+        {/* TOEIC最新単語 説明セクション */}
+        <section className="flex flex-col gap-4 pt-4">
+          <h2 className="text-base font-bold text-slate-800">TOEIC最新単語を無料で効率学習</h2>
+          <p className="text-sm leading-[1.8] text-slate-600">
+            当サイトはTOEIC L&Rテストに頻出するTOEIC単語を「最重要」「中級」「上級」の3レベルで{totalCount}語収録しています。2026年版の最新出題傾向に合わせて単語を選定し、それぞれAIによる詳細解説・例文・類義語・発音を完備。スマホ・PCどちらからでも無料でご利用いただけます。
+          </p>
+        </section>
 
         {/* FAQ セクション */}
         <section className="mt-12 pt-12 border-t border-slate-200 flex flex-col gap-6">

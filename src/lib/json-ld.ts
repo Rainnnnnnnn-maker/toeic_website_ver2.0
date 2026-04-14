@@ -41,6 +41,27 @@ export function generateWordDetailJsonLd(word: string, detail: WordDetails | nul
       "educationalUse": "TOEIC L&R テスト対策",
       "learningResourceType": "vocabulary"
     });
+
+    jsonLd.push({
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": `${detail.word}の意味・使い方 | TOEIC重要単語`,
+      "description": detail.japaneseTranslation,
+      "url": `https://www.toeic-words.com/words/${word}`,
+      "inLanguage": "ja",
+      "about": {
+        "@type": "DefinedTerm",
+        "name": detail.word,
+        "inLanguage": "en",
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "TOEIC重要単語",
+        "url": "https://www.toeic-words.com",
+      },
+      "educationalUse": "TOEIC L&R テスト対策",
+      "learningResourceType": "vocabulary",
+    });
   }
 
   return jsonLd;

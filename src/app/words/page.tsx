@@ -64,9 +64,9 @@ function LevelSection({ id, title, description, words, badgeClass, badgeLabel }:
       <div className="flex flex-col gap-5">
         {letters.map((letter) => (
           <div key={letter}>
-            <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 border-b border-slate-100 pb-1">
+            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 border-b border-slate-100 pb-1">
               {letter}
-            </div>
+            </h3>
             <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
               {groups[letter].map((word) => (
                 <Link
@@ -215,6 +215,22 @@ export default async function WordsListPage() {
             badgeLabel="上級"
           />
         </div>
+
+        {/* SEOコンテンツ */}
+        <section className="pt-8 border-t border-slate-200 flex flex-col gap-4">
+          <h2 className="text-base font-bold text-slate-800">TOEIC単語の効率的な学習法【2026年最新】</h2>
+          <p className="text-sm leading-[1.8] text-slate-600">
+            TOEIC L&Rテストのスコアアップには語彙力が直結します。当サイトは2026年最新の出題傾向を反映したTOEIC頻出単語{totalCount}語をレベル別に収録し、それぞれAI解説・例文・発音つきで無料提供しています。
+          </p>
+          <h3 className="text-sm font-bold text-slate-700">2026年最新のTOEIC単語：出題傾向の変化</h3>
+          <p className="text-sm leading-[1.8] text-slate-600">
+            近年のTOEICでは「リモートワーク」「オンライン会議」「サプライチェーン」などデジタル・グローバル化に伴う語彙の出題が増加しています。従来の「最重要単語」に加え、こうした最新ビジネスシーンに対応したTOEIC単語も本リストに含まれています。
+          </p>
+          <h3 className="text-sm font-bold text-slate-700">レベル別TOEIC単語の優先順位</h3>
+          <p className="text-sm leading-[1.8] text-slate-600">
+            600点突破を目指す方はまず最重要単語（{importantWords.length}語）を優先してください。730〜800点を目指す方は中級単語（{mediumWords.length}語）まで、800点超えを狙う方は高難易度単語（{highWords.length}語）も含めた全語彙の習得が効果的です。
+          </p>
+        </section>
 
         {/* フッターCTA */}
         <section className="mt-4 pt-8 border-t border-slate-200">
