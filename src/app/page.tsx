@@ -202,7 +202,23 @@ export default async function Home() {
             全単語一覧 →
           </Link>
         </div>
-
+        {/* FAQ セクション */}
+        <section className="mt-12 pt-12 border-t border-slate-200 flex flex-col gap-6">
+          <h2 className="text-xl font-bold text-slate-800">TOEIC重要単語 よくある質問</h2>
+          <div className="flex flex-col gap-4">
+            {faqEntries.map((entry, i) => (
+              <details key={i} className="group bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                <summary className="flex items-center justify-between gap-3 px-5 py-4 cursor-pointer text-sm font-semibold text-slate-800 hover:bg-slate-50 transition-colors list-none [&::-webkit-details-marker]:hidden">
+                  <span>{entry.name}</span>
+                  <span className="text-slate-400 transition-transform duration-200 group-open:rotate-180 shrink-0">▼</span>
+                </summary>
+                <div className="px-5 pb-4 pt-0">
+                  <p className="text-sm leading-[1.8] text-slate-600">{entry.text}</p>
+                </div>
+              </details>
+            ))}
+          </div>
+        </section>
         {/* TOEIC最新単語 説明セクション */}
         <section className="mt-12 pt-12 border-t border-slate-200 flex flex-col gap-8">
           <article className="flex flex-col gap-4">
@@ -251,24 +267,6 @@ export default async function Home() {
               600点以上を目指す方は、より難しい単語をAIの解説を活用して、理解を深めながら覚えましょう。
             </p>
           </article>
-        </section>
-
-        {/* FAQ セクション */}
-        <section className="mt-12 pt-12 border-t border-slate-200 flex flex-col gap-6">
-          <h2 className="text-xl font-bold text-slate-800">TOEIC重要単語 よくある質問</h2>
-          <div className="flex flex-col gap-4">
-            {faqEntries.map((entry, i) => (
-              <details key={i} className="group bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                <summary className="flex items-center justify-between gap-3 px-5 py-4 cursor-pointer text-sm font-semibold text-slate-800 hover:bg-slate-50 transition-colors list-none [&::-webkit-details-marker]:hidden">
-                  <span>{entry.name}</span>
-                  <span className="text-slate-400 transition-transform duration-200 group-open:rotate-180 shrink-0">▼</span>
-                </summary>
-                <div className="px-5 pb-4 pt-0">
-                  <p className="text-sm leading-[1.8] text-slate-600">{entry.text}</p>
-                </div>
-              </details>
-            ))}
-          </div>
         </section>
       </main>
     </div>
