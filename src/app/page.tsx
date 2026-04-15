@@ -202,6 +202,76 @@ export default async function Home() {
             全単語一覧 →
           </Link>
         </div>
+
+        {/* --- 新規追加: サイトの独自性・権威性アピールセクション --- */}
+        <section className="mt-12 pt-12 border-t border-slate-200 flex flex-col gap-12">
+          {/* 選ばれる3つの理由 */}
+          <div className="flex flex-col gap-6">
+            <h2 className="text-2xl font-bold text-slate-800 text-center">このサイトが選ばれる3つの理由</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+              <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col gap-3">
+                <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center text-xl font-bold mb-2">1</div>
+                <h3 className="text-lg font-bold text-slate-800">AIによる圧倒的な解説量</h3>
+                <p className="text-sm text-slate-600 leading-relaxed">
+                  単なる日本語訳だけでなく、語源、微妙なニュアンスの違い、ビジネスシーンでの具体的な使われ方をAIが徹底解説。丸暗記に頼らない「生きた英語」が身につきます。
+                </p>
+              </div>
+              <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col gap-3">
+                <div className="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center text-xl font-bold mb-2">2</div>
+                <h3 className="text-lg font-bold text-slate-800">忘却曲線を意識した復習</h3>
+                <p className="text-sm text-slate-600 leading-relaxed">
+                  「学習モード」と「復習モード」を使い分けることで、記憶への定着率を最大化。さらに「今日のおすすめ5単語」機能で、スキマ時間での毎日の継続をサポートします。
+                </p>
+              </div>
+              <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col gap-3">
+                <div className="w-12 h-12 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center text-xl font-bold mb-2">3</div>
+                <h3 className="text-lg font-bold text-slate-800">完全無料・登録不要</h3>
+                <p className="text-sm text-slate-600 leading-relaxed">
+                  アプリのインストールや面倒な会員登録は一切不要。PCでもスマホでも、ブラウザを開くだけで1,300語以上のTOEIC頻出単語をすべて無料で学習できます。
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* 使い方ガイド */}
+          <div className="bg-slate-50 p-6 sm:p-8 rounded-2xl border border-slate-200">
+            <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+              <span className="text-blue-600">💡</span> 効果的な使い方ガイド（おすすめルーティン）
+            </h2>
+            <ol className="flex flex-col gap-4">
+              <li className="flex gap-4 items-start">
+                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold mt-0.5">1</span>
+                <div>
+                  <p className="font-bold text-slate-800">朝のスキマ時間：今日のおすすめ5単語をチェック</p>
+                  <p className="text-sm text-slate-600 mt-1">トップページに表示される5単語を通勤・通学中に確認し、英語脳にスイッチを入れます。</p>
+                </div>
+              </li>
+              <li className="flex gap-4 items-start">
+                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold mt-0.5">2</span>
+                <div>
+                  <p className="font-bold text-slate-800">まとまった時間：学習モードで新規単語をインプット</p>
+                  <p className="text-sm text-slate-600 mt-1">「学習モード」を使って、目標スコアの単語を1日10〜20語ペースで進めます。音声も必ず再生しましょう。</p>
+                </div>
+              </li>
+              <li className="flex gap-4 items-start">
+                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold mt-0.5">3</span>
+                <div>
+                  <p className="font-bold text-slate-800">週末や夜：お気に入り＆復習モードで知識を定着</p>
+                  <p className="text-sm text-slate-600 mt-1">覚えにくい単語は「お気に入り」に登録し、週末に「復習モード」で一気に振り返ります。</p>
+                </div>
+              </li>
+            </ol>
+          </div>
+
+          {/* 開発者・運営からのメッセージ */}
+          <div className="flex flex-col gap-4 border-l-4 border-blue-600 pl-5 py-2">
+            <h2 className="text-lg font-bold text-slate-800">開発チームからのメッセージ</h2>
+            <p className="text-sm text-slate-600 leading-relaxed">
+              「市販の単語帳は持ち歩くのが重い」「アプリは有料のものが多い」——そんなTOEIC学習者の声から、このサイトは生まれました。私たちは、誰もが質の高い英語学習環境に無料でアクセスできるべきだと考えています。AI技術を活用することで、従来の辞書にはない「生きたビジネス英語のニュアンス」を提供し、皆さまのスコアアップ、そしてその先のキャリアアップを全力でサポートします。
+            </p>
+          </div>
+        </section>
+
         {/* FAQ セクション */}
         <section className="mt-12 pt-12 border-t border-slate-200 flex flex-col gap-6">
           <h2 className="text-xl font-bold text-slate-800">TOEIC重要単語 よくある質問</h2>

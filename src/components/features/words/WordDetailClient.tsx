@@ -9,6 +9,7 @@ import type { Word } from "@/data/words";
 import { SnsShareButtons } from "@/components/features/sns/SnsShareButtons";
 import { useTTS } from "@/hooks/useTTS";
 import { useShareTarget } from "@/context/ShareTargetContext";
+import { StudyAdvice } from "./StudyAdvice";
 
 type Props = {
   initialData: WordDetails;
@@ -275,6 +276,8 @@ export function WordDetailClient({ initialData, linkedWords = {}, relatedWords =
             </div>
           </section>
         )}
+
+        <StudyAdvice level={level} />
 
         {relatedWords && relatedWords.length > 0 && (
           <section className="flex flex-col gap-2">

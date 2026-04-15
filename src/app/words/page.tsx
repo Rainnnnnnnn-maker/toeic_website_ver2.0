@@ -41,25 +41,34 @@ type LevelSectionProps = {
   id: string;
   title: string;
   description: string;
+  learningGuide?: React.ReactNode;
   words: Word[];
   badgeClass: string;
   badgeLabel: string;
 };
 
-function LevelSection({ id, title, description, words, badgeClass, badgeLabel }: LevelSectionProps) {
+function LevelSection({ id, title, description, learningGuide, words, badgeClass, badgeLabel }: LevelSectionProps) {
   const groups = groupByFirstLetter(words);
   const letters = Object.keys(groups).sort();
 
   return (
     <section id={id} className="flex flex-col gap-4 scroll-mt-8">
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-3">
         <div className="flex items-center gap-2">
           <h2 className="text-lg font-bold text-slate-800">{title}</h2>
           <span className={`text-[11px] px-2 py-0.5 rounded-full font-semibold ${badgeClass}`}>
             {badgeLabel} · {words.length}語
           </span>
         </div>
-        <p className="text-xs leading-relaxed text-slate-500">{description}</p>
+        <p className="text-sm leading-relaxed text-slate-600">{description}</p>
+        {learningGuide && (
+          <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm mt-1 text-sm text-slate-700 leading-relaxed">
+            <h4 className="font-bold text-slate-800 mb-2 flex items-center gap-2">
+              <span className="text-blue-600">💡</span> 学習のポイント
+            </h4>
+            {learningGuide}
+          </div>
+        )}
       </div>
       <div className="flex flex-col gap-5">
         {letters.map((letter) => (
@@ -194,6 +203,11 @@ export default async function WordsListPage() {
             id="section-important"
             title="最重要単語（TOEIC 600点レベル）"
             description="TOEICスコアアップのために最初に覚えるべき基礎単語。このリストを完璧にすることで600点突破を目指せます。ビジネス英語の基本となる動詞・名詞・形容詞を中心に厳選しています。"
+            learningGuide={
+              <p>
+                TOEIC 600点の壁を越えるには、リスニング（Part 1〜4）とリーディング（Part 5〜6）で確実に正解できる基礎力が不可欠です。このレベルの単語は、問題文や選択肢の核となるため、<strong>「英単語を見たら1秒で日本語の意味が浮かぶ」</strong>状態になるまで反復練習しましょう。特に品詞（名詞・動詞・形容詞など）の違いを意識して覚えると、Part 5の文法問題で大きなアドバンテージになります。
+              </p>
+            }
             words={importantWords}
             badgeClass="bg-blue-100 text-blue-800"
             badgeLabel="最重要"
@@ -202,6 +216,11 @@ export default async function WordsListPage() {
             id="section-medium"
             title="中級単語（TOEIC 730〜800点レベル）"
             description="さらなるスコアアップを目指すための応用単語。Part 5・Part 6・Part 7の正答率向上に直結する語彙です。ビジネス文書・会議・交渉などのシーンで使われる中〜上級単語を収録しています。"
+            learningGuide={
+              <p>
+                730点以上を目指す学習者にとって最大の課題は、Part 7の長文読解（特に言い換え問題や推測問題）です。このスコア帯の単語は、パッセージ内で別の表現にパラフレーズ（言い換え）されることが多いため、<strong>単語単体ではなく「類義語」や「コロケーション（よく使われるフレーズ）」とセットで覚える</strong>のがコツです。AI解説を活用して、微妙なニュアンスの違いまで理解を深めましょう。
+              </p>
+            }
             words={mediumWords}
             badgeClass="bg-purple-100 text-purple-800"
             badgeLabel="中級"
@@ -210,6 +229,11 @@ export default async function WordsListPage() {
             id="section-high"
             title="高難易度単語（TOEIC 800点以上レベル）"
             description="800点以上の高スコアを目指すための上級単語。Part 7の長文読解や高度なビジネス表現に対応するための語彙力強化に特化した単語リストです。"
+            learningGuide={
+              <p>
+                800点以上のハイスコア、さらには900点超えを狙うためには、ビジネスの専門用語や、特定の文脈でしか使われない難語（法律、金融、人事など）をカバーする必要があります。出現頻度自体は低いものの、<strong>長文の決定的な手がかりになる単語</strong>ばかりです。学習モードだけでなく、実際のTOEIC形式の長文の中でどう使われるかを想像しながら学習を進めてください。
+              </p>
+            }
             words={highWords}
             badgeClass="bg-red-100 text-red-800"
             badgeLabel="上級"

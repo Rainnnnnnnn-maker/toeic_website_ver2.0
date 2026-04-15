@@ -40,6 +40,11 @@ export default async function StudyPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <StudyClient words={words} />
+      <div className="sr-only">
+        <h2>TOEIC英単語 学習モード（暗記テスト）</h2>
+        <p>このページでは、TOEIC L&Rテストに頻出する重要単語をフラッシュカード形式で効率的に学習できます。600点、730点、800点以上のレベル別に収録された単語がランダムに出題されます。</p>
+        <p>「覚えている」「覚えていない」を仕分けしながら反復学習することで、忘却曲線を意識した記憶の定着が可能です。覚えていない単語は詳細なAI解説ページへ遷移し、ニュアンスや例文、語源などを深く学ぶことができます。通勤・通学などのスキマ時間を活用して、毎日のTOEIC学習に役立ててください。</p>
+      </div>
     </>
   );
 }
