@@ -22,6 +22,8 @@ A comprehensive web application for learning essential TOEIC vocabulary, featuri
   - Picks are determined by UTC date key + word slug hash, so the same day yields the same 5 words.
 - **Favorites**: Save difficult words for later review (persisted in local storage).
 - **Social Share**: Share word details via Twitter, Facebook, and LINE.
+- **PWA Ready**: Installable on mobile and desktop via `manifest.ts`.
+- **Static Pages**: Includes About, Privacy, Terms, and Contact pages for better user trust and SEO.
 - **Responsive Design**: Optimized for desktop and mobile devices.
 
 ## 🛠️ Tech Stack
