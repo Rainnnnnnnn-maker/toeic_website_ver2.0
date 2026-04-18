@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 export default function AboutPage() {
   return (
-    <main className="mx-auto max-w-3xl px-4 py-12">
+    <>
       <nav className="mb-8 text-sm text-black/50 dark:text-white/50">
         <Link href="/" className="hover:underline">
           TOP
@@ -96,6 +96,6 @@ export default function AboutPage() {
           </ul>
         </section>
       </div>
-    </main>
+    </>
   );
 }

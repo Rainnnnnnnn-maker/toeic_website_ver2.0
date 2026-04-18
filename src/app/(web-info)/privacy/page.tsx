@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 export default function PrivacyPage() {
   return (
-    <main className="mx-auto max-w-3xl px-4 py-12">
+    <>
       <nav className="mb-8 text-sm text-black/50 dark:text-white/50">
         <Link href="/" className="hover:underline">
           TOP
@@ -97,6 +97,6 @@ export default function PrivacyPage() {
           制定日：2026年4月11日
         </p>
       </div>
-    </main>
+    </>
   );
 }
