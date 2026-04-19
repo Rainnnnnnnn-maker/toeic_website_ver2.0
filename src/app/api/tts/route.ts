@@ -1,4 +1,25 @@
 import "server-only";
+import { Ratelimit } from "@upstash/ratelimit";
+import { getRedis } from "@/lib/upstash";
+import { getWordBySlug } from "@/data/words";
+import { createHash } from "crypto";
+
+let ratelimitInstance: Ratelimit | undefined;
+
+function getRatelimit(): Ratelimit {
+  if (ratelimitInstance) return ratelimitInstance;
+  ratelimitInstance = new Ratelimit({
+    redis: getRedis(),
+    limiter: Ratelimit.slidingWindow(20, "1 m"),
+    prefix: "rl:tts",
+  });
+  return ratelimitInstance;
+}
+
+function ttsCacheKey(text: string, language: string): string {
+  const hash = createHash("sha256").update(`${language}:${text}`).digest("hex");
+  return `tts:${hash}`;
+}
 
 export async function POST(request: Request) {
   // Security Check: Verify Custom Header
@@ -20,7 +41,6 @@ export async function POST(request: Request) {
   }
 
   const apiKey = process.env.TTS_API_KEY;
-
   if (!apiKey) {
     return Response.json({ error: "TTS_API_KEY is not configured" }, { status: 500 });
   }
@@ -31,34 +51,70 @@ export async function POST(request: Request) {
     return Response.json({ error: "Invalid request body" }, { status: 400 });
   }
 
-  // Guard: Validate input length instead of whitelist to allow sentences
   if (body.text.length > 500) {
     return Response.json({ error: "Text too long" }, { status: 400 });
   }
 
-  // Determine language and voice settings
   const language = body.language === "ja" ? "ja" : "en";
-  const voiceConfig = language === "ja"
-    // ? { languageCode: "ja-JP", name: "ja-JP-Standard-A" }
-    ? { languageCode: "ja-JP", name: "ja-JP-Neural2-B" }
-    // : { languageCode: "en-US", name: "en-US-Standard-A" };
-    // : { languageCode: "en-US", name: "en-US-Chirp-A" };
-    : { languageCode: "en-US", name: "en-US-Wavenet-C" };
 
-  // NOTE: We removed the getWordBySlug check to allow sentence synthesis.
-  // const wordEntry = getWordBySlug(body.text.toLowerCase());
-  // if (!wordEntry) {
-  //   return Response.json({ error: "Word not allowed" }, { status: 400 });
-  // }
+  // Allowlist check: single English words (no whitespace) must exist in the vocabulary list
+  const isSingleWord = language === "en" && !/\s/.test(body.text.trim());
+  if (isSingleWord) {
+    const entry = await getWordBySlug(body.text.trim().toLowerCase());
+    if (!entry) {
+      return Response.json({ error: "Word not allowed" }, { status: 400 });
+    }
+  }
+
+  const voiceConfig =
+    language === "ja"
+      ? { languageCode: "ja-JP", name: "ja-JP-Neural2-B" }
+      : { languageCode: "en-US", name: "en-US-Wavenet-C" };
+
+  const redis = getRedis();
+  const cacheKey = ttsCacheKey(body.text, language);
+
+  // L1: Redis TTS cache — cached results bypass rate limiting entirely
+  try {
+    const cached = await redis.get<string>(cacheKey);
+    if (cached) {
+      return Response.json(
+        { audioContent: cached },
+        { status: 200, headers: { "Cache-Control": "public, max-age=86400" } }
+      );
+    }
+  } catch (e) {
+    console.warn("TTS cache read failed:", e);
+  }
+
+  // Rate limit only on cache misses (= actual Google TTS API calls)
+  const ip =
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+    request.headers.get("x-real-ip") ??
+    "anonymous";
+
+  const { success, limit, remaining, reset } = await getRatelimit().limit(ip);
+  if (!success) {
+    return Response.json(
+      { error: "Too Many Requests" },
+      {
+        status: 429,
+        headers: {
+          "X-RateLimit-Limit": String(limit),
+          "X-RateLimit-Remaining": String(remaining),
+          "X-RateLimit-Reset": String(reset),
+          "Retry-After": String(Math.ceil((reset - Date.now()) / 1000)),
+        },
+      }
+    );
+  }
 
   try {
     const ttsResponse = await fetch(
       `https://texttospeech.googleapis.com/v1/text:synthesize?key=${apiKey}`,
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           input: { text: body.text },
           voice: voiceConfig,
@@ -71,10 +127,7 @@ export async function POST(request: Request) {
     );
 
     if (!ttsResponse.ok) {
-      return Response.json(
-        { error: "Failed to synthesize speech" },
-        { status: 500 }
-      );
+      return Response.json({ error: "Failed to synthesize speech" }, { status: 500 });
     }
 
     const json = (await ttsResponse.json()) as { audioContent?: string };
@@ -86,14 +139,16 @@ export async function POST(request: Request) {
       );
     }
 
+    // Save to Redis cache (30-day TTL)
+    try {
+      await redis.set(cacheKey, json.audioContent, { ex: 60 * 60 * 24 * 30 });
+    } catch (e) {
+      console.warn("TTS cache write failed:", e);
+    }
+
     return Response.json(
       { audioContent: json.audioContent },
-      {
-        status: 200,
-        headers: {
-          "Cache-Control": "public, max-age=86400",
-        },
-      }
+      { status: 200, headers: { "Cache-Control": "public, max-age=86400" } }
     );
   } catch {
     return Response.json({ error: "Unexpected error while calling TTS API" }, { status: 500 });
@@ -104,13 +159,9 @@ export async function GET() {
   return Response.json(
     {
       error: "Method Not Allowed",
-      message: "This endpoint requires a POST request with a JSON body containing the 'text' to synthesize.",
+      message:
+        "This endpoint requires a POST request with a JSON body containing the 'text' to synthesize.",
     },
-    {
-      status: 405,
-      headers: {
-        Allow: "POST",
-      },
-    }
+    { status: 405, headers: { Allow: "POST" } }
   );
 }
