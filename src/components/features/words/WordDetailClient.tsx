@@ -127,7 +127,7 @@ export function WordDetailClient({ initialData, linkedWords = {}, relatedWords =
                             <button
                               type="button"
                               className="shrink-0 inline-flex items-center justify-center p-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-md transition-colors border border-blue-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-                              onClick={() => handlePlaySentenceAudio(d.example, `meaning-${idx}-detail-${d.number}`)}
+                              onClick={() => handlePlaySentenceAudio(d.example, `meaning-${idx}-detail-${d.number}`, "en", data.word)}
                               disabled={sentenceAudioLoading === `meaning-${idx}-detail-${d.number}`}
                               aria-label="例文を再生"
                             >
@@ -143,7 +143,7 @@ export function WordDetailClient({ initialData, linkedWords = {}, relatedWords =
                              <button
                               type="button"
                               className="shrink-0 inline-flex items-center justify-center p-1.5 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-md transition-colors border border-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500"
-                              onClick={() => handlePlaySentenceAudio(d.exampleJapanese, `meaning-${idx}-detail-${d.number}-ja`, "ja")}
+                              onClick={() => handlePlaySentenceAudio(d.exampleJapanese, `meaning-${idx}-detail-${d.number}-ja`, "ja", data.word)}
                               disabled={sentenceAudioLoading === `meaning-${idx}-detail-${d.number}-ja`}
                               aria-label="日本語訳を再生"
                             >
@@ -243,7 +243,7 @@ export function WordDetailClient({ initialData, linkedWords = {}, relatedWords =
                     <button
                       type="button"
                       className="shrink-0 inline-flex items-center justify-center p-1.5 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-md transition-colors border border-purple-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
-                      onClick={() => handlePlaySentenceAudio(ex.english, `toeic-${i}`)}
+                      onClick={() => handlePlaySentenceAudio(ex.english, `toeic-${i}`, "en", data.word)}
                       disabled={sentenceAudioLoading === `toeic-${i}`}
                       aria-label="例文を再生"
                     >
@@ -259,7 +259,7 @@ export function WordDetailClient({ initialData, linkedWords = {}, relatedWords =
                     <button
                       type="button"
                       className="shrink-0 inline-flex items-center justify-center p-1.5 bg-white hover:bg-slate-50 text-slate-600 rounded-md transition-colors border border-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500"
-                      onClick={() => handlePlaySentenceAudio(ex.japanese, `toeic-${i}-ja`, "ja")}
+                      onClick={() => handlePlaySentenceAudio(ex.japanese, `toeic-${i}-ja`, "ja", data.word)}
                       disabled={sentenceAudioLoading === `toeic-${i}-ja`}
                       aria-label="日本語訳を再生"
                     >

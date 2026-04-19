@@ -413,7 +413,7 @@ export default function StudyClient({
           })}
           <button 
             className="inline-flex items-center justify-center p-0 border-none bg-transparent cursor-pointer align-middle disabled:opacity-70 disabled:cursor-default ml-2 group" 
-            onClick={() => handlePlaySentenceAudio(hintExample, `hint-example-${currentWord?.slug}`)}
+            onClick={() => handlePlaySentenceAudio(hintExample, `hint-example-${currentWord?.slug}`, "en", currentWord?.slug)}
             disabled={sentenceAudioLoading === `hint-example-${currentWord?.slug}`}
             aria-label="Play sample audio"
             style={{ marginLeft: '8px', verticalAlign: 'middle', display: 'inline-flex' }}

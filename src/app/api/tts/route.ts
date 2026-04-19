@@ -16,9 +16,23 @@ function getRatelimit(): Ratelimit {
   return ratelimitInstance;
 }
 
-function ttsCacheKey(text: string, language: string): string {
-  const hash = createHash("sha256").update(`${language}:${text}`).digest("hex");
-  return `tts:${hash}`;
+function sanitizeSlug(raw: string): string {
+  // Keep alphanumerics and hyphen only; prevents colons/spaces breaking key structure
+  return raw.trim().toLowerCase().replace(/[^a-z0-9-]/g, "").slice(0, 64);
+}
+
+function ttsCacheKey(text: string, language: string, wordSlug?: string): string {
+  const trimmed = text.trim();
+  const isSingleWord = !/\s/.test(trimmed);
+
+  if (isSingleWord && language === "en") {
+    const normalized = sanitizeSlug(trimmed);
+    if (normalized) return `tts:en:word:${normalized}`;
+  }
+
+  const hash = createHash("sha256").update(trimmed).digest("hex").slice(0, 12);
+  const tag = wordSlug ? sanitizeSlug(wordSlug) : "";
+  return `tts:${language}:${tag || "_"}:${hash}`;
 }
 
 export async function POST(request: Request) {
@@ -56,6 +70,7 @@ export async function POST(request: Request) {
   }
 
   const language = body.language === "ja" ? "ja" : "en";
+  const wordSlug = typeof body.wordSlug === "string" ? body.wordSlug : undefined;
 
   // Allowlist check: single English words (no whitespace) must exist in the vocabulary list
   const isSingleWord = language === "en" && !/\s/.test(body.text.trim());
@@ -72,7 +87,7 @@ export async function POST(request: Request) {
       : { languageCode: "en-US", name: "en-US-Wavenet-C" };
 
   const redis = getRedis();
-  const cacheKey = ttsCacheKey(body.text, language);
+  const cacheKey = ttsCacheKey(body.text, language, wordSlug);
 
   // L1: Redis TTS cache — cached results bypass rate limiting entirely
   try {

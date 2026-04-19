@@ -44,14 +44,14 @@ export function useTTS() {
         audio.play().catch((e) => console.error("Audio play failed", e));
     }, []);
 
-    const fetchTTS = useCallback(async (text: string, language: string): Promise<string> => {
+    const fetchTTS = useCallback(async (text: string, language: string, wordSlug?: string): Promise<string> => {
         const response = await fetch("/api/tts", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 "X-App-Source": "toeic-client",
             },
-            body: JSON.stringify({ text, language }),
+            body: JSON.stringify({ text, language, wordSlug }),
         });
 
         if (!response.ok) throw new Error("Failed to synthesize speech");
@@ -78,7 +78,7 @@ export function useTTS() {
         setState((prev) => ({ ...prev, audioLoading: true }));
 
         try {
-            const audioUrl = await fetchTTS(word, language);
+            const audioUrl = await fetchTTS(word, language, word);
             setState((prev) => ({
                 ...prev,
                 audioUrl,
@@ -93,7 +93,7 @@ export function useTTS() {
         }
     }, [state.audioUrl, state.cachedWord, playAudio, fetchTTS]);
 
-    const handlePlaySentenceAudio = useCallback(async (text: string, id: string, language: string = "en") => {
+    const handlePlaySentenceAudio = useCallback(async (text: string, id: string, language: string = "en", wordSlug?: string) => {
         if (state.sentenceAudioUrls[id]) {
             playAudio(state.sentenceAudioUrls[id]);
             sendGAEvent("event", "audio_play", { type: "sentence", id, language });
@@ -103,7 +103,7 @@ export function useTTS() {
         setState((prev) => ({ ...prev, sentenceAudioLoading: id }));
 
         try {
-            const audioUrl = await fetchTTS(text, language);
+            const audioUrl = await fetchTTS(text, language, wordSlug);
             setState((prev) => ({
                 ...prev,
                 sentenceAudioUrls: { ...prev.sentenceAudioUrls, [id]: audioUrl },
