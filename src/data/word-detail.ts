@@ -1,5 +1,5 @@
 import "server-only";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 import { getWordBySlug } from "@/data/words";
 import { getWordDetails as getRedisWordDetails, setWordDetails as setRedisWordDetails } from "@/lib/wordCache";
 import { cacheLife, cacheTag } from "next/cache";
@@ -76,17 +76,6 @@ function parseJsonFromText(text: string): RawWordPayload {
   }
 }
 
-function buildModel(client: GoogleGenerativeAI, maxOutputTokens: number) {
-  return client.getGenerativeModel({
-    model: "gemini-2.5-flash-lite",
-    generationConfig: {
-      temperature: 0.2,
-      maxOutputTokens,
-      responseMimeType: "application/json",
-    },
-  });
-}
-
 function normalizePayload(word: string, payload: RawWordPayload): WordDetails {
   const meanings = Array.isArray(payload.meanings) ? payload.meanings : [];
   const normalizedMeanings = meanings.map((m) => ({
@@ -142,7 +131,7 @@ async function fetchWordDetailFromGemini(term: string): Promise<WordDetails> {
     throw new Error("GEMINI_API_KEY is not configured");
   }
 
-  const client = new GoogleGenerativeAI(apiKey);
+  const client = new GoogleGenAI({ apiKey });
   const promptBase = systemPrompt.replaceAll("${word}", term);
   const prompts = [
     {
@@ -162,9 +151,19 @@ async function fetchWordDetailFromGemini(term: string): Promise<WordDetails> {
 
   for (const attempt of prompts) {
     try {
-      const model = buildModel(client, attempt.maxOutputTokens);
-      const result = await model.generateContent(attempt.prompt);
-      const text = result.response.text();
+      const response = await client.models.generateContent({
+        model: "gemini-2.5-flash-lite",
+        contents: attempt.prompt,
+        config: {
+          temperature: 0.2,
+          maxOutputTokens: attempt.maxOutputTokens,
+          responseMimeType: "application/json",
+        },
+      });
+      const text = response.text;
+      if (!text) {
+        throw new Error("Empty response from Gemini");
+      }
       const raw = parseJsonFromText(text);
       data = normalizePayload(term, raw);
       break;
