@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 import { loadGoogleFont } from "@/lib/og-utils";
 
-export const runtime = "edge";
+export const revalidate = 86400;
 
 export const alt = "TOEIC重要単語";
 export const size = {

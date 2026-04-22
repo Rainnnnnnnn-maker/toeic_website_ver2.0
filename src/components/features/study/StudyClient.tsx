@@ -347,12 +347,6 @@ export default function StudyClient({
     }
   }, [currentWord, rememberedSlugs, forgottenSlugs, storageKey]);
 
-  useEffect(() => {
-    if (!currentWord) return;
-    const query = backLink === '/favorites' ? '?from=review' : '?from=study';
-    router.prefetch(`/words/${currentWord.slug}${query}`);
-  }, [currentWord, router, backLink]);
-
   const handleRemembered = () => {
     if (!currentWord) return;
     setRememberedSlugs((prev) => addUnique(prev, currentWord.slug));
