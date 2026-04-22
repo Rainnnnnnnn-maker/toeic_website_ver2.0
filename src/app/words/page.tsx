@@ -81,6 +81,7 @@ function LevelSection({ id, title, description, learningGuide, words, badgeClass
                 <Link
                   key={word.slug}
                   href={`/words/${word.slug}`}
+                  prefetch={false}
                   className="text-sm text-slate-700 font-medium px-2.5 py-1.5 rounded-md bg-white border border-slate-200 hover:border-blue-300 hover:text-blue-700 hover:bg-blue-50 transition-all duration-150 no-underline truncate"
                 >
                   {word.term}

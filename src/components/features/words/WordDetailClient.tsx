@@ -214,6 +214,7 @@ export function WordDetailClient({ initialData, linkedWords = {}, relatedWords =
                   {linkedWords[s] ? (
                     <Link
                       href={`/words/${linkedWords[s]}`}
+                      prefetch={false}
                       className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-green-50 text-green-700 border border-green-200 hover:bg-green-100 hover:border-green-300 transition-all shadow-sm group"
                     >
                       <span className="font-medium">{s}</span>
@@ -288,7 +289,7 @@ export function WordDetailClient({ initialData, linkedWords = {}, relatedWords =
             <ul className="flex flex-wrap gap-1.5 list-none m-0 p-0">
               {relatedWords.map((w) => (
                 <li key={w.slug}>
-                  <Link href={`/words/${w.slug}`} className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-white text-slate-700 text-sm border border-slate-200 hover:border-blue-300 hover:text-blue-600 hover:shadow-md transition-all shadow-sm group">
+                  <Link href={`/words/${w.slug}`} prefetch={false} className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-white text-slate-700 text-sm border border-slate-200 hover:border-blue-300 hover:text-blue-600 hover:shadow-md transition-all shadow-sm group">
                     <span className="font-medium">{w.term}</span>
                     <ArrowUpRight size={12} className="text-slate-400 group-hover:text-blue-500 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
                   </Link>
