@@ -40,6 +40,7 @@ export function CookieConsent() {
           当サイトでは、サービスの向上のためにCookieを使用しています。サイトの利用を続けることで、Cookieの使用に同意したものとみなします。詳しくは
           <Link
             href="/privacy"
+            prefetch={false}
             className="text-blue-600 underline hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
           >
             プライバシーポリシー

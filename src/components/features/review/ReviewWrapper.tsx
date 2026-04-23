@@ -28,10 +28,11 @@ export default function ReviewWrapper({ allWords }: Props) {
           <header className="flex flex-col gap-3 text-center w-full items-center relative">
             <Link 
               href="/favorites" 
+              prefetch={false}
               className="group absolute right-0 -top-4 inline-flex items-center justify-center gap-1.5 h-10 px-5 bg-white border border-gray-200 rounded-full text-slate-600 text-[15px] font-semibold no-underline transition-all duration-200 shadow-sm select-none z-10 hover:bg-gray-50 hover:border-gray-300 hover:text-slate-900 hover:-translate-y-px hover:shadow-md active:translate-y-0 active:shadow-sm"
             >
               <ChevronLeft size={18} className="transition-transform group-hover:-translate-x-0.5 text-slate-400 group-hover:text-slate-600" />
-              お気に入りへ戻る
+              お気に入り
             </Link>
             <h1 className="text-[28px] leading-[1.3] text-slate-900 font-bold mt-12 sm:text-[32px]">復習モード</h1>
           </header>
@@ -45,8 +46,8 @@ export default function ReviewWrapper({ allWords }: Props) {
               お気に入りに登録してから復習モードをご利用ください。
             </p>
             <div className="mt-8">
-              <Link href="/" className="inline-flex items-center justify-center gap-2 px-4 py-2 min-h-[36px] bg-blue-50 text-blue-700 border-2 border-blue-600 rounded-lg font-bold text-sm tracking-wide no-underline transition-all duration-200 hover:bg-blue-100 hover:-translate-y-0.5 active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500">
-                単語を探す
+              <Link href="/" prefetch={false} className="inline-flex items-center justify-center gap-2 px-4 py-2 min-h-[36px] bg-blue-50 text-blue-700 border-2 border-blue-600 rounded-lg font-bold text-sm tracking-wide no-underline transition-all duration-200 hover:bg-blue-100 hover:-translate-y-0.5 active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500">
+                <span className="inline-flex items-center">単語を探す</span>
               </Link>
             </div>
           </div>

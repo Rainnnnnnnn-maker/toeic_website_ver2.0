@@ -17,30 +17,35 @@ export function Footer() {
         <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs text-black/60 dark:text-white/60">
           <Link
             href="/"
+            prefetch={false}
             className="underline underline-offset-4 hover:text-black/80 dark:hover:text-white/80"
           >
             トップ
           </Link>
           <Link
             href="/about"
+            prefetch={false}
             className="underline underline-offset-4 hover:text-black/80 dark:hover:text-white/80"
           >
             当サイトについて
           </Link>
           <Link
             href="/privacy"
+            prefetch={false}
             className="underline underline-offset-4 hover:text-black/80 dark:hover:text-white/80"
           >
             プライバシーポリシー
           </Link>
           <Link
             href="/terms"
+            prefetch={false}
             className="underline underline-offset-4 hover:text-black/80 dark:hover:text-white/80"
           >
             利用規約
           </Link>
           <Link
             href="/contact"
+            prefetch={false}
             className="underline underline-offset-4 hover:text-black/80 dark:hover:text-white/80"
           >
             お問い合わせ

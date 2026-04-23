@@ -164,10 +164,10 @@ export default async function Home() {
             </p>
           </div>
           <div className="flex gap-4 items-center mt-2 flex-wrap justify-end sm:justify-start">
-            <Link href="/study" className="inline-flex items-center justify-center gap-2 px-4 py-2 min-h-[36px] bg-blue-50 text-blue-700 border-2 border-blue-600 rounded-lg font-bold text-sm tracking-wide no-underline transition-all duration-200 hover:bg-blue-100 hover:-translate-y-0.5 active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500">
+            <Link href="/study" prefetch={false} className="inline-flex items-center justify-center gap-2 px-4 py-2 min-h-[36px] bg-blue-50 text-blue-700 border-2 border-blue-600 rounded-lg font-bold text-sm tracking-wide no-underline transition-all duration-200 hover:bg-blue-100 hover:-translate-y-0.5 active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500">
               <span className="inline-flex items-center">学習モード</span>
             </Link>
-            <Link href="/favorites" className="inline-flex items-center justify-center gap-2 px-4 py-2 min-h-[36px] bg-amber-50 text-amber-700 border-2 border-amber-500 rounded-lg font-bold text-sm tracking-wide no-underline transition-all duration-200 hover:bg-amber-100 hover:-translate-y-0.5 active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-amber-500">
+            <Link href="/favorites" prefetch={false} className="inline-flex items-center justify-center gap-2 px-4 py-2 min-h-[36px] bg-amber-50 text-amber-700 border-2 border-amber-500 rounded-lg font-bold text-sm tracking-wide no-underline transition-all duration-200 hover:bg-amber-100 hover:-translate-y-0.5 active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-amber-500">
               <span className="inline-flex items-center">お気に入り</span>
             </Link>
           </div>
@@ -198,7 +198,7 @@ export default async function Home() {
         </section>
 
         <div className="flex justify-center">
-          <Link href="/words" className="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-800 text-white rounded-lg font-semibold text-sm hover:bg-slate-900 transition-colors no-underline">
+          <Link href="/words" prefetch={false} className="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-800 text-white rounded-lg font-semibold text-sm hover:bg-slate-900 transition-colors no-underline">
             全単語一覧 →
           </Link>
         </div>
@@ -299,8 +299,8 @@ export default async function Home() {
             </p>
             <p className="text-[15px] leading-[1.8] text-slate-600">
               本サイトの「TOEIC重要単語」リストでは、そうした最新の出題傾向を踏まえた頻出語彙を厳選。
-              例えば、<Link href="/words/accommodate" className="text-blue-600 font-bold hover:underline">accommodate</Link>（対応する）や<Link href="/words/negotiate" className="text-blue-600 font-bold hover:underline">negotiate</Link>（交渉する）、
-              <Link href="/words/implement" className="text-blue-600 font-bold hover:underline">implement</Link>（実施する）など、スコアアップに直結する重要語を、
+              例えば、<Link href="/words/accommodate" prefetch={false} className="text-blue-600 font-bold hover:underline">accommodate</Link>（対応する）や<Link href="/words/negotiate" prefetch={false} className="text-blue-600 font-bold hover:underline">negotiate</Link>（交渉する）、
+              <Link href="/words/implement" prefetch={false} className="text-blue-600 font-bold hover:underline">implement</Link>（実施する）など、スコアアップに直結する重要語を、
               実践的な例文とともにわかりやすく学べます。
               古い単語帳だけでは補いにくい、今のTOEICに合ったビジネス英語を、このサイトで効率よく身につけましょう。
             </p>
