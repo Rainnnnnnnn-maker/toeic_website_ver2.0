@@ -83,6 +83,33 @@ export default function TodayWordsListenClient({ words }: Props) {
     };
   }, []);
 
+  // Prefetch detail for the current word and the next one so the example area
+  // shows content before the user presses play, and step transitions don't stall.
+  useEffect(() => {
+    const targets = [words[currentIndex]?.slug, words[currentIndex + 1]?.slug].filter(
+      (s): s is string => typeof s === "string" && !wordDetailsCacheRef.current[s]
+    );
+    if (targets.length === 0) return;
+
+    let cancelled = false;
+    void (async () => {
+      for (const slug of targets) {
+        try {
+          const detail = await fetchWordDetail(slug);
+          if (cancelled || !detail) continue;
+          wordDetailsCacheRef.current[slug] = detail;
+          setWordDetailsCache(prev => (prev[slug] ? prev : { ...prev, [slug]: detail }));
+        } catch {
+          // prefetch errors are non-fatal; the play loop will retry on demand
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [words, currentIndex]);
+
   const advance = useCallback(() => {
     const next = NEXT_STEP[stepRef.current];
     if (next) {
