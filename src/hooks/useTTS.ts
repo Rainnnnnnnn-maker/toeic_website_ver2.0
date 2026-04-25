@@ -121,5 +121,6 @@ export function useTTS() {
         ...state,
         handlePlayAudio,
         handlePlaySentenceAudio,
+        fetchTTS,
     };
 }
