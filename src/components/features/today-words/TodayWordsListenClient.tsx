@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useMemo, useEffect, useRef, useCallback } from "react";
-import Link from "next/link";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { ArrowLeft, Play, Pause, SkipForward, SkipBack, Loader2 } from "lucide-react";
 import { Word } from "@/data/words";
 import { fetchWordDetail } from "@/actions/word";
@@ -9,44 +9,51 @@ import { WordDetails } from "@/types/word";
 import { useTTS } from "@/hooks/useTTS";
 
 type Props = {
-  allWords: Word[];
+  words: Word[];
 };
 
 type PlayStep = "word" | "example_en" | "example_ja";
 
-function hashString(value: string): number {
-  let hash = 2166136261;
-  for (let i = 0; i < value.length; i += 1) {
-    hash ^= value.charCodeAt(i);
-    hash = Math.imul(hash, 16777619);
+const NEXT_STEP: Record<PlayStep, PlayStep | null> = {
+  word: "example_en",
+  example_en: "example_ja",
+  example_ja: null,
+};
+
+function pickExample(detail: WordDetails): { en: string; ja: string } {
+  if (detail.toeicExamples && detail.toeicExamples.length > 0) {
+    return { en: detail.toeicExamples[0].english, ja: detail.toeicExamples[0].japanese };
   }
-  return hash >>> 0;
+  const fallback = detail.meanings[0]?.detailedMeanings[0];
+  if (fallback) {
+    return { en: fallback.example, ja: fallback.exampleJapanese };
+  }
+  return { en: "", ja: "" };
 }
 
-export default function TodayWordsListenClient({ allWords }: Props) {
+export default function TodayWordsListenClient({ words }: Props) {
+  const router = useRouter();
   const { fetchTTS } = useTTS();
+
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentStep, setCurrentStep] = useState<PlayStep>("word");
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [currentStep, setCurrentStep] = useState<PlayStep>("word");
+  const [error, setError] = useState<string | null>(null);
   const [wordDetailsCache, setWordDetailsCache] = useState<Record<string, WordDetails>>({});
+
   const wordDetailsCacheRef = useRef<Record<string, WordDetails>>({});
-  
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const indexRef = useRef(0);
+  const stepRef = useRef<PlayStep>("word");
+  const playingRef = useRef(false);
 
-  const todayWords = useMemo(() => {
-    if (allWords.length === 0) return [];
-    const todayKey = new Date().toISOString().slice(0, 10);
-    const ordered = [...allWords].sort((a, b) => {
-      const aHash = hashString(`${todayKey}:${a.slug}`);
-      const bHash = hashString(`${todayKey}:${b.slug}`);
-      if (aHash === bHash) return a.slug.localeCompare(b.slug);
-      return aHash - bHash;
-    });
-    return ordered.slice(0, Math.min(5, ordered.length));
-  }, [allWords]);
+  const currentWord = words[currentIndex];
+  const isCompleted = !isPlaying && currentIndex === words.length - 1 && currentStep === "example_ja";
 
-  const currentWord = todayWords[currentIndex];
+  useEffect(() => { indexRef.current = currentIndex; }, [currentIndex]);
+  useEffect(() => { stepRef.current = currentStep; }, [currentStep]);
+  useEffect(() => { playingRef.current = isPlaying; }, [isPlaying]);
 
   const getWordDetailData = useCallback(async (slug: string) => {
     if (wordDetailsCacheRef.current[slug]) return wordDetailsCacheRef.current[slug];
@@ -60,162 +67,183 @@ export default function TodayWordsListenClient({ allWords }: Props) {
 
   const stopAudio = useCallback(() => {
     if (audioRef.current) {
+      audioRef.current.onended = null;
       audioRef.current.pause();
-      audioRef.current.currentTime = 0;
       audioRef.current = null;
     }
   }, []);
 
-  const playNext = useCallback(() => {
-    if (currentIndex < todayWords.length - 1) {
-      setCurrentIndex(prev => prev + 1);
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.onended = null;
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
+
+  const advance = useCallback(() => {
+    const next = NEXT_STEP[stepRef.current];
+    if (next) {
+      setCurrentStep(next);
+      return;
+    }
+    if (indexRef.current < words.length - 1) {
+      setCurrentIndex(i => i + 1);
       setCurrentStep("word");
     } else {
       setIsPlaying(false);
-      setCurrentIndex(0);
-      setCurrentStep("word");
+      setCurrentStep("example_ja");
     }
-  }, [currentIndex, todayWords.length]);
-
-  const playPrev = useCallback(() => {
-    if (currentIndex > 0) {
-      setCurrentIndex(prev => prev - 1);
-      setCurrentStep("word");
-    }
-  }, [currentIndex]);
-
-  const togglePlay = useCallback(() => {
-    setIsPlaying(prev => !prev);
-  }, []);
+  }, [words.length]);
 
   useEffect(() => {
-    let isCancelled = false;
+    if (!isPlaying || !currentWord) {
+      stopAudio();
+      return;
+    }
 
-    const playAudioSequence = async () => {
-      if (!isPlaying || !currentWord) return;
+    let cancelled = false;
+    const stepAtStart = currentStep;
+    const indexAtStart = currentIndex;
 
+    const run = async () => {
       setIsLoading(true);
+      setError(null);
       stopAudio();
 
       try {
         const detail = await getWordDetailData(currentWord.slug);
-        if (isCancelled) return;
+        if (cancelled) return;
         if (!detail) {
-          setIsLoading(false);
-          playNext();
+          advance();
           return;
         }
 
-        let exampleEn = "";
-        let exampleJa = "";
-
-        if (detail.toeicExamples && detail.toeicExamples.length > 0) {
-          exampleEn = detail.toeicExamples[0].english;
-          exampleJa = detail.toeicExamples[0].japanese;
-        } else if (detail.meanings[0]?.detailedMeanings[0]) {
-          exampleEn = detail.meanings[0].detailedMeanings[0].example;
-          exampleJa = detail.meanings[0].detailedMeanings[0].exampleJapanese;
-        }
+        const { en, ja } = pickExample(detail);
 
         let textToPlay = "";
-        let language = "en";
-
-        if (currentStep === "word") {
+        let language: "en" | "ja" = "en";
+        if (stepAtStart === "word") {
           textToPlay = detail.word;
           language = "en";
-        } else if (currentStep === "example_en") {
-          textToPlay = exampleEn;
+        } else if (stepAtStart === "example_en") {
+          textToPlay = en;
           language = "en";
-        } else if (currentStep === "example_ja") {
-          textToPlay = exampleJa;
+        } else {
+          textToPlay = ja;
           language = "ja";
         }
 
         if (!textToPlay) {
-          // Skip this step if text is missing
-          if (currentStep === "word") setCurrentStep("example_en");
-          else if (currentStep === "example_en") setCurrentStep("example_ja");
-          else playNext();
+          advance();
           return;
         }
 
         const audioUrl = await fetchTTS(textToPlay, language, detail.word);
-        if (isCancelled) return;
+        if (cancelled) return;
 
         const audio = new Audio(audioUrl);
         audioRef.current = audio;
 
         audio.onended = () => {
-          if (isCancelled) return;
-          if (currentStep === "word") {
-            setCurrentStep("example_en");
-          } else if (currentStep === "example_en") {
-            setCurrentStep("example_ja");
-          } else {
-            playNext();
-          }
+          if (cancelled || audioRef.current !== audio) return;
+          if (stepRef.current !== stepAtStart || indexRef.current !== indexAtStart) return;
+          advance();
         };
 
         await audio.play();
-        if (!isCancelled) {
-          setIsLoading(false);
-        }
-
-      } catch (error) {
-        if (!isCancelled) {
-          console.error("Audio playback failed", error);
-          setIsLoading(false);
-          setIsPlaying(false);
-        }
+        if (!cancelled) setIsLoading(false);
+      } catch (e) {
+        if (cancelled) return;
+        setIsLoading(false);
+        setIsPlaying(false);
+        const message = e instanceof Error && e.message.includes("429")
+          ? "リクエストが多すぎます。しばらくしてからもう一度お試しください。"
+          : "音声の再生に失敗しました。時間をおいて再度お試しください。";
+        setError(message);
+        console.error("Audio playback failed", e);
       }
     };
 
-    if (isPlaying) {
-      playAudioSequence();
-    } else {
-      stopAudio();
-    }
-    
+    void run();
+
     return () => {
-      isCancelled = true;
+      cancelled = true;
       stopAudio();
     };
-  }, [isPlaying, currentIndex, currentStep, currentWord, fetchTTS, playNext, stopAudio, getWordDetailData]);
+  }, [isPlaying, currentIndex, currentStep, currentWord, fetchTTS, advance, stopAudio, getWordDetailData]);
 
-  if (!currentWord) return null;
+  const handleTogglePlay = useCallback(() => {
+    setError(null);
+    if (isCompleted) {
+      setCurrentIndex(0);
+      setCurrentStep("word");
+      setIsPlaying(true);
+      return;
+    }
+    setIsPlaying(p => !p);
+  }, [isCompleted]);
+
+  const handlePrev = useCallback(() => {
+    setError(null);
+    if (currentIndex > 0) {
+      setCurrentIndex(i => i - 1);
+      setCurrentStep("word");
+    }
+  }, [currentIndex]);
+
+  const handleNext = useCallback(() => {
+    setError(null);
+    if (currentIndex < words.length - 1) {
+      setCurrentIndex(i => i + 1);
+      setCurrentStep("word");
+    } else {
+      setIsPlaying(false);
+      setCurrentStep("example_ja");
+    }
+  }, [currentIndex, words.length]);
+
+  const handleBack = useCallback(() => {
+    if (typeof window !== "undefined" && window.history.length > 1) {
+      router.back();
+    } else {
+      router.push("/");
+    }
+  }, [router]);
+
+  if (!currentWord) {
+    return (
+      <div className="flex flex-col gap-6 max-w-xl mx-auto w-full text-center py-20">
+        <p className="text-slate-500">表示できる単語がありません。</p>
+      </div>
+    );
+  }
 
   const currentDetail = wordDetailsCache[currentWord.slug];
-  
-  let currentExampleEn = "";
-  let currentExampleJa = "";
-  
-  if (currentDetail) {
-    if (currentDetail.toeicExamples && currentDetail.toeicExamples.length > 0) {
-      currentExampleEn = currentDetail.toeicExamples[0].english;
-      currentExampleJa = currentDetail.toeicExamples[0].japanese;
-    } else if (currentDetail.meanings[0]?.detailedMeanings[0]) {
-      currentExampleEn = currentDetail.meanings[0].detailedMeanings[0].example;
-      currentExampleJa = currentDetail.meanings[0].detailedMeanings[0].exampleJapanese;
-    }
-  }
+  const { en: currentExampleEn, ja: currentExampleJa } = currentDetail
+    ? pickExample(currentDetail)
+    : { en: "", ja: "" };
 
   return (
     <div className="flex flex-col gap-6 max-w-xl mx-auto w-full">
       <div className="flex items-center justify-between">
-        <Link 
-          href="/"
+        <button
+          type="button"
+          onClick={handleBack}
           className="inline-flex items-center justify-center p-2 rounded-full hover:bg-slate-100 text-slate-600 transition-colors"
           aria-label="戻る"
         >
           <ArrowLeft size={20} />
-        </Link>
+        </button>
         <h1 className="text-lg font-bold text-slate-800">今日の単語 聞き流し</h1>
-        <div className="w-9" /> {/* Spacer for centering */}
+        <div className="w-9" />
       </div>
 
       <div className="bg-white rounded-xl border border-slate-200 p-6 sm:p-8 shadow-sm flex flex-col items-center text-center gap-6">
         <div className="text-sm font-medium text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
-          {currentIndex + 1} / {todayWords.length}
+          {currentIndex + 1} / {words.length}
         </div>
 
         <div className="flex flex-col gap-2 min-h-[100px] justify-center items-center w-full">
@@ -244,9 +272,22 @@ export default function TodayWordsListenClient({ allWords }: Props) {
           )}
         </div>
 
+        {error && (
+          <p role="alert" className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-md px-3 py-2 w-full">
+            {error}
+          </p>
+        )}
+
+        {isCompleted && !error && (
+          <p className="text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-md px-3 py-2 w-full">
+            5単語の再生が完了しました。再生ボタンでもう一度聞けます。
+          </p>
+        )}
+
         <div className="flex items-center justify-center gap-6 mt-4">
           <button
-            onClick={playPrev}
+            type="button"
+            onClick={handlePrev}
             disabled={currentIndex === 0}
             className="p-3 rounded-full text-slate-600 hover:bg-slate-100 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
             aria-label="前の単語"
@@ -255,9 +296,9 @@ export default function TodayWordsListenClient({ allWords }: Props) {
           </button>
 
           <button
-            onClick={togglePlay}
-            className="w-16 h-16 rounded-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center shadow-md transition-transform hover:scale-105 active:scale-95 disabled:opacity-70"
-            disabled={isLoading && !isPlaying}
+            type="button"
+            onClick={handleTogglePlay}
+            className="w-16 h-16 rounded-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center shadow-md transition-transform hover:scale-105 active:scale-95"
             aria-label={isPlaying ? "一時停止" : "再生"}
           >
             {isLoading ? (
@@ -270,8 +311,9 @@ export default function TodayWordsListenClient({ allWords }: Props) {
           </button>
 
           <button
-            onClick={playNext}
-            disabled={currentIndex === todayWords.length - 1 && !isPlaying}
+            type="button"
+            onClick={handleNext}
+            disabled={currentIndex === words.length - 1}
             className="p-3 rounded-full text-slate-600 hover:bg-slate-100 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
             aria-label="次の単語"
           >

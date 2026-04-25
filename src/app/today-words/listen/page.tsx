@@ -1,4 +1,4 @@
-import { getAllWords } from "@/data/words";
+import { getTodayRecommendedWords } from "@/data/words";
 import TodayWordsListenClient from "@/components/features/today-words/TodayWordsListenClient";
 import { Suspense } from "react";
 
@@ -8,12 +8,12 @@ export const metadata = {
 };
 
 export default async function TodayWordsListenPage() {
-  const allWords = await getAllWords();
+  const todayWords = await getTodayRecommendedWords(5);
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-2xl">
       <Suspense fallback={<div className="flex justify-center py-20"><div className="animate-pulse w-full max-w-xl h-[400px] bg-white rounded-xl border border-slate-200" /></div>}>
-        <TodayWordsListenClient allWords={allWords} />
+        <TodayWordsListenClient words={todayWords} />
       </Suspense>
     </div>
   );

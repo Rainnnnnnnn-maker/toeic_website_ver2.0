@@ -54,7 +54,9 @@ export function useTTS() {
             body: JSON.stringify({ text, language, wordSlug }),
         });
 
-        if (!response.ok) throw new Error("Failed to synthesize speech");
+        if (!response.ok) {
+            throw new Error(`Failed to synthesize speech (status: ${response.status})`);
+        }
 
         const json = (await response.json()) as { audioContent?: string };
         if (!json.audioContent) throw new Error("Missing audio content");

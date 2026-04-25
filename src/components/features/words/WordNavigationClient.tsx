@@ -10,9 +10,11 @@ import { ChevronLeft } from "lucide-react";
 
 export default function WordNavigationClient({
   allWords,
+  todayWords,
   currentSlug,
 }: {
   allWords: Word[];
+  todayWords: Word[];
   currentSlug: string;
 }) {
   const searchParams = useSearchParams();
@@ -23,25 +25,6 @@ export default function WordNavigationClient({
   const isFromReview = from === "review";
   const { favorites } = useFavorites();
   const { setShareTarget } = useShareTarget();
-
-  const todayWords = useMemo(() => {
-    const todayKey = new Date().toISOString().slice(0, 10);
-    const hashString = (value: string) => {
-      let hash = 2166136261;
-      for (let i = 0; i < value.length; i += 1) {
-        hash ^= value.charCodeAt(i);
-        hash = Math.imul(hash, 16777619);
-      }
-      return hash >>> 0;
-    };
-    const ordered = [...allWords].sort((a, b) => {
-      const aHash = hashString(`${todayKey}:${a.slug}`);
-      const bHash = hashString(`${todayKey}:${b.slug}`);
-      if (aHash === bHash) return a.slug.localeCompare(b.slug);
-      return aHash - bHash;
-    });
-    return ordered.slice(0, Math.min(5, ordered.length));
-  }, [allWords]);
 
   const navigationList = useMemo(() => {
     if (isFromFavorites || isFromReview) {

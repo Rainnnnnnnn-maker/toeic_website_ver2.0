@@ -2,7 +2,7 @@ import Link from "next/link";
 import Script from "next/script";
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { getImportantWords, getMediumWords, getHighWords } from "@/data/words";
+import { getImportantWords, getMediumWords, getHighWords, getTodayRecommendedWords } from "@/data/words";
 import WordsListClient from "@/components/features/words/WordsListClient";
 import { SnsShareButtons } from "@/components/features/sns/SnsShareButtons";
 import TodayRecommendedWordsClient from "@/components/features/words/TodayRecommendedWordsClient";
@@ -23,6 +23,7 @@ export default async function Home() {
   const importantWords = await getImportantWords();
   const mediumWords = await getMediumWords();
   const highWords = await getHighWords();
+  const todayWords = await getTodayRecommendedWords(5);
 
   // WebSite構造化データ
   const websiteJsonLd = {
@@ -173,7 +174,7 @@ export default async function Home() {
           </div>
         </header>
         <Suspense fallback={<section className="bg-white/90 border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-[0_1px_2px_rgba(0,0,0,0.05)] animate-pulse h-[180px]" />}>
-          <TodayRecommendedWordsClient words={[...importantWords, ...mediumWords, ...highWords]} variant="preview" />
+          <TodayRecommendedWordsClient words={todayWords} variant="preview" />
         </Suspense>
         <WordsListClient importantWords={importantWords} mediumWords={mediumWords} highWords={highWords} />
 
