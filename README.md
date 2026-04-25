@@ -20,6 +20,11 @@ A comprehensive web application for learning essential TOEIC vocabulary, featuri
   - A compact “今日おすすめの5単語” section is shown on the TOP page.
   - All 5 words are displayed directly in the TOP section without a separate “view all” button.
   - Picks are determined by UTC date key + word slug hash, so the same day yields the same 5 words.
+  - Selection logic lives server-side in `getTodayRecommendedWords()` as a Cache Component (`'use cache'` + `cacheLife('hours')`), so TOP / `/today-words` / `/today-words/listen` / word-detail navigation always show the same 5 words.
+- **Listen-and-Repeat Mode (Beta)** (`/today-words/listen`):
+  - Hands-free auto-play of today's 5 words: each word is read out as **word → English example → Japanese example**, then advances to the next word.
+  - Play / Pause / Skip-Prev / Skip-Next controls. Completion message is shown after the 5th word; pressing play again restarts from the top.
+  - Internally, audio sequencing uses a ref-based state machine to guard against `onended` race conditions, and prefetches the current and next word's `WordDetails` for instant example previews.
 - **Favorites**: Save difficult words for later review (persisted in local storage via `FavoritesContext`).
 - **Social Share**: Share word details via Twitter, Facebook, and LINE (`react-share`), with GA4 event tracking.
 - **PWA Ready**: Installable on mobile and desktop via `manifest.ts`.
@@ -146,8 +151,13 @@ Generates audio for words or sentences.
 - **Headers**:
   - `Content-Type: application/json`
   - `X-App-Source: toeic-client`
-- **Body**: `{ "text": "word or sentence", "language": "en" | "ja" }`
+- **Body**: `{ "text": "word or sentence", "language": "en" | "ja", "wordSlug": "<slug>" }`
+  - `wordSlug` is **required** for multi-word text or any Japanese text.
 - **Voices**: `en-US-Wavenet-C` (English), `ja-JP-Neural2-B` (Japanese).
+- **Allowlist**:
+  - Single English words must exist in the curated vocabulary list.
+  - Example sentences must exactly match (after whitespace normalization) one of the cached `WordDetails.toeicExamples` or `meanings[].detailedMeanings[].example` entries for the given `wordSlug`. This blocks Referer-spoofing attacks from synthesizing arbitrary text against the Google Cloud TTS quota.
+- **Rate limit**: 30 req/min per IP via Upstash Ratelimit (sliding window). Cached results bypass the counter.
 
 ### Sitemap
 
@@ -158,9 +168,9 @@ Returns `sitemap.xml` containing all static pages and all word detail URLs.
 
 ## 📂 Project Structure
 
-- `src/app`: Next.js App Router pages (e.g., `/`, `/study`, `/favorites`, `/review`, `/today-words`, `/words`, `/words/[word]`, and static `/about`, `/privacy`, `/terms`, `/contact`) and API routes.
+- `src/app`: Next.js App Router pages (e.g., `/`, `/study`, `/favorites`, `/review`, `/today-words`, `/today-words/listen`, `/words`, `/words/[word]`, and static `/about`, `/privacy`, `/terms`, `/contact`) and API routes.
 - `src/actions`: Server Actions (e.g., `fetchWordDetail` wrapping the cached `getWordDetail`).
-- `src/components`: React components organized by feature (`features/words`, `favorites`, `review`, `study`, `sns`) and common UI (`common/` — `Footer`, `TabNavigation`, `CookieConsent`).
+- `src/components`: React components organized by feature (`features/words`, `features/today-words`, `favorites`, `review`, `study`, `sns`) and common UI (`common/` — `Footer`, `TabNavigation`, `CookieConsent`).
 - `src/lib`: Utility functions and API clients (Upstash Redis, Redis-backed word cache, JSON-LD, OG utils).
 - `src/types`: TypeScript type definitions (e.g., `WordDetails`).
 - `src/data`: Data fetching logic — `words.ts` (Local vs Blob switching, `getAllWords` / `getTodayRecommendedWords` / `getRelatedWords`) and `word-detail.ts` (multi-layer cached `getWordDetail`, Gemini generation).
