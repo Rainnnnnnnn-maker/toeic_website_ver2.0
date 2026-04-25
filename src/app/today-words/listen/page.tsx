@@ -1,5 +1,6 @@
 import { getAllWords } from "@/data/words";
 import TodayWordsListenClient from "@/components/features/today-words/TodayWordsListenClient";
+import { Suspense } from "react";
 
 export const metadata = {
   title: "今日の単語 聞き流し | TOEIC Words",
@@ -11,7 +12,9 @@ export default async function TodayWordsListenPage() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-2xl">
-      <TodayWordsListenClient allWords={allWords} />
+      <Suspense fallback={<div className="flex justify-center py-20"><div className="animate-pulse w-full max-w-xl h-[400px] bg-white rounded-xl border border-slate-200" /></div>}>
+        <TodayWordsListenClient allWords={allWords} />
+      </Suspense>
     </div>
   );
 }
