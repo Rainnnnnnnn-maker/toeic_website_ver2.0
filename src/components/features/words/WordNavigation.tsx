@@ -1,8 +1,11 @@
-import { getAllWords } from "@/data/words";
+import { getAllWords, getTodayRecommendedWords } from "@/data/words";
 import WordNavigationClient from "./WordNavigationClient";
 
 export default async function WordNavigation({ currentSlug }: { currentSlug: string }) {
-  const allWords = await getAllWords();
+  const [allWords, todayWords] = await Promise.all([
+    getAllWords(),
+    getTodayRecommendedWords(5),
+  ]);
 
-  return <WordNavigationClient allWords={allWords} currentSlug={currentSlug} />;
+  return <WordNavigationClient allWords={allWords} todayWords={todayWords} currentSlug={currentSlug} />;
 }

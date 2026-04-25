@@ -2,7 +2,40 @@ import "server-only";
 import { Ratelimit } from "@upstash/ratelimit";
 import { getRedis } from "@/lib/upstash";
 import { getWordBySlug } from "@/data/words";
+import { getWordDetails as getCachedWordDetails } from "@/lib/wordCache";
 import { createHash } from "crypto";
+
+function normalizeText(s: string): string {
+  return s.replace(/\s+/g, " ").trim();
+}
+
+async function isAllowedExampleText(
+  text: string,
+  language: "en" | "ja",
+  wordSlug: string
+): Promise<boolean> {
+  const entry = await getWordBySlug(wordSlug.trim().toLowerCase());
+  if (!entry) return false;
+
+  const detail = await getCachedWordDetails(entry.term);
+  if (!detail) return false;
+
+  const target = normalizeText(text);
+
+  for (const ex of detail.toeicExamples ?? []) {
+    if (language === "en" && normalizeText(ex.english) === target) return true;
+    if (language === "ja" && normalizeText(ex.japanese) === target) return true;
+  }
+
+  for (const meaning of detail.meanings ?? []) {
+    for (const dm of meaning.detailedMeanings ?? []) {
+      if (language === "en" && normalizeText(dm.example) === target) return true;
+      if (language === "ja" && normalizeText(dm.exampleJapanese) === target) return true;
+    }
+  }
+
+  return false;
+}
 
 let ratelimitInstance: Ratelimit | undefined;
 
@@ -10,7 +43,7 @@ function getRatelimit(): Ratelimit {
   if (ratelimitInstance) return ratelimitInstance;
   ratelimitInstance = new Ratelimit({
     redis: getRedis(),
-    limiter: Ratelimit.slidingWindow(20, "1 m"),
+    limiter: Ratelimit.slidingWindow(30, "1 m"),
     prefix: "rl:tts",
   });
   return ratelimitInstance;
@@ -72,12 +105,22 @@ export async function POST(request: Request) {
   const language = body.language === "ja" ? "ja" : "en";
   const wordSlug = typeof body.wordSlug === "string" ? body.wordSlug : undefined;
 
-  // Allowlist check: single English words (no whitespace) must exist in the vocabulary list
-  const isSingleWord = language === "en" && !/\s/.test(body.text.trim());
+  // Allowlist check: single English words (no whitespace) must exist in the vocabulary list.
+  // Multi-word text (or any Japanese text) must match a known example sentence for the wordSlug.
+  const trimmedText = body.text.trim();
+  const isSingleWord = language === "en" && !/\s/.test(trimmedText);
   if (isSingleWord) {
-    const entry = await getWordBySlug(body.text.trim().toLowerCase());
+    const entry = await getWordBySlug(trimmedText.toLowerCase());
     if (!entry) {
       return Response.json({ error: "Word not allowed" }, { status: 400 });
+    }
+  } else {
+    if (!wordSlug) {
+      return Response.json({ error: "wordSlug is required for example text" }, { status: 400 });
+    }
+    const allowed = await isAllowedExampleText(trimmedText, language, wordSlug);
+    if (!allowed) {
+      return Response.json({ error: "Example text not allowed" }, { status: 400 });
     }
   }
 

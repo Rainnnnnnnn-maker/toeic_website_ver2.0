@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { getAllWords } from "@/data/words";
+import { getTodayRecommendedWords } from "@/data/words";
 import TodayRecommendedWordsClient from "@/components/features/words/TodayRecommendedWordsClient";
 
 export const metadata: Metadata = {
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 export default async function TodayWordsPage() {
-  const allWords = await getAllWords();
+  const todayWords = await getTodayRecommendedWords(5);
 
   return (
     <div className="relative min-h-screen w-full flex justify-center py-8 px-4 bg-[radial-gradient(circle_at_top,#e0f2fe_0,#f9fafb_45%,#ffffff_100%)] sm:py-12 sm:px-6 lg:py-8 lg:px-8 lg:pb-16">
@@ -37,7 +37,7 @@ export default async function TodayWordsPage() {
         </header>
 
         <Suspense fallback={<section className="bg-white/90 border border-slate-200 rounded-2xl p-4 sm:p-6 shadow-[0_1px_2px_rgba(0,0,0,0.05)] animate-pulse h-[220px]" />}>
-          <TodayRecommendedWordsClient words={allWords} variant="full" />
+          <TodayRecommendedWordsClient words={todayWords} variant="full" />
         </Suspense>
       </main>
     </div>
