@@ -39,6 +39,55 @@ export default async function TodayWordsPage() {
         <Suspense fallback={<section className="bg-white/90 border border-slate-200 rounded-2xl p-4 sm:p-6 shadow-[0_1px_2px_rgba(0,0,0,0.05)] animate-pulse h-[220px]" />}>
           <TodayRecommendedWordsClient words={todayWords} variant="full" />
         </Suspense>
+
+        <section className="mt-10 text-sm leading-relaxed text-slate-700">
+          <h2 className="mb-3 text-base font-semibold text-slate-900">
+            「今日のおすすめ 5 単語」の使い方と仕組み
+          </h2>
+          <p className="mb-3">
+            「今日のおすすめ 5 単語」は、当サイトに収録された 1,300 語以上の TOEIC 重要単語の中から、その日 1 日固定で 5 単語を選出して表示する機能です。同じ日にアクセスすれば必ず同じ 5 語が表示されるため、「今日はこの 5 語を覚える」という日次の目標を立てやすくなります。
+          </p>
+          <h3 className="mt-4 mb-2 text-sm font-semibold text-slate-800">
+            選出ロジック
+          </h3>
+          <p className="mb-3">
+            UTC 日付キーと単語スラッグのハッシュをもとに、サーバー側で 5 語を決定論的に選出しています（Cache Component 化）。これにより、トップページ・本ページ・聞き流しモードのいずれからアクセスしても、同じ 5 単語が表示されます。
+          </p>
+          <h3 className="mt-4 mb-2 text-sm font-semibold text-slate-800">
+            おすすめの活用方法
+          </h3>
+          <ul className="mb-3 list-inside list-disc space-y-1">
+            <li>
+              <strong>朝のスキマ時間</strong>：通勤・通学中に 5 単語の意味と例文を確認
+            </li>
+            <li>
+              <strong>昼休み</strong>：聞き流しモードで「単語 → 英文例 → 日本語訳」の順に音声を聴く
+            </li>
+            <li>
+              <strong>夜の復習</strong>：覚えにくかった単語を「お気に入り」に追加し、後日復習モードで再確認
+            </li>
+            <li>
+              <strong>翌日</strong>：前日の 5 単語を思い出してから、新しい 5 単語に進む
+            </li>
+          </ul>
+          <h3 className="mt-4 mb-2 text-sm font-semibold text-slate-800">
+            なぜ「1 日 5 単語」なのか
+          </h3>
+          <p className="mb-3">
+            認知心理学の研究では、新規情報は 1 セッションあたり 5〜9 個までが短期記憶の限界とされています（マジカルナンバー 7±2）。1 日 5 単語であれば、忘却曲線に沿った復習サイクル（翌日・3 日後・1 週間後）を組み合わせても無理なく継続でき、長期記憶への定着率を最大化できます。
+          </p>
+          <p className="text-xs text-slate-500">
+            復習タイミングの詳細は{" "}
+            <Link href="/guide/forgetting-curve" prefetch={false} className="text-blue-600 underline">
+              「忘却曲線を活用した暗記法」
+            </Link>
+            、毎日の学習習慣の組み立て方は{" "}
+            <Link href="/guide/last-week-plan" prefetch={false} className="text-blue-600 underline">
+              「直前 1 週間で 50 点伸ばす単語復習プラン」
+            </Link>{" "}
+            をご参照ください。
+          </p>
+        </section>
       </main>
     </div>
   );

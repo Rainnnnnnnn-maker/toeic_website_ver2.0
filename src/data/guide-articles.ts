@@ -578,6 +578,552 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     ],
     relatedSlugs: ["toeic-vocab-by-score", "forgetting-curve"],
   },
+  {
+    slug: "exam-day-essentials",
+    title: "TOEIC 試験当日の持ち物・流れ・時間配分まとめ",
+    description:
+      "TOEIC L&R 試験当日に必要な持ち物、午前／午後それぞれの当日スケジュール、Listening 45 分・Reading 75 分の時間配分の目安、会場での注意事項を整理しました。初受験の方も安心して臨めるよう網羅的に解説します。",
+    category: "試験対策",
+    publishedAt: "2026-04-26",
+    updatedAt: "2026-04-26",
+    estimatedReadingMin: 6,
+    blocks: [
+      {
+        type: "p",
+        text: "TOEIC L&R は、Listening 45 分・Reading 75 分・全 200 問という高密度な試験です。本番で実力を発揮するためには、当日の持ち物・流れ・時間配分を事前に頭に入れておくことが欠かせません。本記事では初受験の方にも分かるよう、試験当日の流れを時系列でまとめます。",
+      },
+      { type: "h2", text: "必須の持ち物" },
+      {
+        type: "ul",
+        items: [
+          "受験票（事前にプリントアウトまたは表示準備）",
+          "本人確認書類（運転免許証・パスポート・学生証など写真付き身分証）",
+          "HB または B の鉛筆（複数本、シャープペンシル不可）",
+          "消しゴム（鉛筆の汚れがつきにくいもの）",
+          "腕時計（アナログ推奨、スマートウォッチ・音の出るもの不可）",
+          "マスク（会場ルールに準拠）",
+        ],
+      },
+      {
+        type: "callout",
+        tone: "warning",
+        text: "シャープペンシル、ボールペン、シャープペン型消しゴム、デジタル腕時計の一部、スマートウォッチは使用不可です。腕時計は会場の壁時計が見えない席に当たることもあるため、必ず持参してください。",
+      },
+      { type: "h2", text: "持っていくと安心なもの" },
+      {
+        type: "ul",
+        items: [
+          "鉛筆削り（小型）",
+          "ハンカチ・ティッシュ",
+          "上着（会場の冷房・暖房調整用）",
+          "事前に見直したい単語リスト（試験開始までの復習用）",
+          "飲み物・軽食（試験開始前まで／会場ルールに準拠）",
+        ],
+      },
+      { type: "h2", text: "当日のスケジュール（午前受験の例）" },
+      {
+        type: "table",
+        headers: ["時刻", "内容"],
+        rows: [
+          ["9:25 まで", "受付完了（遅刻すると入室不可）"],
+          ["9:25〜9:55", "試験の説明、音テスト、解答用紙記入"],
+          ["9:55〜10:00", "問題冊子配布、最終確認"],
+          ["10:00〜10:45", "Listening セクション（45 分・100 問）"],
+          ["10:45〜12:00", "Reading セクション（75 分・100 問）"],
+          ["12:00〜12:15", "回収、退室"],
+        ],
+      },
+      {
+        type: "p",
+        text: "午後受験の場合は、午後 2 時頃に開始するスケジュールが一般的です。いずれの時間帯も、開始 30 分前には会場入りすることをおすすめします。",
+      },
+      { type: "h2", text: "Reading セクションの時間配分の目安" },
+      {
+        type: "p",
+        text: "Reading 75 分・100 問は、1 問あたり 45 秒の計算です。パートごとの所要時間目安は以下の通りです。これを意識して練習しないと、Part 7 で時間切れになる可能性があります。",
+      },
+      {
+        type: "table",
+        headers: ["パート", "問題数", "目安時間", "1 問あたり"],
+        rows: [
+          ["Part 5（短文穴埋め）", "30 問", "10 分", "20 秒"],
+          ["Part 6（長文穴埋め）", "16 問", "10 分", "37 秒"],
+          ["Part 7（読解）", "54 問", "55 分", "61 秒"],
+        ],
+      },
+      {
+        type: "callout",
+        tone: "tip",
+        text: "Part 5 を 10 分で抜けるための鍵は語彙力です。当サイトの「学習モード」で頻出語を瞬時に判断できる状態にしておくと、Reading 全体の時間に余裕が生まれます。",
+      },
+      { type: "h2", text: "会場での注意事項" },
+      {
+        type: "ol",
+        items: [
+          "試験中、Listening と Reading の間に休憩はありません",
+          "Listening 中に Reading の問題を先読みするのは禁止",
+          "解答用紙への記入は鉛筆のマークで、はみ出さないように",
+          "途中退室は不可（体調不良時のみ申し出る）",
+          "携帯電話は完全電源 OFF（マナーモード不可）",
+        ],
+      },
+      { type: "h2", text: "試験前 30 分でやるべきこと" },
+      {
+        type: "ol",
+        items: [
+          "事前準備した単語リストで頻出語の最終確認",
+          "深呼吸でリラックス（焦りはケアレスミスの元）",
+          "リスニングのテンポに耳を慣らす（イヤホン使用可なら好きな英語音源を 5 分聴く）",
+          "トイレを済ませる",
+        ],
+      },
+      { type: "h2", text: "試験後にすべきこと" },
+      {
+        type: "p",
+        text: "結果は約 17 日後にオンライン公開、約 30 日後に成績証明書（公式認定証）が郵送されます。試験直後は記憶が鮮明なうちに、間違えた・自信がなかった問題のジャンルをメモしておくと、次回までの学習計画が立てやすくなります。",
+      },
+      {
+        type: "p",
+        text: "試験当日は「準備が 9 割」です。当日の流れと持ち物を事前に把握し、本番では試験そのものに集中できる状態を作ることが、スコアアップへの最短ルートです。",
+      },
+    ],
+    relatedSlugs: ["last-week-plan", "toeic-vocab-by-score"],
+  },
+  {
+    slug: "part7-speed-reading",
+    title: "TOEIC Part 7 速読のコツと頻出ディスコースマーカー",
+    description:
+      "TOEIC Part 7（読解）を時間内に解き切るための速読テクニックと、文章の論理構造を素早く把握するための「ディスコースマーカー」（therefore、moreover、nevertheless など）の分類と使い方を解説します。",
+    category: "Part 別対策",
+    publishedAt: "2026-04-26",
+    updatedAt: "2026-04-26",
+    estimatedReadingMin: 7,
+    blocks: [
+      {
+        type: "p",
+        text: "TOEIC Part 7 は 54 問を約 55 分で解く必要があり、Reading セクションで最も時間が足りなくなりやすいパートです。本記事では、Part 7 を時間内に解き切るための速読の 3 原則と、文章の流れを瞬時に掴むための「ディスコースマーカー」を体系的に解説します。",
+      },
+      { type: "h2", text: "Part 7 の構成と難度" },
+      {
+        type: "table",
+        headers: ["セクション", "問題数", "文書数", "難度"],
+        rows: [
+          ["Single Passage（単一文書）", "29 問", "10 文書", "★★☆"],
+          ["Double Passage（2 文書）", "10 問", "2 セット", "★★★"],
+          ["Triple Passage（3 文書）", "15 問", "3 セット", "★★★★"],
+        ],
+      },
+      { type: "h2", text: "速読の 3 原則" },
+      { type: "h3", text: "原則 1：設問を先に読む" },
+      {
+        type: "p",
+        text: "本文を読み始める前に必ず設問に目を通し、何を問われるかを把握してから本文に入ります。設問のキーワード（人名、固有名詞、日付、金額など）を頭に入れると、本文中で該当箇所を見つけた瞬間に解答できます。",
+      },
+      { type: "h3", text: "原則 2：トピックセンテンスを優先" },
+      {
+        type: "p",
+        text: "英語の論理構造では、各段落の最初の 1〜2 文に主題が置かれることが多く、これを読むだけで段落全体の趣旨がつかめます。詳細部分は設問で問われた箇所だけを精読する戦略が効率的です。",
+      },
+      { type: "h3", text: "原則 3：ディスコースマーカーで論理を追う" },
+      {
+        type: "p",
+        text: "「順接」「逆接」「追加」「結論」を示す接続表現を意識的に拾うと、文章全体の論理構造が骨組みとして見えるようになります。これが速読力の核です。",
+      },
+      { type: "h2", text: "頻出ディスコースマーカーの分類" },
+      {
+        type: "table",
+        headers: ["分類", "代表的な表現", "意味"],
+        rows: [
+          ["順接（だから／その結果）", "therefore, thus, as a result, accordingly", "前文の結果を示す"],
+          ["逆接（しかし）", "however, nevertheless, on the other hand, whereas", "前文と反対の内容"],
+          ["追加（さらに）", "moreover, furthermore, in addition, additionally", "情報の積み増し"],
+          ["例示（例えば）", "for example, for instance, specifically, such as", "具体例の提示"],
+          ["結論（つまり）", "in conclusion, in short, to summarize, overall", "まとめ・総括"],
+          ["時間（その間）", "meanwhile, in the meantime, subsequently", "並行・後続の出来事"],
+          ["対比（一方）", "in contrast, on the contrary, conversely", "対比的な情報"],
+        ],
+      },
+      {
+        type: "callout",
+        tone: "info",
+        text: "上記のうち「逆接」を見つけたら最優先でマークしましょう。設問の正解は、逆接の直後の文に隠されていることが非常に多いです。",
+      },
+      { type: "h2", text: "Part 7 で頻出する論理マーカー（単語ページ）" },
+      {
+        type: "wordLinks",
+        intro: "TOEIC で実際に出題頻度の高いディスコースマーカー語：",
+        words: [
+          "therefore",
+          "moreover",
+          "furthermore",
+          "nevertheless",
+          "thus",
+          "otherwise",
+          "meanwhile",
+          "whereas",
+        ],
+      },
+      { type: "h2", text: "設問タイプ別の解き方" },
+      {
+        type: "ul",
+        items: [
+          "What is the purpose of ...?（目的） → 第 1 段落の冒頭",
+          "What is mentioned about ...?（言及） → 該当キーワードを本文検索",
+          "What is implied / suggested?（示唆） → 文末や逆接の直後",
+          "In paragraph X, the word \"Y\" is closest in meaning to ...（語義） → 文脈から類義語選択",
+        ],
+      },
+      { type: "h2", text: "1 文書あたりの目安時間" },
+      {
+        type: "ol",
+        items: [
+          "Single Passage: 1 文書 5〜6 分（設問 2〜4 問）",
+          "Double Passage: 1 セット 8〜10 分（設問 5 問）",
+          "Triple Passage: 1 セット 10〜12 分（設問 5 問）",
+        ],
+      },
+      {
+        type: "p",
+        text: "Part 7 攻略の本質は「全文を精読しないこと」です。ディスコースマーカーで論理構造の骨組みを掴み、設問に関係する箇所だけを精読するスタイルを身につければ、時間切れに悩まされなくなります。",
+      },
+    ],
+    relatedSlugs: ["part5-frequent-words", "toeic-vocab-by-score"],
+  },
+  {
+    slug: "listening-pre-read",
+    title: "TOEIC リスニング Part 3・4 攻略｜先読みテクニックの全手順",
+    description:
+      "TOEIC Part 3（会話問題）・Part 4（説明文問題）でスコアが伸び悩む最大の原因は「設問の先読み不足」です。本記事では、ディレクションが流れている時間を活用した先読みの具体的な手順、注目すべき 5W1H、頻出設問パターンを解説します。",
+    category: "Part 別対策",
+    publishedAt: "2026-04-26",
+    updatedAt: "2026-04-26",
+    estimatedReadingMin: 6,
+    blocks: [
+      {
+        type: "p",
+        text: "TOEIC Part 3（会話問題）と Part 4（説明文問題）は、Listening セクションの中で最も配点が高く、また「先読み」の有無でスコアが大きく変わるパートです。本記事では、本番で使える先読みの具体手順と、注目すべきポイントを解説します。",
+      },
+      { type: "h2", text: "Part 3・Part 4 の特徴" },
+      {
+        type: "table",
+        headers: ["パート", "問題形式", "問題数", "1 セットの設問数"],
+        rows: [
+          ["Part 3（会話）", "2〜3 名の会話を聴く", "39 問", "3 問"],
+          ["Part 4（説明文）", "1 名のスピーチ／案内を聴く", "30 問", "3 問"],
+        ],
+      },
+      { type: "h2", text: "なぜ「先読み」が重要なのか" },
+      {
+        type: "p",
+        text: "Part 3・4 では、音声が一度しか流れません。設問を聴いてから本文を思い出すのではなく、「何を問われるか」を事前に頭に入れた状態で本文を聴くことで、必要な情報を狙い撃ちで拾えるようになります。これが先読みです。",
+      },
+      { type: "h2", text: "先読みのタイムテーブル" },
+      {
+        type: "table",
+        headers: ["タイミング", "やること"],
+        rows: [
+          ["Part 3 開始のディレクション中（約 30 秒）", "最初の 1 セット（3 問）の設問を読む"],
+          ["1 セット目の本文音声中", "音声に集中（先読みは禁止）"],
+          ["1 セット目の設問読み上げ中（各 8 秒×3 問＝24 秒）", "解答→次セットの先読み"],
+          ["以降、各セット間の 24 秒で次の先読みを繰り返す", "リズムが命"],
+        ],
+      },
+      {
+        type: "callout",
+        tone: "warning",
+        text: "本文音声中に先読みすると、本文の重要部分を聞き逃します。先読みは「次のセットの設問読み上げ中」に行うのが鉄則です。",
+      },
+      { type: "h2", text: "先読み時に注目すべき 5W1H" },
+      {
+        type: "ol",
+        items: [
+          "Who（誰）：登場人物の役職・関係性（同僚／顧客／上司）",
+          "Where（どこ）：場所（オフィス／店舗／空港）",
+          "When（いつ）：時間・日付・曜日",
+          "What（何）：話題（製品／サービス／問題）",
+          "Why（なぜ）：理由・目的",
+          "How（どのように）：手段・方法・程度",
+        ],
+      },
+      { type: "h2", text: "頻出設問パターン" },
+      {
+        type: "ul",
+        items: [
+          "What is the conversation mainly about?（会話の主題）",
+          "Where most likely is the conversation taking place?（場所推測）",
+          "Who most likely is the man / woman?（人物推測）",
+          "What does the speaker imply about ...?（示唆）",
+          "What will the speaker probably do next?（次の行動）",
+          "Look at the graphic. What ...?（図表参照）",
+        ],
+      },
+      { type: "h2", text: "Part 4 で特に頻出のシーン" },
+      {
+        type: "wordLinks",
+        intro: "Part 4 で頻出するシーン関連語：",
+        words: ["announce", "conference", "instruction", "inform", "focus"],
+      },
+      {
+        type: "table",
+        headers: ["頻出シーン", "典型的な設問パターン"],
+        rows: [
+          ["社内アナウンス", "What is being announced?"],
+          ["商品案内・広告", "What is the advertisement for?"],
+          ["留守番電話", "Why is the speaker calling?"],
+          ["観光案内・ツアー", "Where most likely is the speaker?"],
+          ["天気予報・交通情報", "What problem is mentioned?"],
+        ],
+      },
+      { type: "h2", text: "先読みを身につける練習法" },
+      {
+        type: "ol",
+        items: [
+          "公式問題集の Part 3・4 を、まずは普通に解く",
+          "次に、設問だけ先に 30 秒読んでから本文を聴く",
+          "「先読みあり」「先読みなし」で正答数を比較",
+          "先読み時間を 30 秒 → 24 秒 → 20 秒と短縮していく",
+          "最終的にディレクション中に 1 セット（3 問）を 20 秒で先読みできる状態に",
+        ],
+      },
+      {
+        type: "p",
+        text: "先読みは「練習しないと本番では絶対にできない」テクニックです。1 ヶ月でも継続して練習すれば、Part 3・4 のスコアは確実に伸びます。今日からぜひ取り入れてみてください。",
+      },
+    ],
+    relatedSlugs: ["part5-frequent-words", "part7-speed-reading"],
+  },
+  {
+    slug: "synonym-pairs-15",
+    title: "TOEIC で問われる類義語の使い分け 15 ペア",
+    description:
+      "TOEIC Part 5・Part 7 で頻出する類義語ペアを 15 組厳選し、ニュアンスの違い・典型的な使い方・コロケーションを解説します。accept/admit、improve/enhance、postpone/decline などの定番ペアを完全網羅。",
+    category: "語彙集",
+    publishedAt: "2026-04-26",
+    updatedAt: "2026-04-26",
+    estimatedReadingMin: 8,
+    blocks: [
+      {
+        type: "p",
+        text: "TOEIC Part 5 の語彙問題では、「文意は通るが選択肢が複数あって迷う」シチュエーションが頻発します。これは選択肢が類義語で構成されているからです。本記事では TOEIC で特に問われやすい類義語ペアを 15 組厳選し、使い分けの基準を解説します。",
+      },
+      { type: "h2", text: "なぜ類義語の使い分けが問われるのか" },
+      {
+        type: "p",
+        text: "TOEIC は「ビジネス文脈で適切な語を選べるか」を測る試験です。たとえば accept と admit はどちらも「受け入れる」と訳せますが、対象（提案 vs 過ち）が違います。こうした「文脈に最適な 1 語」を選ぶ力こそ、TOEIC が測ろうとしている語彙力です。",
+      },
+      { type: "h2", text: "1. accept / admit（受け入れる）" },
+      {
+        type: "p",
+        text: "accept は「申し出・条件を受け入れる」、admit は「過ち・事実を認める」「入場・入会を許可する」。「I accept your offer.」と「He admitted his mistake.」のように使い分けます。",
+      },
+      { type: "wordLinks", words: ["accept", "admit"] },
+      { type: "h2", text: "2. improve / enhance（改善する）" },
+      {
+        type: "p",
+        text: "improve は「悪い・不十分なものをより良くする」、enhance は「すでに良いものをさらに高める」。改善の出発点が違います。「improve customer service」「enhance brand value」が典型です。",
+      },
+      { type: "wordLinks", words: ["improve", "enhance"] },
+      { type: "h2", text: "3. expand / extend（広げる・延長する）" },
+      {
+        type: "p",
+        text: "expand は「面・規模が広がる（拡大）」、extend は「線・期間が伸びる（延長）」。「expand business overseas」「extend the deadline」のように使い分けます。",
+      },
+      { type: "wordLinks", words: ["expand", "extend"] },
+      { type: "h2", text: "4. propose / suggest（提案する）" },
+      {
+        type: "p",
+        text: "どちらも提案ですが、propose の方が公式・正式な提案、suggest はカジュアルな示唆。「propose a plan to the board」「suggest taking a break」のニュアンス差を覚えましょう。",
+      },
+      { type: "wordLinks", words: ["propose", "suggest"] },
+      { type: "h2", text: "5. examine / inspect（調べる）" },
+      {
+        type: "p",
+        text: "examine は「詳細に調査・検討する」（書類・データ・身体）、inspect は「公式に検査する」（設備・現場・製品）。「examine the report」「inspect the factory」が典型例です。",
+      },
+      { type: "wordLinks", words: ["examine", "inspect"] },
+      { type: "h2", text: "6. estimate / evaluate（見積もる・評価する）" },
+      {
+        type: "p",
+        text: "estimate は「数量・コストを見積もる」、evaluate は「価値・パフォーマンスを評価する」。「estimate the cost」「evaluate the performance」が典型です。",
+      },
+      { type: "wordLinks", words: ["estimate", "evaluate"] },
+      { type: "h2", text: "7. recognize / identify（認識する・特定する）" },
+      {
+        type: "p",
+        text: "recognize は「以前見たものだと認識する」「功績を認める」、identify は「身元・問題・原因を特定する」。「recognize his face」「identify the cause」のように使い分けます。",
+      },
+      { type: "wordLinks", words: ["recognize", "identify"] },
+      { type: "h2", text: "8. complete / finalize（完了する・確定する）" },
+      {
+        type: "p",
+        text: "complete は「タスクを完成・修了する」、finalize は「最終決定する・取りまとめる」。「complete the form」「finalize the contract」が典型です。",
+      },
+      { type: "wordLinks", words: ["complete", "finalize"] },
+      { type: "h2", text: "9. initiate / commence（開始する）" },
+      {
+        type: "p",
+        text: "initiate は「（プロジェクト・手続きを）始動させる」、commence は「（イベント・式典が）正式に始まる」。commence は initiate より格式高い表現です。「initiate a project」「The ceremony will commence at 10.」",
+      },
+      { type: "wordLinks", words: ["initiate", "commence"] },
+      { type: "h2", text: "10. replace / substitute（置き換える）" },
+      {
+        type: "p",
+        text: "replace は「古いもの／壊れたものを新しいものに交換」、substitute は「一時的に代わりとして使う」。「replace the broken machine」「substitute butter for oil」が典型です。",
+      },
+      { type: "wordLinks", words: ["replace", "substitute"] },
+      { type: "h2", text: "11. exceed / surpass（上回る）" },
+      {
+        type: "p",
+        text: "exceed は「数値・基準を上回る」（中立的）、surpass は「期待・記録を凌駕する」（ポジティブ含意）。「exceed the budget」「surpass expectations」が典型です。",
+      },
+      { type: "wordLinks", words: ["exceed", "surpass"] },
+      { type: "h2", text: "12. maintain / preserve（維持する・保存する）" },
+      {
+        type: "p",
+        text: "maintain は「機能・品質を維持し続ける」、preserve は「劣化・消失から守る」。「maintain quality」「preserve historical buildings」が典型です。",
+      },
+      { type: "wordLinks", words: ["maintain", "preserve"] },
+      { type: "h2", text: "13. ensure / guarantee（保証する）" },
+      {
+        type: "p",
+        text: "ensure は「（結果を）確実にする」（プロセス重視）、guarantee は「（品質・成果を）約束する」（結果重視）。「ensure compliance」「guarantee a refund」が典型です。",
+      },
+      { type: "wordLinks", words: ["ensure", "guarantee"] },
+      { type: "h2", text: "14. encourage / motivate（励ます・動機付ける）" },
+      {
+        type: "p",
+        text: "encourage は「行動を促す・後押しする」、motivate は「内発的なやる気を引き出す」。「encourage employees to participate」「motivate the team」が典型です。",
+      },
+      { type: "wordLinks", words: ["encourage", "motivate"] },
+      { type: "h2", text: "15. reject / decline（断る）" },
+      {
+        type: "p",
+        text: "reject は「強く拒絶する」（ネガティブ）、decline は「丁寧に辞退する」（フォーマル）。「reject the proposal outright」「decline the invitation politely」が典型です。",
+      },
+      { type: "wordLinks", words: ["reject", "decline"] },
+      { type: "h2", text: "学習のコツ" },
+      {
+        type: "callout",
+        tone: "tip",
+        text: "類義語ペアを覚えるときは「ニュアンスの違い」と「典型的なコロケーション」をセットで覚えましょう。コロケーションを 1〜2 個覚えれば、Part 5 の選択肢からその場で正解を判断できるようになります。",
+      },
+      {
+        type: "p",
+        text: "類義語の使い分けは、TOEIC のスコアを 700 → 800 に押し上げる際に最も差がつくポイントです。本記事の 15 ペアは、すべて公式問題集や市販模試で出題実績のあるものです。各単語の詳細ページで例文を確認し、自分の中に「使い分け基準」を作っていきましょう。",
+      },
+    ],
+    relatedSlugs: ["part5-frequent-words", "business-vocab-essentials"],
+  },
+  {
+    slug: "last-week-plan",
+    title: "TOEIC 直前 1 週間で 50 点伸ばす単語復習プラン",
+    description:
+      "TOEIC 試験の 7 日前から当日までにやるべき単語復習を、日次プランで具体的に解説します。新規単語のインプットは控え、既習単語の再強化に絞ることで、本番で 30〜50 点のスコアアップを狙えるプランです。",
+    category: "学習法",
+    publishedAt: "2026-04-26",
+    updatedAt: "2026-04-26",
+    estimatedReadingMin: 6,
+    blocks: [
+      {
+        type: "p",
+        text: "TOEIC 試験の 1 週間前。「あと何をやればスコアが伸びるか」と悩む方は多いはずです。この時期に新出単語を 100 語増やしても、本番では 7 割以上忘れてしまい逆効果。本記事では、既に学習済みの単語を再強化することで、本番で確実に 30〜50 点のスコアアップを狙える 7 日間プランを紹介します。",
+      },
+      { type: "h2", text: "前提：直前期の鉄則" },
+      {
+        type: "ul",
+        items: [
+          "新規単語のインプットはやらない（既習語の再強化に集中）",
+          "苦手分野・苦手語彙に時間を集中投下",
+          "睡眠時間を削らない（暗記効率が下がる）",
+          "本番と同じ時間帯に勉強する（生体リズムを合わせる）",
+          "前日と当日朝の負荷を意図的に下げる（ピークを当日に持ってくる）",
+        ],
+      },
+      { type: "h2", text: "Day 7（試験 7 日前）：現状診断" },
+      {
+        type: "ol",
+        items: [
+          "公式問題集 1 回分を本番と同じ時間配分で実施（午前か午後、本番と同じ時間帯で）",
+          "Listening / Reading の各パート別正答率を集計",
+          "間違えた問題の語彙をすべてリストアップ（30〜50 語が目安）",
+          "リストの単語を当サイトの「お気に入り」に登録",
+        ],
+      },
+      {
+        type: "callout",
+        tone: "info",
+        text: "Day 7 の模試結果は、本番スコアの予測値ではなく「弱点発見ツール」として使います。スコアに一喜一憂せず、間違いの傾向だけ見るのがポイントです。",
+      },
+      { type: "h2", text: "Day 6〜Day 4：苦手単語の集中復習" },
+      {
+        type: "p",
+        text: "Day 7 で抽出した苦手単語を、3 日間で集中的に復習します。1 日あたり 60〜90 分を確保できるとベストです。",
+      },
+      {
+        type: "ol",
+        items: [
+          "朝 15 分：当サイトの「復習モード」でお気に入り単語をフラッシュチェック",
+          "昼 15 分：詳細ページで例文 3 つを音読、コロケーションを確認",
+          "夜 30 分：苦手語を含む例文をシャドーイング（音声に被せて発音）",
+          "就寝前 5 分：その日に確認した単語を見直す",
+        ],
+      },
+      { type: "h2", text: "Day 3〜Day 2：類義語と語形変化の確認" },
+      {
+        type: "p",
+        text: "Part 5 の品詞問題・語彙問題で迷いやすい類義語ペアと、派生語（動詞・名詞・形容詞・副詞）を確認します。",
+      },
+      {
+        type: "ul",
+        items: [
+          "類義語の使い分け：accept / admit、improve / enhance、ensure / guarantee など",
+          "派生語マッピング：implement / implementation / implemented",
+          "コロケーション再確認：make a decision、reach an agreement、submit a proposal",
+        ],
+      },
+      {
+        type: "wordLinks",
+        intro: "直前期に再確認したい派生語のある単語：",
+        words: ["complete", "review", "evaluate", "prepare", "focus"],
+      },
+      { type: "h2", text: "Day 1（試験前日）：軽い見直しと早寝" },
+      {
+        type: "ol",
+        items: [
+          "新しいことは一切やらない",
+          "お気に入り単語リストを 30 分で軽く流す",
+          "持ち物を確認、受験票を準備",
+          "夕食は消化の良いものを早めに",
+          "23 時までには就寝（最低 7 時間睡眠を確保）",
+        ],
+      },
+      {
+        type: "callout",
+        tone: "warning",
+        text: "前日に詰め込みすぎると、当日の集中力が切れます。「もう少しやれる」と感じる程度で切り上げるのが正解です。",
+      },
+      { type: "h2", text: "Day 0（試験当日）：直前 30 分の最終確認" },
+      {
+        type: "ol",
+        items: [
+          "起床後すぐに英語音源を 5 分聴く（耳のウォームアップ）",
+          "朝食はしっかり食べる（脳のエネルギー源）",
+          "会場到着後、お気に入り単語の上位 30 語だけ確認",
+          "試験開始 5 分前は深呼吸でリラックス",
+        ],
+      },
+      { type: "h2", text: "このプランで 50 点伸びる理由" },
+      {
+        type: "p",
+        text: "直前 1 週間の伸びの正体は、「忘れかけていた単語を本番で思い出せる状態に戻す」ことです。新出単語を 1 つ覚えるより、既に 70% 覚えている単語を 100% に押し上げる方が、Part 5・Part 7 での得点機会がはるかに増えます。本プランは「既習語の歩留まり改善」に特化しているため、コストパフォーマンスが極めて高いのです。",
+      },
+      {
+        type: "p",
+        text: "試験直前は焦りやすい時期ですが、冷静に「やるべきこと」と「やらないこと」を分けて行動すれば、確実にスコアアップにつながります。本プランを参考に、ベストコンディションで本番を迎えてください。",
+      },
+    ],
+    relatedSlugs: ["forgetting-curve", "exam-day-essentials"],
+  },
 ];
 
 export function getGuideArticleBySlug(slug: string): GuideArticle | undefined {
@@ -586,4 +1132,20 @@ export function getGuideArticleBySlug(slug: string): GuideArticle | undefined {
 
 export function getAllGuideSlugs(): string[] {
   return GUIDE_ARTICLES.map((a) => a.slug);
+}
+
+export function getLatestGuideArticles(limit = GUIDE_ARTICLES.length): GuideArticle[] {
+  return GUIDE_ARTICLES
+    .map((article, index) => ({ article, index }))
+    .sort((a, b) => {
+      const updatedAtOrder = b.article.updatedAt.localeCompare(a.article.updatedAt);
+      if (updatedAtOrder !== 0) return updatedAtOrder;
+
+      const publishedAtOrder = b.article.publishedAt.localeCompare(a.article.publishedAt);
+      if (publishedAtOrder !== 0) return publishedAtOrder;
+
+      return b.index - a.index;
+    })
+    .slice(0, limit)
+    .map(({ article }) => article);
 }

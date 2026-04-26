@@ -30,7 +30,7 @@ A comprehensive web application for learning essential TOEIC vocabulary, featuri
 - **PWA Ready**: Installable on mobile and desktop via `manifest.ts`.
 - **Dynamic OGP**: Per-word Open Graph images generated on-the-fly via `src/app/words/[word]/opengraph-image.tsx`.
 - **Static Pages**: Includes About, Privacy, Terms, and Contact pages for better user trust and SEO. The Privacy Policy explicitly discloses Google AdSense / third-party ad vendors' Cookie usage and Google Analytics tracking, with opt-out links, in line with AdSense program policy requirements.
-- **Learning Guide Articles** (`/guide`): Original long-form articles covering TOEIC vocabulary strategy by score (600/730/860), Part 5 attack patterns, the forgetting curve / SRS applied to vocab learning, business vocabulary essentials, and the site's word-rank selection criteria. Each article ships with `Article` + `BreadcrumbList` JSON-LD and internal links to relevant `/words/<slug>` pages.
+- **Learning Guide Articles** (`/guide`): 10 original long-form articles covering TOEIC vocabulary strategy by score (600/730/860), Part 5 attack patterns, Part 7 speed-reading with discourse markers, Part 3/4 listening pre-read technique, exam-day essentials, last-week 50-point boost plan, the forgetting curve / SRS applied to vocab learning, business vocabulary essentials, 15 synonym-pair distinctions, and the site's word-rank selection criteria. Each article ships with `Article` + `BreadcrumbList` JSON-LD and internal links to relevant `/words/<slug>` pages. The TOP page features a "Latest Guides" card grid linking into the article corpus.
 - **Cookie Consent**: First-visit consent banner (`CookieConsent`) aligned with GA4 tracking.
 - **Responsive Design**: Optimized for desktop and mobile devices.
 

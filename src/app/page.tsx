@@ -6,6 +6,7 @@ import { getImportantWords, getMediumWords, getHighWords, getTodayRecommendedWor
 import WordsListClient from "@/components/features/words/WordsListClient";
 import { SnsShareButtons } from "@/components/features/sns/SnsShareButtons";
 import TodayRecommendedWordsClient from "@/components/features/words/TodayRecommendedWordsClient";
+import { getLatestGuideArticles } from "@/data/guide-articles";
 
 export const metadata: Metadata = {
   title: {
@@ -24,6 +25,7 @@ export default async function Home() {
   const mediumWords = await getMediumWords();
   const highWords = await getHighWords();
   const todayWords = await getTodayRecommendedWords(5);
+  const latestGuideArticles = getLatestGuideArticles(6);
 
   // WebSite構造化データ
   const websiteJsonLd = {
@@ -270,6 +272,46 @@ export default async function Home() {
             <p className="text-sm text-slate-600 leading-relaxed">
               「市販の単語帳は持ち歩くのが重い」「アプリは有料のものが多い」——そんなTOEIC学習者の声から、このサイトは生まれました。私たちは、誰もが質の高い英語学習環境に無料でアクセスできるべきだと考えています。AI技術を活用することで、従来の辞書にはない「生きたビジネス英語のニュアンス」を提供し、皆さまのスコアアップ、そしてその先のキャリアアップを全力でサポートします。
             </p>
+          </div>
+        </section>
+
+        {/* 学習ガイド最新記事セクション */}
+        <section className="mt-12 pt-12 border-t border-slate-200 flex flex-col gap-6">
+          <div className="flex items-end justify-between gap-4 flex-wrap">
+            <h2 className="text-xl font-bold text-slate-800">学習ガイド｜最新記事</h2>
+            <Link
+              href="/guide"
+              prefetch={false}
+              className="text-sm text-blue-600 hover:underline whitespace-nowrap"
+            >
+              すべての記事を見る →
+            </Link>
+          </div>
+          <p className="text-sm text-slate-600 leading-relaxed">
+            TOEIC のスコアアップに直結する学習戦略・Part 別対策・語彙集を、運営チームが体系的にまとめています。
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {latestGuideArticles.map((article) => (
+              <Link
+                key={article.slug}
+                href={`/guide/${article.slug}`}
+                prefetch={false}
+                className="group flex flex-col gap-2 rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-blue-400 hover:shadow-md"
+              >
+                <div className="flex items-center gap-2 text-xs text-slate-500">
+                  <span className="rounded bg-slate-100 px-2 py-0.5 font-medium text-slate-600">
+                    {article.category}
+                  </span>
+                  <span>約 {article.estimatedReadingMin} 分</span>
+                </div>
+                <h3 className="text-sm font-bold text-slate-800 leading-snug group-hover:text-blue-700">
+                  {article.title}
+                </h3>
+                <p className="text-xs leading-relaxed text-slate-600 line-clamp-3">
+                  {article.description}
+                </p>
+              </Link>
+            ))}
           </div>
         </section>
 
