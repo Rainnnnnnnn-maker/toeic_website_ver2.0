@@ -1,4 +1,5 @@
 import { getAllWords } from "@/data/words";
+import { GUIDE_ARTICLES } from "@/data/guide-articles";
 
 const BASE_URL = "https://www.toeic-words.com";
 
@@ -51,6 +52,12 @@ export async function GET() {
     <priority>0.5</priority>
   </url>
   <url>
+    <loc>${BASE_URL}/guide</loc>
+    <lastmod>${lastModified}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
     <loc>${BASE_URL}/privacy</loc>
     <lastmod>${lastModified}</lastmod>
     <changefreq>yearly</changefreq>
@@ -69,6 +76,16 @@ export async function GET() {
     <priority>0.3</priority>
   </url>
 `;
+
+  for (const article of GUIDE_ARTICLES) {
+    xml += `  <url>
+    <loc>${BASE_URL}/guide/${article.slug}</loc>
+    <lastmod>${new Date(article.updatedAt).toISOString()}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+`;
+  }
 
   for (const w of allWords) {
     xml += `  <url>

@@ -29,7 +29,8 @@ A comprehensive web application for learning essential TOEIC vocabulary, featuri
 - **Social Share**: Share word details via Twitter, Facebook, and LINE (`react-share`), with GA4 event tracking.
 - **PWA Ready**: Installable on mobile and desktop via `manifest.ts`.
 - **Dynamic OGP**: Per-word Open Graph images generated on-the-fly via `src/app/words/[word]/opengraph-image.tsx`.
-- **Static Pages**: Includes About, Privacy, Terms, and Contact pages for better user trust and SEO.
+- **Static Pages**: Includes About, Privacy, Terms, and Contact pages for better user trust and SEO. The Privacy Policy explicitly discloses Google AdSense / third-party ad vendors' Cookie usage and Google Analytics tracking, with opt-out links, in line with AdSense program policy requirements.
+- **Learning Guide Articles** (`/guide`): Original long-form articles covering TOEIC vocabulary strategy by score (600/730/860), Part 5 attack patterns, the forgetting curve / SRS applied to vocab learning, business vocabulary essentials, and the site's word-rank selection criteria. Each article ships with `Article` + `BreadcrumbList` JSON-LD and internal links to relevant `/words/<slug>` pages.
 - **Cookie Consent**: First-visit consent banner (`CookieConsent`) aligned with GA4 tracking.
 - **Responsive Design**: Optimized for desktop and mobile devices.
 

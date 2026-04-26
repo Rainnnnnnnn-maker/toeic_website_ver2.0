@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "当サイトについて",
+  title: "当サイトについて｜運営方針・単語選定基準・更新ポリシー",
   description:
-    "TOEIC重要単語は、AIを活用してTOEIC頻出単語を効率的に学習できる無料サービスです。サイトの特徴や機能について紹介します。",
+    "TOEIC重要単語は、AIを活用してTOEIC頻出単語を効率的に学習できる無料サービスです。運営者情報、単語選定の根拠、AI解説の検証フロー、サイトの更新方針について説明します。",
   alternates: {
     canonical: "https://www.toeic-words.com/about",
   },
@@ -23,11 +23,24 @@ export default function AboutPage() {
 
       <h1 className="mb-8 text-2xl font-bold">当サイトについて</h1>
 
-      <div className="space-y-8 text-sm leading-relaxed text-black/80 dark:text-white/80">
+      <div className="space-y-10 text-sm leading-relaxed text-black/80 dark:text-white/80">
         <section>
           <h2 className="mb-3 text-lg font-semibold">TOEIC重要単語とは</h2>
           <p>
-            「TOEIC重要単語」は、TOEIC試験に頻出する英単語を効率的に学習できる無料のWebサービスです。AIによる詳細な解説と豊富な例文で、単語の意味だけでなく、実際のビジネスシーンでの使い方まで理解を深めることができます。
+            「TOEIC重要単語」は、TOEIC L&amp;R 試験に頻出する英単語を効率的に学習できる無料の Web サービスです。1,300 語以上の頻出単語を「important（基礎）／ mid（中級）／ high（上級）」の 3 段階に分類し、各単語に AI による意味・ニュアンス解説と複数の例文、ネイティブ発音音声を提供しています。
+          </p>
+          <p className="mt-2">
+            会員登録は不要で、すべての機能を無料で利用できます。お気に入り情報はブラウザのローカルストレージに保存され、サーバーには送信されません。
+          </p>
+        </section>
+
+        <section>
+          <h2 className="mb-3 text-lg font-semibold">このサイトを作った理由</h2>
+          <p>
+            運営者自身が TOEIC 学習に取り組む中で、「市販の単語帳は冊子としてかさばる」「Web で単語の意味を調べてもビジネス文脈に即した例文が見つからない」「派生語まで含めた解説が得られない」という不便を感じていました。
+          </p>
+          <p className="mt-2">
+            そこで、TOEIC のビジネス文脈に最適化された AI 解説と例文を、いつでもスマートフォンから無料で確認できる学習ツールが欲しいという動機で、本サイトを開発しました。学習者が「単語の意味だけでなく、ニュアンスとコロケーションまで含めて運用できる状態」に到達することを目標にしています。
           </p>
         </section>
 
@@ -36,62 +49,161 @@ export default function AboutPage() {
           <ul className="list-inside list-disc space-y-2">
             <li>
               <strong>レベル別単語一覧</strong>
-              ：目標スコア（600点・730点・800点）に合わせて厳選された頻出単語
+              ：目標スコア（600・730・860 点）に合わせて 3 段階に分類された頻出単語
             </li>
             <li>
-              <strong>AI解説</strong>
-              ：各単語の意味、ニュアンス、文法パターンを丁寧に解説
+              <strong>AI 解説</strong>
+              ：Google Gemini により生成された、各単語の意味・ニュアンス・文法パターンの丁寧な解説
             </li>
             <li>
               <strong>実践的な例文</strong>
-              ：TOEIC試験に即した3〜5つのビジネス例文
+              ：TOEIC のビジネス文脈に即した 3〜5 件の例文（音声付き）
             </li>
             <li>
-              <strong>音声発音</strong>
-              ：ネイティブ発音を確認できるTTS機能
+              <strong>ネイティブ発音</strong>
+              ：Google Cloud Text-to-Speech による高品質な英語・日本語音声
             </li>
             <li>
               <strong>学習モード</strong>
-              ：ランダム出題で効率的に暗記チェック
+              ：ランダム出題形式で暗記の定着度をチェック
             </li>
             <li>
-              <strong>お気に入り機能</strong>
-              ：覚えたい単語を保存して復習
+              <strong>復習モード</strong>
+              ：お気に入り登録した単語のみを集中的に復習
             </li>
             <li>
-              <strong>今日のおすすめ単語</strong>
-              ：毎日5単語を厳選してお届け
+              <strong>今日のおすすめ 5 単語</strong>
+              ：日付固定ロジックで毎日同じ 5 語をおすすめ
+            </li>
+            <li>
+              <strong>聞き流しモード</strong>
+              ：今日の 5 単語を「単語 → 英文例 → 日本語訳」の順に自動再生
+            </li>
+            <li>
+              <strong>学習ガイド</strong>
+              ：スコア別戦略・Part 別対策・忘却曲線を活用した暗記法などの記事を公開（
+              <Link
+                href="/guide"
+                className="text-blue-600 underline hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+              >
+                /guide
+              </Link>
+              ）
             </li>
           </ul>
         </section>
 
         <section>
-          <h2 className="mb-3 text-lg font-semibold">開発について</h2>
+          <h2 className="mb-3 text-lg font-semibold">単語選定の根拠</h2>
           <p>
-            当サイトは、個人開発者によって運営されています。Next.jsをベースにしたモダンなWeb技術を使用し、快適な学習体験を提供しています。コンテンツの生成にはGoogle
-            GeminiのAI技術を活用しています。
+            収録単語は、以下の複数ソースに基づき、TOEIC 頻出度を集計したうえでランクを決定しています。
           </p>
-          <p className="mt-2">
-            ソースコードはGitHubで公開しています。機能追加のリクエストや不具合のご報告は、
+          <ul className="mt-2 list-inside list-disc space-y-1">
+            <li>TOEIC 公式問題集（複数年版）に出現する語彙の頻度集計</li>
+            <li>市販の TOEIC 頻出語彙集における必出ランク</li>
+            <li>コーパス分析（COCA・BNC）におけるビジネス語彙の頻度</li>
+            <li>過去の受験者がつまずきやすいと報告した単語</li>
+          </ul>
+          <p className="mt-3">
+            選定基準とランクの定義については、
             <Link
-              href="/contact"
+              href="/guide/word-rank-criteria"
               className="text-blue-600 underline hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
             >
-              お問い合わせページ
+              「当サイトの単語選定基準と推奨学習フロー」
             </Link>
-            からお気軽にどうぞ。
+            で詳しく説明しています。
           </p>
         </section>
 
         <section>
-          <h2 className="mb-3 text-lg font-semibold">注意事項</h2>
-          <ul className="list-inside list-disc space-y-1">
+          <h2 className="mb-3 text-lg font-semibold">AI 解説の生成と品質管理</h2>
+          <p>
+            各単語の意味・ニュアンス・例文は、Google Gemini モデル（gemini-2.5-flash-lite）により生成しています。生成内容は以下のフローで品質を担保しています。
+          </p>
+          <ol className="mt-2 list-inside list-decimal space-y-1">
             <li>
-              「TOEIC」はEducational Testing
-              Service（ETS）の登録商標です。当サイトはETSとの提携・推奨関係はありません。
+              TOEIC のビジネス文脈に限定したプロンプト設計（一般会話例文を排除）
             </li>
             <li>
-              コンテンツはAIにより生成されているため、誤りが含まれる可能性があります。学習の参考としてご活用ください。
+              出力後の自動検証（必須フィールド・例文数・形式の整合性チェック）
+            </li>
+            <li>閲覧時にエラー検知された場合は即時再生成</li>
+            <li>
+              ユーザー報告で誤りを受けた場合、個別キャッシュをクリアして再生成
+            </li>
+          </ol>
+          <p className="mt-3">
+            生成された解説は Vercel Blob と Upstash Redis の多段キャッシュで配信され、応答速度と品質の両立を図っています。
+          </p>
+        </section>
+
+        <section>
+          <h2 className="mb-3 text-lg font-semibold">運営者情報</h2>
+          <ul className="list-inside list-disc space-y-1">
+            <li>
+              <strong>運営者</strong>：Rain（個人開発者）
+            </li>
+            <li>
+              <strong>連絡先</strong>：
+              <Link
+                href="/contact"
+                className="text-blue-600 underline hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+              >
+                お問い合わせページ
+              </Link>
+            </li>
+            <li>
+              <strong>サイト開設</strong>：2025 年 12 月
+            </li>
+            <li>
+              <strong>収益化</strong>：Google AdSense 広告による無料運営
+            </li>
+            <li>
+              <strong>ソースコード</strong>：GitHub にて一部公開（個人プロジェクト）
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 className="mb-3 text-lg font-semibold">サイトの更新方針</h2>
+          <ul className="list-inside list-disc space-y-1">
+            <li>
+              新しい TOEIC 出題傾向に応じて、収録単語の追加・削除を随時実施
+            </li>
+            <li>
+              AI 解説のプロンプトは、ユーザーからの指摘を受けて継続的に改善
+            </li>
+            <li>
+              重複・誤分類は発見次第修正し、修正履歴を技術ドキュメントに記録
+            </li>
+            <li>
+              学習ガイド記事は月 1〜2 本のペースで追加・更新
+            </li>
+            <li>
+              サイト機能や技術スタックの変更も、すべて更新履歴に明記
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 className="mb-3 text-lg font-semibold">注意事項・免責</h2>
+          <ul className="list-inside list-disc space-y-1">
+            <li>
+              「TOEIC」は Educational Testing Service（ETS）の登録商標です。当サイトは ETS との提携・推奨関係はありません。
+            </li>
+            <li>
+              コンテンツは AI により生成されているため、誤りが含まれる可能性があります。学習の参考としてご活用ください。
+            </li>
+            <li>
+              本サイトの利用により発生した損害について、運営者は責任を負いかねます。詳細は
+              <Link
+                href="/terms"
+                className="text-blue-600 underline hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+              >
+                利用規約
+              </Link>
+              をご確認ください。
             </li>
           </ul>
         </section>

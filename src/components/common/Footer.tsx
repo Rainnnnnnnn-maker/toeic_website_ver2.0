@@ -30,6 +30,13 @@ export function Footer() {
             当サイトについて
           </Link>
           <Link
+            href="/guide"
+            prefetch={false}
+            className="underline underline-offset-4 hover:text-black/80 dark:hover:text-white/80"
+          >
+            学習ガイド
+          </Link>
+          <Link
             href="/privacy"
             prefetch={false}
             className="underline underline-offset-4 hover:text-black/80 dark:hover:text-white/80"
