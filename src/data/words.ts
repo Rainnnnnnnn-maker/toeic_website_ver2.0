@@ -187,7 +187,11 @@ function hashString(value: string): number {
 }
 
 function getTodayKey(): string {
-  return new Date().toISOString().slice(0, 10);
+  // Adjust time to JST (UTC+9) and subtract 7 hours so that the date changes at 7:00 AM JST
+  const now = new Date();
+  const jstTime = now.getTime() + 9 * 60 * 60 * 1000;
+  const targetTime = jstTime - 7 * 60 * 60 * 1000;
+  return new Date(targetTime).toISOString().slice(0, 10);
 }
 
 export async function getTodayRecommendedWords(limit: number = 5): Promise<Word[]> {
