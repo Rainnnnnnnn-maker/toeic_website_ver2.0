@@ -2,7 +2,7 @@
 
 import {
   createContext,
-  useContext,
+  use,
   useEffect,
   useState,
   useCallback,
@@ -90,7 +90,7 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
   );
 
   return (
-    <FavoritesContext.Provider
+    <FavoritesContext
       value={{
         favorites,
         addFavorite,
@@ -101,12 +101,12 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
       }}
     >
       {children}
-    </FavoritesContext.Provider>
+    </FavoritesContext>
   );
 }
 
 export function useFavorites() {
-  const context = useContext(FavoritesContext);
+  const context = use(FavoritesContext);
   if (context === undefined) {
     throw new Error("useFavorites must be used within a FavoritesProvider");
   }
