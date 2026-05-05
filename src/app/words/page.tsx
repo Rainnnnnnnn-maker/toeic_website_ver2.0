@@ -4,6 +4,7 @@ import { Home, ChevronRight, BookOpen } from "lucide-react";
 import type { Metadata } from "next";
 import { getImportantWords, getMediumWords, getHighWords } from "@/data/words";
 import type { Word } from "@/data/words";
+import { WordLinkPending } from "@/components/features/words/WordLinkPending";
 
 export const metadata: Metadata = {
   title: {
@@ -82,9 +83,10 @@ function LevelSection({ id, title, description, learningGuide, words, badgeClass
                   key={word.slug}
                   href={`/words/${word.slug}`}
                   prefetch={false}
-                  className="text-sm text-slate-700 font-medium px-2.5 py-1.5 rounded-md bg-white border border-slate-200 hover:border-blue-300 hover:text-blue-700 hover:bg-blue-50 transition-all duration-150 no-underline truncate"
+                  className="relative text-sm text-slate-700 font-medium px-2.5 py-1.5 rounded-md bg-white border border-slate-200 hover:border-blue-300 hover:text-blue-700 hover:bg-blue-50 transition-all duration-150 no-underline truncate"
                 >
                   {word.term}
+                  <WordLinkPending />
                 </Link>
               ))}
             </div>

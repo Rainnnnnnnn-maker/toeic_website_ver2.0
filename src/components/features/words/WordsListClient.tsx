@@ -5,6 +5,7 @@ import Link from "next/link";
 import type { Word } from "@/data/words";
 import { X, ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight } from "lucide-react";
 import TabNavigation, { TabId } from "@/components/common/TabNavigation";
+import { WordLinkPending } from "@/components/features/words/WordLinkPending";
 
 type Props = {
   importantWords: Word[];
@@ -200,8 +201,9 @@ export default function WordsListClient({ importantWords, mediumWords, highWords
             key={word.slug}
             href={`/words/${word.slug}`}
             prefetch={false}
-            className="flex flex-col gap-1 p-3 bg-white rounded-lg border border-slate-200 no-underline transition-all duration-200 shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:-translate-y-0.5 hover:shadow-md hover:border-slate-300"
+            className="relative flex flex-col gap-1 p-3 bg-white rounded-lg border border-slate-200 no-underline transition-all duration-200 shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:-translate-y-0.5 hover:shadow-md hover:border-slate-300"
           >
+            <WordLinkPending />
             <div className="flex items-center justify-between gap-2">
               <span className="text-base font-semibold text-gray-900">{word.term}</span>
               {query && (
