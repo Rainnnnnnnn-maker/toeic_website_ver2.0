@@ -107,7 +107,6 @@ alwaysApply: true
 ## 8. Git / ブランチ運用
 
 - コミットメッセージのスタイルは `.trae/rules/git-commit-message.md` に従う。
-- 直接 `main` にコミット・プッシュしない。作業用ブランチを切って PR ベースで進める。
 - 破壊的操作（`reset --hard`, `push --force`, ブランチ削除等）はユーザの明示指示がない限り行わない。
 
 ## 9. 秘密情報の取り扱い
