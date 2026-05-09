@@ -10,6 +10,8 @@ export const size = {
 };
 
 export const contentType = "image/png";
+// OG画像は単語の翻訳が変わらない限り不変。30日に1回だけ再生成してISR Writesを抑制
+export const revalidate = 2592000;
 
 
 export default async function Image({ params }: { params: Promise<{ word: string }> }) {

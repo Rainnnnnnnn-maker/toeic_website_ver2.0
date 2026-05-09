@@ -11,6 +11,9 @@ import Loading from "./loading";
 
 // Vercel Hobbyプランの制限対策 (60秒)
 export const maxDuration = 60;
+// 明示的にISR期間を指定し、Next.js 16 cacheComponents下での予期せぬ再生成を抑制
+export const revalidate = 604800; // 7日
+export const dynamicParams = true;
 
 const WordDetailClient = dynamic(
   () => import("@/components/features/words/WordDetailClient").then((m) => m.WordDetailClient),

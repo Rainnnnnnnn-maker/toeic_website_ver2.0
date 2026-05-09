@@ -197,7 +197,7 @@ function getTodayKey(): string {
 export async function getTodayRecommendedWords(limit: number = 5): Promise<Word[]> {
   'use cache';
   cacheTag('today-recommended-words');
-  cacheLife('hours');
+  cacheLife('days');
 
   const data = await getWordsDataCached();
   if (data.allWords.length === 0 || limit <= 0) {

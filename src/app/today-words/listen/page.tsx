@@ -16,12 +16,13 @@ export default async function TodayWordsListenPage() {
   const todayWords = await getTodayRecommendedWords(5);
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-2xl">
-      <Suspense fallback={<div className="flex justify-center py-20"><div className="animate-pulse w-full max-w-xl h-[400px] bg-white rounded-xl border border-slate-200" /></div>}>
-        <TodayWordsListenClient words={todayWords} />
-      </Suspense>
+    <div className="relative min-h-screen w-full flex justify-center py-8 px-4 bg-[radial-gradient(circle_at_top,#e0f2fe_0,#f9fafb_45%,#ffffff_100%)] sm:py-12 sm:px-6 lg:py-8 lg:px-8 lg:pb-16">
+      <div className="w-full max-w-2xl flex flex-col relative">
+        <Suspense fallback={<div className="flex justify-center py-20"><div className="animate-pulse w-full max-w-xl h-[400px] bg-white rounded-xl border border-slate-200" /></div>}>
+          <TodayWordsListenClient words={todayWords} />
+        </Suspense>
 
-      <section className="mt-10 text-sm leading-relaxed text-slate-700">
+        <section className="mt-10 text-sm leading-relaxed text-slate-700">
         <h2 className="mb-3 text-base font-semibold text-slate-900">
           今日の単語 聞き流しモードとは
         </h2>
@@ -96,6 +97,7 @@ export default async function TodayWordsListenPage() {
           をご覧ください。
         </p>
       </section>
+      </div>
     </div>
   );
 }
