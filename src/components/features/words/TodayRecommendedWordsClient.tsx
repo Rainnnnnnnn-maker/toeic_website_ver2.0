@@ -31,7 +31,7 @@ export default function TodayRecommendedWordsClient({ words, variant }: Props) {
               href="/today-words/listen"
               className="inline-flex items-center justify-center px-3 py-1.5 text-xs font-bold text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 hover:border-blue-300 transition-all shadow-sm"
             >
-              聞き流し(Beta)
+              聞き流し
             </Link>
           </div>
           <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-5">
@@ -65,7 +65,7 @@ export default function TodayRecommendedWordsClient({ words, variant }: Props) {
             href="/today-words/listen"
             className="inline-flex items-center justify-center px-3 py-1.5 text-xs font-bold text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 hover:border-blue-300 transition-all shadow-sm"
           >
-            聞き流し(Beta)
+            聞き流し
           </Link>
         </div>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
