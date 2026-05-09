@@ -6,7 +6,7 @@ import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "今日の単語 聞き流し | TOEIC Words",
-  description: "今日の単語5つの英語と例文を自動再生で聞き流し学習ができます。",
+  description: "通勤・通学や家事などのスキマ時間に。その日に選ばれたTOEIC頻出単語5つの発音・英語例文・日本語訳を自動再生する「聞き流しモード」で、リスニング力と語彙力を同時に鍛えられます。",
   alternates: {
     canonical: "https://www.toeic-words.com/today-words/listen",
   },
