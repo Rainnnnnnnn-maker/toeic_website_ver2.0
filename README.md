@@ -21,7 +21,7 @@ A comprehensive web application for learning essential TOEIC vocabulary, featuri
   - A compact “今日おすすめの5単語” section is shown on the TOP page.
   - All 5 words are displayed directly in the TOP section without a separate “view all” button.
   - Picks are determined by UTC date key + word slug hash, so the same day yields the same 5 words.
-  - Selection logic lives server-side in `getTodayRecommendedWords()` as a Cache Component (`'use cache'` + `cacheLife('hours')`), so TOP / `/today-words` / `/today-words/listen` / word-detail navigation always show the same 5 words.
+  - Selection logic lives server-side in `getTodayRecommendedWords()` as a Cache Component (`'use cache'` + `cacheLife('days')`), so TOP / `/today-words` / `/today-words/listen` / word-detail navigation always show the same 5 words. The cache window is `days` (not `hours`) because the selection only changes once per JST day — using `hours` previously caused redundant ISR Writes.
 - **Listen-and-Repeat Mode (Beta)** (`/today-words/listen`):
   - Hands-free auto-play of today's 5 words: each word is read out as **word → English example → Japanese example**, then advances to the next word.
   - Play / Pause / Skip-Prev / Skip-Next controls. Completion message is shown after the 5th word; pressing play again restarts from the top.
