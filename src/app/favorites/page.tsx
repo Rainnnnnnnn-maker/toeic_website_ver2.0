@@ -4,6 +4,7 @@ import FavoritesListClient from "@/components/features/favorites/FavoritesListCl
 import type { Metadata } from "next";
 import ReviewModeButton from "@/components/features/review/ReviewModeButton";
 import Script from "next/script";
+import { ArrowLeft } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "お気に入り単語",
@@ -56,8 +57,9 @@ export default async function FavoritesPage() {
           </div>
           <div className="flex gap-4 items-center mt-2 flex-wrap justify-end sm:justify-start">
             <ReviewModeButton />
-            <Link href="/" prefetch={false} className="inline-flex items-center justify-center gap-2 px-4 py-2 min-h-[36px] bg-slate-50 text-slate-700 border-2 border-slate-700 rounded-lg font-bold text-sm tracking-wide no-underline transition-all duration-200 hover:bg-slate-100 hover:-translate-y-0.5 active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-slate-500">
-              単語一覧
+            <Link href="/" prefetch={false} className="group relative inline-flex items-center justify-center gap-1.5 px-4 py-2 min-h-[36px] bg-white text-slate-700 border border-slate-200 rounded-lg font-bold text-sm shadow-sm transition-all duration-300 hover:border-slate-300 hover:bg-slate-50 hover:shadow-md hover:-translate-y-1 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-slate-500">
+              <ArrowLeft size={16} className="transition-transform group-hover:-translate-x-1" />
+              <span>単語一覧</span>
             </Link>
           </div>
         </header>

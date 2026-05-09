@@ -2,6 +2,7 @@ import Link from "next/link";
 import Script from "next/script";
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { BookOpen, Star, List } from "lucide-react";
 import { getImportantWords, getMediumWords, getHighWords, getTodayRecommendedWords } from "@/data/words";
 import WordsListClient from "@/components/features/words/WordsListClient";
 import { SnsShareButtons } from "@/components/features/sns/SnsShareButtons";
@@ -167,11 +168,19 @@ export default async function Home() {
             </p>
           </div>
           <div className="flex gap-4 items-center mt-2 flex-wrap justify-end sm:justify-start">
-            <Link href="/study" prefetch={false} className="inline-flex items-center justify-center gap-2 px-4 py-2 min-h-[36px] bg-blue-50 text-blue-700 border-2 border-blue-600 rounded-lg font-bold text-sm tracking-wide no-underline transition-all duration-200 hover:bg-blue-100 hover:-translate-y-0.5 active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500">
-              <span className="inline-flex items-center">学習モード</span>
+            <Link href="/study" prefetch={false} className="group relative inline-flex items-center justify-center gap-1.5 px-4 py-2 min-h-[36px] bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-lg font-bold text-sm shadow-[0_4px_14px_0_rgba(37,99,235,0.39)] overflow-hidden transition-all duration-300 hover:shadow-[0_6px_20px_rgba(37,99,235,0.23)] hover:-translate-y-1 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500">
+              <div className="absolute inset-0 flex h-full w-full justify-center [transform:skew(-12deg)_translateX(-150%)] group-hover:duration-1000 group-hover:[transform:skew(-12deg)_translateX(150%)]">
+                <div className="relative h-full w-8 bg-white/20" />
+              </div>
+              <BookOpen size={16} className="transition-transform group-hover:scale-110" />
+              <span className="relative z-10">学習モード</span>
             </Link>
-            <Link href="/favorites" prefetch={false} className="inline-flex items-center justify-center gap-2 px-4 py-2 min-h-[36px] bg-amber-50 text-amber-700 border-2 border-amber-500 rounded-lg font-bold text-sm tracking-wide no-underline transition-all duration-200 hover:bg-amber-100 hover:-translate-y-0.5 active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-amber-500">
-              <span className="inline-flex items-center">お気に入り</span>
+            <Link href="/favorites" prefetch={false} className="group relative inline-flex items-center justify-center gap-1.5 px-4 py-2 min-h-[36px] bg-gradient-to-r from-amber-500 to-orange-400 text-white rounded-lg font-bold text-sm shadow-[0_4px_14px_0_rgba(245,158,11,0.39)] overflow-hidden transition-all duration-300 hover:shadow-[0_6px_20px_rgba(245,158,11,0.23)] hover:-translate-y-1 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-amber-500">
+              <div className="absolute inset-0 flex h-full w-full justify-center [transform:skew(-12deg)_translateX(-150%)] group-hover:duration-1000 group-hover:[transform:skew(-12deg)_translateX(150%)]">
+                <div className="relative h-full w-8 bg-white/20" />
+              </div>
+              <Star size={16} className="transition-transform group-hover:rotate-12 group-hover:scale-110" />
+              <span className="relative z-10">お気に入り</span>
             </Link>
           </div>
         </header>
@@ -201,8 +210,13 @@ export default async function Home() {
         </section>
 
         <div className="flex justify-center">
-          <Link href="/words" prefetch={false} className="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-800 text-white rounded-lg font-semibold text-sm hover:bg-slate-900 transition-colors no-underline">
-            全単語一覧 →
+          <Link href="/words" prefetch={false} className="group relative inline-flex items-center gap-1.5 px-5 py-2.5 bg-slate-800 text-white rounded-lg font-bold text-sm shadow-[0_4px_14px_0_rgba(15,23,42,0.39)] overflow-hidden transition-all duration-300 hover:bg-slate-700 hover:shadow-[0_6px_20px_rgba(15,23,42,0.23)] hover:-translate-y-1 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-slate-800 no-underline">
+            <div className="absolute inset-0 flex h-full w-full justify-center [transform:skew(-12deg)_translateX(-150%)] group-hover:duration-1000 group-hover:[transform:skew(-12deg)_translateX(150%)]">
+              <div className="relative h-full w-8 bg-white/10" />
+            </div>
+            <List size={16} className="transition-transform group-hover:scale-110" />
+            <span className="relative z-10">全単語一覧</span>
+            <span className="relative z-10 transition-transform duration-300 group-hover:translate-x-1">→</span>
           </Link>
         </div>
 
