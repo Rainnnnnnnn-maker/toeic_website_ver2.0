@@ -4,7 +4,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "当サイトについて｜運営方針・単語選定基準・更新ポリシー",
   description:
-    "TOEIC重要単語は、AIを活用してTOEIC頻出単語を効率的に学習できる無料サービスです。運営者情報、単語選定の根拠、AI解説の検証フロー、サイトの更新方針について説明します。",
+    "TOEIC 重要単語は、TOEIC 頻出 1,300 語以上を効率的に学習できる無料サービスです。運営者情報、単語選定の根拠、解説作成と品質管理のフロー、サイトの更新方針について説明します。",
   alternates: {
     canonical: "https://www.toeic-words.com/about",
   },
@@ -27,7 +27,7 @@ export default function AboutPage() {
         <section>
           <h2 className="mb-3 text-lg font-semibold">TOEIC重要単語とは</h2>
           <p>
-            「TOEIC重要単語」は、TOEIC L&amp;R 試験に頻出する英単語を効率的に学習できる無料の Web サービスです。1,300 語以上の頻出単語を「important（基礎）／ mid（中級）／ high（上級）」の 3 段階に分類し、各単語に AI による意味・ニュアンス解説と複数の例文、ネイティブ発音音声を提供しています。
+            「TOEIC重要単語」は、TOEIC L&amp;R 試験に頻出する英単語を効率的に学習できる無料の Web サービスです。1,300 語以上の頻出単語を「important（基礎）／ mid（中級）／ high（上級）」の 3 段階に分類し、各単語にビジネス文脈に最適化した意味・ニュアンス解説、複数の例文、ネイティブ発音音声を提供しています。解説は運営者がチェックし、気になる箇所は修正しながら掲載しています。
           </p>
           <p className="mt-2">
             会員登録は不要で、すべての機能を無料で利用できます。お気に入り情報はブラウザのローカルストレージに保存され、サーバーには送信されません。
@@ -117,24 +117,36 @@ export default function AboutPage() {
         </section>
 
         <section>
-          <h2 className="mb-3 text-lg font-semibold">AI 解説の生成と品質管理</h2>
+          <h2 className="mb-3 text-lg font-semibold">解説の作成方針と品質管理</h2>
           <p>
-            各単語の意味・ニュアンス・例文は、Google Gemini モデル（gemini-2.5-flash-lite）により生成しています。生成内容は以下のフローで品質を担保しています。
+            各単語の意味・ニュアンス・例文は、TOEIC のビジネス文脈に限定したプロンプト設計のもとで下書きを作成し、運営者が掲載前後に内容を目視で確認しています。気になった箇所は適宜修正し、品質を維持するように運用しています。
           </p>
           <ol className="mt-2 list-inside list-decimal space-y-1">
             <li>
-              TOEIC のビジネス文脈に限定したプロンプト設計（一般会話例文を排除）
+              TOEIC のビジネス文脈に限定した下書き生成（一般会話の例文を排除）
             </li>
             <li>
-              出力後の自動検証（必須フィールド・例文数・形式の整合性チェック）
+              必須フィールド・例文数・形式の整合性を自動チェック
             </li>
-            <li>閲覧時にエラー検知された場合は即時再生成</li>
             <li>
-              ユーザー報告で誤りを受けた場合、個別キャッシュをクリアして再生成
+              運営者が単語ページを実際に閲覧して内容を目視確認し、不自然な訳語・例文・コロケーションを発見次第修正
+            </li>
+            <li>
+              閲覧者から誤りの指摘を受けた場合は、該当単語のキャッシュをクリアし、解説を再作成・再確認
+            </li>
+            <li>
+              修正の経緯は GitHub のコミット履歴に記録し、変更内容を追跡可能な形で管理
             </li>
           </ol>
           <p className="mt-3">
-            生成された解説は Vercel Blob と Upstash Redis の多段キャッシュで配信され、応答速度と品質の両立を図っています。
+            なお、本サービスは個人運営のため、全 1,300 語以上のレビューには時間を要します。誤りや不自然な表現を見つけた場合は{" "}
+            <Link
+              href="/contact"
+              className="text-blue-600 underline hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+            >
+              お問い合わせ
+            </Link>
+            よりご報告いただけると、優先的に修正します。
           </p>
         </section>
 
@@ -154,7 +166,10 @@ export default function AboutPage() {
               </Link>
             </li>
             <li>
-              <strong>サイト開設</strong>：2025 年 12 月
+              <strong>サイト開設</strong>：2026 年 3 月
+            </li>
+            <li>
+              <strong>最終更新</strong>：2026 年 5 月（コンテンツ・機能ともに継続的に更新中）
             </li>
             <li>
               <strong>収益化</strong>：Google AdSense 広告による無料運営

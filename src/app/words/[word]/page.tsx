@@ -38,7 +38,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { word: slug } = await params;
-  
+
   // 基本情報の取得（同期・高速）
   const wordEntry = await getWordBySlug(slug);
   if (!wordEntry) {
@@ -48,11 +48,39 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
-  // 詳細情報の取得（getWordDetail）を削除し、ここで待機しないようにする
-  // これによりSuspense（ローディング）が即座に動作し、UXが向上する
+  // 詳細情報も取得して meta description をユニーク化
+  // （L1 Data Cache ヒット時は数ms。SSGビルド済みのため実質無コスト）
+  const detailData = await getWordDetail(slug).catch(() => null);
+
+  const levelLabel =
+    wordEntry.level === "important" ? "重要" :
+    wordEntry.level === "medium" ? "中級" : "上級";
 
   const title = `${wordEntry.term} | TOEIC重要単語`;
-  const description = `TOEIC頻出単語「${wordEntry.term}」の意味と使い方をAIが解説。効率よく学習してスコアアップを目指しましょう。`;
+
+  let description: string;
+  if (detailData) {
+    const translation = detailData.japaneseTranslation?.trim() || "";
+    const partsOfSpeech = Array.from(
+      new Set(detailData.meanings.map((m) => m.partOfSpeech).filter(Boolean))
+    ).join("・");
+    const exampleEn = detailData.toeicExamples?.[0]?.english?.trim() || "";
+
+    const head = translation
+      ? `「${wordEntry.term}」の意味は「${translation}」。`
+      : `TOEIC頻出単語「${wordEntry.term}」の使い方を解説。`;
+    const middle = partsOfSpeech
+      ? `品詞:${partsOfSpeech}、TOEIC ${levelLabel}レベル。`
+      : `TOEIC ${levelLabel}レベル。`;
+    const tail = exampleEn
+      ? `例文「${exampleEn}」など、ビジネス文脈の例文・類義語・発音音声を掲載。`
+      : `ビジネス文脈の例文・類義語・派生語・発音音声を掲載。`;
+
+    // 160字前後に収める
+    description = `${head}${middle}${tail}`.slice(0, 158);
+  } else {
+    description = `「${wordEntry.term}」(TOEIC ${levelLabel}レベル) の意味・例文・類義語・派生語・発音音声を、ビジネス文脈に絞って掲載。`;
+  }
   const url = `https://www.toeic-words.com/words/${slug}`;
   const images = [
     {

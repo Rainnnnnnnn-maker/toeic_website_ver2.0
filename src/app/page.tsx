@@ -11,10 +11,10 @@ import { getLatestGuideArticles } from "@/data/guide-articles";
 
 export const metadata: Metadata = {
   title: {
-    absolute: "TOEIC 重要単語【2026年最新】600点・730点・800点突破｜AI解説付き無料単語帳",
+    absolute: "TOEIC 重要単語【2026年最新】600点・730点・800点突破｜詳しい解説付き無料単語帳",
   },
   description:
-    "【完全無料】TOEIC重要単語をAIが徹底解説！2026年最新の出題傾向（リモートワーク・オンライン会議など）を反映した頻出英単語帳です。目標スコア（600点・730点・800点）のレベル別に厳選した単語を収録し、最短でのスコアアップを強力にサポート。実践的なビジネス例文、類義語の使い分け、音声発音チェック機能も完備。スマホでいつでも効率的に学習し、今のTOEICに通用する英語力を身につけましょう。",
+    "【完全無料】TOEIC重要単語をビジネス文脈に絞って徹底解説。2026年最新の出題傾向（リモートワーク・オンライン会議など）を反映した頻出英単語1,300語以上と、学習ガイド記事12本以上を収録。目標スコア（600点・730点・800点）のレベル別に厳選した単語、ビジネス例文、類義語の使い分け、音声発音チェック機能も完備。スマホでいつでも効率的に学習し、今のTOEICに通用する英語力を身につけましょう。",
   keywords: ["TOEIC 重要単語", "TOEIC 単語帳", "TOEIC 頻出単語", "2026年", "最新", "無料", "アプリ", "600点", "730点", "800点"],
   alternates: {
     canonical: "https://www.toeic-words.com/",
@@ -33,7 +33,7 @@ export default async function Home() {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: "TOEIC重要単語",
-    description: "【完全無料】TOEIC重要単語をAIが徹底解説！2026年最新の出題傾向（リモートワーク・オンライン会議など）を反映した頻出英単語帳です。目標スコア（600点・730点・800点）のレベル別に厳選した単語を収録し、最短でのスコアアップを強力にサポート。実践的なビジネス例文、類義語の使い分け、音声発音チェック機能も完備。スマホでいつでも効率的に学習し、今のTOEICに通用する英語力を身につけましょう。",
+    description: "【完全無料】TOEIC重要単語をビジネス文脈に絞って徹底解説。2026年最新の出題傾向（リモートワーク・オンライン会議など）を反映した頻出英単語1,300語以上と、学習ガイド記事12本以上を収録。目標スコア（600点・730点・800点）のレベル別に厳選した単語、ビジネス例文、類義語の使い分け、音声発音チェック機能も完備。スマホでいつでも効率的に学習し、今のTOEICに通用する英語力を身につけましょう。",
     alternateName: ["TOEIC重要単語", "TOEIC Words", "TOEIC単語帳"],
     url: "https://www.toeic-words.com/",
     inLanguage: "ja-JP",
@@ -105,7 +105,7 @@ export default async function Home() {
     },
     {
       name: "TOEIC単語帳アプリと当サイトの違いは？",
-      text: "当サイトはインストール不要でブラウザからすぐに使える完全無料のTOEIC単語学習サービスです。最大の特徴はAIによる詳細な単語解説です。単なる日本語訳だけでなく、語源・ニュアンス・コロケーション・TOEIC実践例文まで網羅しており、深い理解に基づく暗記をサポートします。"
+      text: "当サイトはインストール不要でブラウザからすぐに使える完全無料のTOEIC単語学習サービスです。最大の特徴はビジネス文脈に絞った詳細な単語解説で、単なる日本語訳だけでなく、語源・ニュアンス・コロケーション・TOEIC実践例文まで網羅しており、深い理解に基づく暗記をサポートします。さらに、12本以上の学習ガイド記事でスコア別戦略・Part別対策まで体系的に学べます。"
     },
     {
       name: "TOEIC 600点に必要な単語力は？",
@@ -113,7 +113,7 @@ export default async function Home() {
     },
     {
       name: "TOEIC 800点以上を目指すには？",
-      text: `800点以上を目指す場合、最重要単語に加えて中級単語${mediumWords.length}語と高難易度単語${highWords.length}語もカバーする必要があります。特にPart 7の長文読解では、文脈から意味を推測する力が問われるため、単語の複数の意味や使い分けを理解することが重要です。当サイトのAI解説で各単語のニュアンスを深く学びましょう。`
+      text: `800点以上を目指す場合、最重要単語に加えて中級単語${mediumWords.length}語と高難易度単語${highWords.length}語もカバーする必要があります。特にPart 7の長文読解では、文脈から意味を推測する力が問われるため、単語の複数の意味や使い分けを理解することが重要です。当サイトの解説で各単語のニュアンスを深く学びましょう。`
     },
   ];
 
@@ -228,9 +228,9 @@ export default async function Home() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col gap-3">
                 <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center text-xl font-bold mb-2">1</div>
-                <h3 className="text-lg font-bold text-slate-800">AIによる圧倒的な解説量</h3>
+                <h3 className="text-lg font-bold text-slate-800">ビジネス文脈に絞った詳しい解説</h3>
                 <p className="text-sm text-slate-600 leading-relaxed">
-                  単なる日本語訳だけでなく、語源、微妙なニュアンスの違い、ビジネスシーンでの具体的な使われ方をAIが徹底解説。丸暗記に頼らない「生きた英語」が身につきます。
+                  単なる日本語訳だけでなく、語源、微妙なニュアンスの違い、ビジネスシーンでの具体的な使われ方まで踏み込んで解説。丸暗記に頼らない「生きた英語」が身につきます。
                 </p>
               </div>
               <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col gap-3">
@@ -284,7 +284,7 @@ export default async function Home() {
           <div className="flex flex-col gap-4 border-l-4 border-blue-600 pl-5 py-2">
             <h2 className="text-lg font-bold text-slate-800">開発チームからのメッセージ</h2>
             <p className="text-sm text-slate-600 leading-relaxed">
-              「市販の単語帳は持ち歩くのが重い」「アプリは有料のものが多い」——そんなTOEIC学習者の声から、このサイトは生まれました。私たちは、誰もが質の高い英語学習環境に無料でアクセスできるべきだと考えています。AI技術を活用することで、従来の辞書にはない「生きたビジネス英語のニュアンス」を提供し、皆さまのスコアアップ、そしてその先のキャリアアップを全力でサポートします。
+              「市販の単語帳は持ち歩くのが重い」「アプリは有料のものが多い」——そんなTOEIC学習者の声から、このサイトは生まれました。誰もが質の高い英語学習環境に無料でアクセスできるべきだと考えています。従来の辞書にはない「生きたビジネス英語のニュアンス」を、運営者の手で確認しながら提供し、皆さまのスコアアップ、そしてその先のキャリアアップをサポートします。
             </p>
           </div>
         </section>
@@ -302,7 +302,7 @@ export default async function Home() {
             </Link>
           </div>
           <p className="text-sm text-slate-600 leading-relaxed">
-            TOEIC のスコアアップに直結する学習戦略・Part 別対策・語彙集を、運営チームが体系的にまとめています。
+            TOEIC のスコアアップに直結する学習戦略・Part 別対策・語彙集を、運営者が体系的にまとめた長文記事を <strong>12 本以上</strong> 公開しています。スコア別の語彙数、忘却曲線を活用した暗記法、Part 5/7 の頻出語リストなど、単語帳だけでは補えない内容を扱います。
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {latestGuideArticles.map((article) => (
@@ -368,7 +368,7 @@ export default async function Home() {
             <p className="text-[15px] leading-[1.8] text-slate-600">
               TOEICスコアアップの鍵は、試験に出る「TOEIC重要単語」を確実にマスターすることです。
               単に英単語と日本語訳を丸暗記するのではなく、実際の例文の中でどのように使われるかを理解することが重要です。
-              本サイトでは、AIを活用して各単語の詳細な意味の解説、語形変化、類義語、ニュアンス、そして例文を提供しています。
+              本サイトでは、各単語の詳細な意味、語形変化、類義語、ニュアンス、そして実践的な例文を、ビジネス文脈に絞って提供しています。
             </p>
             <ul className="list-disc pl-6 mt-2 flex flex-col gap-2">
               <li className="text-[15px] leading-[1.6] text-slate-600">
@@ -391,7 +391,7 @@ export default async function Home() {
             </p>
             <p className="text-[15px] leading-[1.8] text-slate-600">
               TOEIC 600点を目指す方は、頻繁に使われる基本的な最重要単語を確実に抑えましょう。
-              600点以上を目指す方は、より難しい単語をAIの解説を活用して、理解を深めながら覚えましょう。
+              600点以上を目指す方は、より難しい単語のニュアンス・コロケーションまで踏み込んで理解を深めながら覚えましょう。
             </p>
           </article>
         </section>
