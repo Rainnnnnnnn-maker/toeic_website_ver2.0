@@ -197,7 +197,9 @@ function getTodayKey(): string {
 export async function getTodayRecommendedWords(limit: number = 5): Promise<Word[]> {
   'use cache';
   cacheTag('today-recommended-words');
-  cacheLife('days');
+  // Cronで毎日 JST 7時に revalidateTag('today-recommended-words') を呼んで明示的に更新するため、
+  // 自動失効は実質止める（'weeks' で長期保持し、ISR Writes を最小化）
+  cacheLife('weeks');
 
   const data = await getWordsDataCached();
   if (data.allWords.length === 0 || limit <= 0) {

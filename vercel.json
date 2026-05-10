@@ -1,5 +1,11 @@
 {
   "git": {
     "deploymentEnabled": true
-  }
+  },
+  "crons": [
+    {
+      "path": "/api/revalidate/today-words?token=a404c98c-6352-41fe-acfe-fce90a50e9cb",
+      "schedule": "5 22 * * *"
+    }
+  ]
 }
