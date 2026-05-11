@@ -139,7 +139,7 @@ async function fetchWordDetailFromGemini(term: string): Promise<WordDetails> {
   const promptBase = systemPrompt.replaceAll("${word}", term);
   const prompts = [
     {
-      maxOutputTokens: 1024,
+      maxOutputTokens: 1536,
       prompt: promptBase,
     },
     {
