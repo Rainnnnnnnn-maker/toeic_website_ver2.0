@@ -35,7 +35,9 @@ Return ONLY a JSON object for "\${word}" with the following fields:
     { "english": "English sentence", "japanese": "日本語訳" }
   ],
   "englishDefinition": "短い英語定義",
-  "japaneseTranslation": "日本語訳"
+  "japaneseTranslation": "日本語訳",
+  "etymology": "語源・成り立ち（例: re(再び) + spect(見る)）",
+  "collocations": ["よく使われるコロケーション1", "コロケーション2"]
 }
 
 Constraints:
@@ -44,8 +46,8 @@ Constraints:
 - meanings は品詞ごとに1〜2文で簡潔に
 - definition は短い日本語で出力する
 - englishDefinition は短い英語で出力する
-- 語形変化は最大5件、類義語は最大5件、toeicExamples は3〜5件
-- 語源・使用注意・地域差などの付加情報は含めない
+- 語形変化は最大5件、類義語は最大5件、toeicExamples は3〜5件、collocationsは2〜3件
+- etymology は単語の成り立ちや記憶のフックになる情報を日本語で1〜2文で出力する
 - JSON以外のテキストは出力しない
 `;
 
@@ -110,6 +112,8 @@ function normalizePayload(word: string, payload: RawWordPayload): WordDetails {
     japanese: ex.japanese ?? "",
   }));
 
+  const collocations = Array.isArray(payload.collocations) ? payload.collocations.slice(0, 3) : [];
+
   return {
     word,
     pronunciation: payload.pronunciation ?? "",
@@ -120,8 +124,8 @@ function normalizePayload(word: string, payload: RawWordPayload): WordDetails {
     toeicExamples,
     englishDefinition: payload.englishDefinition ?? "",
     japaneseTranslation: payload.japaneseTranslation ?? "",
-    etymology: payload.etymology,
-    usageNotes: payload.usageNotes,
+    etymology: payload.etymology ?? "",
+    collocations,
   };
 }
 

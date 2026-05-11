@@ -183,6 +183,34 @@ export function WordDetailClient({ initialData, linkedWords = {}, relatedWords =
           </section>
         )}
 
+        {data.etymology && (
+          <section className="flex flex-col gap-2">
+            <h2 className="text-xs font-bold tracking-wider uppercase text-slate-500 flex items-center gap-1.5">
+              <span className="w-0.5 h-2.5 bg-orange-500 rounded-full"></span>
+              語源・成り立ち
+            </h2>
+            <div className="bg-orange-50/50 rounded-lg p-3 border border-orange-100/50">
+              <p className="text-sm text-slate-700 leading-relaxed">{data.etymology}</p>
+            </div>
+          </section>
+        )}
+
+        {data.collocations && data.collocations.length > 0 && (
+          <section className="flex flex-col gap-2">
+            <h2 className="text-xs font-bold tracking-wider uppercase text-slate-500 flex items-center gap-1.5">
+              <span className="w-0.5 h-2.5 bg-pink-500 rounded-full"></span>
+              よく使われる表現・コロケーション
+            </h2>
+            <ul className="flex flex-wrap gap-1.5 list-none m-0 p-0">
+              {data.collocations.map((col, i) => (
+                <li key={`col-${i}`} className="px-2 py-1 rounded bg-pink-50 text-pink-700 text-sm border border-pink-200 font-medium">
+                  {col}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
         {data.wordForms.length > 0 && (
           <section className="flex flex-col gap-2">
             <h2 className="text-xs font-bold tracking-wider uppercase text-slate-500 flex items-center gap-1.5">

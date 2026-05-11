@@ -21,12 +21,8 @@ export type RawWordPayload = {
   toeicExamples: Array<{ english: string; japanese: string }>;
   englishDefinition: string;
   japaneseTranslation: string;
-  etymology?: string;
-  usageNotes?: {
-    commonCollocations?: string[];
-    register?: string;
-    regionalVariations?: string;
-  };
+  etymology?: string; // 語源・成り立ち（例: "re(再び) + spect(見る)"）
+  collocations?: string[]; // よく使われるコロケーション（例: "have an impact on"）
 };
 
 export type WordDetails = {
@@ -53,9 +49,5 @@ export type WordDetails = {
   englishDefinition: string;
   japaneseTranslation: string;
   etymology?: string;
-  usageNotes?: {
-    commonCollocations?: string[];
-    register?: string;
-    regionalVariations?: string;
-  };
+  collocations?: string[];
 };
