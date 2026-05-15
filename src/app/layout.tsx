@@ -6,7 +6,7 @@ import { GoogleAnalytics } from "@next/third-parties/google";
 import { FavoritesProvider } from "@/context/FavoritesContext";
 import { Footer } from "@/components/common/Footer";
 import { CookieConsent } from "@/components/common/CookieConsent";
-import { A8AdBanner } from "@/components/common/A8AdBanner";
+import { A8AdBanner1 } from "@/components/common/A8AdBanner";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -94,7 +94,7 @@ export default function RootLayout({
         <FavoritesProvider>
           <div className="flex min-h-screen flex-col">
             <div className="flex-1">{children}</div>
-            <A8AdBanner />
+            <A8AdBanner1 />
             <Footer />
           </div>
           <CookieConsent />

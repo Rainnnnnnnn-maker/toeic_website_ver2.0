@@ -1,5 +1,5 @@
 
-export const A8AdBanner = () => {
+export const A8AdBanner1 = () => {
   return (
     <div className="w-full flex justify-center my-8 px-4">
       <div className="relative inline-block max-w-full text-center">
