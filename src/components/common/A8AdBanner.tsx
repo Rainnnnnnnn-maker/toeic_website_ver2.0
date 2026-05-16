@@ -1,9 +1,15 @@
-
-export const A8AdBanner1 = () => {
+export const A8AdBanner728x90 = () => {
   return (
     <div className="w-full flex justify-center my-8 px-4">
-      <div className="relative inline-block max-w-full text-center">
-        <a href="https://px.a8.net/svt/ejp?a8mat=4B3N6Y+6JSFM+3AQG+C3QQ9" rel="nofollow">
+      <div
+        className="relative inline-block w-full max-w-[728px] text-center"
+        style={{ aspectRatio: "728 / 90" }}
+      >
+        <a
+          href="https://px.a8.net/svt/ejp?a8mat=4B3N6Y+6JSFM+3AQG+C3QQ9"
+          rel="sponsored nofollow noopener"
+          target="_blank"
+        >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             style={{ border: 0 }}
@@ -11,12 +17,12 @@ export const A8AdBanner1 = () => {
             height="90"
             alt=""
             src="https://www25.a8.net/svt/bgt?aid=260510506011&wid=001&eno=01&mid=s00000015388002033000&mc=1"
-            className="max-w-full h-auto"
+            className="w-full h-auto"
           />
         </a>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          style={{ border: 0 }}
+          style={{ border: 0, position: "absolute", width: 1, height: 1 }}
           width="1"
           height="1"
           src="https://www18.a8.net/0.gif?a8mat=4B3N6Y+6JSFM+3AQG+C3QQ9"
