@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { getTodayRecommendedWords } from "@/data/words";
 import TodayWordsListenClient from "@/components/features/today-words/TodayWordsListenClient";
+import { A8AdBanner468x60 } from "@/components/common/A8AdBanner";
 import { Suspense } from "react";
 
 export const metadata: Metadata = {
@@ -21,6 +22,8 @@ export default async function TodayWordsListenPage() {
         <Suspense fallback={<div className="flex justify-center py-20"><div className="animate-pulse w-full max-w-xl h-[400px] bg-white rounded-xl border border-slate-200" /></div>}>
           <TodayWordsListenClient words={todayWords} />
         </Suspense>
+
+        <A8AdBanner468x60 />
 
         <section className="mt-10 text-sm leading-relaxed text-slate-700">
         <h2 className="mb-3 text-base font-semibold text-slate-900">
