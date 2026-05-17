@@ -145,6 +145,20 @@ Clears L1 (Next.js Data Cache) for a specific word. To also clear L2 (Upstash Re
   curl "https://<your-site>/api/revalidate/word?token=<REVALIDATION_TOKEN>&slug=additional&upstash=true"
   ```
 
+### Delete Upstash Word Cache Key (L2 Only)
+
+Deletes a specific Upstash Redis key for word details (`word:<slug>`). This endpoint does not touch the Next.js Data Cache (L1).
+
+- **Endpoint**: `GET /api/revalidate/upstash-word`
+- **Authentication**: Requires `token` query parameter matching `REVALIDATION_TOKEN`.
+- **Parameters**:
+  - `key` (Must start with `word:`. Example: `word:ability`)
+- **Usage**:
+
+  ```bash
+  curl "https://<your-site>/api/revalidate/upstash-word?token=<REVALIDATION_TOKEN>&key=word:ability"
+  ```
+
 ### Text-to-Speech
 
 Generates audio for words or sentences.
