@@ -15,9 +15,9 @@ type Props = {
 type PlayStep = "word" | "example_en" | "example_ja";
 
 const NEXT_STEP: Record<PlayStep, PlayStep | null> = {
-  word: "example_en",
-  example_en: "example_ja",
-  example_ja: null,
+  word: "example_ja",
+  example_ja: "example_en",
+  example_en: null,
 };
 
 function pickExample(detail: WordDetails): { en: string; ja: string } {
@@ -49,7 +49,7 @@ export default function TodayWordsListenClient({ words }: Props) {
   const playingRef = useRef(false);
 
   const currentWord = words[currentIndex];
-  const isCompleted = !isPlaying && currentIndex === words.length - 1 && currentStep === "example_ja";
+  const isCompleted = !isPlaying && currentIndex === words.length - 1 && currentStep === "example_en";
 
   useEffect(() => { indexRef.current = currentIndex; }, [currentIndex]);
   useEffect(() => { stepRef.current = currentStep; }, [currentStep]);
@@ -121,7 +121,7 @@ export default function TodayWordsListenClient({ words }: Props) {
       setCurrentStep("word");
     } else {
       setIsPlaying(false);
-      setCurrentStep("example_ja");
+      setCurrentStep("example_en");
     }
   }, [words.length]);
 
@@ -228,7 +228,7 @@ export default function TodayWordsListenClient({ words }: Props) {
       setCurrentStep("word");
     } else {
       setIsPlaying(false);
-      setCurrentStep("example_ja");
+      setCurrentStep("example_en");
     }
   }, [currentIndex, words.length]);
 
@@ -285,11 +285,11 @@ export default function TodayWordsListenClient({ words }: Props) {
         <div className="w-full bg-slate-50 rounded-lg p-4 border border-slate-100 min-h-[120px] flex flex-col justify-center gap-3">
           {currentDetail ? (
             <>
-              <p className={`text-base font-medium leading-relaxed transition-colors duration-300 ${currentStep === "example_en" && isPlaying ? "text-blue-600" : "text-slate-800"}`}>
-                {currentExampleEn}
-              </p>
               <p className={`text-sm leading-relaxed transition-colors duration-300 ${currentStep === "example_ja" && isPlaying ? "text-blue-600" : "text-slate-600"}`}>
                 {currentExampleJa}
+              </p>
+              <p className={`text-base font-medium leading-relaxed transition-colors duration-300 ${currentStep === "example_en" && isPlaying ? "text-blue-600" : "text-slate-800"}`}>
+                {currentExampleEn}
               </p>
             </>
           ) : (
