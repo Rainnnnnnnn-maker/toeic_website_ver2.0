@@ -10,16 +10,14 @@ export const size = {
 };
 
 export const contentType = "image/png";
+export const dynamicParams = false;
 
 // ビルド時に全単語のOG画像を静的生成する。
 // cacheComponents 環境では `export const revalidate` が無効化されるため、
 // SSG で生成して Function 実行（Active CPU）を発生させない方針に統一する。
 export async function generateStaticParams() {
   const words = await getAllWords();
-  if (words.length > 0) {
-    return words.map((w) => ({ word: w.slug }));
-  }
-  return [{ word: "__build_placeholder__" }];
+  return words.map((w) => ({ word: w.slug }));
 }
 
 export default async function Image({ params }: { params: Promise<{ word: string }> }) {
