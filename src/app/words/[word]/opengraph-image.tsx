@@ -1,5 +1,5 @@
 import { ImageResponse } from "next/og";
-import { getWordBySlug } from "@/data/words";
+import { getWordBySlug, getAllWords } from "@/data/words";
 import { getWordDetail } from "@/data/word-detail";
 import { loadGoogleFont } from "@/lib/og-utils";
 
@@ -10,9 +10,17 @@ export const size = {
 };
 
 export const contentType = "image/png";
-// OG画像は単語の翻訳が変わらない限り不変。30日に1回だけ再生成してISR Writesを抑制
-export const revalidate = 2592000;
 
+// ビルド時に全単語のOG画像を静的生成する。
+// cacheComponents 環境では `export const revalidate` が無効化されるため、
+// SSG で生成して Function 実行（Active CPU）を発生させない方針に統一する。
+export async function generateStaticParams() {
+  const words = await getAllWords();
+  if (words.length > 0) {
+    return words.map((w) => ({ word: w.slug }));
+  }
+  return [{ word: "__build_placeholder__" }];
+}
 
 export default async function Image({ params }: { params: Promise<{ word: string }> }) {
   const { word } = await params;
