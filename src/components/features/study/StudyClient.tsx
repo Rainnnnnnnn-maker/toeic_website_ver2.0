@@ -255,8 +255,6 @@ export default function StudyClient({
             pool = mediumWords;
           }
         } else {
-          // 通常の重み付け
-          // highWordsがある場合の重み付け
           if (highWords.length > 0) {
             // high: 30%, medium: 60%, important: 10%
             const r = Math.random();
@@ -355,22 +353,28 @@ export default function StudyClient({
     return () => window.clearTimeout(timer);
   }, [pickRandomWord, wordBySlug, storageKey]);
 
+  const writePersistedState = useCallback(
+    (slug: string, remembered: string[], forgotten: string[], count: number) => {
+      if (typeof window === 'undefined') return;
+      try {
+        const nextState: PersistedStudyStateV1 = {
+          v: 1,
+          currentSlug: slug,
+          rememberedSlugs: remembered,
+          forgottenSlugs: forgotten,
+          consecutiveForgotCount: count,
+          updatedAt: Date.now(),
+        };
+        window.sessionStorage.setItem(storageKey, JSON.stringify(nextState));
+      } catch {}
+    },
+    [storageKey],
+  );
+
   useEffect(() => {
-    if (typeof window === 'undefined') return;
     if (!currentWord) return;
-    try {
-      const nextState: PersistedStudyStateV1 = {
-        v: 1,
-        currentSlug: currentWord.slug,
-        rememberedSlugs,
-        forgottenSlugs,
-        consecutiveForgotCount,
-        updatedAt: Date.now(),
-      };
-      window.sessionStorage.setItem(storageKey, JSON.stringify(nextState));
-    } catch {
-    }
-  }, [currentWord, rememberedSlugs, forgottenSlugs, consecutiveForgotCount, storageKey]);
+    writePersistedState(currentWord.slug, rememberedSlugs, forgottenSlugs, consecutiveForgotCount);
+  }, [currentWord, rememberedSlugs, forgottenSlugs, consecutiveForgotCount, writePersistedState]);
 
   const handleRemembered = () => {
     if (!currentWord) return;
@@ -382,26 +386,17 @@ export default function StudyClient({
 
   const handleForgot = () => {
     if (!currentWord) return;
-    
+
     const newForgotSlugs = addUnique(forgottenSlugs, currentWord.slug);
     const newRememberedSlugs = removeValue(rememberedSlugs, currentWord.slug);
     const newCount = consecutiveForgotCount + 1;
-    
+
     setForgottenSlugs(newForgotSlugs);
     setRememberedSlugs(newRememberedSlugs);
     setConsecutiveForgotCount(newCount);
 
-    try {
-      const nextState: PersistedStudyStateV1 = {
-        v: 1,
-        currentSlug: currentWord.slug,
-        rememberedSlugs: newRememberedSlugs,
-        forgottenSlugs: newForgotSlugs,
-        consecutiveForgotCount: newCount,
-        updatedAt: Date.now(),
-      };
-      window.sessionStorage.setItem(storageKey, JSON.stringify(nextState));
-    } catch {}
+    // router.push でアンマウントされる前に同期で永続化（useEffect が走らない可能性があるため）
+    writePersistedState(currentWord.slug, newRememberedSlugs, newForgotSlugs, newCount);
 
     const query = backLink === '/favorites' ? '?from=review' : '?from=study';
     router.push(`/words/${currentWord.slug}${query}`);
