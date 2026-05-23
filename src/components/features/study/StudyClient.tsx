@@ -24,6 +24,7 @@ type PersistedStudyStateV1 = {
   rememberedSlugs: string[];
   forgottenSlugs: string[];
   consecutiveForgotCount?: number;
+  consecutiveRememberCount?: number;
   updatedAt: number;
 };
 
@@ -56,6 +57,7 @@ function parsePersistedStudyState(raw: string): PersistedStudyStateV1 | null {
       return null;
     }
     if (obj.consecutiveForgotCount !== undefined && typeof obj.consecutiveForgotCount !== 'number') return null;
+    if (obj.consecutiveRememberCount !== undefined && typeof obj.consecutiveRememberCount !== 'number') return null;
     if (typeof obj.updatedAt !== 'number') return null;
     return obj as PersistedStudyStateV1;
   } catch {
@@ -147,7 +149,7 @@ export default function StudyClient({
   const [currentWord, setCurrentWord] = useState<Word | null>(null);
   const [rememberedSlugs, setRememberedSlugs] = useState<string[]>([]);
   const [forgottenSlugs, setForgottenSlugs] = useState<string[]>([]);
-  const [consecutiveForgotCount, setConsecutiveForgotCount] = useState(0);
+  const [consecutiveRememberCount, setConsecutiveRememberCount] = useState(0);
   const initializedRef = useRef(false);
   const [countdownValue, setCountdownValue] = useState<number | null>(null);
   const [countdownKey, setCountdownKey] = useState(0);
@@ -223,7 +225,7 @@ export default function StudyClient({
     }
 
     let nextWord: Word;
-    const currentCount = overrideCount !== undefined ? overrideCount : consecutiveForgotCount;
+    const currentCount = overrideCount !== undefined ? overrideCount : consecutiveRememberCount;
 
     if (order === 'sequential') {
       if (!currentWord) {
@@ -240,35 +242,26 @@ export default function StudyClient({
       do {
         let pool = words;
 
-        // 3回連続で「覚えていない」を押した場合、難易度の低い単語(important)を優先する
-        if (currentCount >= 3) {
-          if (importantWords.length > 0) {
-            const r = Math.random();
-            if (r < 0.8) {
-              pool = importantWords;
-            } else if (r < 0.95 && mediumWords.length > 0) {
-              pool = mediumWords;
-            } else if (highWords.length > 0) {
-              pool = highWords;
-            }
-          } else if (mediumWords.length > 0) {
-            pool = mediumWords;
-          }
+        // 連続正解回数による段階的な難易度調整
+        // 0〜4回: important中心 (important 80%, medium 20%)
+        // 5〜9回: medium中心 (important 20%, medium 60%, high 20%)
+        // 10回〜: high中心 (important 10%, medium 30%, high 60%)
+        const r = Math.random();
+
+        if (currentCount < 5) {
+          if (r < 0.8 && importantWords.length > 0) pool = importantWords;
+          else if (mediumWords.length > 0) pool = mediumWords;
+          else if (highWords.length > 0) pool = highWords;
+        } else if (currentCount < 10) {
+          if (r < 0.6 && mediumWords.length > 0) pool = mediumWords;
+          else if (r < 0.8 && importantWords.length > 0) pool = importantWords;
+          else if (highWords.length > 0) pool = highWords;
+          else if (mediumWords.length > 0) pool = mediumWords;
         } else {
-          if (highWords.length > 0) {
-            // high: 30%, medium: 60%, important: 10%
-            const r = Math.random();
-            if (r < 0.3) {
-              pool = highWords;
-            } else if (r < 0.9) {
-              pool = mediumWords;
-            } else {
-              pool = importantWords;
-            }
-          } else if (mediumWords.length > 0 && importantWords.length > 0) {
-            // 重み付け: medium(80%), important(20%)
-            pool = Math.random() < 0.8 ? mediumWords : importantWords;
-          }
+          if (r < 0.6 && highWords.length > 0) pool = highWords;
+          else if (r < 0.9 && mediumWords.length > 0) pool = mediumWords;
+          else if (importantWords.length > 0) pool = importantWords;
+          else if (highWords.length > 0) pool = highWords;
         }
 
         const randomIndex = Math.floor(Math.random() * pool.length);
@@ -283,7 +276,7 @@ export default function StudyClient({
     }
 
     setCurrentWord(nextWord);
-  }, [startCountdown, words, currentWord, mediumWords, importantWords, highWords, order, consecutiveForgotCount]);
+  }, [startCountdown, words, currentWord, mediumWords, importantWords, highWords, order, consecutiveRememberCount]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -336,8 +329,8 @@ export default function StudyClient({
               setCurrentWord(word);
               setRememberedSlugs(uniqueStrings(persisted.rememberedSlugs));
               setForgottenSlugs(uniqueStrings(persisted.forgottenSlugs));
-              if (persisted.consecutiveForgotCount !== undefined) {
-                setConsecutiveForgotCount(persisted.consecutiveForgotCount);
+              if (persisted.consecutiveRememberCount !== undefined) {
+                setConsecutiveRememberCount(persisted.consecutiveRememberCount);
               }
               setShowHintButton(true);
               return;
@@ -362,7 +355,7 @@ export default function StudyClient({
           currentSlug: slug,
           rememberedSlugs: remembered,
           forgottenSlugs: forgotten,
-          consecutiveForgotCount: count,
+          consecutiveRememberCount: count,
           updatedAt: Date.now(),
         };
         window.sessionStorage.setItem(storageKey, JSON.stringify(nextState));
@@ -373,15 +366,16 @@ export default function StudyClient({
 
   useEffect(() => {
     if (!currentWord) return;
-    writePersistedState(currentWord.slug, rememberedSlugs, forgottenSlugs, consecutiveForgotCount);
-  }, [currentWord, rememberedSlugs, forgottenSlugs, consecutiveForgotCount, writePersistedState]);
+    writePersistedState(currentWord.slug, rememberedSlugs, forgottenSlugs, consecutiveRememberCount);
+  }, [currentWord, rememberedSlugs, forgottenSlugs, consecutiveRememberCount, writePersistedState]);
 
   const handleRemembered = () => {
     if (!currentWord) return;
     setRememberedSlugs((prev) => addUnique(prev, currentWord.slug));
     setForgottenSlugs((prev) => removeValue(prev, currentWord.slug));
-    setConsecutiveForgotCount(0);
-    pickRandomWord(0);
+    const newCount = consecutiveRememberCount + 1;
+    setConsecutiveRememberCount(newCount);
+    pickRandomWord(newCount);
   };
 
   const handleForgot = () => {
@@ -389,11 +383,11 @@ export default function StudyClient({
 
     const newForgotSlugs = addUnique(forgottenSlugs, currentWord.slug);
     const newRememberedSlugs = removeValue(rememberedSlugs, currentWord.slug);
-    const newCount = consecutiveForgotCount + 1;
+    const newCount = 0; // リセット
 
     setForgottenSlugs(newForgotSlugs);
     setRememberedSlugs(newRememberedSlugs);
-    setConsecutiveForgotCount(newCount);
+    setConsecutiveRememberCount(newCount);
 
     // router.push でアンマウントされる前に同期で永続化（useEffect が走らない可能性があるため）
     writePersistedState(currentWord.slug, newRememberedSlugs, newForgotSlugs, newCount);
