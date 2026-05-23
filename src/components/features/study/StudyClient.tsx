@@ -246,11 +246,11 @@ export default function StudyClient({
         // 10回〜: high中心 (important 10%, medium 30%, high 60%)
         const r = Math.random();
 
-        if (currentCount < 5) {
+        if (currentCount < 3) {
           if (r < 0.8 && importantWords.length > 0) pool = importantWords;
           else if (mediumWords.length > 0) pool = mediumWords;
           else if (highWords.length > 0) pool = highWords;
-        } else if (currentCount < 10) {
+        } else if (currentCount < 6) {
           if (r < 0.6 && mediumWords.length > 0) pool = mediumWords;
           else if (r < 0.8 && importantWords.length > 0) pool = importantWords;
           else if (highWords.length > 0) pool = highWords;
