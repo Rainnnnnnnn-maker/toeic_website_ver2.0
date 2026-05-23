@@ -23,7 +23,6 @@ type PersistedStudyStateV1 = {
   currentSlug: string;
   rememberedSlugs: string[];
   forgottenSlugs: string[];
-  consecutiveForgotCount?: number;
   consecutiveRememberCount?: number;
   updatedAt: number;
 };
@@ -56,7 +55,6 @@ function parsePersistedStudyState(raw: string): PersistedStudyStateV1 | null {
     if (!Array.isArray(obj.forgottenSlugs) || !obj.forgottenSlugs.every((s) => typeof s === 'string')) {
       return null;
     }
-    if (obj.consecutiveForgotCount !== undefined && typeof obj.consecutiveForgotCount !== 'number') return null;
     if (obj.consecutiveRememberCount !== undefined && typeof obj.consecutiveRememberCount !== 'number') return null;
     if (typeof obj.updatedAt !== 'number') return null;
     return obj as PersistedStudyStateV1;
@@ -383,7 +381,7 @@ export default function StudyClient({
 
     const newForgotSlugs = addUnique(forgottenSlugs, currentWord.slug);
     const newRememberedSlugs = removeValue(rememberedSlugs, currentWord.slug);
-    const newCount = 0; // リセット
+    const newCount = 0;
 
     setForgottenSlugs(newForgotSlugs);
     setRememberedSlugs(newRememberedSlugs);
