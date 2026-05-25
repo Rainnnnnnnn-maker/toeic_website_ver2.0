@@ -21,8 +21,8 @@ export const config = {
      * - api (APIルート)
      * - _next/static (静的ファイル)
      * - _next/image (画像最適化ファイル)
-     * - favicon.ico, sitemap.xml, robots.txt (メタデータファイル)
+     * - public/ や metadata routes の拡張子付き静的ファイル
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)',
+    '/((?!api|_next/static|_next/image|.*\\..*$).*)',
   ],
 };
