@@ -185,7 +185,11 @@ export default function FavoritesListenClient({ allWords }: Props) {
         audio.onended = () => {
           if (cancelled || audioRef.current !== audio) return;
           if (stepRef.current !== stepAtStart || indexRef.current !== indexAtStart) return;
-          advance();
+          // 単語やステップ間の間隔を少しあける（0.5秒）
+          setTimeout(() => {
+            if (cancelled || stepRef.current !== stepAtStart || indexRef.current !== indexAtStart) return;
+            advance();
+          }, 500);
         };
 
         await audio.play();
