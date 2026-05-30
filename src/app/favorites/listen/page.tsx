@@ -5,9 +5,7 @@ import FavoritesListenClient from "@/components/features/favorites/FavoritesList
 export const metadata: Metadata = {
   title: "お気に入り単語 聞き流し | TOEIC Words",
   description: "お気に入りに登録した単語の発音・英語例文・日本語訳を自動再生する「聞き流しモード」です。",
-  alternates: {
-    canonical: "https://www.toeic-words.com/favorites/listen",
-  },
+  // ユーザー固有のお気に入りに依存するページなので noindex（self-canonical は付けない）
   robots: {
     index: false,
   },
