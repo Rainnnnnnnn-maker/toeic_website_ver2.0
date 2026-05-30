@@ -22,8 +22,8 @@ A comprehensive web application for learning essential TOEIC vocabulary, featuri
   - All 5 words are displayed directly in the TOP section without a separate “view all” button.
   - Picks are determined by UTC date key + word slug hash, so the same day yields the same 5 words.
   - Selection logic lives server-side in `getTodayRecommendedWords()` as a Cache Component (`'use cache'` + `cacheLife('weeks')`), so TOP / `/today-words` / `/today-words/listen` / word-detail navigation always show the same 5 words. The cache is held long-term and refreshed once per day at JST 7:05 (UTC 22:05) via Vercel Cron (`/api/revalidate/today-words`), which calls `revalidateTag('today-recommended-words')`. This minimizes ISR Writes (one per day) while guaranteeing the daily rotation lines up exactly with the JST 7:00 boundary.
-- **Listen-and-Repeat Mode (Beta)** (`/today-words/listen`):
-  - Hands-free auto-play of today's 5 words: each word is read out as **word → English example → Japanese example**, then advances to the next word.
+- **Listen-and-Repeat Mode (Beta)** (`/today-words/listen`, `/favorites/listen`):
+  - Hands-free auto-play of today's 5 words or favorite words: each word is read out as **word → English example → Japanese example**, then advances to the next word.
   - Play / Pause / Skip-Prev / Skip-Next controls. Completion message is shown after the 5th word; pressing play again restarts from the top.
   - Internally, audio sequencing uses a ref-based state machine to guard against `onended` race conditions, and prefetches the current and next word's `WordDetails` for instant example previews.
 - **Favorites**: Save difficult words for later review (persisted in local storage via `FavoritesContext`).
@@ -185,7 +185,7 @@ Returns `sitemap.xml` containing all static pages and all word detail URLs.
 
 ## 📂 Project Structure
 
-- `src/app`: Next.js App Router pages (e.g., `/`, `/study`, `/favorites`, `/review`, `/today-words`, `/today-words/listen`, `/words`, `/words/[word]`, and static `/about`, `/privacy`, `/terms`, `/contact`) and API routes.
+- `src/app`: Next.js App Router pages (e.g., `/`, `/study`, `/favorites`, `/favorites/listen`, `/review`, `/today-words`, `/today-words/listen`, `/words`, `/words/[word]`, and static `/about`, `/privacy`, `/terms`, `/contact`) and API routes.
 - `src/proxy.ts`: Temporarily disabled to reduce Vercel Middleware usage (previously blocked non-Server-Action `POST` requests).
 - `src/actions`: Server Actions (e.g., `fetchWordDetail` wrapping the cached `getWordDetail`).
 - `src/components`: React components organized by feature (`features/words`, `features/today-words`, `favorites`, `review`, `study`, `sns`) and common UI (`common/` — `Footer`, `TabNavigation`, `CookieConsent`).
