@@ -2,7 +2,7 @@ import "server-only";
 import { Ratelimit } from "@upstash/ratelimit";
 import { getRedis } from "@/lib/upstash";
 import { getWordBySlug } from "@/data/words";
-import { getWordDetails as getCachedWordDetails } from "@/lib/wordCache";
+import { getWordDetail } from "@/data/word-detail";
 import { createHash } from "crypto";
 
 function normalizeText(s: string): string {
@@ -17,7 +17,10 @@ async function isAllowedExampleText(
   const entry = await getWordBySlug(wordSlug.trim().toLowerCase());
   if (!entry) return false;
 
-  const detail = await getCachedWordDetails(entry.term);
+  // Use the full cache chain (L1 → L2 → Gemini) so that an expired Redis entry
+  // does not incorrectly reject valid example text that is still in the Next.js
+  // Data Cache (L1).
+  const detail = await getWordDetail(entry.slug);
   if (!detail) return false;
 
   const target = normalizeText(text);
