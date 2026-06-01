@@ -7,6 +7,12 @@ import { fetchWordDetail } from "@/actions/word";
 import { WordDetails } from "@/types/word";
 import { useTTS } from "@/hooks/useTTS";
 
+// iOS Safari blocks audio.play() unless called within a user gesture call stack.
+// We work around this by creating one persistent Audio element during the play
+// button tap (which IS in the gesture stack) and reusing it for all subsequent
+// programmatic plays.
+const SILENT_AUDIO = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA";
+
 export type PlayStep = "word" | "example_en" | "example_ja";
 
 const NEXT_STEP: Record<PlayStep, PlayStep | null> = {
@@ -54,6 +60,9 @@ export function useListenPlayer({ words, backHref }: UseListenPlayerArgs) {
 
   const wordDetailsCacheRef = useRef<Record<string, WordDetails>>({});
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  // Persistent element created in the user-gesture handler; reused for all plays
+  // so iOS Safari never sees play() outside a gesture context.
+  const persistentAudioRef = useRef<HTMLAudioElement | null>(null);
   const advanceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const indexRef = useRef(0);
   const stepRef = useRef<PlayStep>("word");
@@ -96,6 +105,11 @@ export function useListenPlayer({ words, backHref }: UseListenPlayerArgs) {
         audioRef.current.onended = null;
         audioRef.current.pause();
         audioRef.current = null;
+      }
+      if (persistentAudioRef.current) {
+        persistentAudioRef.current.onended = null;
+        persistentAudioRef.current.pause();
+        persistentAudioRef.current = null;
       }
     };
   }, [clearAdvanceTimer]);
@@ -190,8 +204,13 @@ export function useListenPlayer({ words, backHref }: UseListenPlayerArgs) {
         const audioUrl = await fetchTTS(textToPlay, language, detail.word);
         if (cancelled) return;
 
-        const audio = new Audio(audioUrl);
+        // Reuse the persistent element that was created in the user-gesture handler.
+        // Falling back to new Audio() on the rare case the persistent element is
+        // not yet initialised (e.g. autoplay triggered programmatically in tests).
+        const audio = persistentAudioRef.current ?? new Audio();
+        if (!persistentAudioRef.current) persistentAudioRef.current = audio;
         audioRef.current = audio;
+        audio.src = audioUrl;
 
         audio.onended = () => {
           if (cancelled || audioRef.current !== audio) return;
@@ -230,6 +249,15 @@ export function useListenPlayer({ words, backHref }: UseListenPlayerArgs) {
 
   const handleTogglePlay = useCallback(() => {
     setError(null);
+    // iOS Safari: audio.play() is only allowed within a user-gesture call stack.
+    // Create (or reuse) the persistent audio element here — synchronously, inside
+    // the tap handler — so the element is already "unlocked" when the effect later
+    // calls play() after async network operations.
+    if (!persistentAudioRef.current) {
+      const a = new Audio(SILENT_AUDIO);
+      persistentAudioRef.current = a;
+      void a.play().catch(() => {});
+    }
     if (isCompleted) {
       setCurrentIndex(0);
       setCurrentStep("word");
