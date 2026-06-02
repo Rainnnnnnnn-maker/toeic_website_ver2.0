@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Star, Volume2, Loader2, ChevronLeft } from 'lucide-react';
@@ -84,7 +84,7 @@ function escapeRegExp(string: string) {
 const AutoResizingText = ({ text, className, style }: { text: string, className?: string, style?: React.CSSProperties }) => {
   const ref = useRef<HTMLSpanElement>(null);
   
-  const adjustSize = useCallback(() => {
+  const adjustSize = () => {
     const el = ref.current;
     if (!el) return;
     
@@ -119,7 +119,7 @@ const AutoResizingText = ({ text, className, style }: { text: string, className?
        // Fits! Ensure no ellipsis by keeping overflow visible, but constrain width just in case.
        el.style.maxWidth = '100%';
     }
-  }, []);
+  };
 
   useEffect(() => {
     adjustSize();
@@ -164,28 +164,28 @@ export default function StudyClient({
     handlePlaySentenceAudio
   } = useTTS();
 
-  const mediumWords = useMemo(() => words.filter(w => w.level === 'medium'), [words]);
-  const importantWords = useMemo(() => words.filter(w => w.level === 'important'), [words]);
-  const highWords = useMemo(() => words.filter(w => w.level === 'high'), [words]);
+  const mediumWords = words.filter(w => w.level === 'medium');
+  const importantWords = words.filter(w => w.level === 'important');
+  const highWords = words.filter(w => w.level === 'high');
 
-  const wordBySlug = useMemo(() => {
+  const wordBySlug = (() => {
     const map = new Map<string, Word>();
     for (const w of words) {
       map.set(w.slug, w);
     }
     return map;
-  }, [words]);
+  })();
 
-  const clearCountdown = useCallback(() => {
+  const clearCountdown = () => {
     for (const id of countdownTimeoutsRef.current) {
       clearTimeout(id);
     }
     countdownTimeoutsRef.current = [];
     setCountdownValue(null);
     setShowHintButton(false);
-  }, []);
+  };
 
-  const startCountdown = useCallback(() => {
+  const startCountdown = () => {
     for (const id of countdownTimeoutsRef.current) {
       clearTimeout(id);
     }
@@ -213,9 +213,9 @@ export default function StudyClient({
     }, 2060); // 2s + 60ms
 
     countdownTimeoutsRef.current = [t1, t0, th];
-  }, []);
+  };
 
-  const pickRandomWord = useCallback((overrideCount?: number) => {
+  const pickRandomWord = (overrideCount?: number) => {
     if (words.length === 0) return;
 
     if (typeof window !== 'undefined') {
@@ -274,7 +274,7 @@ export default function StudyClient({
     }
 
     setCurrentWord(nextWord);
-  }, [startCountdown, words, currentWord, mediumWords, importantWords, highWords, order, consecutiveRememberCount]);
+  };
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -344,23 +344,25 @@ export default function StudyClient({
     return () => window.clearTimeout(timer);
   }, [pickRandomWord, wordBySlug, storageKey]);
 
-  const writePersistedState = useCallback(
-    (slug: string, remembered: string[], forgotten: string[], count: number) => {
-      if (typeof window === 'undefined') return;
-      try {
-        const nextState: PersistedStudyStateV1 = {
-          v: 1,
-          currentSlug: slug,
-          rememberedSlugs: remembered,
-          forgottenSlugs: forgotten,
-          consecutiveRememberCount: count,
-          updatedAt: Date.now(),
-        };
-        window.sessionStorage.setItem(storageKey, JSON.stringify(nextState));
-      } catch {}
-    },
-    [storageKey],
-  );
+  const writePersistedState = (
+    slug: string,
+    remembered: string[],
+    forgotten: string[],
+    count: number,
+  ) => {
+    if (typeof window === 'undefined') return;
+    try {
+      const nextState: PersistedStudyStateV1 = {
+        v: 1,
+        currentSlug: slug,
+        rememberedSlugs: remembered,
+        forgottenSlugs: forgotten,
+        consecutiveRememberCount: count,
+        updatedAt: Date.now(),
+      };
+      window.sessionStorage.setItem(storageKey, JSON.stringify(nextState));
+    } catch {}
+  };
 
   useEffect(() => {
     if (!currentWord) return;
