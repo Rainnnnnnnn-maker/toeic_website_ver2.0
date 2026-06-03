@@ -1,6 +1,5 @@
 "use client";
 
-import { useMemo } from "react";
 import Link from "next/link";
 import { useFavorites } from "@/context/FavoritesContext";
 import StudyClient from "@/components/features/study/StudyClient";
@@ -14,12 +13,12 @@ type Props = {
 export default function ReviewWrapper({ allWords }: Props) {
   const { favorites } = useFavorites();
 
-  const favoriteWords = useMemo(() => {
+  const favoriteWords = (() => {
     const wordsMap = new Map(allWords.map((w) => [w.slug, w]));
     return favorites
       .map((slug) => wordsMap.get(slug))
       .filter((w): w is Word => w !== undefined);
-  }, [allWords, favorites]);
+  })();
 
   if (favoriteWords.length === 0) {
     return (

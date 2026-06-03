@@ -1,5 +1,5 @@
  "use client";
-import { useMemo, useState, useRef } from "react";
+import { useState, useRef } from "react";
 import type { ChangeEvent, KeyboardEvent } from "react";
 import Link from "next/link";
 import type { Word } from "@/data/words";
@@ -21,17 +21,10 @@ export default function WordsListClient({ importantWords, mediumWords, highWords
   const inputRef = useRef<HTMLInputElement>(null);
   const pageSize = 20;
 
-  const { importantWithCategory, mediumWithCategory, highWithCategory, allWithCategory } = useMemo(() => {
-    const imp = importantWords.map(w => ({ ...w, category: 'important' as const }));
-    const med = mediumWords.map(w => ({ ...w, category: 'medium' as const }));
-    const high = highWords.map(w => ({ ...w, category: 'high' as const }));
-    return {
-      importantWithCategory: imp,
-      mediumWithCategory: med,
-      highWithCategory: high,
-      allWithCategory: [...imp, ...med, ...high]
-    };
-  }, [importantWords, mediumWords, highWords]);
+  const importantWithCategory = importantWords.map(w => ({ ...w, category: 'important' as const }));
+  const mediumWithCategory = mediumWords.map(w => ({ ...w, category: 'medium' as const }));
+  const highWithCategory = highWords.map(w => ({ ...w, category: 'high' as const }));
+  const allWithCategory = [...importantWithCategory, ...mediumWithCategory, ...highWithCategory];
 
   const handleQueryChange = (e: ChangeEvent<HTMLInputElement>) => {
     const nextQuery = e.target.value;
@@ -57,7 +50,7 @@ export default function WordsListClient({ importantWords, mediumWords, highWords
     setPage(1);
   };
 
-  const filtered = useMemo(() => {
+  const filtered = (() => {
     const q = query.trim().toLowerCase();
     if (!q) {
       if (activeTab === 'important') return importantWithCategory;
@@ -80,7 +73,7 @@ export default function WordsListClient({ importantWords, mediumWords, highWords
     }
 
     return allWithCategory.filter((w) => w.term.toLowerCase().startsWith(q));
-  }, [query, activeTab, importantWithCategory, mediumWithCategory, highWithCategory, allWithCategory]);
+  })();
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
   const currentPage = Math.min(page, totalPages);

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useFavorites } from "@/context/FavoritesContext";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import type { Word } from "@/data/words";
 import { useShareTarget } from "@/context/ShareTargetContext";
 import { ChevronLeft } from "lucide-react";
@@ -26,7 +26,7 @@ export default function WordNavigationClient({
   const { favorites } = useFavorites();
   const { setShareTarget } = useShareTarget();
 
-  const navigationList = useMemo(() => {
+  const navigationList = (() => {
     if (isFromFavorites || isFromReview) {
       const wordMap = new Map(allWords.map((w) => [w.slug, w]));
       // お気に入り一覧と同じ順序（最新が先頭）にする
@@ -39,7 +39,7 @@ export default function WordNavigationClient({
       return todayWords;
     }
     return allWords;
-  }, [allWords, favorites, isFromFavorites, isFromReview, isFromToday, todayWords]);
+  })();
 
   const currentIndex = navigationList.findIndex((w) => w.slug === currentSlug);
   const computedPrevWord: Word | null = currentIndex > 0 ? navigationList[currentIndex - 1] : null;
