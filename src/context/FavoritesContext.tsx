@@ -5,7 +5,6 @@ import {
   use,
   useEffect,
   useState,
-  useCallback,
   ReactNode,
 } from "react";
 import { sendGAEvent } from "@next/third-parties/google";
@@ -53,41 +52,35 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
     }
   }, [favorites, isLoaded]);
 
-  const addFavorite = useCallback((slug: string) => {
+  const addFavorite = (slug: string) => {
     setFavorites((prev) => {
       if (prev.includes(slug)) return prev;
       return [...prev, slug];
     });
-  }, []);
+  };
 
-  const removeFavorite = useCallback((slug: string) => {
+  const removeFavorite = (slug: string) => {
     setFavorites((prev) => prev.filter((item) => item !== slug));
-  }, []);
+  };
 
-  const toggleFavorite = useCallback(
-    (slug: string) => {
-      setFavorites((prev) => {
-        if (prev.includes(slug)) {
-          sendGAEvent("event", "favorite_toggle", { action: "remove", word: slug });
-          return prev.filter((item) => item !== slug);
-        }
-        sendGAEvent("event", "favorite_toggle", { action: "add", word: slug });
-        return [...prev, slug];
-      });
-    },
-    []
-  );
+  const toggleFavorite = (slug: string) => {
+    setFavorites((prev) => {
+      if (prev.includes(slug)) {
+        sendGAEvent("event", "favorite_toggle", { action: "remove", word: slug });
+        return prev.filter((item) => item !== slug);
+      }
+      sendGAEvent("event", "favorite_toggle", { action: "add", word: slug });
+      return [...prev, slug];
+    });
+  };
 
-  const clearFavorites = useCallback(() => {
+  const clearFavorites = () => {
     setFavorites([]);
-  }, []);
+  };
 
-  const isFavorite = useCallback(
-    (slug: string) => {
-      return favorites.includes(slug);
-    },
-    [favorites]
-  );
+  const isFavorite = (slug: string) => {
+    return favorites.includes(slug);
+  };
 
   return (
     <FavoritesContext

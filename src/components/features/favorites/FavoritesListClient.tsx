@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useFavorites } from "@/context/FavoritesContext";
 import type { Word } from "@/data/words";
@@ -21,14 +21,14 @@ export default function FavoritesListClient({ allWords }: { allWords: Word[] }) 
     setShowConfirmModal(false);
   };
 
-  const favoriteWords = useMemo(() => {
+  const favoriteWords = (() => {
     const wordMap = new Map(allWords.map((w) => [w.slug, w]));
     // お気に入り追加順（逆順：最新が先頭）で表示
     return [...favorites]
       .reverse()
       .map((slug) => wordMap.get(slug))
       .filter((w): w is Word => w !== undefined);
-  }, [allWords, favorites]);
+  })();
 
   const totalPages = Math.max(1, Math.ceil(favoriteWords.length / pageSize));
   // ページ数が減った場合に現在のページが範囲外にならないように調整
