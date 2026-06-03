@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useSyncExternalStore } from "react";
+import { useSyncExternalStore } from "react";
 
 const STORAGE_KEY = "cookie-consent-accepted";
 
@@ -21,15 +21,15 @@ function getServerSnapshot() {
 export function CookieConsent() {
   const accepted = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
-  const handleAccept = useCallback(() => {
+  const handleAccept = () => {
     localStorage.setItem(STORAGE_KEY, "true");
     window.dispatchEvent(new StorageEvent("storage", { key: STORAGE_KEY }));
-  }, []);
+  };
 
-  const handleDecline = useCallback(() => {
+  const handleDecline = () => {
     localStorage.setItem(STORAGE_KEY, "declined");
     window.dispatchEvent(new StorageEvent("storage", { key: STORAGE_KEY }));
-  }, []);
+  };
 
   if (accepted) return null;
 
