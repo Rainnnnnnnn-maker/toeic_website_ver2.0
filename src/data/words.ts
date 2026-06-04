@@ -5,53 +5,19 @@ import { cacheTag, cacheLife } from "next/cache";
 import { cache } from "react";
 import fs from "node:fs";
 import path from "node:path";
+import {
+  parseWords,
+  buildWordData,
+  getTodayKey,
+  selectTodayWords,
+  type WordData,
+} from "@/lib/word-select";
 
 export type Word = {
   slug: string;
   term: string;
   level: 'important' | 'medium' | 'high';
 };
-
-type WordData = {
-  important: Word[];
-  medium: Word[];
-  high: Word[];
-  allWords: Word[];
-};
-
-function parseWords(text: string, level: 'important' | 'medium' | 'high'): Word[] {
-  const seen = new Set<string>();
-  const lines = text.split(/\r?\n/);
-  const words: Word[] = [];
-
-  for (const raw of lines) {
-    const term = raw.trim();
-    if (!term) continue;
-    const slug = term.toLowerCase();
-    if (seen.has(slug)) continue;
-    seen.add(slug);
-    words.push({ slug, term, level });
-  }
-  return words;
-}
-
-function buildWordData(important: Word[], medium: Word[], high: Word[]): WordData {
-  const allWordsMap = new Map<string, Word>();
-  [...important, ...medium, ...high].forEach(w => {
-    if (!allWordsMap.has(w.slug)) {
-      allWordsMap.set(w.slug, w);
-    }
-  });
-  const allWords = Array.from(allWordsMap.values());
-
-  return {
-    important,
-    medium,
-    high,
-    allWords,
-  };
-}
-
 
 async function getWordsLocal(): Promise<WordData> {
   const loadWords = (filename: string, level: 'important' | 'medium' | 'high'): Word[] => {
@@ -177,42 +143,13 @@ export async function getWordBySlug(slug: string): Promise<Word | undefined> {
   return data.allWords.find(w => w.slug === slug);
 }
 
-function hashString(value: string): number {
-  let hash = 2166136261;
-  for (let i = 0; i < value.length; i += 1) {
-    hash ^= value.charCodeAt(i);
-    hash = Math.imul(hash, 16777619);
-  }
-  return hash >>> 0;
-}
-
-function getTodayKey(): string {
-  // Adjust time to JST (UTC+9) and subtract 7 hours so that the date changes at 7:00 AM JST
-  const now = new Date();
-  const jstTime = now.getTime() + 9 * 60 * 60 * 1000;
-  const targetTime = jstTime - 7 * 60 * 60 * 1000;
-  return new Date(targetTime).toISOString().slice(0, 10);
-}
-
 export async function getTodayRecommendedWords(limit: number = 5): Promise<Word[]> {
   'use cache';
   cacheTag('today-recommended-words');
   cacheLife('days');
 
   const data = await getWordsDataCached();
-  if (data.allWords.length === 0 || limit <= 0) {
-    return [];
-  }
-
-  const todayKey = getTodayKey();
-  const ordered = [...data.allWords].sort((a, b) => {
-    const aHash = hashString(`${todayKey}:${a.slug}`);
-    const bHash = hashString(`${todayKey}:${b.slug}`);
-    if (aHash === bHash) return a.slug.localeCompare(b.slug);
-    return aHash - bHash;
-  });
-
-  return ordered.slice(0, Math.min(limit, ordered.length));
+  return selectTodayWords(data.allWords, getTodayKey(), limit);
 }
 
 export async function getRelatedWords(currentSlug: string, count: number = 5): Promise<Word[]> {

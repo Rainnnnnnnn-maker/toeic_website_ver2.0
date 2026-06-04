@@ -3,11 +3,7 @@ import { Ratelimit } from "@upstash/ratelimit";
 import { getRedis } from "@/lib/upstash";
 import { getWordBySlug } from "@/data/words";
 import { getWordDetail } from "@/data/word-detail";
-import { createHash } from "crypto";
-
-function normalizeText(s: string): string {
-  return s.replace(/\s+/g, " ").trim();
-}
+import { ttsCacheKey, matchesExample } from "@/lib/tts-utils";
 
 async function isAllowedExampleText(
   text: string,
@@ -23,21 +19,7 @@ async function isAllowedExampleText(
   const detail = await getWordDetail(entry.slug);
   if (!detail) return false;
 
-  const target = normalizeText(text);
-
-  for (const ex of detail.toeicExamples ?? []) {
-    if (language === "en" && normalizeText(ex.english) === target) return true;
-    if (language === "ja" && normalizeText(ex.japanese) === target) return true;
-  }
-
-  for (const meaning of detail.meanings ?? []) {
-    for (const dm of meaning.detailedMeanings ?? []) {
-      if (language === "en" && normalizeText(dm.example) === target) return true;
-      if (language === "ja" && normalizeText(dm.exampleJapanese) === target) return true;
-    }
-  }
-
-  return false;
+  return matchesExample(detail, text, language);
 }
 
 let ratelimitInstance: Ratelimit | undefined;
@@ -50,25 +32,6 @@ function getRatelimit(): Ratelimit {
     prefix: "rl:tts",
   });
   return ratelimitInstance;
-}
-
-function sanitizeSlug(raw: string): string {
-  // Keep alphanumerics and hyphen only; prevents colons/spaces breaking key structure
-  return raw.trim().toLowerCase().replace(/[^a-z0-9-]/g, "").slice(0, 64);
-}
-
-function ttsCacheKey(text: string, language: string, wordSlug?: string): string {
-  const trimmed = text.trim();
-  const isSingleWord = !/\s/.test(trimmed);
-
-  if (isSingleWord && language === "en") {
-    const normalized = sanitizeSlug(trimmed);
-    if (normalized) return `tts:en:word:${normalized}`;
-  }
-
-  const hash = createHash("sha256").update(trimmed).digest("hex").slice(0, 12);
-  const tag = wordSlug ? sanitizeSlug(wordSlug) : "";
-  return `tts:${language}:${tag || "_"}:${hash}`;
 }
 
 export async function POST(request: Request) {

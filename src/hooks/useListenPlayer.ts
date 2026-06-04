@@ -6,6 +6,10 @@ import { Word } from "@/data/words";
 import { fetchWordDetail } from "@/actions/word";
 import { WordDetails } from "@/types/word";
 import { useTTS } from "@/hooks/useTTS";
+import { pickExample } from "@/lib/listen-utils";
+
+// 後方互換のため re-export（既存の import 経路を維持）
+export { pickExample };
 
 // iOS Safari blocks audio.play() unless called within a user gesture call stack.
 // We work around this by creating one persistent Audio element during the play
@@ -20,17 +24,6 @@ const NEXT_STEP: Record<PlayStep, PlayStep | null> = {
   example_ja: "example_en",
   example_en: null,
 };
-
-export function pickExample(detail: WordDetails): { en: string; ja: string } {
-  if (detail.toeicExamples && detail.toeicExamples.length > 0) {
-    return { en: detail.toeicExamples[0].english, ja: detail.toeicExamples[0].japanese };
-  }
-  const fallback = detail.meanings[0]?.detailedMeanings[0];
-  if (fallback) {
-    return { en: fallback.example, ja: fallback.exampleJapanese };
-  }
-  return { en: "", ja: "" };
-}
 
 type UseListenPlayerArgs = {
   /** 再生対象の単語（表示順そのまま） */
