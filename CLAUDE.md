@@ -90,7 +90,7 @@ Any feature change must update **both** `README.md` and `.trae/documents/技術�
 ### Testing
 **Unit tests (Vitest) cover pure logic only**; integration/UI is still verified by manual smoke test.
 
-- Pure, side-effect-free logic lives in `src/lib/*.ts` and is unit-tested in co-located `src/lib/*.test.ts` files (`environment: "node"`, no secrets required). Current suites: `word-select` (parsing/dedup, FNV-1a hash, JST day key, daily selection), `word-detail-parse` (Gemini JSON extraction + normalization), `tts-utils` (text normalization, slug sanitization, cache keys, example allowlist matching), `listen-utils` (`pickExample` fallback).
+- Pure, side-effect-free logic lives in `src/lib/*.ts` and is unit-tested in `src/lib/(tests)/*.test.ts` files (`environment: "node"`, no secrets required). Current suites: `word-select` (parsing/dedup, FNV-1a hash, JST day key, daily selection), `word-detail-parse` (Gemini JSON extraction + normalization), `tts-utils` (text normalization, slug sanitization, cache keys, example allowlist matching), `listen-utils` (`pickExample` fallback).
 - When extracting testable logic out of a `server-only` module, put the pure function in `src/lib/` (no `server-only`, type-only imports for server types) and have the server module import it — never duplicate.
 - Do **not** add tests that require Gemini/Redis/Blob/TTS or render React components; cover those by manual testing.
 

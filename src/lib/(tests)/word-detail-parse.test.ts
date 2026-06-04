@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { parseJsonFromText, normalizePayload } from "./word-detail-parse";
+import { parseJsonFromText, normalizePayload } from "../word-detail-parse";
 import type { RawWordPayload } from "@/types/word";
 
 describe("parseJsonFromText", () => {

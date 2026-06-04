@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { pickExample } from "./listen-utils";
+import { pickExample } from "../listen-utils";
 import type { WordDetails } from "@/types/word";
 
 function base(): WordDetails {

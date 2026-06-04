@@ -5,7 +5,7 @@ import {
   hashString,
   getTodayKey,
   selectTodayWords,
-} from "./word-select";
+} from "../word-select";
 
 describe("parseWords", () => {
   it("trims whitespace and lowercases the slug", () => {

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { normalizeText, sanitizeSlug, ttsCacheKey, matchesExample } from "./tts-utils";
+import { normalizeText, sanitizeSlug, ttsCacheKey, matchesExample } from "../tts-utils";
 import type { WordDetails } from "@/types/word";
 
 describe("normalizeText", () => {
