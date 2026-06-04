@@ -115,7 +115,7 @@ A comprehensive web application for learning essential TOEIC vocabulary, featuri
 - `npm run build`: Builds the application for production.
 - `npm run start`: Starts the production server.
 - `npm run lint`: Runs ESLint.
-- `npm run test`: Runs tests using Vitest (Note: Manual testing is the primary strategy for this project).
+- `npm run test`: Runs Vitest unit tests. These cover **pure logic only** (word selection/parsing, Gemini response normalization, TTS cache keys & example allowlist, listen-mode example fallback) and run in CI alongside `npm run lint`. Integration and UI changes are still verified by manual smoke testing.
 
 ## 🔄 API Endpoints
 

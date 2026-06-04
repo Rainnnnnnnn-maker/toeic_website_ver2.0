@@ -10,10 +10,10 @@ npm run dev             # Start development server at http://localhost:3000
 npm run build           # Production build (also validates TypeScript)
 npm run lint            # Run ESLint (must pass before merging)
 npm run start           # Start production server after build
-npm run test            # Run Vitest (not used in practice — see Testing below)
+npm run test            # Run Vitest unit tests (pure-logic only — see Testing below)
 ```
 
-**CI runs only `npm run lint`.** The `npm run build` step in `.github/workflows/ci.yml` is commented out and should be run locally before pushing.
+**CI runs `npm run lint` and `npm run test`.** The `npm run build` step in `.github/workflows/ci.yml` is commented out and should be run locally before pushing.
 
 ## Architecture
 
@@ -88,10 +88,17 @@ All revalidation endpoints require `?token=<REVALIDATION_TOKEN>`:
 Any feature change must update **both** `README.md` and `.trae/documents/技術ドキュメント.md` (including the "最終更新日") in the same commit or PR.
 
 ### Testing
-This project uses **manual testing only**. Do not run `npm run test` in CI. Before merging:
+**Unit tests (Vitest) cover pure logic only**; integration/UI is still verified by manual smoke test.
+
+- Pure, side-effect-free logic lives in `src/lib/*.ts` and is unit-tested in co-located `src/lib/*.test.ts` files (`environment: "node"`, no secrets required). Current suites: `word-select` (parsing/dedup, FNV-1a hash, JST day key, daily selection), `word-detail-parse` (Gemini JSON extraction + normalization), `tts-utils` (text normalization, slug sanitization, cache keys, example allowlist matching), `listen-utils` (`pickExample` fallback).
+- When extracting testable logic out of a `server-only` module, put the pure function in `src/lib/` (no `server-only`, type-only imports for server types) and have the server module import it — never duplicate.
+- Do **not** add tests that require Gemini/Redis/Blob/TTS or render React components; cover those by manual testing.
+
+Before merging:
 1. `npm run lint` — must pass
-2. `npm run build` — must succeed locally
-3. Manual smoke test of the affected feature in `npm run dev`
+2. `npm run test` — must pass (also runs in CI)
+3. `npm run build` — must succeed locally
+4. Manual smoke test of the affected feature in `npm run dev`
 
 ### OGP Font Loading (Known Fragility)
 `src/lib/og-utils.ts:loadGoogleFont` uses a regex to parse Google Fonts CSS. The current parser only matches `opentype`/`truetype` formats and may fail if Google serves `woff2` only. A fix is documented in `.trae/TODO_Refactoring1.md`.
