@@ -185,7 +185,7 @@ Returns `sitemap.xml` containing all static pages and all word detail URLs.
 
 ## 📂 Project Structure
 
-- `src/app`: Next.js App Router pages (e.g., `/`, `/study`, `/favorites`, `/favorites/listen`, `/review`, `/today-words`, `/today-words/listen`, `/words`, `/words/[word]`, and static `/about`, `/privacy`, `/terms`, `/contact`) and API routes.
+- `src/app`: Next.js App Router pages (e.g., `/`, `/study`, `/favorites`, `/favorites/listen`, `/review`, `/today-words`, `/today-words/listen`, `/words`, `/words/[word]`, and static `/about`, `/privacy`, `/terms`, `/contact`, `/donate`) and API routes.
 - `src/proxy.ts`: Temporarily disabled to reduce Vercel Middleware usage (previously blocked non-Server-Action `POST` requests).
 - `src/actions`: Server Actions (e.g., `fetchWordDetail` wrapping the cached `getWordDetail`).
 - `src/components`: React components organized by feature (`features/words`, `features/today-words`, `favorites`, `review`, `study`, `sns`) and common UI (`common/` — `Footer`, `TabNavigation`, `CookieConsent`).
