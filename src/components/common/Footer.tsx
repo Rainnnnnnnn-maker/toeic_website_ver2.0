@@ -57,6 +57,13 @@ export function Footer() {
           >
             お問い合わせ
           </Link>
+          <Link
+            href="/donate"
+            prefetch={false}
+            className="underline underline-offset-4 hover:text-black/80 dark:hover:text-white/80"
+          >
+            寄付のお願い
+          </Link>
         </div>
         <p className="mt-4 text-center text-xs text-black/40 dark:text-white/40">
           © {year ? `${year} ` : ""}TOEIC重要単語
