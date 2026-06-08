@@ -1,6 +1,7 @@
 import "server-only";
 import { revalidateTag } from 'next/cache';
 import { NextRequest, NextResponse } from 'next/server';
+import { safeEqual } from '@/lib/safe-compare';
 
 export async function GET(request: NextRequest) {
   const token = request.nextUrl.searchParams.get('token');
@@ -9,7 +10,7 @@ export async function GET(request: NextRequest) {
   // トークンが設定されていない、または一致しない場合は拒否
   // 開発環境ではトークンチェックをスキップすることも可能ですが、
   // 安全のため設定を推奨します。
-  if (!secret || token !== secret) {
+  if (!safeEqual(token, secret)) {
     return NextResponse.json({ message: 'Invalid token' }, { status: 401 });
   }
 

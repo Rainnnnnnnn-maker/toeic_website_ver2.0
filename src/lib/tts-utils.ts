@@ -37,6 +37,24 @@ export function ttsCacheKey(text: string, language: string, wordSlug?: string): 
 }
 
 /**
+ * Origin/Referer ヘッダの host が、リクエストの host と厳密に一致するか判定する。
+ * `header.includes(host)` のような部分一致は
+ * `https://www.example.com.attacker.com` のような文字列を誤って許可してしまうため、
+ * URL としてパースした host 同士で厳密比較する。パース不能な場合は false。
+ */
+export function isSameHost(
+  header: string | null | undefined,
+  host: string | null | undefined
+): boolean {
+  if (!header || !host) return false;
+  try {
+    return new URL(header).host === host;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * 指定テキストが、単語詳細内の既知の例文（toeicExamples もしくは
  * meanings[].detailedMeanings[].example）と空白正規化後に一致するか判定する。
  */

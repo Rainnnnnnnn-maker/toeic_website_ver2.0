@@ -2,6 +2,7 @@ import "server-only";
 import { revalidateTag } from 'next/cache';
 import { NextRequest, NextResponse } from 'next/server';
 import { deleteWordDetails } from '@/lib/wordCache';
+import { safeEqual } from '@/lib/safe-compare';
 
 export async function GET(request: NextRequest) {
   const token = request.nextUrl.searchParams.get('token');
@@ -9,7 +10,7 @@ export async function GET(request: NextRequest) {
   const clearUpstash = request.nextUrl.searchParams.get('upstash') === 'true';
   const secret = process.env.REVALIDATION_TOKEN;
 
-  if (!secret || token !== secret) {
+  if (!safeEqual(token, secret)) {
     return NextResponse.json({ message: 'Invalid token' }, { status: 401 });
   }
 

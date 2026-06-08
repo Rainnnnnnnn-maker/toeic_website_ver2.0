@@ -3,7 +3,7 @@ import { Ratelimit } from "@upstash/ratelimit";
 import { getRedis } from "@/lib/upstash";
 import { getWordBySlug } from "@/data/words";
 import { getWordDetail } from "@/data/word-detail";
-import { ttsCacheKey, matchesExample } from "@/lib/tts-utils";
+import { ttsCacheKey, matchesExample, isSameHost } from "@/lib/tts-utils";
 
 async function isAllowedExampleText(
   text: string,
@@ -47,7 +47,7 @@ export async function POST(request: Request) {
   const host = request.headers.get("host");
 
   if (host) {
-    const allowed = (origin && origin.includes(host)) || (referer && referer.includes(host));
+    const allowed = isSameHost(origin, host) || isSameHost(referer, host);
     if (!allowed) {
       return Response.json({ error: "Unauthorized origin" }, { status: 403 });
     }
