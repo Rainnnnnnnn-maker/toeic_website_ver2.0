@@ -43,7 +43,7 @@ A comprehensive web application for learning essential TOEIC vocabulary, featuri
 - **UI**: React 19, [Tailwind CSS v3.4](https://tailwindcss.com/) (Utility-first CSS), Lucide React
 - **Compiler**: React Compiler (`babel-plugin-react-compiler`) for automatic memoization
 - **Social**: react-share
-- **AI**: Google Gemini (`@google/generative-ai`) - model: `gemini-2.5-flash-lite`
+- **AI**: Google Gemini (`@google/genai` / `GoogleGenAI`) - model: `gemini-2.5-flash-lite`
 - **Database / Cache**: Upstash Redis (`@upstash/redis`)
 - **Storage**: Vercel Blob (`@vercel/blob`) - for word lists
 - **Analytics**: Google Analytics 4 (via `@next/third-parties`), Vercel Analytics & Speed Insights

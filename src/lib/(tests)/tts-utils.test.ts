@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { normalizeText, sanitizeSlug, ttsCacheKey, matchesExample } from "../tts-utils";
+import { normalizeText, sanitizeSlug, ttsCacheKey, matchesExample, isSameHost } from "../tts-utils";
 import type { WordDetails } from "@/types/word";
 
 describe("normalizeText", () => {
@@ -91,5 +91,30 @@ describe("matchesExample", () => {
   it("rejects when language does not match the field", () => {
     // English text checked against the Japanese side should not match
     expect(matchesExample(detail, "We respect the deadline.", "ja")).toBe(false);
+  });
+});
+
+describe("isSameHost", () => {
+  it("accepts an origin whose host strictly equals the request host", () => {
+    expect(isSameHost("https://toeic-words.com", "toeic-words.com")).toBe(true);
+  });
+
+  it("matches host including port", () => {
+    expect(isSameHost("http://localhost:3000", "localhost:3000")).toBe(true);
+  });
+
+  it("rejects a suffix-style spoofed host", () => {
+    expect(isSameHost("https://toeic-words.com.attacker.com", "toeic-words.com")).toBe(false);
+  });
+
+  it("rejects a prefix-style spoofed host", () => {
+    expect(isSameHost("https://attacker.com/toeic-words.com", "toeic-words.com")).toBe(false);
+  });
+
+  it("returns false for unparseable headers or missing values", () => {
+    expect(isSameHost("not a url", "toeic-words.com")).toBe(false);
+    expect(isSameHost(null, "toeic-words.com")).toBe(false);
+    expect(isSameHost("https://toeic-words.com", null)).toBe(false);
+    expect(isSameHost(undefined, undefined)).toBe(false);
   });
 });

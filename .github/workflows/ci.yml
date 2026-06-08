@@ -36,5 +36,7 @@ jobs:
             ${{ runner.os }}-nextjs-${{ hashFiles('package-lock.json') }}-
       - run: npm ci
       - run: npm run lint --if-present
+      # 型エラー・本番ビルド破壊を CI で検知する（Gemini API Key 無しでも型チェックは通る）
+      - run: npm run typecheck --if-present
       - run: npm run test --if-present
       #- run: npm run build

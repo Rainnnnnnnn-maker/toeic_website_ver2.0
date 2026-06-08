@@ -1,6 +1,7 @@
 import "server-only";
 import { NextRequest, NextResponse } from "next/server";
 import { cacheKeyForWord, deleteWordDetails } from "@/lib/wordCache";
+import { safeEqual } from "@/lib/safe-compare";
 
 const NO_STORE_HEADERS = { "Cache-Control": "no-store" } as const;
 
@@ -12,7 +13,7 @@ export async function GET(request: NextRequest) {
   const key = request.nextUrl.searchParams.get("key");
   const secret = process.env.REVALIDATION_TOKEN;
 
-  if (!secret || !token || token !== secret) {
+  if (!safeEqual(token, secret)) {
     return NextResponse.json(
       { message: "Invalid token" },
       { status: 401, headers: NO_STORE_HEADERS },
