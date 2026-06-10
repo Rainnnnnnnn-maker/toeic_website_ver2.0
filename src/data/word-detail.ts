@@ -147,7 +147,9 @@ export async function getWordDetail(slug: string) {
   "use cache";
   // 個別の単語詳細パージ用タグと、全体パージ用タグを付与
   cacheTag(`word-detail-${slug}`, "word-detail");
-  cacheLife("weeks");
+  // 単語解説はほぼ不変のため "max"（revalidate 30日）で再書き込みを抑制し、
+  // Vercel の ISR Writes を節約する。更新時は /api/revalidate/word でオンデマンドにパージする。
+  cacheLife("max");
 
   return getWordDetailInternal(slug);
 }

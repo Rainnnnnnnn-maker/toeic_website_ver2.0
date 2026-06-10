@@ -105,7 +105,9 @@ async function getWordsBlob(): Promise<WordData> {
 async function getWordsData(): Promise<WordData> {
   'use cache';
   cacheTag('word-list');
-  cacheLife('weeks');
+  // 単語リストの更新頻度は低いため "max"（revalidate 30日）で再書き込みを抑制し、
+  // Vercel の ISR Writes を節約する。更新時は /api/revalidate/words でオンデマンドにパージする。
+  cacheLife('max');
 
   if (process.env.NODE_ENV === "development") {
     return getWordsLocal();

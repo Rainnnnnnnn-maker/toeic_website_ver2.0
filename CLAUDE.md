@@ -38,7 +38,7 @@ Setting `BLOB_URL_IMPORTANT`, `BLOB_URL_MEDIUM`, `BLOB_URL_HIGH` skips the Blob 
 
 `src/data/word-detail.ts:getWordDetail(slug)` is the single entry point for word detail data:
 
-1. **L1** — Next.js Data Cache (`"use cache"` + `cacheLife("weeks")` + `cacheTag("word-detail-${slug}", "word-detail")`)
+1. **L1** — Next.js Data Cache (`"use cache"` + `cacheLife("max")` + `cacheTag("word-detail-${slug}", "word-detail")`)
 2. **L2** — Upstash Redis (`src/lib/wordCache.ts`, key: `word:<slug>`, TTL: `WORD_CACHE_TTL_DAYS` days)
 3. **L3** — Google Gemini generation → normalize → write to Redis
 
