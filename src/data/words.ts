@@ -44,19 +44,15 @@ async function getWordsBlob(): Promise<WordData> {
   const highUrl = process.env.BLOB_URL_HIGH;
 
   if (importantUrl && mediumUrl && highUrl) {
+    // 失敗時に [] を返すと "use cache"（max）で空リストが最大30日固定されるため throw する。
+    // throw ならキャッシュされず、バックグラウンド再検証の失敗時は直前の正常キャッシュが使われ続ける。
     const loadWordsDirect = async (url: string, level: 'important' | 'medium' | 'high'): Promise<Word[]> => {
-      try {
-        const res = await fetch(url);
-        if (!res.ok) {
-          console.warn(`Failed to fetch blob from URL: ${url}`);
-          return [];
-        }
-        const text = await res.text();
-        return parseWords(text, level);
-      } catch (e) {
-        console.error(`Error loading words from URL ${url}:`, e);
-        return [];
+      const res = await fetch(url);
+      if (!res.ok) {
+        throw new Error(`Failed to fetch blob from URL: ${url} (status: ${res.status})`);
       }
+      const text = await res.text();
+      return parseWords(text, level);
     };
 
     const [important, medium, high] = await Promise.all([
@@ -74,22 +70,16 @@ async function getWordsBlob(): Promise<WordData> {
     // Find blob ending with filename (to handle potential folders or prefixes)
     const blob = blobs.find(b => b.pathname.endsWith(filename));
     if (!blob) {
-      console.warn(`Blob not found for: ${filename}`);
-      return [];
+      // 空リストのまま長期キャッシュされるのを防ぐため、欠損は例外として扱う
+      throw new Error(`Blob not found for: ${filename}`);
     }
 
-    try {
-      const res = await fetch(blob.url);
-      if (!res.ok) {
-        console.warn(`Failed to fetch blob: ${blob.url}`);
-        return [];
-      }
-      const text = await res.text();
-      return parseWords(text, level);
-    } catch (e) {
-      console.error(`Error loading words from blob ${filename}:`, e);
-      return [];
+    const res = await fetch(blob.url);
+    if (!res.ok) {
+      throw new Error(`Failed to fetch blob: ${blob.url} (status: ${res.status})`);
     }
+    const text = await res.text();
+    return parseWords(text, level);
   };
 
   const [important, medium, high] = await Promise.all([
