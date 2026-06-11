@@ -236,6 +236,7 @@ sonar.javascript.lcov.reportPaths=coverage/lcov.info
 | `Project not found` | projectKey / organization が間違い | SonarCloud の Project Information ページと sonar-project.properties を照合 |
 | `No coverage report found` | lcov.info が生成されていない | `npm run test:coverage` が実行されているか、`coverage/lcov.info` のパスが合っているか確認 |
 | Quality Gate: Failed | コード品質しきい値超過 | SonarCloud → Quality Gates で条件を確認・緩和、またはコードを修正 |
+| `You are running CI analysis while Automatic Analysis is enabled` (exit code 3) | SonarCloud の Automatic Analysis と CI スキャンが二重に動いている | SonarCloud → プロジェクト → **Administration → Analysis Method** を開き、**Automatic Analysis をOFF**にする。CI 連携スキャンのみを残す（Automatic Analysis はカバレッジを取得できないため CI 連携が推奨） |
 
 ---
 
