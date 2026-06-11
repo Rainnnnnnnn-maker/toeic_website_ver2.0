@@ -8,7 +8,20 @@ export default defineConfig({
     },
   },
   test: {
+    include: ["src/lib/(tests)/**/*.test.ts"],
     environment: "node",
+    coverage: {
+      provider: "v8",
+      reporter: ["lcov", "text"],
+      include: ["src/lib/**/*.ts"],
+      exclude: [
+        "src/lib/(tests)/**",
+        "src/lib/json-ld.ts",
+        "src/lib/og-utils.ts",
+        "src/lib/upstash.ts",
+        "src/lib/wordCache.ts",
+      ],
+    },
   },
 });
 
