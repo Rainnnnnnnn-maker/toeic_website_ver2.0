@@ -38,13 +38,55 @@
 
 ---
 
-## 2. SONAR_TOKEN を GitHub Secrets に登録
+## 2. SONAR_TOKEN を取得して GitHub Secrets に登録
+
+### 2-1. SONAR_TOKEN の取得
+
+トークンは以下の **3つのルート** のどれかで取得できる。上から順に試すこと。
+
+---
+
+#### ルート A: プロジェクト登録直後に表示される（初回のみ）
+
+プロジェクトの Set Up 画面で Analysis Method を **「With GitHub Actions」** に設定すると、
+そのページにそのまま `SONAR_TOKEN` の値が表示される。
+
+> ⚠️ このページを閉じると二度と表示されないため、その場でコピーする。
+
+---
+
+#### ルート B: プロジェクトの Administration から再表示（プロジェクト登録済みの場合）
+
+1. SonarCloud の対象プロジェクト（`toeic_website_ver2.0`）を開く
+2. 上部メニュー **「Administration」（歯車アイコン）→「Analysis Method」**
+3. **「With GitHub Actions」** を選択すると `SONAR_TOKEN` が再表示される
+
+> ⚠️ **見つからない場合**: `Administration` メニューはプロジェクト画面にあり、Organization のトップ画面にある `Administration` とは別物。プロジェクトを開いた後に探すこと。
+
+---
+
+#### ルート C: Access Tokens ページで新規発行（上記で見つからない場合）
+
+1. SonarCloud 右上のアカウントアイコン → **「My Account」**
+2. 左メニュー **「Access Tokens」** をクリック
+3. **「Generate Tokens」** セクションで Token Name を入力（例: `github-actions-ci`）→ **「Generate Token」**
+4. 表示されたトークン値をコピー
+
+> ⚠️ **「Make sure you copy it now, you won't be able to see it again!」** と表示される通り、**一度しか表示されない**。必ずコピーしてから画面を閉じること。
+
+> **注意**: Personal Access Token は **60日間未使用で期限切れ**になる（Scheduled expiry として表示）。CI が定期的に動いていれば自動延長されるが、期限切れ後は再発行して GitHub Secrets を更新する必要がある。
+
+---
+
+### 2-2. GitHub Secrets に登録
 
 1. GitHub リポジトリの **Settings → Secrets and variables → Actions**
 2. **「New repository secret」**
    - Name: `SONAR_TOKEN`
-   - Secret: 手順 1-3 でコピーしたトークン
+   - Secret: 2-1 で取得したトークン値
 3. **「Add secret」** で保存
+
+> **CI ジョブに `environment: Production` がある場合**、リポジトリの Secrets だけでなく、その Environment の Secrets にも同じ `SONAR_TOKEN` を登録する必要がある（Settings → Environments → Production → Add secret）。
 
 ---
 
