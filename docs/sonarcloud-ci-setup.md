@@ -95,8 +95,47 @@
 リポジトリルートに以下のファイルを作成する。  
 `<YOUR_ORG>` と `<YOUR_PROJECT_KEY>` は SonarCloud の画面に表示された値に置き換える。
 
+> **projectKey の確認方法**  
+> SonarCloud の対象プロジェクトページ → **Information（右下）** → Project Key
+
+---
+
+### パターン A: 自動テストなし（静的解析のみ）
+
+テストコードが存在しない場合はカバレッジ関連の設定を省略できる。  
+SonarCloud は Bugs / Vulnerabilities / Code Smells の静的解析のみ行う。
+
 ```properties
-# sonar-project.properties
+# sonar-project.properties（自動テストなし）
+
+sonar.projectKey=<YOUR_PROJECT_KEY>
+sonar.organization=<YOUR_ORG>
+
+# スキャン対象
+sonar.sources=src
+sonar.exclusions=**/node_modules/**,**/.next/**,**/public/**
+
+# TypeScript
+sonar.typescript.tsconfigPath=tsconfig.json
+```
+
+対応する CI ステップ（カバレッジ生成ステップは不要）：
+
+```yaml
+      - run: npm ci
+      - run: npm run lint --if-present
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+```
+
+---
+
+### パターン B: 自動テストあり・カバレッジあり（本プロジェクトの構成）
+
+```properties
+# sonar-project.properties（カバレッジあり）
 
 sonar.projectKey=Rainnnnnnnn-maker_toeic_website_ver2.0
 sonar.organization=rainnnnnnnn-maker
@@ -115,9 +154,6 @@ sonar.typescript.tsconfigPath=tsconfig.json
 # カバレッジ（手順4を実施した場合のみ有効化）
 # sonar.javascript.lcov.reportPaths=coverage/lcov.info
 ```
-
-> **projectKey の確認方法**  
-> SonarCloud の対象プロジェクトページ → **Information（右下）** → Project Key
 
 ---
 
