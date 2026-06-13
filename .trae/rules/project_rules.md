@@ -78,11 +78,10 @@ alwaysApply: true
 
 ## 5. テスト方針
 
-- **本プロジェクトは自動テストを採用しない。手動テストが基本方針。**
-- `npm run test`（Vitest）は実行しない。CI でも回さない。
 - 変更後は以下を必ずローカルで確認する：
   - `npm run lint`
   - `npm run build`（型チェックとプロダクションビルドの確認）
+  - `npm run test`（Vitestによる自動テストの実行）
   - `npm run dev` で対象画面の動作確認
 
 ## 6. ドキュメント更新ルール
