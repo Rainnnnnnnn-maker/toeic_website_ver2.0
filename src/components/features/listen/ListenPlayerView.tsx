@@ -82,9 +82,10 @@ export default function ListenPlayerView({ player, title, completionMessage }: P
               </p>
             </>
           ) : (
-             <div className="flex items-center justify-center h-full">
-               <Loader2 className="animate-spin text-slate-400" size={24} />
-             </div>
+            <div className="flex flex-col items-center justify-center h-full w-full gap-4 animate-pulse px-4">
+              <div className="h-4 bg-slate-200 rounded w-3/4"></div>
+              <div className="h-5 bg-slate-200 rounded w-full max-w-[90%]"></div>
+            </div>
           )}
         </div>
 
