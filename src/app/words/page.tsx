@@ -39,18 +39,18 @@ function groupByFirstLetter(words: Word[]): Record<string, Word[]> {
 }
 
 type LevelSectionProps = {
-  id: string;
-  title: string;
-  description: string;
-  learningGuide?: React.ReactNode;
-  words: Word[];
-  badgeClass: string;
-  badgeLabel: string;
+  readonly id: string;
+  readonly title: string;
+  readonly description: string;
+  readonly learningGuide?: React.ReactNode;
+  readonly words: Word[];
+  readonly badgeClass: string;
+  readonly badgeLabel: string;
 };
 
 function LevelSection({ id, title, description, learningGuide, words, badgeClass, badgeLabel }: LevelSectionProps) {
   const groups = groupByFirstLetter(words);
-  const letters = Object.keys(groups).sort();
+  const letters = Object.keys(groups).sort((a, b) => a.localeCompare(b));
 
   return (
     <section id={id} className="flex flex-col gap-4 scroll-mt-8">
