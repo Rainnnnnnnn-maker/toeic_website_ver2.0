@@ -58,11 +58,12 @@ function validateSecurityHeaders(request: Request): ValidationError | null {
   return null;
 }
 
-function validateApiKey(): ValidationError | null {
-  if (!process.env.TTS_API_KEY) {
+function getApiKey(): { key: string } | ValidationError {
+  const key = process.env.TTS_API_KEY;
+  if (!key) {
     return { error: "TTS_API_KEY is not configured", status: 500 };
   }
-  return null;
+  return { key };
 }
 
 async function parseAndValidateBody(request: Request): Promise<ParseResult> {
@@ -193,9 +194,9 @@ export async function POST(request: Request) {
     return Response.json({ error: securityError.error }, { status: securityError.status });
   }
 
-  const apiKeyError = validateApiKey();
-  if (apiKeyError) {
-    return Response.json({ error: apiKeyError.error }, { status: apiKeyError.status });
+  const apiKeyResult = getApiKey();
+  if ("error" in apiKeyResult) {
+    return Response.json({ error: apiKeyResult.error }, { status: apiKeyResult.status });
   }
 
   const parseResult = await parseAndValidateBody(request);
@@ -230,8 +231,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const apiKey = process.env.TTS_API_KEY!;
-  const audioResult = await callTtsApi(text, voiceConfig, apiKey);
+  const audioResult = await callTtsApi(text, voiceConfig, apiKeyResult.key);
 
   if ("error" in audioResult) {
     return Response.json({ error: audioResult.error }, { status: audioResult.status });
