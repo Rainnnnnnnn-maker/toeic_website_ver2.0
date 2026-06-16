@@ -13,8 +13,62 @@ on:
       - '.gitignore'
 
 jobs:
-  ci:
-    name: ci
+
+  #--------------------------------------------------------------------------------------------#
+  # nodejs-audit
+  #--------------------------------------------------------------------------------------------#
+
+  nodejs-audit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm audit --audit-level=high
+
+  #--------------------------------------------------------------------------------------------#
+  # nodejs-linter
+  #--------------------------------------------------------------------------------------------#
+
+  nodejs-linter:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+
+  #--------------------------------------------------------------------------------------------#
+  # nodejs-typecheck
+  #--------------------------------------------------------------------------------------------#
+
+  nodejs-typecheck:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      # 型エラー・本番ビルド破壊を CI で検知する（Gemini API Key 無しでも型チェックは通る）
+      - run: npm run typecheck
+
+  #--------------------------------------------------------------------------------------------#
+  # nodejs-test-coverage + sonarcloud
+  # SonarCloud は lcov.info を必要とするため test:coverage と同じ Job で実行する
+  #--------------------------------------------------------------------------------------------#
+
+  nodejs-test-coverage:
     runs-on: ubuntu-latest
     environment: Production
     env:
@@ -23,26 +77,15 @@ jobs:
       UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
       # あえてGemini API Keyを設定しない
       # GEMINI_API_KEY: なし
+
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
-      - uses: actions/cache@v4
-        with:
-          path: .next/cache
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('package-lock.json') }}-${{ hashFiles('src/**/*') }}
-          restore-keys: |
-            ${{ runner.os }}-nextjs-${{ hashFiles('package-lock.json') }}-
       - run: npm ci
-      - run: npm audit --audit-level=high
-      - run: npm run lint --if-present
-      # 型エラー・本番ビルド破壊を CI で検知する（Gemini API Key 無しでも型チェックは通る）
-      - run: npm run typecheck --if-present
-      - run: npm run test:coverage --if-present
-      #- run: npm run build
-      # SonarCloud スキャン（自動テストがある場合、lcov.info を生成してからスキャン）
+      - run: npm run test:coverage
       - name: SonarCloud Scan
         uses: SonarSource/sonarqube-scan-action@v5
         env:
