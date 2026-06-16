@@ -41,8 +41,92 @@ jobs:
       - run: npm run typecheck --if-present
       - run: npm run test:coverage --if-present
       #- run: npm run build
-      # SonarCloud スキャン（lcov.info を生成してからスキャン）
+      # SonarCloud スキャン（自動テストがある場合、lcov.info を生成してからスキャン）
       - name: SonarCloud Scan
         uses: SonarSource/sonarqube-scan-action@v5
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  #--------------------------------------------------------------------------------------------#
+  # nodejs-documentation
+  #--------------------------------------------------------------------------------------------#
+
+  nodejs-documentation:
+    continue-on-error: true
+    runs-on: ubuntu-latest
+
+    env:
+      NODE_VERSION: "20"
+      TYPESCRIPT_SOURCE_DIR: "src"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: Generate documentation
+        shell: bash
+        env:
+          TYPESCRIPT_SOURCE_DIR: ${{ env.TYPESCRIPT_SOURCE_DIR }}
+        run: |
+          set -ex
+          npm install typedoc > /dev/null 2>&1
+          npx typedoc --entryPointStrategy expand --out docs ${TYPESCRIPT_SOURCE_DIR}
+
+      - name: Upload documentation artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: artifact-documentation-nodejs
+          path: docs/
+          retention-days: 7
+
+  #--------------------------------------------------------------------------------------------#
+  # nodejs-license-check
+  #--------------------------------------------------------------------------------------------#
+
+  nodejs-license-check:
+    continue-on-error: true
+    runs-on: ubuntu-latest
+
+    env:
+      NODE_VERSION: "20"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: License check
+        shell: bash
+        run: |
+          set -ex
+          sudo apt-get update > /dev/null 2>&1
+          sudo apt-get install -yq ruby ruby-dev gem build-essential > /dev/null 2>&1
+          sudo gem install license_finder > /dev/null 2>&1
+
+          export THOR_SILENCE_DEPRECATION=1
+          license_finder permitted_licenses add MIT
+          license_finder permitted_licenses add "Apache-2.0"
+          license_finder permitted_licenses add "BSD"
+          mkdir -p license_report
+          license_finder report --format html > license_report/index.html || true
+
+      - name: Upload license report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: artifact-license-nodejs
+          path: license_report/
+          retention-days: 7
