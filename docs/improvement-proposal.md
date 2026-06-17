@@ -342,6 +342,11 @@ create trigger word_progress_updated_at before update on public.word_progress
 
 ### 5.1 🎯 ユーザーアカウント & 進捗同期 【優先度: 最高】
 
+**初回リリースでは範囲を絞る**:
+- まずは「ログイン任意 + お気に入り同期 + ゲストモード維持」だけを実装する
+- SRS・学習進捗・プロフィール設定は、ログイン導線と同期品質を確認してから Phase 2 以降で追加する
+- 未ログインユーザーの体験を落とさず、ログインは「複数端末でお気に入りを同期したい人向け」の任意機能として出す
+
 **機能**:
 - Google / GitHub / Email / Magic Link ログイン（Supabase Auth）
 - ゲストモード維持（未ログインでも localStorage で動作 → ログイン時にマージ）
@@ -525,20 +530,25 @@ where user_id = $1 group by status;
 
 ## 6. 移行フェーズ（段階的ローンチ）
 
-### Phase 1: 基盤 + Auth + お気に入り同期（2〜3 週間）
+### Phase 1: 最小ローンチ（ログイン任意 + お気に入り同期 + ゲスト維持）（1〜2 週間）
+
+初回は Supabase 導入の価値を最小リスクで検証するため、**お気に入り同期だけ**に絞る。SRS・学習進捗・プロフィール設定・ダッシュボードは入れず、未ログイン時は現在と同じ localStorage 動作を維持する。
 
 - [ ] Supabase プロジェクト作成（Tokyo リージョン）
 - [ ] `@supabase/supabase-js` + `@supabase/ssr` インストール
-- [ ] `src/lib/supabase/client.ts` (Browser) / `server.ts` (Server) / `middleware.ts` (Session refresh)
-- [ ] スキーマ 4.2 のうち `profiles` / `favorites` を作成
+- [ ] `src/lib/supabase/client.ts` (Browser) / `server.ts` (Server) / `proxy.ts` (Session refresh)
+- [ ] スキーマ 4.2 のうち `profiles` / `favorites` のみ作成
 - [ ] ログイン UI（Google + Email Magic Link）
 - [ ] 既存 `FavoritesContext` をラップし、ログイン時は Supabase・未ログイン時は localStorage
-- [ ] ログイン時のデータマージ処理 (5.1)
+- [ ] ログイン時の localStorage お気に入りマージ処理 (5.1)
 - [ ] E2E: Playwright で「ログイン→お気に入り追加→別ブラウザで確認」
+- [ ] プライバシーポリシー / About の「会員登録なし」記述を、ログイン任意の説明に更新
 
 ### Phase 2: SRS + 復習モード（3〜4 週間）
 
 - [ ] スキーマ `word_progress` / `study_sessions` / `study_session_items` / `learning_streaks` を作成
+- [ ] ログイン済みユーザー向けに学習進捗を Supabase に保存
+- [ ] 未ログイン時の localStorage 進捗保存を検討（必要ならログイン時にマージ）
 - [ ] `src/lib/srs.ts` 実装（SM-2）
 - [ ] `/review/srs` ルート追加
 - [ ] 既存 Study Mode に「覚えた/覚えてない」→ SM-2 quality 変換ロジック追加
@@ -776,8 +786,8 @@ export async function updateWordProgress(
   1. LICENSE 追加 (30分)
   2. Playwright 導入 (1日)
 
-【Phase 1: 2〜3週間】 ★最優先
-  3. Supabase 導入 + Auth + お気に入り同期
+【Phase 1: 1〜2週間】 ★最優先
+  3. Supabase 導入（ログイン任意 + お気に入り同期 + ゲスト維持のみ）
 
 【Phase 2: 3〜4週間】
   4. SRS (SM-2) + /review/srs + 連続学習日数
