@@ -347,26 +347,23 @@ create trigger word_progress_updated_at before update on public.word_progress
 - SRS・学習進捗・プロフィール設定は、ログイン導線と同期品質を確認してから Phase 2 以降で追加する
 - 未ログインユーザーの体験を落とさず、ログインは「複数端末でお気に入りを同期したい人向け」の任意機能として出す
 
-**機能**:
+**機能（最終形）**:
 - Google / GitHub / Email / Magic Link ログイン（Supabase Auth）
 - ゲストモード維持（未ログインでも localStorage で動作 → ログイン時にマージ）
 - プロフィール設定（目標スコア・試験日・好みの音声）
 
 **マイグレーション戦略**:
 ```ts
-// ログイン時に localStorage のお気に入り・進捗を Supabase に取り込み
-async function mergeLocalDataOnLogin(userId: string) {
+// Phase 1 では、ログイン時に localStorage のお気に入りだけを Supabase に取り込む
+async function mergeLocalFavoritesOnLogin(userId: string) {
   const localFavorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-  const localProgress = JSON.parse(localStorage.getItem('wordProgress') || '{}');
 
-  // upsert (競合時は新しい方の updated_at を優先)
   await supabase.from('favorites').upsert(
     localFavorites.map((slug: string) => ({ user_id: userId, word_slug: slug })),
     { onConflict: 'user_id,word_slug', ignoreDuplicates: true }
   );
-  // 進捗も同様
+
   localStorage.removeItem('favorites');
-  localStorage.removeItem('wordProgress');
 }
 ```
 
@@ -643,11 +640,11 @@ export async function createClient() {
 ```
 
 ```ts
-// src/middleware.ts (Session refresh)
+// src/proxy.ts (Session refresh)
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -674,7 +671,7 @@ export const config = {
 };
 ```
 
-> ⚠️ middleware matcher から `/api/tts` と `/api/revalidate/*` を除外することが重要。Vercel Middleware 実行量削減の現行方針（`proxy.ts` 無効化）と整合させる。
+> ⚠️ proxy matcher から `/api/tts` と `/api/revalidate/*` を除外することが重要。Vercel Proxy 実行量を増やしすぎないよう、Session refresh が必要な範囲だけに絞る。
 
 ### 8.2 型生成
 
@@ -772,10 +769,10 @@ export async function updateWordProgress(
 | # | 項目 | 対応案 |
 |---|---|---|
 | 1 | LICENSE 未設定 | MIT LICENSE 追加 |
-| 2 | E2E テスト不在 | Playwright 導入。コアフロー: ログイン→SRS復習→お気に入り→リスニング |
+| 2 | E2E テスト不在 | Playwright 導入。Phase 1 は「ログイン→お気に入り同期→別ブラウザで確認」、Phase 2 以降で SRS 復習・リスニングを追加 |
 | 3 | `.github/workflows` 可視性 | CI で `lint` + `typecheck` + `test` + Playwright を回す |
 | 4 | Vercel ロックイン | Supabase は Vercel 非依存なので、DB 層のポータビリティは向上。Blob → Supabase Storage に将来的移行可能 |
-| 5 | `proxy.ts.disabled` | Supabase Auth 導入後、POST 保護は Auth で担保できるため、このまま無効化継続で OK |
+| 5 | `proxy.ts.disabled` | Supabase Auth 導入時に、Session refresh 用の最小 matcher で `proxy.ts` を有効化する |
 
 ---
 
