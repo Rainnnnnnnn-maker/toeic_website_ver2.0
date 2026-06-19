@@ -49,46 +49,46 @@ export default function AboutPage() {
           <ul className="list-inside list-disc space-y-2">
             <li>
               <strong>レベル別単語一覧</strong>
-              ：目標スコア（600・730・860 点）に合わせて 3 段階に分類された頻出単語
+              {"：目標スコア（600・730・860 点）に合わせて 3 段階に分類された頻出単語"}
             </li>
             <li>
               <strong>AI 解説</strong>
-              ：Google Gemini により生成された、各単語の意味・ニュアンス・文法パターンの丁寧な解説
+              {"：Google Gemini により生成された、各単語の意味・ニュアンス・文法パターンの丁寧な解説"}
             </li>
             <li>
               <strong>実践的な例文</strong>
-              ：TOEIC のビジネス文脈に即した 3〜5 件の例文（音声付き）
+              {"：TOEIC のビジネス文脈に即した 3〜5 件の例文（音声付き）"}
             </li>
             <li>
               <strong>ネイティブ発音</strong>
-              ：Google Cloud Text-to-Speech による高品質な英語・日本語音声
+              {"：Google Cloud Text-to-Speech による高品質な英語・日本語音声"}
             </li>
             <li>
               <strong>学習モード</strong>
-              ：ランダム出題形式で暗記の定着度をチェック
+              {"：ランダム出題形式で暗記の定着度をチェック"}
             </li>
             <li>
               <strong>復習モード</strong>
-              ：お気に入り登録した単語のみを集中的に復習
+              {"：お気に入り登録した単語のみを集中的に復習"}
             </li>
             <li>
               <strong>今日のおすすめ 5 単語</strong>
-              ：日付固定ロジックで毎日同じ 5 語をおすすめ
+              {"：日付固定ロジックで毎日同じ 5 語をおすすめ"}
             </li>
             <li>
               <strong>聞き流しモード</strong>
-              ：今日の 5 単語を「単語 → 英文例 → 日本語訳」の順に自動再生
+              {"：今日の 5 単語を「単語 → 英文例 → 日本語訳」の順に自動再生"}
             </li>
             <li>
               <strong>学習ガイド</strong>
-              ：スコア別戦略・Part 別対策・忘却曲線を活用した暗記法などの記事を公開（
+              {"：スコア別戦略・Part 別対策・忘却曲線を活用した暗記法などの記事を公開（"}
               <Link
                 href="/guide"
                 className="text-blue-600 underline hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
               >
                 /guide
               </Link>
-              ）
+              {"）"}
             </li>
           </ul>
         </section>
@@ -154,10 +154,12 @@ export default function AboutPage() {
           <h2 className="mb-3 text-lg font-semibold">運営者情報</h2>
           <ul className="list-inside list-disc space-y-1">
             <li>
-              <strong>運営者</strong>：Rain（個人開発者）
+              <strong>運営者</strong>
+              {"：Rain（個人開発者）"}
             </li>
             <li>
-              <strong>連絡先</strong>：
+              <strong>連絡先</strong>
+              {"："}
               <Link
                 href="/contact"
                 className="text-blue-600 underline hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
@@ -166,16 +168,20 @@ export default function AboutPage() {
               </Link>
             </li>
             <li>
-              <strong>サイト開設</strong>：2026 年 3 月
+              <strong>サイト開設</strong>
+              {"：2026 年 3 月"}
             </li>
             <li>
-              <strong>最終更新</strong>：2026 年 5 月（コンテンツ・機能ともに継続的に更新中）
+              <strong>最終更新</strong>
+              {"：2026 年 5 月（コンテンツ・機能ともに継続的に更新中）"}
             </li>
             <li>
-              <strong>収益化</strong>：Google AdSense 広告による無料運営
+              <strong>収益化</strong>
+              {"：Google AdSense 広告による無料運営"}
             </li>
             <li>
-              <strong>ソースコード</strong>：GitHub にて一部公開（個人プロジェクト）
+              <strong>ソースコード</strong>
+              {"：GitHub にて一部公開（個人プロジェクト）"}
             </li>
           </ul>
         </section>

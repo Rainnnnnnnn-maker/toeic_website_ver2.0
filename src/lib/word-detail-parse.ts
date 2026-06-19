@@ -11,7 +11,7 @@ export function parseJsonFromText(text: string): RawWordPayload {
   const trimmed = text.trim();
   const withoutFences = trimmed
     .replace(/^```(?:json)?\s*/i, "")
-    .replace(/\s*```$/, "")
+    .replace(/```$/, "")
     .trim();
 
   if (!withoutFences.includes("{")) {
