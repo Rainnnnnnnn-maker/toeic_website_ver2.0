@@ -10,6 +10,7 @@ import {
   buildWordData,
   getTodayKey,
   selectTodayWords,
+  TODAY_WORDS_COUNT,
   type WordData,
 } from "@/lib/word-select";
 
@@ -135,7 +136,7 @@ export async function getWordBySlug(slug: string): Promise<Word | undefined> {
   return data.allWords.find(w => w.slug === slug);
 }
 
-export async function getTodayRecommendedWords(limit: number = 5): Promise<Word[]> {
+export async function getTodayRecommendedWords(limit: number = TODAY_WORDS_COUNT): Promise<Word[]> {
   'use cache';
   cacheTag('today-recommended-words');
   // JST 7:05 の Vercel Cron で毎日明示的に再検証する。

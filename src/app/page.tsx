@@ -25,7 +25,7 @@ export default async function Home() {
   const importantWords = await getImportantWords();
   const mediumWords = await getMediumWords();
   const highWords = await getHighWords();
-  const todayWords = await getTodayRecommendedWords(5);
+  const todayWords = await getTodayRecommendedWords();
   const latestGuideArticles = getLatestGuideArticles(6);
 
   // WebSite構造化データ

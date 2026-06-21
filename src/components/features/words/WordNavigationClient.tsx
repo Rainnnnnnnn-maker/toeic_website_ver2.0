@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useFavorites } from "@/context/FavoritesContext";
 import { useState } from "react";
 import type { Word } from "@/data/words";
+import { TODAY_WORDS_COUNT } from "@/lib/word-select";
 import { useShareTarget } from "@/context/ShareTargetContext";
 import { ChevronLeft } from "lucide-react";
 
@@ -24,24 +25,32 @@ export default function WordNavigationClient({
   const { favorites } = useFavorites();
   const { setShareTarget } = useShareTarget();
 
-  const wordMap = new Map(allWords.map((word) => [word.slug, word]));
-  const todayWords = Array.from(
-    new Set((searchParams.get("today") ?? "").split(",").filter(Boolean))
-  )
-    .slice(0, 5)
-    .map((slug) => wordMap.get(slug))
-    .filter((word): word is Word => word !== undefined);
+  // 「今日おすすめ」コンテキストのときだけ today クエリを解釈する。
+  // 通常の単語一覧ナビでは allWords の Map 構築・クエリ解析を行わない。
+  const todayWords: Word[] = (() => {
+    if (!isFromToday) return [];
+    const slugs = Array.from(
+      new Set((searchParams.get("today") ?? "").split(",").filter(Boolean))
+    ).slice(0, TODAY_WORDS_COUNT);
+    if (slugs.length === 0) return [];
+    const wordMap = new Map(allWords.map((word) => [word.slug, word]));
+    return slugs
+      .map((slug) => wordMap.get(slug))
+      .filter((word): word is Word => word !== undefined);
+  })();
 
   const navigationList = (() => {
     if (isFromFavorites || isFromReview) {
       // お気に入り一覧と同じ順序（最新が先頭）にする
+      const wordMap = new Map(allWords.map((w) => [w.slug, w]));
       return [...favorites]
         .reverse()
         .map((slug) => wordMap.get(slug))
         .filter((w): w is Word => w !== undefined);
     }
     if (isFromToday) {
-      return todayWords;
+      // today クエリが欠落／全て無効な場合（旧リンク等）は全単語ナビにフォールバックする
+      return todayWords.length > 0 ? todayWords : allWords;
     }
     return allWords;
   })();

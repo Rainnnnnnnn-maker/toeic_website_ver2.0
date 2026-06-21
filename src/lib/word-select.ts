@@ -15,6 +15,9 @@ export type WordData = {
   allWords: Word[];
 };
 
+/** 「今日おすすめ」として選定・表示する単語数。選定ロジックと表示/ナビUIで共有する。 */
+export const TODAY_WORDS_COUNT = 5;
+
 /** 1行1単語のテキストをパースする。前後空白を除去し、slug(小文字)で重複排除する。 */
 export function parseWords(text: string, level: WordLevel): Word[] {
   const seen = new Set<string>();
