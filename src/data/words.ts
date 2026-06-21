@@ -138,7 +138,9 @@ export async function getWordBySlug(slug: string): Promise<Word | undefined> {
 export async function getTodayRecommendedWords(limit: number = 5): Promise<Word[]> {
   'use cache';
   cacheTag('today-recommended-words');
-  cacheLife('days');
+  // JST 7:05 の Vercel Cron で毎日明示的に再検証する。
+  // 時間ベースの日次再検証を併用すると Cron と二重に stale 化するため、長期保持する。
+  cacheLife('max');
 
   const data = await getWordsDataCached();
   return selectTodayWords(data.allWords, getTodayKey(), limit);

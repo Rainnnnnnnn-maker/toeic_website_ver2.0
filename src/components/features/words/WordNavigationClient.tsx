@@ -10,11 +10,9 @@ import { ChevronLeft } from "lucide-react";
 
 export default function WordNavigationClient({
   allWords,
-  todayWords,
   currentSlug,
 }: {
   allWords: Word[];
-  todayWords: Word[];
   currentSlug: string;
 }) {
   const searchParams = useSearchParams();
@@ -26,9 +24,16 @@ export default function WordNavigationClient({
   const { favorites } = useFavorites();
   const { setShareTarget } = useShareTarget();
 
+  const wordMap = new Map(allWords.map((word) => [word.slug, word]));
+  const todayWords = Array.from(
+    new Set((searchParams.get("today") ?? "").split(",").filter(Boolean))
+  )
+    .slice(0, 5)
+    .map((slug) => wordMap.get(slug))
+    .filter((word): word is Word => word !== undefined);
+
   const navigationList = (() => {
     if (isFromFavorites || isFromReview) {
-      const wordMap = new Map(allWords.map((w) => [w.slug, w]));
       // お気に入り一覧と同じ順序（最新が先頭）にする
       return [...favorites]
         .reverse()
@@ -82,7 +87,19 @@ export default function WordNavigationClient({
   const entry = allWords.find((w) => w.slug === currentSlug);
   const term = entry?.term || currentSlug;
 
-  const querySuffix = isFromFavorites ? "?from=favorites" : isFromToday ? "?from=today" : isFromStudy ? "?from=study" : isFromReview ? "?from=review" : "";
+  const querySuffix = (() => {
+    if (isFromToday) {
+      const params = new URLSearchParams({ from: "today" });
+      if (todayWords.length > 0) {
+        params.set("today", todayWords.map((word) => word.slug).join(","));
+      }
+      return `?${params.toString()}`;
+    }
+    if (isFromFavorites) return "?from=favorites";
+    if (isFromStudy) return "?from=study";
+    if (isFromReview) return "?from=review";
+    return "";
+  })();
 
   return (
     <>
