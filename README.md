@@ -21,7 +21,8 @@ A comprehensive web application for learning essential TOEIC vocabulary, featuri
   - A compact “今日おすすめの5単語” section is shown on the TOP page.
   - All 5 words are displayed directly in the TOP section without a separate “view all” button.
   - Picks are determined by UTC date key + word slug hash, so the same day yields the same 5 words.
-  - Selection logic lives server-side in `getTodayRecommendedWords()` as a Cache Component (`'use cache'` + `cacheLife('weeks')`), so TOP / `/today-words` / `/today-words/listen` / word-detail navigation always show the same 5 words. The cache is held long-term and refreshed once per day at JST 7:05 (UTC 22:05) via Vercel Cron (`/api/revalidate/today-words`), which calls `revalidateTag('today-recommended-words')`. This minimizes ISR Writes (one per day) while guaranteeing the daily rotation lines up exactly with the JST 7:00 boundary.
+  - Selection logic lives server-side in `getTodayRecommendedWords()` as a Cache Component (`'use cache'` + `cacheLife('max')`). TOP / `/today-words` / `/today-words/listen` receive the same cached 5 words, refreshed once per day at JST 7:05 (UTC 22:05) via Vercel Cron (`/api/revalidate/today-words`).
+  - Word-detail navigation does not call `getTodayRecommendedWords()`. Links from the daily-picks UI carry the five selected slugs in the `today` query parameter, and the client navigation validates them against the long-lived word list. This prevents the daily cache tag from propagating to every pre-rendered `/words/[word]` page and avoids roughly 1,350 daily ISR revalidation candidates.
 - **Listen-and-Repeat Mode (Beta)** (`/today-words/listen`, `/favorites/listen`):
   - Hands-free auto-play of today's 5 words or favorite words: each word is read out as **word → English example → Japanese example**, then advances to the next word.
   - Play / Pause / Skip-Prev / Skip-Next controls. Completion message is shown after the 5th word; pressing play again restarts from the top.
