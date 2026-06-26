@@ -173,7 +173,8 @@ export default function WordNavigationClient({
         {prevWord ? (
           <Link
             href={`/words/${prevWord.slug}${querySuffix}`}
-            prefetch={false}
+            // 次/前は高意図リンク（リンク2本のみ）なので、あえて prefetch を有効化。
+            // loading.tsx の殻が先読みされ、クリック時にスケルトンが即出る（一覧の大量リンクとは扱いを分ける）。
             className="inline-flex items-center justify-center gap-1.5 h-9 px-4 bg-white border border-gray-200 rounded-full text-gray-600 text-[13px] font-medium no-underline transition-all duration-200 shadow-sm select-none hover:bg-gray-50 hover:border-gray-300 hover:text-gray-900 hover:-translate-y-px hover:shadow-md active:translate-y-0 active:shadow-sm"
           >
             <span aria-hidden="true">←</span> 前単語
@@ -187,7 +188,8 @@ export default function WordNavigationClient({
         {nextWord ? (
           <Link
             href={`/words/${nextWord.slug}${querySuffix}`}
-            prefetch={false}
+            // 次/前は高意図リンク（リンク2本のみ）なので、あえて prefetch を有効化。
+            // loading.tsx の殻が先読みされ、クリック時にスケルトンが即出る（一覧の大量リンクとは扱いを分ける）。
             className="inline-flex items-center justify-center gap-1.5 h-9 px-4 bg-white border border-gray-200 rounded-full text-gray-600 text-[13px] font-medium no-underline transition-all duration-200 shadow-sm select-none hover:bg-gray-50 hover:border-gray-300 hover:text-gray-900 hover:-translate-y-px hover:shadow-md active:translate-y-0 active:shadow-sm"
           >
             次単語 <span aria-hidden="true">→</span>
