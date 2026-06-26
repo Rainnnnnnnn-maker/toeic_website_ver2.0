@@ -35,7 +35,7 @@ export default function TodayRecommendedWordsClient({ words, variant }: Props) {
             <h2 className="text-base font-bold text-slate-800">今日おすすめの5単語</h2>
             <Link
               href="/today-words/listen"
-              prefetch={false}
+              // prefetch={false}
               className="group relative inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-400 rounded-lg shadow-[0_2px_8px_0_rgba(16,185,129,0.39)] overflow-hidden transition-all duration-300 hover:shadow-[0_4px_12px_rgba(16,185,129,0.23)] hover:-translate-y-0.5 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-emerald-500"
             >
               <div className="absolute inset-0 flex h-full w-full justify-center [transform:skew(-12deg)_translateX(-150%)] group-hover:duration-1000 group-hover:[transform:skew(-12deg)_translateX(150%)]">
@@ -50,7 +50,7 @@ export default function TodayRecommendedWordsClient({ words, variant }: Props) {
               <Link
                 key={word.slug}
                 href={`/words/${word.slug}?${todayQuery}`}
-                prefetch={false}
+                // prefetch={false}
                 className="flex flex-col gap-0.5 p-2.5 bg-white rounded-md border border-slate-200 no-underline transition-all duration-200 shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:-translate-y-0.5 hover:shadow-sm hover:border-slate-300"
               >
                 <div className="flex items-center justify-between gap-2">
@@ -75,7 +75,7 @@ export default function TodayRecommendedWordsClient({ words, variant }: Props) {
           <h2 className="text-base font-bold text-slate-800">今日おすすめの5単語</h2>
           <Link
             href="/today-words/listen"
-            prefetch={false}
+            // prefetch={false}
             className="group relative inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-400 rounded-lg shadow-[0_2px_8px_0_rgba(16,185,129,0.39)] overflow-hidden transition-all duration-300 hover:shadow-[0_4px_12px_rgba(16,185,129,0.23)] hover:-translate-y-0.5 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-emerald-500"
           >
             <div className="absolute inset-0 flex h-full w-full justify-center [transform:skew(-12deg)_translateX(-150%)] group-hover:duration-1000 group-hover:[transform:skew(-12deg)_translateX(150%)]">
@@ -90,7 +90,7 @@ export default function TodayRecommendedWordsClient({ words, variant }: Props) {
             <Link
               key={word.slug}
               href={`/words/${word.slug}?${todayQuery}`}
-              prefetch={false}
+              // prefetch={false}
               className="flex flex-col gap-1 p-3 bg-white rounded-md border border-slate-200 no-underline transition-all duration-200 shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:-translate-y-0.5 hover:shadow-sm hover:border-slate-300"
             >
               <div className="flex items-center justify-between gap-2">
