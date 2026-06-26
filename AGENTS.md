@@ -53,6 +53,7 @@ Never call Gemini directly. Always go through `getWordDetail`. For client-side a
 - All modules that touch secrets or server-only APIs must start with `import "server-only"`.
 - Only `NEXT_PUBLIC_*` env vars may be used client-side.
 - Navigation links use `prefetch={false}` site-wide to reduce Vercel Edge Requests. Use the existing `WordLinkPending` pattern (via `useLinkStatus`) for click-feedback on links that need a loading pulse.
+  - Counterintuitive gotcha: on Suspense-streaming pages (e.g. `/words/[word]`, where `page.tsx` wraps the data fetcher in `<Suspense fallback={<Loading />}>`), `prefetch={false}` *disables* the instant `loading.tsx` skeleton — prefetch is what caches the loading shell so it can render on click. Without prefetch the router waits on the current page, so the skeleton never visibly fires. Enable prefetch only when you intentionally want that fallback to show.
 
 ### TTS API (`POST /api/tts`)
 
