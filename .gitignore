@@ -60,3 +60,5 @@ __doc__/*
 
 #skill script
 sync-blob.mjs
+
+__BLOB__/
