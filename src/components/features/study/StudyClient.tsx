@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Star, Volume2, Loader2, ChevronLeft } from 'lucide-react';
+import { Star, Volume2, Loader2, ChevronLeft, Clock3 } from 'lucide-react';
 import { useFavorites } from '@/context/FavoritesContext';
 import type { Word } from '@/data/words';
 import { fetchWordDetail } from '@/actions/word';
@@ -23,6 +23,7 @@ type PersistedStudyStateV1 = {
   currentSlug: string;
   rememberedSlugs: string[];
   forgottenSlugs: string[];
+  laterSlugs?: string[];
   consecutiveRememberCount?: number;
   updatedAt: number;
 };
@@ -53,6 +54,9 @@ function parsePersistedStudyState(raw: string): PersistedStudyStateV1 | null {
       return null;
     }
     if (!Array.isArray(obj.forgottenSlugs) || !obj.forgottenSlugs.every((s) => typeof s === 'string')) {
+      return null;
+    }
+    if (obj.laterSlugs !== undefined && (!Array.isArray(obj.laterSlugs) || !obj.laterSlugs.every((s) => typeof s === 'string'))) {
       return null;
     }
     if (obj.consecutiveRememberCount !== undefined && typeof obj.consecutiveRememberCount !== 'number') return null;
@@ -147,8 +151,10 @@ export default function StudyClient({
   const [currentWord, setCurrentWord] = useState<Word | null>(null);
   const [rememberedSlugs, setRememberedSlugs] = useState<string[]>([]);
   const [forgottenSlugs, setForgottenSlugs] = useState<string[]>([]);
+  const [laterSlugs, setLaterSlugs] = useState<string[]>([]);
   const [consecutiveRememberCount, setConsecutiveRememberCount] = useState(0);
   const initializedRef = useRef(false);
+  const cardRef = useRef<HTMLElement>(null);
   const [countdownValue, setCountdownValue] = useState<number | null>(null);
   const [countdownKey, setCountdownKey] = useState(0);
   const countdownTimeoutsRef = useRef<number[]>([]);
@@ -175,6 +181,10 @@ export default function StudyClient({
     }
     return map;
   })();
+
+  const laterWords = laterSlugs
+    .map((slug) => wordBySlug.get(slug))
+    .filter((word): word is Word => Boolean(word));
 
   const clearCountdown = () => {
     for (const id of countdownTimeoutsRef.current) {
@@ -313,6 +323,7 @@ export default function StudyClient({
         }
         setRememberedSlugs([]);
         setForgottenSlugs([]);
+        setLaterSlugs([]);
         pickRandomWord();
         return;
       }
@@ -327,6 +338,7 @@ export default function StudyClient({
               setCurrentWord(word);
               setRememberedSlugs(uniqueStrings(persisted.rememberedSlugs));
               setForgottenSlugs(uniqueStrings(persisted.forgottenSlugs));
+              setLaterSlugs(uniqueStrings(persisted.laterSlugs ?? []));
               if (persisted.consecutiveRememberCount !== undefined) {
                 setConsecutiveRememberCount(persisted.consecutiveRememberCount);
               }
@@ -348,6 +360,7 @@ export default function StudyClient({
     slug: string,
     remembered: string[],
     forgotten: string[],
+    later: string[],
     count: number,
   ) => {
     if (typeof window === 'undefined') return;
@@ -357,6 +370,7 @@ export default function StudyClient({
         currentSlug: slug,
         rememberedSlugs: remembered,
         forgottenSlugs: forgotten,
+        laterSlugs: later,
         consecutiveRememberCount: count,
         updatedAt: Date.now(),
       };
@@ -366,13 +380,14 @@ export default function StudyClient({
 
   useEffect(() => {
     if (!currentWord) return;
-    writePersistedState(currentWord.slug, rememberedSlugs, forgottenSlugs, consecutiveRememberCount);
-  }, [currentWord, rememberedSlugs, forgottenSlugs, consecutiveRememberCount, writePersistedState]);
+    writePersistedState(currentWord.slug, rememberedSlugs, forgottenSlugs, laterSlugs, consecutiveRememberCount);
+  }, [currentWord, rememberedSlugs, forgottenSlugs, laterSlugs, consecutiveRememberCount, writePersistedState]);
 
   const handleRemembered = () => {
     if (!currentWord) return;
     setRememberedSlugs((prev) => addUnique(prev, currentWord.slug));
     setForgottenSlugs((prev) => removeValue(prev, currentWord.slug));
+    setLaterSlugs((prev) => removeValue(prev, currentWord.slug));
     const newCount = consecutiveRememberCount + 1;
     setConsecutiveRememberCount(newCount);
     pickRandomWord(newCount);
@@ -383,17 +398,46 @@ export default function StudyClient({
 
     const newForgotSlugs = addUnique(forgottenSlugs, currentWord.slug);
     const newRememberedSlugs = removeValue(rememberedSlugs, currentWord.slug);
+    const newLaterSlugs = removeValue(laterSlugs, currentWord.slug);
     const newCount = 0;
 
     setForgottenSlugs(newForgotSlugs);
     setRememberedSlugs(newRememberedSlugs);
+    setLaterSlugs(newLaterSlugs);
     setConsecutiveRememberCount(newCount);
 
     // router.push でアンマウントされる前に同期で永続化（useEffect が走らない可能性があるため）
-    writePersistedState(currentWord.slug, newRememberedSlugs, newForgotSlugs, newCount);
+    writePersistedState(currentWord.slug, newRememberedSlugs, newForgotSlugs, newLaterSlugs, newCount);
 
     const query = backLink === '/favorites' ? '?from=review' : '?from=study';
     router.push(`/words/${currentWord.slug}${query}`);
+  };
+
+  const handleLater = () => {
+    if (!currentWord) return;
+
+    const newLaterSlugs = addUnique(laterSlugs, currentWord.slug);
+    const newRememberedSlugs = removeValue(rememberedSlugs, currentWord.slug);
+    const newForgotSlugs = removeValue(forgottenSlugs, currentWord.slug);
+    const newCount = 0;
+
+    setLaterSlugs(newLaterSlugs);
+    setRememberedSlugs(newRememberedSlugs);
+    setForgottenSlugs(newForgotSlugs);
+    setConsecutiveRememberCount(newCount);
+    pickRandomWord(newCount);
+  };
+
+  const handleSelectLaterWord = (word: Word) => {
+    setCurrentWord(word);
+    if (typeof window !== 'undefined') {
+      startCountdown();
+      // モバイル（lg未満）ではサイドバーがカードの下に表示されるため、
+      // 選択した単語が反映されたカードを画面内へスクロールする
+      if (window.innerWidth < 1024) {
+        cardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
   };
 
   const handleHint = async () => {
@@ -477,7 +521,14 @@ export default function StudyClient({
 
   return (
     <div className="min-h-screen w-full flex justify-center items-center py-8 px-4 bg-[radial-gradient(circle_at_top,#e0f2fe_0,#f9fafb_45%,#ffffff_100%)] sm:py-12 sm:px-6">
-      <main className="w-full max-w-[600px] flex flex-col gap-8 items-center">
+      <div
+        className={`w-full items-start ${
+          laterWords.length > 0
+            ? 'grid max-w-[980px] grid-cols-1 gap-6 lg:grid-cols-[minmax(0,600px)_minmax(260px,320px)]'
+            : 'max-w-[600px]'
+        }`}
+      >
+      <main className="w-full max-w-[600px] flex flex-col gap-8 items-center lg:max-w-none">
         <header className="flex flex-col gap-3 text-center w-full items-center relative">
           <Link 
             href={backLink} 
@@ -493,7 +544,7 @@ export default function StudyClient({
           </p>
         </header>
 
-        <section className="w-full perspective-[1000px] relative">
+        <section ref={cardRef} className="w-full perspective-[1000px] relative">
           <div className={`flex flex-col justify-center items-center px-6 py-12 rounded-3xl bg-white/95 border border-gray-200 shadow-[0_10px_25px_rgba(15,23,42,0.08)] transition-all duration-300 min-h-[225px] ${isFlipped ? 'animate-flipIn' : ''}`}>
             {!isFlipped ? (
               <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
@@ -582,9 +633,9 @@ export default function StudyClient({
         </section>
 
         <section className="flex flex-col items-center w-full mt-0">
-          <div className="flex gap-6 w-full justify-center">
+          <div className="flex flex-wrap gap-4 w-full justify-center sm:gap-6">
             <button 
-              className="flex flex-col items-center justify-center gap-2 w-[120px] h-[120px] rounded-full border-none cursor-pointer transition-all duration-200 shadow-sm bg-green-200 text-green-900 border-2 border-green-300 hover:bg-green-300 hover:-translate-y-0.5 hover:shadow-md active:translate-y-0"
+              className="flex flex-col items-center justify-center gap-2 w-24 h-24 rounded-full border-none cursor-pointer transition-all duration-200 shadow-sm bg-green-200 text-green-900 border-2 border-green-300 hover:bg-green-300 hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 sm:h-[120px] sm:w-[120px]"
               onClick={handleRemembered}
               aria-label="覚えている"
             >
@@ -593,12 +644,21 @@ export default function StudyClient({
             </button>
             
             <button 
-              className="flex flex-col items-center justify-center gap-2 w-[120px] h-[120px] rounded-full border-none cursor-pointer transition-all duration-200 shadow-sm bg-red-200 text-red-900 border-2 border-red-300 hover:bg-red-300 hover:-translate-y-0.5 hover:shadow-md active:translate-y-0"
+              className="flex flex-col items-center justify-center gap-2 w-24 h-24 rounded-full border-none cursor-pointer transition-all duration-200 shadow-sm bg-red-200 text-red-900 border-2 border-red-300 hover:bg-red-300 hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 sm:h-[120px] sm:w-[120px]"
               onClick={handleForgot}
               aria-label="覚えていない"
             >
               <span className="text-[32px] font-bold">❔</span>
               <span className="text-sm font-semibold">覚えていない</span>
+            </button>
+
+            <button
+              className="flex flex-col items-center justify-center gap-2 w-24 h-24 rounded-full border-none cursor-pointer transition-all duration-200 shadow-sm bg-amber-100 text-amber-900 border-2 border-amber-300 hover:bg-amber-200 hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 sm:h-[120px] sm:w-[120px]"
+              onClick={handleLater}
+              aria-label="あとで確認"
+            >
+              <Clock3 size={32} strokeWidth={2.4} />
+              <span className="text-sm font-semibold">あとで</span>
             </button>
           </div>
 
@@ -615,6 +675,55 @@ export default function StudyClient({
           )}
         </section>
       </main>
+
+      {laterWords.length > 0 && (
+        <aside className="w-full rounded-3xl border border-gray-200 bg-white/90 p-5 shadow-[0_10px_25px_rgba(15,23,42,0.08)] backdrop-blur-sm lg:sticky lg:top-8">
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-amber-100 text-amber-700">
+                <Clock3 size={18} strokeWidth={2.4} />
+              </span>
+              <div>
+                <h2 className="text-base font-bold leading-tight text-slate-900">あとで確認</h2>
+                <p className="text-xs font-medium text-slate-500">{laterWords.length}語を保留中</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="max-h-[420px] space-y-2 overflow-y-auto pr-1">
+            {laterWords.map((word) => {
+              const isActive = currentWord.slug === word.slug;
+
+              return (
+                <button
+                  key={word.slug}
+                  type="button"
+                  onClick={() => handleSelectLaterWord(word)}
+                  className={`group flex w-full items-center justify-between gap-3 rounded-2xl border px-3.5 py-3 text-left transition-all duration-200 ${
+                    isActive
+                      ? 'border-blue-300 bg-blue-50 text-blue-900 shadow-sm'
+                      : 'border-slate-200 bg-white text-slate-700 hover:border-amber-300 hover:bg-amber-50 hover:-translate-y-0.5 hover:shadow-sm'
+                  }`}
+                  aria-current={isActive ? 'true' : undefined}
+                >
+                  <span className="min-w-0">
+                    <span className="block truncate text-sm font-bold">{word.term}</span>
+                    <span className="mt-0.5 block text-xs font-medium text-slate-500">
+                      {word.level === 'important' ? '重要' : word.level === 'medium' ? '中級' : '上級'}
+                    </span>
+                  </span>
+                  <span className={`shrink-0 rounded-full px-2 py-1 text-[11px] font-bold ${
+                    isActive ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-500 group-hover:bg-amber-100 group-hover:text-amber-700'
+                  }`}>
+                    確認
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </aside>
+      )}
+      </div>
     </div>
   );
 }

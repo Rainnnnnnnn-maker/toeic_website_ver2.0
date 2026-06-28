@@ -15,7 +15,7 @@ A comprehensive web application for learning essential TOEIC vocabulary, featuri
 - **Pronunciation Support**: High-quality audio via **Google Cloud Text-to-Speech** (supports both words and sentences, English & Japanese voices).
 - **Study Modes**:
   - **List View**: Browse words by level (Important / Medium / High) with prefix and wildcard (`*`) search.
-  - **Study Mode**: Flashcard-style learning with tracking (Remembered / Not Remembered), hint example via AI detail.
+  - **Study Mode**: Flashcard-style learning with tracking (Remembered / Not Remembered / Later), hint example via AI detail, and an in-session "review later" sidebar for deferred words.
   - **Review Mode**: Focus on words marked as favorites.
 - **Today’s 5 Picks**:
   - A compact “今日おすすめの5単語” section is shown on the TOP page.
