@@ -419,13 +419,12 @@ export default function StudyClient({
     const newLaterSlugs = addUnique(laterSlugs, currentWord.slug);
     const newRememberedSlugs = removeValue(rememberedSlugs, currentWord.slug);
     const newForgotSlugs = removeValue(forgottenSlugs, currentWord.slug);
-    const newCount = 0;
 
     setLaterSlugs(newLaterSlugs);
     setRememberedSlugs(newRememberedSlugs);
     setForgottenSlugs(newForgotSlugs);
-    setConsecutiveRememberCount(newCount);
-    pickRandomWord(newCount);
+    // 「あとで」は判断保留なので連続カウントはリセットしない
+    pickRandomWord();
   };
 
   const handleSelectLaterWord = (word: Word) => {
