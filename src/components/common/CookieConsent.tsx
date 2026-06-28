@@ -1,37 +1,29 @@
 "use client";
 
 import Link from "next/link";
-import { useSyncExternalStore } from "react";
+import { useState } from "react";
 
-const STORAGE_KEY = "cookie-consent-accepted";
+export const CONSENT_COOKIE_NAME = "cookie-consent-accepted";
+const ONE_YEAR_SECONDS = 60 * 60 * 24 * 365;
 
-function subscribe(onStoreChange: () => void) {
-  window.addEventListener("storage", onStoreChange);
-  return () => window.removeEventListener("storage", onStoreChange);
-}
-
-function getSnapshot() {
-  return localStorage.getItem(STORAGE_KEY);
-}
-
-function getServerSnapshot() {
-  return "true";
+function setConsentCookie(value: "true" | "declined") {
+  document.cookie = `${CONSENT_COOKIE_NAME}=${value}; path=/; max-age=${ONE_YEAR_SECONDS}; SameSite=Lax`;
 }
 
 export function CookieConsent() {
-  const accepted = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const [dismissed, setDismissed] = useState(false);
 
   const handleAccept = () => {
-    localStorage.setItem(STORAGE_KEY, "true");
-    window.dispatchEvent(new StorageEvent("storage", { key: STORAGE_KEY }));
+    setConsentCookie("true");
+    setDismissed(true);
   };
 
   const handleDecline = () => {
-    localStorage.setItem(STORAGE_KEY, "declined");
-    window.dispatchEvent(new StorageEvent("storage", { key: STORAGE_KEY }));
+    setConsentCookie("declined");
+    setDismissed(true);
   };
 
-  if (accepted) return null;
+  if (dismissed) return null;
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-50 border-t border-black/10 bg-white/95 p-4 shadow-lg backdrop-blur-sm dark:border-white/10 dark:bg-black/95">

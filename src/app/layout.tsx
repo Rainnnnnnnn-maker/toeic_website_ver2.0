@@ -3,9 +3,10 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import { Suspense } from "react";
 import { FavoritesProvider } from "@/context/FavoritesContext";
 import { Footer } from "@/components/common/Footer";
-import { CookieConsent } from "@/components/common/CookieConsent";
+import { CookieConsentGate } from "@/components/common/CookieConsentGate";
 import { A8AdBanner728x90 } from "@/components/common/A8AdBanner";
 import "./globals.css";
 
@@ -97,7 +98,9 @@ export default function RootLayout({
             <A8AdBanner728x90 />
             <Footer />
           </div>
-          <CookieConsent />
+          <Suspense fallback={null}>
+            <CookieConsentGate />
+          </Suspense>
         </FavoritesProvider>
         <Analytics />
         <SpeedInsights />

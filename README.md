@@ -35,7 +35,7 @@ A comprehensive web application for learning essential TOEIC vocabulary, featuri
 - **Lean Proxy Matching (Currently Disabled)**: `src/proxy.ts` (formerly used to block non-Server-Action `POST` requests) is temporarily disabled to reduce Vercel Middleware/Proxy execution usage.
 - **Static Pages**: Includes About, Privacy, Terms, and Contact pages for better user trust and SEO. The Privacy Policy explicitly discloses Google AdSense / third-party ad vendors' Cookie usage and Google Analytics tracking, with opt-out links, in line with AdSense program policy requirements.
 - **Learning Guide Articles** (`/guide`): 10 original long-form articles covering TOEIC vocabulary strategy by score (600/730/860), Part 5 attack patterns, Part 7 speed-reading with discourse markers, Part 3/4 listening pre-read technique, exam-day essentials, last-week 50-point boost plan, the forgetting curve / SRS applied to vocab learning, business vocabulary essentials, 15 synonym-pair distinctions, and the site's word-rank selection criteria. Each article ships with `Article` + `BreadcrumbList` JSON-LD and internal links to relevant `/words/<slug>` pages. The TOP page features a "Latest Guides" card grid linking into the article corpus.
-- **Cookie Consent**: First-visit consent banner (`CookieConsent`) aligned with GA4 tracking.
+- **Cookie Consent**: First-visit consent banner aligned with GA4 tracking. Consent is stored in a cookie and read server-side via `CookieConsentGate` (wrapped in `<Suspense>` in the root layout), so the banner is server-rendered for undecided visitors and omitted entirely once accepted/declined — avoiding the late client-only paint that previously made it the LCP element on mobile.
 - **Responsive Design**: Optimized for desktop and mobile devices.
 
 ## 🛠️ Tech Stack
@@ -190,7 +190,7 @@ Returns `sitemap.xml` containing all static pages and all word detail URLs.
 - `src/app`: Next.js App Router pages (e.g., `/`, `/study`, `/favorites`, `/favorites/listen`, `/review`, `/today-words`, `/today-words/listen`, `/words`, `/words/[word]`, and static `/about`, `/privacy`, `/terms`, `/contact`, `/donate`) and API routes.
 - `src/proxy.ts`: Temporarily disabled to reduce Vercel Middleware usage (previously blocked non-Server-Action `POST` requests).
 - `src/actions`: Server Actions (e.g., `fetchWordDetail` wrapping the cached `getWordDetail`).
-- `src/components`: React components organized by feature (`features/words`, `features/today-words`, `favorites`, `review`, `study`, `sns`) and common UI (`common/` — `Footer`, `TabNavigation`, `CookieConsent`).
+- `src/components`: React components organized by feature (`features/words`, `features/today-words`, `favorites`, `review`, `study`, `sns`) and common UI (`common/` — `Footer`, `TabNavigation`, `CookieConsent` / `CookieConsentGate`).
 - `src/lib`: Utility functions and API clients (Upstash Redis, Redis-backed word cache, JSON-LD, OG utils).
 - `src/types`: TypeScript type definitions (e.g., `WordDetails`).
 - `src/data`: Data fetching logic — `words.ts` (Local vs Blob switching, `getAllWords` / `getTodayRecommendedWords` / `getRelatedWords`) and `word-detail.ts` (multi-layer cached `getWordDetail`, Gemini generation).
