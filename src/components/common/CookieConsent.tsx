@@ -2,12 +2,14 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import {
+  CONSENT_COOKIE_MAX_AGE,
+  CONSENT_COOKIE_NAME,
+  type ConsentValue,
+} from "@/lib/cookieConsent";
 
-export const CONSENT_COOKIE_NAME = "cookie-consent-accepted";
-const ONE_YEAR_SECONDS = 60 * 60 * 24 * 365;
-
-function setConsentCookie(value: "true" | "declined") {
-  document.cookie = `${CONSENT_COOKIE_NAME}=${value}; path=/; max-age=${ONE_YEAR_SECONDS}; SameSite=Lax`;
+function setConsentCookie(value: ConsentValue) {
+  document.cookie = `${CONSENT_COOKIE_NAME}=${value}; path=/; max-age=${CONSENT_COOKIE_MAX_AGE}; SameSite=Lax`;
 }
 
 export function CookieConsent() {
