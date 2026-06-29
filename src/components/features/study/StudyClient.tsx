@@ -639,7 +639,7 @@ export default function StudyClient({
               aria-label="覚えている"
             >
               <span className="text-[32px] font-bold">💡</span>
-              <span className="text-sm font-semibold">覚えている</span>
+              <span className="text-[10px] font-semibold leading-none sm:text-sm">覚えている</span>
             </button>
             
             <button 
@@ -648,7 +648,7 @@ export default function StudyClient({
               aria-label="覚えていない"
             >
               <span className="text-[32px] font-bold">❔</span>
-              <span className="text-sm font-semibold">覚えていない</span>
+              <span className="text-[10px] font-semibold leading-none sm:text-sm">覚えていない</span>
             </button>
 
             <button
@@ -657,7 +657,7 @@ export default function StudyClient({
               aria-label="あとで確認"
             >
               <Clock3 size={32} strokeWidth={2.4} />
-              <span className="text-sm font-semibold">あとで</span>
+              <span className="text-[10px] font-semibold leading-none sm:text-sm">あとで</span>
             </button>
           </div>
 
