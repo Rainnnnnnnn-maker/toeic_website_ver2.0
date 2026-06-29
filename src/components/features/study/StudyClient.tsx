@@ -656,7 +656,7 @@ export default function StudyClient({
               onClick={handleLater}
               aria-label="あとで確認"
             >
-              <Clock3 size={32} strokeWidth={2.4} />
+              <span className="text-[32px] font-bold">⏰</span>
               <span className="text-[10px] font-semibold leading-none sm:text-sm">あとで</span>
             </button>
           </div>
