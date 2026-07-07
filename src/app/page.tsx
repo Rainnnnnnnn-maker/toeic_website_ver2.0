@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Script from "next/script";
 import type { Metadata } from "next";
-import { Suspense } from "react";
+import { Suspense, cache } from "react";
 import { BookOpen, Star, List } from "lucide-react";
 import { getImportantWords, getMediumWords, getHighWords, getTodayRecommendedWords } from "@/data/words";
 import WordsListClient from "@/components/features/words/WordsListClient";
@@ -26,10 +26,190 @@ async function TodayRecommendedWordsSection() {
   return <TodayRecommendedWordsClient words={todayWords} variant="preview" />;
 }
 
-export default async function Home() {
-  const importantWords = await getImportantWords();
-  const mediumWords = await getMediumWords();
-  const highWords = await getHighWords();
+const getHomeWordData = cache(async () => {
+  const [importantWords, mediumWords, highWords] = await Promise.all([
+    getImportantWords(),
+    getMediumWords(),
+    getHighWords(),
+  ]);
+  const totalCount = importantWords.length + mediumWords.length + highWords.length;
+
+  return { importantWords, mediumWords, highWords, totalCount };
+});
+
+function buildFaqEntries({
+  importantWords,
+  mediumWords,
+  highWords,
+  totalCount,
+}: Awaited<ReturnType<typeof getHomeWordData>>) {
+  return [
+    {
+      name: "2026年最新のTOEIC重要単語と出題傾向は？",
+      text: "近年のTOEIC L&Rテストでは、ビジネス環境の変化に伴い「リモートワーク」「オンライン会議」「チャットツール」に関連する語彙の出題頻度が増加しています。また、従来のオフィスワークだけでなく、ハイブリッドワークや柔軟な働き方を示唆する文脈も増えています。"
+    },
+    {
+      name: "TOEIC重要単語の効率的な覚え方は？",
+      text: "単に英単語と日本語訳を丸暗記するのではなく、実際の例文の中でどのように使われるかを理解することが重要です。コロケーション（語の組み合わせ）を意識し、類義語との違いを理解し、音声とセットで覚えることが効果的です。"
+    },
+    {
+      name: "目標スコア別のTOEIC重要単語の選び方は？",
+      text: "現在のスコアや目標に応じて、優先して覚えるべき重要単語は異なります。まずは基礎となる「最重要単語」から始め、基礎を固めた上で「中級単語」へとステップアップすることをおすすめします。600点を目指す方は最重要単語を、それ以上を目指す方はより難しい単語を学習しましょう。"
+    },
+    {
+      name: "TOEIC重要単語は全部で何語覚えればいいですか？",
+      text: `当サイトでは合計${totalCount}語のTOEIC頻出単語を収録しています。内訳は最重要単語${importantWords.length}語（600点レベル）、中級単語${mediumWords.length}語（730〜800点レベル）、高難易度単語${highWords.length}語（800点以上レベル）です。目標スコアに合わせて、まずは最重要単語から取り組みましょう。`
+    },
+    {
+      name: "TOEIC単語学習は毎日何語ずつ進めればいい？",
+      text: "1日10〜20語を目安にするのが効果的です。新しい単語を覚えるだけでなく、前日・3日前・1週間前に学習した単語の復習も組み合わせましょう。「今日のおすすめ5単語」機能を活用すれば、スキマ時間にも無理なく毎日の学習習慣を続けられます。"
+    },
+    {
+      name: "TOEICで最も頻出する品詞は何ですか？",
+      text: "TOEICでは特に動詞と名詞が重要です。Part 5（短文穴埋め）では品詞問題が頻出し、語形変化（例: implement / implementation / implemented）の理解が問われます。各単語ページでは語形変化も掲載しているので、動詞・名詞・形容詞・副詞の形をセットで覚えましょう。"
+    },
+    {
+      name: "TOEICの単語学習はいつから始めるべき？",
+      text: "試験日の2〜3ヶ月前から本格的に取り組むのが理想です。ただし、日常的に英単語に触れる習慣をつけることが最も効果的です。通勤・通学時間などのスキマ時間を活用し、当サイトの「学習モード」や「今日のおすすめ単語」で毎日少しずつ進めましょう。"
+    },
+    {
+      name: "TOEIC単語帳アプリと当サイトの違いは？",
+      text: "当サイトはインストール不要でブラウザからすぐに使える完全無料のTOEIC単語学習サービスです。最大の特徴はビジネス文脈に絞った詳細な単語解説で、単なる日本語訳だけでなく、語源・ニュアンス・コロケーション・TOEIC実践例文まで網羅しており、深い理解に基づく暗記をサポートします。さらに、12本以上の学習ガイド記事でスコア別戦略・Part別対策まで体系的に学べます。"
+    },
+    {
+      name: "TOEIC 600点に必要な単語力は？",
+      text: `TOEIC 600点を目指すなら、まずは当サイトの最重要単語${importantWords.length}語を確実にマスターしましょう。これらはTOEIC全体で最も出現頻度が高い基礎単語です。リーディング・リスニング両方のパートで繰り返し登場するため、この層の単語を押さえるだけで大幅なスコアアップが期待できます。`
+    },
+    {
+      name: "TOEIC 800点以上を目指すには？",
+      text: `800点以上を目指す場合、最重要単語に加えて中級単語${mediumWords.length}語と高難易度単語${highWords.length}語もカバーする必要があります。特にPart 7の長文読解では、文脈から意味を推測する力が問われるため、単語の複数の意味や使い分けを理解することが重要です。当サイトの解説で各単語のニュアンスを深く学びましょう。`
+    },
+  ];
+}
+
+function TodayRecommendedWordsFallback() {
+  return (
+    <section className="bg-white/90 border border-slate-200 rounded-xl p-3 sm:p-4 shadow-[0_1px_2px_rgba(0,0,0,0.05)] animate-pulse min-h-[208px] sm:min-h-[118px]" />
+  );
+}
+
+function HomeWordDataFallback() {
+  return (
+    <>
+      <section className="bg-white/90 border border-slate-200 rounded-xl p-4 shadow-sm animate-pulse min-h-[420px]">
+        <div className="h-5 w-36 rounded bg-slate-200" />
+        <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+          {Array.from({ length: 20 }).map((_, index) => (
+            <div key={index} className="h-8 rounded-md bg-slate-100" />
+          ))}
+        </div>
+      </section>
+      <section className="grid grid-cols-2 gap-3 sm:grid-cols-4 animate-pulse">
+        {Array.from({ length: 4 }).map((_, index) => (
+          <div key={index} className="h-[86px] rounded-xl border border-slate-200 bg-white" />
+        ))}
+      </section>
+    </>
+  );
+}
+
+async function HomeWordDataSection() {
+  const { importantWords, mediumWords, highWords, totalCount } = await getHomeWordData();
+
+  return (
+    <>
+      <WordsListClient importantWords={importantWords} mediumWords={mediumWords} highWords={highWords} />
+
+      {/* 統計・数値セクション */}
+      <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="bg-white rounded-xl border border-slate-200 p-4 text-center shadow-sm">
+          <div className="text-2xl font-bold text-slate-800">{totalCount}</div>
+          <div className="text-xs text-slate-500 mt-0.5">収録単語数</div>
+        </div>
+        <div className="bg-blue-50 rounded-xl border border-blue-200 p-4 text-center shadow-sm">
+          <div className="text-2xl font-bold text-blue-700">{importantWords.length}</div>
+          <div className="text-xs text-blue-600 mt-0.5">最重要（600点）</div>
+        </div>
+        <div className="bg-purple-50 rounded-xl border border-purple-200 p-4 text-center shadow-sm">
+          <div className="text-2xl font-bold text-purple-700">{mediumWords.length}</div>
+          <div className="text-xs text-purple-600 mt-0.5">中級（730〜800点）</div>
+        </div>
+        <div className="bg-red-50 rounded-xl border border-red-200 p-4 text-center shadow-sm">
+          <div className="text-2xl font-bold text-red-700">{highWords.length}</div>
+          <div className="text-xs text-red-600 mt-0.5">上級（800点以上）</div>
+        </div>
+      </section>
+
+      <div className="flex justify-center">
+        <Link href="/words" prefetch={false} className="group relative inline-flex items-center gap-1.5 px-5 py-2.5 bg-slate-800 text-white rounded-lg font-bold text-sm shadow-[0_4px_14px_0_rgba(15,23,42,0.39)] overflow-hidden transition-all duration-300 hover:bg-slate-700 hover:shadow-[0_6px_20px_rgba(15,23,42,0.23)] hover:-translate-y-1 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-slate-800 no-underline">
+          <div className="absolute inset-0 flex h-full w-full justify-center [transform:skew(-12deg)_translateX(-150%)] group-hover:duration-1000 group-hover:[transform:skew(-12deg)_translateX(150%)]">
+            <div className="relative h-full w-8 bg-white/10" />
+          </div>
+          <List size={16} className="transition-transform group-hover:scale-110" />
+          <span className="relative z-10">全単語一覧</span>
+          <span className="relative z-10 transition-transform duration-300 group-hover:translate-x-1">→</span>
+        </Link>
+      </div>
+    </>
+  );
+}
+
+function FaqFallback() {
+  return (
+    <section className="mt-12 pt-12 border-t border-slate-200 flex flex-col gap-6 animate-pulse">
+      <div className="h-6 w-56 rounded bg-slate-200" />
+      <div className="flex flex-col gap-4">
+        {Array.from({ length: 5 }).map((_, index) => (
+          <div key={index} className="h-[54px] rounded-xl border border-slate-200 bg-white" />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+async function FaqSection() {
+  const faqEntries = buildFaqEntries(await getHomeWordData());
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqEntries.map(entry => ({
+      "@type": "Question",
+      name: entry.name,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: entry.text,
+      }
+    })),
+  };
+
+  return (
+    <>
+      <Script
+        id="ldjson-faq"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
+      <section className="mt-12 pt-12 border-t border-slate-200 flex flex-col gap-6">
+        <h2 className="text-xl font-bold text-slate-800">TOEIC重要単語 よくある質問</h2>
+        <div className="flex flex-col gap-4">
+          {faqEntries.map((entry, i) => (
+            <details key={i} className="group bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+              <summary className="flex items-center justify-between gap-3 px-5 py-4 cursor-pointer text-sm font-semibold text-slate-800 hover:bg-slate-50 transition-colors list-none [&::-webkit-details-marker]:hidden">
+                <span>{entry.name}</span>
+                <span className="text-slate-400 transition-transform duration-200 group-open:rotate-180 shrink-0">▼</span>
+              </summary>
+              <div className="px-5 pb-4 pt-0">
+                <p className="text-sm leading-[1.8] text-slate-600">{entry.text}</p>
+              </div>
+            </details>
+          ))}
+        </div>
+      </section>
+    </>
+  );
+}
+
+export default function Home() {
   const latestGuideArticles = getLatestGuideArticles(6);
 
   // WebSite構造化データ
@@ -75,65 +255,6 @@ export default async function Home() {
     educationalCredentialAwarded: "TOEIC L&R スコアアップ",
   };
 
-  const totalCount = importantWords.length + mediumWords.length + highWords.length;
-
-  // FAQPage構造化データ
-  const faqEntries = [
-    {
-      name: "2026年最新のTOEIC重要単語と出題傾向は？",
-      text: "近年のTOEIC L&Rテストでは、ビジネス環境の変化に伴い「リモートワーク」「オンライン会議」「チャットツール」に関連する語彙の出題頻度が増加しています。また、従来のオフィスワークだけでなく、ハイブリッドワークや柔軟な働き方を示唆する文脈も増えています。"
-    },
-    {
-      name: "TOEIC重要単語の効率的な覚え方は？",
-      text: "単に英単語と日本語訳を丸暗記するのではなく、実際の例文の中でどのように使われるかを理解することが重要です。コロケーション（語の組み合わせ）を意識し、類義語との違いを理解し、音声とセットで覚えることが効果的です。"
-    },
-    {
-      name: "目標スコア別のTOEIC重要単語の選び方は？",
-      text: "現在のスコアや目標に応じて、優先して覚えるべき重要単語は異なります。まずは基礎となる「最重要単語」から始め、基礎を固めた上で「中級単語」へとステップアップすることをおすすめします。600点を目指す方は最重要単語を、それ以上を目指す方はより難しい単語を学習しましょう。"
-    },
-    {
-      name: "TOEIC重要単語は全部で何語覚えればいいですか？",
-      text: `当サイトでは合計${totalCount}語のTOEIC頻出単語を収録しています。内訳は最重要単語${importantWords.length}語（600点レベル）、中級単語${mediumWords.length}語（730〜800点レベル）、高難易度単語${highWords.length}語（800点以上レベル）です。目標スコアに合わせて、まずは最重要単語から取り組みましょう。`
-    },
-    {
-      name: "TOEIC単語学習は毎日何語ずつ進めればいい？",
-      text: "1日10〜20語を目安にするのが効果的です。新しい単語を覚えるだけでなく、前日・3日前・1週間前に学習した単語の復習も組み合わせましょう。「今日のおすすめ5単語」機能を活用すれば、スキマ時間にも無理なく毎日の学習習慣を続けられます。"
-    },
-    {
-      name: "TOEICで最も頻出する品詞は何ですか？",
-      text: "TOEICでは特に動詞と名詞が重要です。Part 5（短文穴埋め）では品詞問題が頻出し、語形変化（例: implement / implementation / implemented）の理解が問われます。各単語ページでは語形変化も掲載しているので、動詞・名詞・形容詞・副詞の形をセットで覚えましょう。"
-    },
-    {
-      name: "TOEICの単語学習はいつから始めるべき？",
-      text: "試験日の2〜3ヶ月前から本格的に取り組むのが理想です。ただし、日常的に英単語に触れる習慣をつけることが最も効果的です。通勤・通学時間などのスキマ時間を活用し、当サイトの「学習モード」や「今日のおすすめ単語」で毎日少しずつ進めましょう。"
-    },
-    {
-      name: "TOEIC単語帳アプリと当サイトの違いは？",
-      text: "当サイトはインストール不要でブラウザからすぐに使える完全無料のTOEIC単語学習サービスです。最大の特徴はビジネス文脈に絞った詳細な単語解説で、単なる日本語訳だけでなく、語源・ニュアンス・コロケーション・TOEIC実践例文まで網羅しており、深い理解に基づく暗記をサポートします。さらに、12本以上の学習ガイド記事でスコア別戦略・Part別対策まで体系的に学べます。"
-    },
-    {
-      name: "TOEIC 600点に必要な単語力は？",
-      text: `TOEIC 600点を目指すなら、まずは当サイトの最重要単語${importantWords.length}語を確実にマスターしましょう。これらはTOEIC全体で最も出現頻度が高い基礎単語です。リーディング・リスニング両方のパートで繰り返し登場するため、この層の単語を押さえるだけで大幅なスコアアップが期待できます。`
-    },
-    {
-      name: "TOEIC 800点以上を目指すには？",
-      text: `800点以上を目指す場合、最重要単語に加えて中級単語${mediumWords.length}語と高難易度単語${highWords.length}語もカバーする必要があります。特にPart 7の長文読解では、文脈から意味を推測する力が問われるため、単語の複数の意味や使い分けを理解することが重要です。当サイトの解説で各単語のニュアンスを深く学びましょう。`
-    },
-  ];
-
-  const faqJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": faqEntries.map(entry => ({
-      "@type": "Question",
-      "name": entry.name,
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": entry.text,
-      }
-    })),
-  };
-
   return (
     <div className="relative min-h-screen w-full flex justify-center py-8 px-4 bg-[radial-gradient(circle_at_top,#e0f2fe_0,#f9fafb_45%,#ffffff_100%)] sm:py-12 sm:px-6 lg:py-8 lg:px-8 lg:pb-16">
       <Script
@@ -150,11 +271,6 @@ export default async function Home() {
         id="ldjson-educational"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(educationalJsonLd) }}
-      />
-      <Script
-        id="ldjson-faq"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
       <main className="w-full max-w-[960px] flex flex-col gap-5 relative">
         <div className="mb-[-8px] sm:mb-0 flex justify-end">
@@ -188,41 +304,12 @@ export default async function Home() {
             </Link>
           </div>
         </header>
-        <Suspense fallback={<section className="bg-white/90 border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-[0_1px_2px_rgba(0,0,0,0.05)] animate-pulse h-[180px]" />}>
+        <Suspense fallback={<TodayRecommendedWordsFallback />}>
           <TodayRecommendedWordsSection />
         </Suspense>
-        <WordsListClient importantWords={importantWords} mediumWords={mediumWords} highWords={highWords} />
-
-        {/* 統計・数値セクション */}
-        <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <div className="bg-white rounded-xl border border-slate-200 p-4 text-center shadow-sm">
-            <div className="text-2xl font-bold text-slate-800">{totalCount}</div>
-            <div className="text-xs text-slate-500 mt-0.5">収録単語数</div>
-          </div>
-          <div className="bg-blue-50 rounded-xl border border-blue-200 p-4 text-center shadow-sm">
-            <div className="text-2xl font-bold text-blue-700">{importantWords.length}</div>
-            <div className="text-xs text-blue-600 mt-0.5">最重要（600点）</div>
-          </div>
-          <div className="bg-purple-50 rounded-xl border border-purple-200 p-4 text-center shadow-sm">
-            <div className="text-2xl font-bold text-purple-700">{mediumWords.length}</div>
-            <div className="text-xs text-purple-600 mt-0.5">中級（730〜800点）</div>
-          </div>
-          <div className="bg-red-50 rounded-xl border border-red-200 p-4 text-center shadow-sm">
-            <div className="text-2xl font-bold text-red-700">{highWords.length}</div>
-            <div className="text-xs text-red-600 mt-0.5">上級（800点以上）</div>
-          </div>
-        </section>
-
-        <div className="flex justify-center">
-          <Link href="/words" prefetch={false} className="group relative inline-flex items-center gap-1.5 px-5 py-2.5 bg-slate-800 text-white rounded-lg font-bold text-sm shadow-[0_4px_14px_0_rgba(15,23,42,0.39)] overflow-hidden transition-all duration-300 hover:bg-slate-700 hover:shadow-[0_6px_20px_rgba(15,23,42,0.23)] hover:-translate-y-1 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-slate-800 no-underline">
-            <div className="absolute inset-0 flex h-full w-full justify-center [transform:skew(-12deg)_translateX(-150%)] group-hover:duration-1000 group-hover:[transform:skew(-12deg)_translateX(150%)]">
-              <div className="relative h-full w-8 bg-white/10" />
-            </div>
-            <List size={16} className="transition-transform group-hover:scale-110" />
-            <span className="relative z-10">全単語一覧</span>
-            <span className="relative z-10 transition-transform duration-300 group-hover:translate-x-1">→</span>
-          </Link>
-        </div>
+        <Suspense fallback={<HomeWordDataFallback />}>
+          <HomeWordDataSection />
+        </Suspense>
 
         {/* --- 新規追加: サイトの独自性・権威性アピールセクション --- */}
         <section className="mt-12 pt-12 border-t border-slate-200 flex flex-col gap-12">
@@ -333,23 +420,9 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* FAQ セクション */}
-        <section className="mt-12 pt-12 border-t border-slate-200 flex flex-col gap-6">
-          <h2 className="text-xl font-bold text-slate-800">TOEIC重要単語 よくある質問</h2>
-          <div className="flex flex-col gap-4">
-            {faqEntries.map((entry, i) => (
-              <details key={i} className="group bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                <summary className="flex items-center justify-between gap-3 px-5 py-4 cursor-pointer text-sm font-semibold text-slate-800 hover:bg-slate-50 transition-colors list-none [&::-webkit-details-marker]:hidden">
-                  <span>{entry.name}</span>
-                  <span className="text-slate-400 transition-transform duration-200 group-open:rotate-180 shrink-0">▼</span>
-                </summary>
-                <div className="px-5 pb-4 pt-0">
-                  <p className="text-sm leading-[1.8] text-slate-600">{entry.text}</p>
-                </div>
-              </details>
-            ))}
-          </div>
-        </section>
+        <Suspense fallback={<FaqFallback />}>
+          <FaqSection />
+        </Suspense>
         {/* TOEIC最新単語 説明セクション */}
         <section className="mt-12 pt-12 border-t border-slate-200 flex flex-col gap-8">
           <article className="flex flex-col gap-4">
