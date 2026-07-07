@@ -21,11 +21,15 @@ export const metadata: Metadata = {
   },
 };
 
+async function TodayRecommendedWordsSection() {
+  const todayWords = await getTodayRecommendedWords();
+  return <TodayRecommendedWordsClient words={todayWords} variant="preview" />;
+}
+
 export default async function Home() {
   const importantWords = await getImportantWords();
   const mediumWords = await getMediumWords();
   const highWords = await getHighWords();
-  const todayWords = await getTodayRecommendedWords();
   const latestGuideArticles = getLatestGuideArticles(6);
 
   // WebSite構造化データ
@@ -185,7 +189,7 @@ export default async function Home() {
           </div>
         </header>
         <Suspense fallback={<section className="bg-white/90 border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-[0_1px_2px_rgba(0,0,0,0.05)] animate-pulse h-[180px]" />}>
-          <TodayRecommendedWordsClient words={todayWords} variant="preview" />
+          <TodayRecommendedWordsSection />
         </Suspense>
         <WordsListClient importantWords={importantWords} mediumWords={mediumWords} highWords={highWords} />
 
