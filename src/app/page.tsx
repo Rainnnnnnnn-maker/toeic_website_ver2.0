@@ -6,6 +6,7 @@ import { BookOpen, Star, List } from "lucide-react";
 import { getImportantWords, getMediumWords, getHighWords, getTodayRecommendedWords } from "@/data/words";
 import WordsListClient from "@/components/features/words/WordsListClient";
 import { SnsShareButtons } from "@/components/features/sns/SnsShareButtons";
+import { AuthStatus } from "@/components/features/auth/AuthStatus";
 import TodayRecommendedWordsClient from "@/components/features/words/TodayRecommendedWordsClient";
 import { getLatestGuideArticles } from "@/data/guide-articles";
 
@@ -273,7 +274,8 @@ export default function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(educationalJsonLd) }}
       />
       <main className="w-full max-w-[960px] flex flex-col gap-5 relative">
-        <div className="mb-[-8px] sm:mb-0 flex justify-end">
+        <div className="mb-[-8px] sm:mb-0 flex items-center justify-between gap-4">
+          <AuthStatus />
           <SnsShareButtons
             url="https://www.toeic-words.com/"
             title="【2026年最新】TOEIC 重要単語 | 頻出単語を効率よく学習"
@@ -335,7 +337,7 @@ export default function Home() {
                 <div className="w-12 h-12 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center text-xl font-bold mb-2">3</div>
                 <h3 className="text-lg font-bold text-slate-800">完全無料・登録不要</h3>
                 <p className="text-sm text-slate-600 leading-relaxed">
-                  アプリのインストールや面倒な会員登録は一切不要。PCでもスマホでも、ブラウザを開くだけで1,300語以上のTOEIC頻出単語をすべて無料で学習できます。
+                  アプリのインストールや面倒な会員登録は一切不要。PCでもスマホでも、ブラウザを開くだけで1,300語以上のTOEIC頻出単語をすべて無料で学習できます。複数端末でお気に入りを同期したい方向けに、任意のログイン機能も用意しています。
                 </p>
               </div>
             </div>

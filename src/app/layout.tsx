@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { Suspense } from "react";
+import { AuthProvider } from "@/context/AuthContext";
 import { FavoritesProvider } from "@/context/FavoritesContext";
 import { Footer } from "@/components/common/Footer";
 import { CookieConsentGate } from "@/components/common/CookieConsentGate";
@@ -92,16 +93,18 @@ export default function RootLayout({
         ></script>
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <FavoritesProvider>
-          <div className="flex min-h-screen flex-col">
-            <div className="flex-1">{children}</div>
-            <A8AdBanner728x90 />
-            <Footer />
-          </div>
-          <Suspense fallback={null}>
-            <CookieConsentGate />
-          </Suspense>
-        </FavoritesProvider>
+        <AuthProvider>
+          <FavoritesProvider>
+            <div className="flex min-h-screen flex-col">
+              <div className="flex-1">{children}</div>
+              <A8AdBanner728x90 />
+              <Footer />
+            </div>
+            <Suspense fallback={null}>
+              <CookieConsentGate />
+            </Suspense>
+          </FavoritesProvider>
+        </AuthProvider>
         <Analytics />
         <SpeedInsights />
         {process.env.NEXT_PUBLIC_GA_ID && (

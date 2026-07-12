@@ -29,11 +29,12 @@ A comprehensive web application for learning essential TOEIC vocabulary, featuri
   - Hands-free auto-play of today's 5 words or favorite words: each word is read out as **word → English example → Japanese example**, then advances to the next word.
   - Play / Pause / Skip-Prev / Skip-Next controls. Completion message is shown after the 5th word; pressing play again restarts from the top.
   - Internally, audio sequencing uses a ref-based state machine to guard against `onended` race conditions, and prefetches the current and next word's `WordDetails` for instant example previews.
-- **Favorites**: Save difficult words for later review (persisted in local storage via `FavoritesContext`).
+- **Favorites**: Save difficult words for later review. Persisted in local storage via `FavoritesContext` for guests; synced to Supabase for signed-in users.
+- **Optional Sign-In & Favorites Sync (Supabase)**: Google sign-in (`/login`) is fully optional — all features work without an account. Signing in stores favorites in Supabase Postgres (RLS-protected `favorites` table) so they sync across devices. On first login, locally stored favorites are merged into the account (upsert with `ignoreDuplicates`), and local storage is cleared only after a successful merge. On sign-out, the account's favorites are copied back to local storage so they stay visible, tagged with the owner's user id so that a different account signing in on the same browser never inherits them. Auth state is resolved client-side (`onAuthStateChange`) to keep pages statically cacheable; the session cookie exchange happens in `/auth/callback`.
 - **Social Share**: Share word details via Twitter, Facebook, and LINE (`react-share`), with GA4 event tracking.
 - **PWA Ready**: Installable on mobile and desktop via `manifest.ts`.
 - **Dynamic OGP**: Per-word Open Graph images generated on-the-fly via `src/app/words/[word]/opengraph-image.tsx`.
-- **Lean Proxy Matching (Currently Disabled)**: `src/proxy.ts` (formerly used to block non-Server-Action `POST` requests) is temporarily disabled to reduce Vercel Middleware/Proxy execution usage.
+- **Lean Proxy Matching**: `src/proxy.ts` refreshes the Supabase Auth session, with the matcher minimized to `/login` and `/auth/*` to keep Vercel Middleware/Proxy execution usage low (auth state elsewhere is handled client-side).
 - **Static Pages**: Includes About, Privacy, Terms, and Contact pages for better user trust and SEO. The Privacy Policy explicitly discloses Google AdSense / third-party ad vendors' Cookie usage and Google Analytics tracking, with opt-out links, in line with AdSense program policy requirements.
 - **Learning Guide Articles** (`/guide`): 10 original long-form articles covering TOEIC vocabulary strategy by score (600/730/860), Part 5 attack patterns, Part 7 speed-reading with discourse markers, Part 3/4 listening pre-read technique, exam-day essentials, last-week 50-point boost plan, the forgetting curve / SRS applied to vocab learning, business vocabulary essentials, 15 synonym-pair distinctions, and the site's word-rank selection criteria. Each article ships with `Article` + `BreadcrumbList` JSON-LD and internal links to relevant `/words/<slug>` pages. The TOP page features a "Latest Guides" card grid linking into the article corpus.
 - **Cookie Consent**: First-visit consent banner aligned with GA4 tracking. Consent is stored in a cookie and read server-side via `CookieConsentGate` (wrapped in `<Suspense>` in the root layout), so the banner is server-rendered for undecided visitors and omitted entirely once accepted/declined — avoiding the late client-only paint that previously made it the LCP element on mobile.
@@ -48,6 +49,7 @@ A comprehensive web application for learning essential TOEIC vocabulary, featuri
 - **Social**: react-share
 - **AI**: Google Gemini (`@google/genai` / `GoogleGenAI`) - model: `gemini-2.5-flash-lite`
 - **Database / Cache**: Upstash Redis (`@upstash/redis`)
+- **Auth / User Data**: [Supabase](https://supabase.com/) (`@supabase/supabase-js` + `@supabase/ssr`) — Google sign-in and RLS-protected favorites sync
 - **Storage**: Vercel Blob (`@vercel/blob`) - for word lists
 - **Analytics**: Google Analytics 4 (via `@next/third-parties`), Vercel Analytics & Speed Insights
 - **Deployment**: Vercel
@@ -94,6 +96,8 @@ A comprehensive web application for learning essential TOEIC vocabulary, featuri
     | `REVALIDATION_TOKEN` | Secret token for validating ISR revalidation requests. |
     | `WORD_CACHE_TTL_DAYS` | (Optional) Cache duration in days (default: 30). |
     | `NEXT_PUBLIC_GA_ID` | Google Analytics 4 Measurement ID (G-XXXXXXXXXX). |
+    | `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL (optional sign-in / favorites sync). |
+    | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Supabase publishable key (safe for client exposure; data access is protected by RLS). |
 
 4. **Data Setup (Local Development)**
     For local development (`NODE_ENV=development`), the app reads word lists from the `__doc__` directory by default.
@@ -188,13 +192,13 @@ Returns `sitemap.xml` containing all static pages and all word detail URLs.
 
 ## 📂 Project Structure
 
-- `src/app`: Next.js App Router pages (e.g., `/`, `/study`, `/favorites`, `/favorites/listen`, `/review`, `/today-words`, `/today-words/listen`, `/words`, `/words/[word]`, and static `/about`, `/privacy`, `/terms`, `/contact`, `/donate`) and API routes.
-- `src/proxy.ts`: Temporarily disabled to reduce Vercel Middleware usage (previously blocked non-Server-Action `POST` requests).
+- `src/app`: Next.js App Router pages (e.g., `/`, `/study`, `/favorites`, `/favorites/listen`, `/review`, `/today-words`, `/today-words/listen`, `/words`, `/words/[word]`, `/login`, `/auth/callback`, and static `/about`, `/privacy`, `/terms`, `/contact`, `/donate`) and API routes.
+- `src/proxy.ts`: Supabase Auth session refresh, with the matcher minimized to `/login` and `/auth/*` to keep Vercel Middleware usage low.
 - `src/actions`: Server Actions (e.g., `fetchWordDetail` wrapping the cached `getWordDetail`).
-- `src/components`: React components organized by feature (`features/words`, `features/today-words`, `favorites`, `review`, `study`, `sns`) and common UI (`common/` — `Footer`, `TabNavigation`, `CookieConsent` / `CookieConsentGate`).
-- `src/lib`: Utility functions and API clients (Upstash Redis, Redis-backed word cache, JSON-LD, OG utils).
+- `src/components`: React components organized by feature (`features/words`, `features/today-words`, `auth`, `favorites`, `review`, `study`, `sns`) and common UI (`common/` — `Footer`, `TabNavigation`, `CookieConsent` / `CookieConsentGate`).
+- `src/lib`: Utility functions and API clients (Upstash Redis, Redis-backed word cache, Supabase browser/server clients, favorites-sync pure logic, JSON-LD, OG utils).
 - `src/types`: TypeScript type definitions (e.g., `WordDetails`).
 - `src/data`: Data fetching logic — `words.ts` (Local vs Blob switching, `getAllWords` / `getTodayRecommendedWords` / `getRelatedWords`) and `word-detail.ts` (multi-layer cached `getWordDetail`, Gemini generation).
 - `src/hooks`: Custom React hooks (e.g., `useTTS`).
-- `src/context`: React Contexts (`FavoritesContext`, `ShareTargetContext`).
+- `src/context`: React Contexts (`AuthContext`, `FavoritesContext`, `ShareTargetContext`).
 - `__doc__`: Local storage for word lists during development.
