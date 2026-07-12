@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useAuth } from "@/context/AuthContext";
 
 export function Footer() {
   const [year, setYear] = useState<number | null>(null);
+  const { user, isAuthLoading, signOut } = useAuth();
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -64,6 +66,24 @@ export function Footer() {
           >
             寄付のお願い
           </Link>
+          {!isAuthLoading &&
+            (user ? (
+              <button
+                type="button"
+                onClick={signOut}
+                className="underline underline-offset-4 hover:text-black/80 dark:hover:text-white/80"
+              >
+                ログアウト
+              </button>
+            ) : (
+              <Link
+                href="/login"
+                prefetch={false}
+                className="underline underline-offset-4 hover:text-black/80 dark:hover:text-white/80"
+              >
+                ログイン
+              </Link>
+            ))}
         </div>
         <p className="mt-4 text-center text-xs text-black/40 dark:text-white/40">
           © {year ? `${year} ` : ""}TOEIC重要単語
