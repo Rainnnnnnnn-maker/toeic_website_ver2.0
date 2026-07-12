@@ -57,14 +57,14 @@
 
 ### 3-1. Supabase プロジェクト作成
 
-- [ ] https://supabase.com にサインアップ / ログイン（GitHub アカウント連携が楽）
-- [ ] 「New Project」でプロジェクト作成
+- [X] https://supabase.com にサインアップ / ログイン（GitHub アカウント連携が楽）
+- [X] 「New Project」でプロジェクト作成
   - Organization: 個人用でよい
   - Name: `toeic-words`（任意）
   - Database Password: 強いパスワードを生成し**パスワードマネージャに保存**（Phase 1 のコードでは使わないが、後で必要になる）
   - **Region: Northeast Asia (Tokyo)** ← 必ず東京を選ぶ。後から変更不可
   - Plan: Free
-- [ ] プロジェクトが起動したら **Project Settings → API** で以下 2 つを控える
+- [X] プロジェクトが起動したら **Project Settings → API** で以下 2 つを控える
   - `Project URL`（`https://xxxx.supabase.co`）
   - `Publishable key`（`sb_publishable_...`。旧 UI では `anon` キー。**どちらでも動く**。クライアント公開前提のキーで、RLS で保護される）
   - ※ `Secret key`（`sb_secret_...` / 旧 `service_role`）は **Phase 1 では不要**。取得・保存しない（RLS をバイパスする危険なキーのため、必要になる Phase まで触らない）
@@ -74,7 +74,7 @@
 
 ### 3-2. データベーススキーマ作成（SQL Editor で実行）
 
-- [ ] Supabase ダッシュボード → **SQL Editor** → 下記をそのまま貼り付けて Run
+- [X] Supabase ダッシュボード → **SQL Editor** → 下記をそのまま貼り付けて Run
 
 ```sql
 -- ============================================
@@ -140,11 +140,11 @@ create trigger on_auth_user_created
   for each row execute function public.handle_new_user();
 ```
 
-- [ ] **Table Editor** で `profiles` / `favorites` が作成され、両方に RLS バッジが付いていることを確認
+- [X] **Table Editor** で `profiles` / `favorites` が作成され、両方に RLS バッジが付いていることを確認
 
 ### 3-3. Google ログイン設定（Google Cloud Console + Supabase）
 
-- [ ] https://console.cloud.google.com で新規プロジェクト作成（既存の TTS 用プロジェクトと分けても同じでもよい）
+- [X] https://console.cloud.google.com で新規プロジェクト作成（既存の TTS 用プロジェクトと分けても同じでもよい）
 - [ ] 「API とサービス → OAuth 同意画面」を設定
   - User Type: **外部（External）**
   - アプリ名: `TOEIC重要単語`、サポートメール: 自分のメール
@@ -161,7 +161,7 @@ create trigger on_auth_user_created
 > ⚠️ **Supabase 内蔵メール送信は「プロジェクトのチームメンバー宛のみ・毎時数通」に制限されている。**
 > 一般ユーザーに Magic Link / 確認メールを送るには**カスタム SMTP（Resend 無料枠など）の設定が必須**。
 
-- [ ] 方針を決める（推奨: 初回リリースは **Google ログインのみ** → SMTP 設定不要で最速。Email は SMTP 設定後に追加）
+- [X] 方針を決める → **決定 (2026-07-12): Google ログインのみ**（SMTP 設定不要。Email は将来 SMTP 設定後に追加）
 - [ ] （Email も出す場合のみ）Resend 等で SMTP 情報を取得 → Supabase **Authentication → Emails → SMTP Settings** に設定
 
 ### 3-5. リダイレクト URL 設定（Supabase 側）
@@ -175,14 +175,14 @@ create trigger on_auth_user_created
 
 ### 3-6. 環境変数の設定
 
-- [ ] ローカル `.env.local` に追記:
+- [X] ローカル `.env.local` に追記:
 
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...   # 3-1 で控えた Publishable key
 ```
 
-- [ ] Vercel ダッシュボード → プロジェクト → **Settings → Environment Variables** に同じ 2 変数を追加（Production / Preview / Development すべてにチェック）
+- [X] Vercel ダッシュボード → プロジェクト → **Settings → Environment Variables** に同じ 2 変数を追加（Production / Preview / Development すべてにチェック）
 
 > `NEXT_PUBLIC_` プレフィックスなのでクライアントに露出するが、これは**公開前提のキー**（RLS が防御線）。Secret key / service_role は絶対に env に入れない（Phase 1 では不要）。
 
@@ -190,14 +190,14 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...   # 3-1 で控えた Pub
 
 ## 4. 取得済み情報の記録欄（シークレットは書かない）
 
-| 項目                                       | 値 / 状態                          | 記入日 |
-| ------------------------------------------ | ---------------------------------- | ------ |
-| Supabase Project Ref（URL のサブドメイン） | （未記入）                         |        |
-| Supabase リージョン                        | Tokyo 予定                         |        |
-| Google OAuth クライアント作成              | 未 / 済                            |        |
-| カスタム SMTP                              | 不要（Google のみ）/ Resend 設定済 |        |
-| Vercel 環境変数 2 件                       | 未 / 済                            |        |
-| DB スキーマ（3-2 の SQL）                  | 未実行 / 実行済                    |        |
+| 項目                                       | 値 / 状態                              | 記入日     |
+| ------------------------------------------ | -------------------------------------- | ---------- |
+| Supabase Project Ref（URL のサブドメイン） | （未記入）                             |            |
+| Supabase リージョン                        | Tokyo 予定                             |            |
+| Google OAuth クライアント作成              | **未**（スモークテスト前に必須） |            |
+| カスタム SMTP                              | 不要（Google のみで運用）              | 2026-07-12 |
+| Vercel 環境変数 2 件                       | 済                                     | 2026-07-12 |
+| DB スキーマ（3-2 の SQL）                  | 実行済                                 | 2026-07-12 |
 
 ---
 
@@ -209,41 +209,40 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...   # 3-1 で控えた Pub
 
 - [X] `npm install @supabase/supabase-js @supabase/ssr`（`package.json` の dependencies に追加）
 - [X] `.env.example` に `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` を追記
-- [ ] `src/lib/supabase/client.ts` — `createBrowserClient`（提案書 §8.1 のコード。ただし env 変数名は `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` に読み替える — 提案書は旧名 `ANON_KEY` のまま）
-- [ ] `src/lib/supabase/server.ts` — `createServerClient` + `cookies()`（提案書 §8.1 のコード。env 変数名は同上。`import "server-only"` を先頭に付ける）
-- [ ] `src/proxy.ts.disabled` → `src/proxy.ts` にリネームし、Supabase セッションリフレッシュ実装（提案書 §8.1 の proxy コード。env 変数名は同上）
-  - matcher は**セッションが必要なパスだけに最小化**（§6 注意点 N-2 参照）。`/api/tts`・`/api/revalidate` は必ず除外
+- [X] `src/lib/supabase/client.ts` — `createBrowserClient`（env 変数名は `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`）
+- [X] `src/lib/supabase/server.ts` — `createServerClient` + `cookies()`（`import "server-only"` 付き）
+- [X] `src/proxy.ts.disabled` → `src/proxy.ts` に置換し、Supabase セッションリフレッシュ実装
+  - matcher は `["/login", "/auth/:path*"]` に最小化（§6 N-2 の最小案を採用。`/api/tts`・`/api/revalidate` は当然対象外）
 
 ### 5-2. 認証フロー
 
-- [ ] `src/app/auth/callback/route.ts` — OAuth / Magic Link のコード交換（`supabase.auth.exchangeCodeForSession`）→ 元ページへリダイレクト
-- [ ] `src/app/login/page.tsx` — ログインページ（D-1 の決定に従い Google ボタン ± Email フォーム）
-  - 「ログインは任意です。複数端末でお気に入りを同期したい方向けの機能です」の説明を必ず入れる
-- [ ] ログアウト処理（Server Action or クライアント `supabase.auth.signOut()`）
-- [ ] ヘッダーにログイン状態表示（クライアントコンポーネントで `onAuthStateChange` 購読。§6 N-1 参照）
+- [X] `src/app/auth/callback/route.ts` — 認可コード交換（`exchangeCodeForSession`、open redirect 対策付き）→ 元ページへリダイレクト
+- [X] `src/app/login/page.tsx` + `src/components/features/auth/LoginClient.tsx` — Google ログインのみ（noindex、「ログインは任意」の説明入り）
+- [X] ログアウト処理（クライアント `supabase.auth.signOut()`、`AuthContext` の `signOut`）
+- [X] ログイン状態表示 — `src/context/AuthContext.tsx`（`onAuthStateChange` 購読）+ TOP 右上の `AuthStatus` + Footer のログイン/ログアウトリンク（サイトに共通ヘッダーがないため）
 
 ### 5-3. お気に入り同期
 
-- [ ] `src/context/FavoritesContext.tsx` を拡張:
+- [X] `src/context/FavoritesContext.tsx` を拡張:
   - 未ログイン: 現行どおり localStorage（`STORAGE_KEY = "toeic_favorites"`）
   - ログイン済み: Supabase `favorites` テーブルを読み書き（楽観的更新: ローカル state 即時反映 → 裏で upsert / delete）
   - 公開 API（`favorites` / `toggleFavorite` / `isFavorite` 等）の**型は変えない** — 利用側コンポーネント（`/review`、`/favorites`、単語詳細など）は無改修で済ませる
-- [ ] 初回ログイン時マージ処理: localStorage の `toeic_favorites` を `favorites` テーブルへ upsert（`onConflict: 'user_id,word_slug', ignoreDuplicates: true`）
-  - **マージ成功を確認してから** localStorage をクリア。失敗時は localStorage を残す（提案書 §9 リスク表の方針）
-- [ ] マージ・差分計算などの**純ロジックは `src/lib/favorites-sync.ts` に切り出し**、`src/lib/(tests)/favorites-sync.test.ts` で Vitest ユニットテスト（Supabase 呼び出し自体はテストしない — テスト規約どおり）
+- [X] 初回ログイン時マージ処理: localStorage の `toeic_favorites` を `favorites` テーブルへ upsert（`onConflict: 'user_id,word_slug', ignoreDuplicates: true`）
+  - マージ成功時のみ localStorage をクリアし `toeic_favorites_merged_at` を記録。失敗時は localStorage を残す（次回ログインで再マージ）
+- [X] 純ロジックを `src/lib/favorites-sync.ts` に切り出し、`src/lib/(tests)/favorites-sync.test.ts` で Vitest ユニットテスト（15 ケース）
 
 ### 5-4. 文言・ドキュメント更新（同一 PR 必須）
 
-- [ ] `src/app/(web-info)/privacy/page.tsx:45` — 「会員登録機能はなく…」を「ログインは任意。ログイン時はメールアドレス等を Supabase に保存」の記述に更新（**リリース前必須**。メールアドレス収集が始まるため）
-- [ ] `src/app/(web-info)/about/page.tsx:33` — 同様に更新
-- [ ] `src/app/page.tsx:338` / `src/app/(web-info)/donate/page.tsx:7,33` — 「会員登録不要」→「登録なしで全機能利用可（任意ログインで同期）」等に調整
-- [ ] `README.md` と `.trae/documents/技術ドキュメント.md`（最終更新日含む）を更新 — **リポジトリの必須ルール**
+- [X] `src/app/(web-info)/privacy/page.tsx` — 収集情報にアカウント情報を追記し、任意ログイン時の Supabase 保存を明記（最終更新日も更新）
+- [X] `src/app/(web-info)/about/page.tsx` — 任意 Google ログインの説明を追記
+- [X] `src/app/page.tsx` / `src/app/(web-info)/donate/page.tsx` — 「会員登録不要（ログインは任意）」等に調整
+- [X] `README.md` と `.trae/documents/技術ドキュメント.md`（最終更新日・更新履歴 4.5）を更新
 
 ### 5-5. 検証
 
-- [ ] `npm run lint` / `npm run test` / `npm run build` すべて成功
-- [ ] §7 のスモークテストを実施
-- [ ] （任意・提案書 §10）Playwright E2E「ログイン → お気に入り追加 → 別ブラウザで確認」— 現行リポジトリは手動スモーク運用のため、導入するかは D-3 で判断
+- [X] `npm run lint` / `npm run test` / `npm run build` すべて成功（2026-07-12）
+- [ ] §7 のスモークテストを実施（**要: §3-3 Google OAuth 設定と §3-5 Redirect URL 設定の完了**）
+- [ ] （任意・提案書 §10）Playwright E2E — D-3 の決定により Phase 1 では見送り（導入する場合は別タスク化）
 
 ---
 
@@ -261,12 +260,12 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...   # 3-1 で控えた Pub
 
 ### 未決事項（再開時にまず決める）
 
-- [ ] **D-1: ログイン方式。** Issue #42 は Email+Password 前提の文面だが、提案書は Google + Magic Link。
-  **推奨: 初回は Google のみ**（SMTP 不要・パスワード管理不要・実装最小）。Email 系は SMTP 設定（3-4）後に追加。決定したら Issue #42 の本文も更新する。
-- [ ] **D-2: ログアウト時の挙動。** サーバーのお気に入りはそのまま残し、ログアウト後は localStorage（空 or 既存）に戻る、でよいか。ログアウト時にサーバーの内容を localStorage へ書き戻すか。
-  推奨: 書き戻さない（シンプル）。ログイン中は localStorage を触らない。
-- [ ] **D-3: Playwright E2E を Phase 1 で導入するか。** 現行は「Vitest は純ロジックのみ + 手動スモーク」規約。導入するなら CI 設定も含めて別タスク化を推奨。
-- [ ] **D-4: マージ後に localStorage を消すか。** 提案書は削除、リスク表は失敗時残置。推奨: 成功時のみ削除 + マージ済みフラグ（例: `toeic_favorites_merged_at`）を localStorage に記録し、二重マージを防ぐ。
+すべて 2026-07-12 に決定済み。
+
+- [X] **D-1: ログイン方式。** → **Google ログインのみ**で実装（SMTP 不要・実装最小）。Email 系は SMTP 設定（3-4）後に追加検討。Issue #42 の本文更新は未対応（TODO）。
+- [X] **D-2: ログアウト時の挙動。** → 当初「書き戻さない」で実装したが、スモークテストで「ログアウトするとお気に入りが消えたように見える」ことが判明し、**改定 (2026-07-12): ログアウト時にアカウントのお気に入りを localStorage へ書き戻す**方式に変更。ログアウト後も同じお気に入りが見え続ける（共用端末ではアカウントのお気に入りが端末に残る点は許容）。
+- [X] **D-3: Playwright E2E。** → **Phase 1 では見送り**（現行の「Vitest 純ロジック + 手動スモーク」規約を維持）。導入する場合は CI 設定含め別タスク化。
+- [X] **D-4: マージ後の localStorage。** → **成功時のみ削除** + `toeic_favorites_merged_at` を記録。失敗時は残置し次回ログインで再マージ（upsert `ignoreDuplicates` なので冪等）。
 
 ---
 
@@ -279,7 +278,7 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...   # 3-1 で控えた Pub
 3. **マージ**: 未ログインでお気に入りを 2〜3 件付けてからログイン → Supabase Table Editor の `favorites` に該当行ができている
 4. **同期**: ログイン状態で別ブラウザ（またはシークレットウィンドウ）から同じアカウントでログイン → 同じお気に入りが見える
 5. **RLS**: 別の Google アカウントでログイン → 他人のお気に入りが**見えない**こと
-6. **ログアウト**: ログアウト後も未ログイン機能が正常（localStorage モードに戻る）
+6. **ログアウト**: ログアウト後もお気に入りがそのまま見える（アカウントの内容が localStorage へ書き戻される）＋未ログイン機能が正常
 7. **回帰**: `/words/[word]` の表示・TTS 再生・今日の 5 単語が無影響であること（proxy の matcher ミスがあるとここが遅くなる/壊れる）
 
 ---
