@@ -3,6 +3,7 @@ import {
   buildFavoriteRows,
   mergeFavorites,
   parseStoredFavorites,
+  shouldMergeLocalFavorites,
 } from "@/lib/favorites-sync";
 
 describe("parseStoredFavorites", () => {
@@ -71,6 +72,24 @@ describe("mergeFavorites", () => {
 
   it("local が空なら remote をそのまま返す", () => {
     expect(mergeFavorites(["x"], [])).toEqual(["x"]);
+  });
+});
+
+describe("shouldMergeLocalFavorites", () => {
+  it("持ち主の印がない（ゲストのデータ）ならマージ可", () => {
+    expect(shouldMergeLocalFavorites(null, "user-1")).toBe(true);
+  });
+
+  it("印が空文字ならゲスト扱いでマージ可", () => {
+    expect(shouldMergeLocalFavorites("", "user-1")).toBe(true);
+  });
+
+  it("印が本人ならマージ可", () => {
+    expect(shouldMergeLocalFavorites("user-1", "user-1")).toBe(true);
+  });
+
+  it("印が別人ならマージ不可（アカウント間の混入防止）", () => {
+    expect(shouldMergeLocalFavorites("user-1", "user-2")).toBe(false);
   });
 });
 
