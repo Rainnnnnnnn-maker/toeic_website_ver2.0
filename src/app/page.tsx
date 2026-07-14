@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Script from "next/script";
 import type { Metadata } from "next";
 import { Suspense, cache } from "react";
 import { BookOpen, Star, List } from "lucide-react";
@@ -185,7 +184,7 @@ async function FaqSection() {
 
   return (
     <>
-      <Script
+      <script
         id="ldjson-faq"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
@@ -217,9 +216,9 @@ export default function Home() {
   const websiteJsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "TOEIC重要単語",
+    name: "TOEIC語彙ラボ",
     description: "【完全無料】TOEIC重要単語をビジネス文脈に絞って徹底解説。2026年最新の出題傾向（リモートワーク・オンライン会議など）を反映した頻出英単語1,300語以上と、学習ガイド記事12本以上を収録。目標スコア（600点・730点・800点）のレベル別に厳選した単語、ビジネス例文、類義語の使い分け、音声発音チェック機能も完備。スマホでいつでも効率的に学習し、今のTOEICに通用する英語力を身につけましょう。",
-    alternateName: ["TOEIC重要単語", "TOEIC Words", "TOEIC単語帳"],
+    alternateName: "toeic-words.com",
     url: "https://www.toeic-words.com/",
     inLanguage: "ja-JP",
     potentialAction: {
@@ -258,17 +257,17 @@ export default function Home() {
 
   return (
     <div className="relative min-h-screen w-full flex justify-center py-8 px-4 bg-[radial-gradient(circle_at_top,#e0f2fe_0,#f9fafb_45%,#ffffff_100%)] sm:py-12 sm:px-6 lg:py-8 lg:px-8 lg:pb-16">
-      <Script
+      <script
         id="ldjson-website"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
       />
-      <Script
+      <script
         id="ldjson-breadcrumb"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
-      <Script
+      <script
         id="ldjson-educational"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(educationalJsonLd) }}
@@ -283,7 +282,7 @@ export default function Home() {
         </div>
         <header className="flex flex-col gap-5 sm:flex-row sm:justify-between sm:items-start">
           <div className="flex flex-col gap-3 sm:max-w-[60%]">
-            <p className="text-xs tracking-[0.12em] uppercase text-slate-500">LEVEL UP YOUR SCORE</p>
+            <p className="text-xs tracking-[0.12em] text-slate-500">TOEIC語彙ラボ · LEVEL UP YOUR SCORE</p>
             <h1 className="text-[22px] leading-[1.3] text-slate-900 font-bold sm:text-[26px] lg:text-[28px]">【2026年最新】TOEIC 重要単語</h1>
             <p className="text-sm leading-[1.6] text-gray-500">
               頻出単語を効率よく学習して、スコアアップを目指しましょう。

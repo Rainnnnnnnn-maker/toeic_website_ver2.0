@@ -86,7 +86,7 @@ export function Footer() {
             ))}
         </div>
         <p className="mt-4 text-center text-xs text-black/40 dark:text-white/40">
-          © {year ? `${year} ` : ""}TOEIC重要単語
+          © {year ? `${year} ` : ""}TOEIC語彙ラボ｜TOEIC重要単語
         </p>
       </div>
     </footer>
