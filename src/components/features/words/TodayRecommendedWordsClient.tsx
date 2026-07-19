@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { Word } from "@/data/words";
+import { TODAY_WORDS_COUNT } from "@/lib/word-select";
 import { Headphones } from "lucide-react";
 
 type Props = {
@@ -32,7 +33,9 @@ export default function TodayRecommendedWordsClient({ words, variant }: Props) {
       <section className="bg-white/90 border border-slate-200 rounded-xl p-3 sm:p-4 shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between gap-2 mb-1">
-            <h2 className="text-base font-bold text-slate-800">今日おすすめの5単語</h2>
+            <h2 className="text-base font-bold text-slate-800">
+              今日おすすめの{TODAY_WORDS_COUNT}単語
+            </h2>
             <Link
               href="/today-words/listen"
               // prefetch={false}
@@ -45,7 +48,7 @@ export default function TodayRecommendedWordsClient({ words, variant }: Props) {
               <span className="relative z-10">聞き流し</span>
             </Link>
           </div>
-          <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-5">
+          <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 lg:grid-cols-6">
             {words.map((word) => (
               <Link
                 key={word.slug}
@@ -72,7 +75,9 @@ export default function TodayRecommendedWordsClient({ words, variant }: Props) {
     <section className="bg-white/90 border border-slate-200 rounded-xl p-3 sm:p-4 shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between gap-2 mb-1">
-          <h2 className="text-base font-bold text-slate-800">今日おすすめの5単語</h2>
+          <h2 className="text-base font-bold text-slate-800">
+            今日おすすめの{TODAY_WORDS_COUNT}単語
+          </h2>
           <Link
             href="/today-words/listen"
             // prefetch={false}
@@ -85,7 +90,7 @@ export default function TodayRecommendedWordsClient({ words, variant }: Props) {
             <span className="relative z-10">聞き流し</span>
           </Link>
         </div>
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
           {words.map((word) => (
             <Link
               key={word.slug}

@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { getImportantWords, getMediumWords, getHighWords } from "@/data/words";
 import type { Word } from "@/data/words";
 import { WordLinkPending } from "@/components/features/words/WordLinkPending";
+import { TODAY_WORDS_COUNT } from "@/lib/word-select";
 
 export const metadata: Metadata = {
   title: {
@@ -196,7 +197,7 @@ export default async function WordsListPage() {
             href="/today-words"
             className="inline-flex items-center gap-2 px-4 py-2 bg-white text-slate-700 border border-slate-200 rounded-lg font-semibold text-sm hover:bg-slate-50 transition-colors no-underline"
           >
-            今日のおすすめ5単語
+            今日のおすすめ{TODAY_WORDS_COUNT}単語
           </Link>
         </div>
 
@@ -269,7 +270,7 @@ export default async function WordsListPage() {
             </Link>
             <Link href="/today-words" className="flex flex-col gap-1 p-4 bg-white rounded-xl border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all no-underline">
               <span className="text-sm font-bold text-slate-800">今日のおすすめ単語</span>
-              <span className="text-xs text-slate-500">毎日5語ずつスキマ時間に学習する習慣をつけよう</span>
+              <span className="text-xs text-slate-500">毎日{TODAY_WORDS_COUNT}語ずつスキマ時間に学習する習慣をつけよう</span>
             </Link>
           </div>
         </section>

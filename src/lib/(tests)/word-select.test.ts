@@ -5,7 +5,14 @@ import {
   hashString,
   getTodayKey,
   selectTodayWords,
+  TODAY_WORDS_COUNT,
 } from "../word-select";
+
+describe("TODAY_WORDS_COUNT", () => {
+  it("selects six recommended words per day", () => {
+    expect(TODAY_WORDS_COUNT).toBe(6);
+  });
+});
 
 describe("parseWords", () => {
   it("trims whitespace and lowercases the slug", () => {

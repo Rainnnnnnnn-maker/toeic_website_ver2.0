@@ -8,6 +8,7 @@ import { SnsShareButtons } from "@/components/features/sns/SnsShareButtons";
 import { AuthStatus } from "@/components/features/auth/AuthStatus";
 import TodayRecommendedWordsClient from "@/components/features/words/TodayRecommendedWordsClient";
 import { getLatestGuideArticles } from "@/data/guide-articles";
+import { TODAY_WORDS_COUNT } from "@/lib/word-select";
 
 export const metadata: Metadata = {
   title: {
@@ -62,7 +63,7 @@ function buildFaqEntries({
     },
     {
       name: "TOEIC単語学習は毎日何語ずつ進めればいい？",
-      text: "1日10〜20語を目安にするのが効果的です。新しい単語を覚えるだけでなく、前日・3日前・1週間前に学習した単語の復習も組み合わせましょう。「今日のおすすめ5単語」機能を活用すれば、スキマ時間にも無理なく毎日の学習習慣を続けられます。"
+      text: `1日10〜20語を目安にするのが効果的です。新しい単語を覚えるだけでなく、前日・3日前・1週間前に学習した単語の復習も組み合わせましょう。「今日のおすすめ${TODAY_WORDS_COUNT}単語」機能を活用すれば、スキマ時間にも無理なく毎日の学習習慣を続けられます。`
     },
     {
       name: "TOEICで最も頻出する品詞は何ですか？",
@@ -89,7 +90,7 @@ function buildFaqEntries({
 
 function TodayRecommendedWordsFallback() {
   return (
-    <section className="bg-white/90 border border-slate-200 rounded-xl p-3 sm:p-4 shadow-[0_1px_2px_rgba(0,0,0,0.05)] animate-pulse min-h-[208px] sm:min-h-[118px]" />
+    <section className="bg-white/90 border border-slate-200 rounded-xl p-3 sm:p-4 shadow-[0_1px_2px_rgba(0,0,0,0.05)] animate-pulse min-h-[208px] sm:min-h-[182px] lg:min-h-[118px]" />
   );
 }
 
@@ -329,7 +330,7 @@ export default function Home() {
                 <div className="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center text-xl font-bold mb-2">2</div>
                 <h3 className="text-lg font-bold text-slate-800">忘却曲線を意識した復習</h3>
                 <p className="text-sm text-slate-600 leading-relaxed">
-                  「学習モード」と「復習モード」を使い分けることで、記憶への定着率を最大化。さらに「今日のおすすめ5単語」機能で、スキマ時間での毎日の継続をサポートします。
+                  「学習モード」と「復習モード」を使い分けることで、記憶への定着率を最大化。さらに「今日のおすすめ{TODAY_WORDS_COUNT}単語」機能で、スキマ時間での毎日の継続をサポートします。
                 </p>
               </div>
               <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col gap-3">
@@ -351,8 +352,8 @@ export default function Home() {
               <li className="flex gap-4 items-start">
                 <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold mt-0.5">1</span>
                 <div>
-                  <p className="font-bold text-slate-800">朝のスキマ時間：今日のおすすめ5単語をチェック</p>
-                  <p className="text-sm text-slate-600 mt-1">トップページに表示される5単語を通勤・通学中に確認し、英語脳にスイッチを入れます。</p>
+                  <p className="font-bold text-slate-800">朝のスキマ時間：今日のおすすめ{TODAY_WORDS_COUNT}単語をチェック</p>
+                  <p className="text-sm text-slate-600 mt-1">トップページに表示される{TODAY_WORDS_COUNT}単語を通勤・通学中に確認し、英語脳にスイッチを入れます。</p>
                 </div>
               </li>
               <li className="flex gap-4 items-start">

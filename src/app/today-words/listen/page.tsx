@@ -3,11 +3,12 @@ import type { Metadata } from "next";
 import { getTodayRecommendedWords } from "@/data/words";
 import TodayWordsListenClient from "@/components/features/today-words/TodayWordsListenClient";
 import { A8AdBanner468x60 } from "@/components/common/A8AdBanner";
+import { TODAY_WORDS_COUNT } from "@/lib/word-select";
 import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "今日の単語 聞き流し | TOEIC Words",
-  description: "通勤・通学や家事などのスキマ時間に。その日に選ばれたTOEIC頻出単語5つの発音・英語例文・日本語訳を自動再生する「聞き流しモード」で、リスニング力と語彙力を同時に鍛えられます。",
+  description: `通勤・通学や家事などのスキマ時間に。その日に選ばれたTOEIC頻出単語${TODAY_WORDS_COUNT}つの発音・英語例文・日本語訳を自動再生する「聞き流しモード」で、リスニング力と語彙力を同時に鍛えられます。`,
   alternates: {
     canonical: "https://www.toeic-words.com/today-words/listen",
   },
@@ -30,7 +31,7 @@ export default async function TodayWordsListenPage() {
           今日の単語 聞き流しモードとは
         </h2>
         <p className="mb-3">
-          「聞き流しモード」は、その日に選ばれた TOEIC 重要単語 5 語を、画面を見続けなくても耳だけで学習できる自動再生機能です。単語の発音・英語例文・日本語訳が自然な間隔で連続再生されるため、通勤・通学・家事などの「ながら時間」を活かして語彙とリスニング力を同時に鍛えられます。
+          「聞き流しモード」は、その日に選ばれた TOEIC 重要単語 {TODAY_WORDS_COUNT} 語を、画面を見続けなくても耳だけで学習できる自動再生機能です。単語の発音・英語例文・日本語訳が自然な間隔で連続再生されるため、通勤・通学・家事などの「ながら時間」を活かして語彙とリスニング力を同時に鍛えられます。
         </p>
 
         <h3 className="mt-4 mb-2 text-sm font-semibold text-slate-800">
@@ -87,7 +88,7 @@ export default async function TodayWordsListenPage() {
         <p className="text-xs text-slate-500">
           文字でじっくり確認したい場合は{" "}
           <Link href="/today-words" prefetch={false} className="text-blue-600 underline">
-            「今日のおすすめ 5 単語」
+            「今日のおすすめ {TODAY_WORDS_COUNT} 単語」
           </Link>
           、テスト形式で覚えたい場合は{" "}
           <Link href="/study" prefetch={false} className="text-blue-600 underline">

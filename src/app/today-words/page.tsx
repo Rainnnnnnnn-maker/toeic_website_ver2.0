@@ -3,10 +3,11 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { getTodayRecommendedWords } from "@/data/words";
 import TodayRecommendedWordsClient from "@/components/features/words/TodayRecommendedWordsClient";
+import { TODAY_WORDS_COUNT } from "@/lib/word-select";
 
 export const metadata: Metadata = {
-  title: "今日おすすめの5単語",
-  description: "毎日更新されるおすすめ5単語で、TOEIC学習を短時間で始めましょう。",
+  title: `今日おすすめの${TODAY_WORDS_COUNT}単語`,
+  description: `毎日更新されるおすすめ${TODAY_WORDS_COUNT}単語で、TOEIC学習を短時間で始めましょう。`,
   alternates: {
     canonical: "https://www.toeic-words.com/today-words",
   },
@@ -21,9 +22,11 @@ export default async function TodayWordsPage() {
         <header className="flex flex-col gap-5 sm:flex-row sm:justify-between sm:items-start">
           <div className="flex flex-col gap-3 sm:max-w-[65%]">
             <p className="text-xs tracking-[0.12em] uppercase text-slate-500">TODAY&apos;S PICKS</p>
-            <h1 className="text-[22px] leading-[1.3] text-slate-900 font-bold sm:text-[26px] lg:text-[28px]">今日おすすめの5単語</h1>
+            <h1 className="text-[22px] leading-[1.3] text-slate-900 font-bold sm:text-[26px] lg:text-[28px]">
+              今日おすすめの{TODAY_WORDS_COUNT}単語
+            </h1>
             <p className="text-sm leading-[1.6] text-gray-500">
-              毎日同じ5語を固定表示。まずはここから短時間で学習を始めましょう。
+              毎日同じ{TODAY_WORDS_COUNT}語を固定表示。まずはここから短時間で学習を始めましょう。
             </p>
           </div>
           <div className="flex gap-4 items-center justify-center flex-wrap">
@@ -42,23 +45,23 @@ export default async function TodayWordsPage() {
 
         <section className="mt-10 text-sm leading-relaxed text-slate-700">
           <h2 className="mb-3 text-base font-semibold text-slate-900">
-            「今日のおすすめ 5 単語」の使い方と仕組み
+            「今日のおすすめ {TODAY_WORDS_COUNT} 単語」の使い方と仕組み
           </h2>
           <p className="mb-3">
-            「今日のおすすめ 5 単語」は、当サイトに収録された 1,300 語以上の TOEIC 重要単語の中から、その日 1 日固定で 5 単語を選出して表示する機能です。同じ日にアクセスすれば必ず同じ 5 語が表示されるため、「今日はこの 5 語を覚える」という日次の目標を立てやすくなります。
+            「今日のおすすめ {TODAY_WORDS_COUNT} 単語」は、当サイトに収録された 1,300 語以上の TOEIC 重要単語の中から、その日 1 日固定で {TODAY_WORDS_COUNT} 単語を選出して表示する機能です。同じ日にアクセスすれば必ず同じ {TODAY_WORDS_COUNT} 語が表示されるため、「今日はこの {TODAY_WORDS_COUNT} 語を覚える」という日次の目標を立てやすくなります。
           </p>
           <h3 className="mt-4 mb-2 text-sm font-semibold text-slate-800">
             選出ロジック
           </h3>
           <p className="mb-3">
-            UTC 日付キーと単語スラッグのハッシュをもとに、サーバー側で 5 語を決定論的に選出しています（Cache Component 化）。これにより、トップページ・本ページ・聞き流しモードのいずれからアクセスしても、同じ 5 単語が表示されます。
+            UTC 日付キーと単語スラッグのハッシュをもとに、サーバー側で {TODAY_WORDS_COUNT} 語を決定論的に選出しています（Cache Component 化）。これにより、トップページ・本ページ・聞き流しモードのいずれからアクセスしても、同じ {TODAY_WORDS_COUNT} 単語が表示されます。
           </p>
           <h3 className="mt-4 mb-2 text-sm font-semibold text-slate-800">
             おすすめの活用方法
           </h3>
           <ul className="mb-3 list-inside list-disc space-y-1">
             <li>
-              <strong>朝のスキマ時間</strong>：通勤・通学中に 5 単語の意味と例文を確認
+              <strong>朝のスキマ時間</strong>：通勤・通学中に {TODAY_WORDS_COUNT} 単語の意味と例文を確認
             </li>
             <li>
               <strong>昼休み</strong>：聞き流しモードで「単語 → 英文例 → 日本語訳」の順に音声を聴く
@@ -67,14 +70,14 @@ export default async function TodayWordsPage() {
               <strong>夜の復習</strong>：覚えにくかった単語を「お気に入り」に追加し、後日復習モードで再確認
             </li>
             <li>
-              <strong>翌日</strong>：前日の 5 単語を思い出してから、新しい 5 単語に進む
+              <strong>翌日</strong>：前日の {TODAY_WORDS_COUNT} 単語を思い出してから、新しい {TODAY_WORDS_COUNT} 単語に進む
             </li>
           </ul>
           <h3 className="mt-4 mb-2 text-sm font-semibold text-slate-800">
-            なぜ「1 日 5 単語」なのか
+            なぜ「1 日 {TODAY_WORDS_COUNT} 単語」なのか
           </h3>
           <p className="mb-3">
-            認知心理学の研究では、新規情報は 1 セッションあたり 5〜9 個までが短期記憶の限界とされています（マジカルナンバー 7±2）。1 日 5 単語であれば、忘却曲線に沿った復習サイクル（翌日・3 日後・1 週間後）を組み合わせても無理なく継続でき、長期記憶への定着率を最大化できます。
+            認知心理学の研究では、新規情報は 1 セッションあたり 5〜9 個までが短期記憶の限界とされています（マジカルナンバー 7±2）。1 日 {TODAY_WORDS_COUNT} 単語であれば、忘却曲線に沿った復習サイクル（翌日・3 日後・1 週間後）を組み合わせても無理なく継続でき、長期記憶への定着率を最大化できます。
           </p>
           <p className="text-xs text-slate-500">
             復習タイミングの詳細は{" "}
