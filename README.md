@@ -123,7 +123,7 @@ TOEIC語彙ラボ is a comprehensive web application for learning essential TOEI
 - `npm run build`: Builds the application for production.
 - `npm run start`: Starts the production server.
 - `npm run lint`: Runs ESLint.
-- `npm run test`: Runs Vitest unit tests. These cover **pure logic only** (word selection/parsing, Gemini response normalization, TTS cache keys & example allowlist, listen-mode example fallback) and run in CI alongside `npm run lint`. Integration and UI changes are still verified by manual smoke testing.
+- `npm run test`: Runs Vitest unit tests. These cover **pure logic only** (word selection/parsing, Gemini response normalization, TTS cache keys & example allowlist, listen-mode example fallback, favorites sync/merge, study-mode word selection & persisted-state parsing) and run in CI alongside `npm run lint`. Integration and UI changes are still verified by manual smoke testing.
 
 ## 🔄 API Endpoints
 
