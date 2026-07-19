@@ -3,11 +3,23 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Star, Volume2, Loader2, ChevronLeft, Clock3 } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import { useFavorites } from '@/context/FavoritesContext';
 import type { Word } from '@/data/words';
 import { fetchWordDetail } from '@/actions/word';
 import { useTTS } from '@/hooks/useTTS';
+import { useStudyCountdown } from '@/hooks/useStudyCountdown';
+import { useStudyProgress, readPersistedState, clearPersistedState } from '@/hooks/useStudyProgress';
+import {
+  buildWordMap,
+  getNavigationType,
+  splitWordsByLevel,
+  pickRandomStudyWord,
+  pickSequentialStudyWord,
+} from '@/lib/study-utils';
+import StudyCard from './StudyCard';
+import StudyActions from './StudyActions';
+import LaterWordsSidebar from './LaterWordsSidebar';
 
 type Props = {
   words: Word[];
@@ -18,128 +30,13 @@ type Props = {
   order?: 'random' | 'sequential';
 };
 
-type PersistedStudyStateV1 = {
-  v: 1;
-  currentSlug: string;
-  rememberedSlugs: string[];
-  forgottenSlugs: string[];
-  laterSlugs?: string[];
-  consecutiveRememberCount?: number;
-  updatedAt: number;
-};
-
 const DEFAULT_STORAGE_KEY = 'toeic-study-state-v1';
 const DEFAULT_PAGE_TITLE = '英単語学習';
 const DEFAULT_BACK_LINK = '/';
 const DEFAULT_BACK_LINK_TEXT = '単語一覧';
 
-function getNavigationType(): string | undefined {
-  if (typeof window === 'undefined') return undefined;
-  const entry = window.performance.getEntriesByType('navigation')[0];
-  if (!entry) return undefined;
-  if ('type' in entry) {
-    return (entry as PerformanceNavigationTiming).type;
-  }
-  return undefined;
-}
-
-function parsePersistedStudyState(raw: string): PersistedStudyStateV1 | null {
-  try {
-    const data = JSON.parse(raw) as unknown;
-    if (!data || typeof data !== 'object') return null;
-    const obj = data as Record<string, unknown>;
-    if (obj.v !== 1) return null;
-    if (typeof obj.currentSlug !== 'string') return null;
-    if (!Array.isArray(obj.rememberedSlugs) || !obj.rememberedSlugs.every((s) => typeof s === 'string')) {
-      return null;
-    }
-    if (!Array.isArray(obj.forgottenSlugs) || !obj.forgottenSlugs.every((s) => typeof s === 'string')) {
-      return null;
-    }
-    if (obj.laterSlugs !== undefined && (!Array.isArray(obj.laterSlugs) || !obj.laterSlugs.every((s) => typeof s === 'string'))) {
-      return null;
-    }
-    if (obj.consecutiveRememberCount !== undefined && typeof obj.consecutiveRememberCount !== 'number') return null;
-    if (typeof obj.updatedAt !== 'number') return null;
-    return obj as PersistedStudyStateV1;
-  } catch {
-    return null;
-  }
-}
-
-function uniqueStrings(values: string[]): string[] {
-  return Array.from(new Set(values));
-}
-
-function addUnique(values: string[], value: string): string[] {
-  if (values.includes(value)) return values;
-  return [...values, value];
-}
-
-function removeValue(values: string[], value: string): string[] {
-  return values.filter((v) => v !== value);
-}
-
-function escapeRegExp(string: string) {
-  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
-// AutoResizingText Component
-const AutoResizingText = ({ text, className, style }: { text: string, className?: string, style?: React.CSSProperties }) => {
-  const ref = useRef<HTMLSpanElement>(null);
-  
-  const adjustSize = () => {
-    const el = ref.current;
-    if (!el) return;
-    
-    const parent = el.parentElement;
-    // If parent is not available or has 0 width (hidden), skip
-    if (!parent || parent.clientWidth === 0) return;
-
-    // Force styles to allow accurate measurement of natural width
-    // We override class styles that might constrain width or show ellipsis
-    el.style.maxWidth = 'none';
-    el.style.overflow = 'visible';
-    el.style.textOverflow = 'clip';
-    el.style.whiteSpace = 'nowrap';
-    
-    let size = 48; // default from css
-    el.style.fontSize = `${size}px`;
-    
-    // Let's use a safe margin.
-    const maxWidth = parent.clientWidth - 10; 
-
-    while (el.scrollWidth > maxWidth && size > 16) {
-      size -= 2;
-      el.style.fontSize = `${size}px`;
-    }
-    
-    // If still overflowing, allow wrap
-    if (el.scrollWidth > maxWidth) {
-       el.style.whiteSpace = 'normal';
-       el.style.wordBreak = 'break-word';
-       el.style.maxWidth = '100%';
-    } else {
-       // Fits! Ensure no ellipsis by keeping overflow visible, but constrain width just in case.
-       el.style.maxWidth = '100%';
-    }
-  };
-
-  useEffect(() => {
-    adjustSize();
-  }, [adjustSize]);
-
-  useEffect(() => {
-    const handleResize = () => adjustSize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [adjustSize]);
-
-  return <span ref={ref} className={className} style={style}>{text}</span>;
-};
-
-export default function StudyClient({ 
-  words, 
+export default function StudyClient({
+  words,
   storageKey = DEFAULT_STORAGE_KEY,
   pageTitle = DEFAULT_PAGE_TITLE,
   backLink = DEFAULT_BACK_LINK,
@@ -149,19 +46,11 @@ export default function StudyClient({
   const router = useRouter();
   const { isFavorite, toggleFavorite } = useFavorites();
   const [currentWord, setCurrentWord] = useState<Word | null>(null);
-  const [rememberedSlugs, setRememberedSlugs] = useState<string[]>([]);
-  const [forgottenSlugs, setForgottenSlugs] = useState<string[]>([]);
-  const [laterSlugs, setLaterSlugs] = useState<string[]>([]);
-  const [consecutiveRememberCount, setConsecutiveRememberCount] = useState(0);
-  const initializedRef = useRef(false);
-  const cardRef = useRef<HTMLElement>(null);
-  const [countdownValue, setCountdownValue] = useState<number | null>(null);
-  const [countdownKey, setCountdownKey] = useState(0);
-  const countdownTimeoutsRef = useRef<number[]>([]);
-  const [showHintButton, setShowHintButton] = useState(false);
   const [hintExample, setHintExample] = useState<string | null>(null);
   const [isFlipped, setIsFlipped] = useState(false);
   const [isLoadingHint, setIsLoadingHint] = useState(false);
+  const initializedRef = useRef(false);
+  const cardRef = useRef<HTMLElement>(null);
 
   const {
     audioLoading,
@@ -170,342 +59,132 @@ export default function StudyClient({
     handlePlaySentenceAudio
   } = useTTS();
 
-  const mediumWords = words.filter(w => w.level === 'medium');
-  const importantWords = words.filter(w => w.level === 'important');
-  const highWords = words.filter(w => w.level === 'high');
+  const {
+    countdownValue,
+    countdownKey,
+    showHintButton,
+    setShowHintButton,
+    startCountdown,
+  } = useStudyCountdown(isFlipped);
 
-  const wordBySlug = (() => {
-    const map = new Map<string, Word>();
-    for (const w of words) {
-      map.set(w.slug, w);
-    }
-    return map;
-  })();
+  const {
+    laterSlugs,
+    consecutiveRememberCount,
+    markRemembered,
+    markForgot,
+    markLater,
+    restoreProgress,
+    resetProgress,
+  } = useStudyProgress(storageKey, currentWord?.slug ?? null);
+
+  const wordBySlug = buildWordMap(words);
 
   const laterWords = laterSlugs
     .map((slug) => wordBySlug.get(slug))
     .filter((word): word is Word => Boolean(word));
 
-  const clearCountdown = () => {
-    for (const id of countdownTimeoutsRef.current) {
-      clearTimeout(id);
-    }
-    countdownTimeoutsRef.current = [];
-    setCountdownValue(null);
-    setShowHintButton(false);
-  };
-
-  const startCountdown = () => {
-    for (const id of countdownTimeoutsRef.current) {
-      clearTimeout(id);
-    }
-    countdownTimeoutsRef.current = [];
-
-    // Count down from 2
-    setCountdownValue(2);
-    setShowHintButton(false);
+  /** カウントダウンを開始し、ヒント関連の状態をリセットする */
+  const startCardCountdown = () => {
+    startCountdown();
     setHintExample(null);
     setIsFlipped(false);
     setIsLoadingHint(false);
-    setCountdownKey((k) => k + 1);
-
-    const t1 = window.setTimeout(() => {
-      setCountdownValue(1);
-      setCountdownKey((k) => k + 1);
-    }, 1000);
-    const t0 = window.setTimeout(() => {
-      setCountdownValue(0);
-      setCountdownKey((k) => k + 1);
-    }, 2000);
-    const th = window.setTimeout(() => {
-      setCountdownValue(null);
-      setShowHintButton(true);
-    }, 2060); // 2s + 60ms
-
-    countdownTimeoutsRef.current = [t1, t0, th];
   };
 
-  const pickRandomWord = (overrideCount?: number) => {
+  /** 次の単語を選んで表示する（random は難易度調整付き） */
+  const advanceToNextWord = (overrideCount?: number) => {
     if (words.length === 0) return;
-
-    if (typeof window !== 'undefined') {
-      startCountdown();
-    }
-
-    let nextWord: Word;
-    const currentCount = overrideCount !== undefined ? overrideCount : consecutiveRememberCount;
-
-    if (order === 'sequential') {
-      if (!currentWord) {
-        nextWord = words[0];
-      } else {
-        const currentIndex = words.findIndex(w => w.slug === currentWord.slug);
-        const nextIndex = (currentIndex + 1) % words.length;
-        nextWord = words[nextIndex];
-      }
-    } else {
-      let safetyCounter = 0;
-      
-      // 現在の単語と同じ場合は再抽選する（リストが2つ以上ある場合のみ）
-      do {
-        let pool = words;
-
-        // 連続正解回数による段階的な難易度調整
-        // 0〜4回: important中心 (important 80%, medium 20%)
-        // 5〜9回: medium中心 (important 20%, medium 60%, high 20%)
-        // 10回〜: high中心 (important 10%, medium 30%, high 60%)
-        const r = Math.random();
-
-        if (currentCount < 5) {
-          if (r < 0.8 && importantWords.length > 0) pool = importantWords;
-          else if (mediumWords.length > 0) pool = mediumWords;
-          else if (highWords.length > 0) pool = highWords;
-        } else if (currentCount < 10) {
-          if (r < 0.6 && mediumWords.length > 0) pool = mediumWords;
-          else if (r < 0.8 && importantWords.length > 0) pool = importantWords;
-          else if (highWords.length > 0) pool = highWords;
-          else if (mediumWords.length > 0) pool = mediumWords;
-        } else {
-          if (r < 0.6 && highWords.length > 0) pool = highWords;
-          else if (r < 0.9 && mediumWords.length > 0) pool = mediumWords;
-          else if (importantWords.length > 0) pool = importantWords;
-          else if (highWords.length > 0) pool = highWords;
-        }
-
-        const randomIndex = Math.floor(Math.random() * pool.length);
-        nextWord = pool[randomIndex];
-        safetyCounter++;
-      } while (
-        words.length > 1 && 
-        currentWord && 
-        nextWord.slug === currentWord.slug && 
-        safetyCounter < 10
-      );
-    }
-
-    setCurrentWord(nextWord);
+    startCardCountdown();
+    const count = overrideCount ?? consecutiveRememberCount;
+    const next =
+      order === 'sequential'
+        ? pickSequentialStudyWord(words, currentWord?.slug ?? null)
+        : pickRandomStudyWord(splitWordsByLevel(words), currentWord?.slug ?? null, count);
+    if (next) setCurrentWord(next);
   };
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const onPageShow = (event: PageTransitionEvent) => {
-      // 戻るボタンでの遷移時、もし既にヒントボタンが表示されている(showHintButton=true)か、
-      // カードが裏返っている(isFlipped=true)場合は、状態をリセットしない。
-      // これにより、BFCacheで復元された場合でもヒントボタンの状態を維持する。
-      if (showHintButton || isFlipped) {
-        return;
-      }
-      if (event.persisted || getNavigationType() === 'back_forward') {
-        clearCountdown();
-      }
-    };
-
-    window.addEventListener('pageshow', onPageShow);
-    return () => {
-      window.removeEventListener('pageshow', onPageShow);
-      // clearCountdown(); // コンポーネントのアンマウント時にクリアすると戻るボタンで戻った時に消えてしまうため削除
-    };
-  }, [clearCountdown, showHintButton, isFlipped]);
-
+  // 初回マウント時: リロードなら状態を破棄し、それ以外は sessionStorage からの復元を試みる
   useEffect(() => {
     if (initializedRef.current) return;
     const timer = window.setTimeout(() => {
       if (initializedRef.current) return;
       initializedRef.current = true;
 
-      const navigationType = getNavigationType();
-
-      if (navigationType === 'reload') {
-        try {
-          window.sessionStorage.removeItem(storageKey);
-        } catch {
+      if (getNavigationType() === 'reload') {
+        clearPersistedState(storageKey);
+        resetProgress();
+      } else {
+        const persisted = readPersistedState(storageKey);
+        const word = persisted ? wordBySlug.get(persisted.currentSlug) : undefined;
+        if (persisted && word) {
+          setCurrentWord(word);
+          restoreProgress(persisted);
+          setShowHintButton(true);
+          return;
         }
-        setRememberedSlugs([]);
-        setForgottenSlugs([]);
-        setLaterSlugs([]);
-        pickRandomWord();
-        return;
       }
 
-      try {
-        const raw = window.sessionStorage.getItem(storageKey);
-        if (raw) {
-          const persisted = parsePersistedStudyState(raw);
-          if (persisted) {
-            const word = wordBySlug.get(persisted.currentSlug);
-            if (word) {
-              setCurrentWord(word);
-              setRememberedSlugs(uniqueStrings(persisted.rememberedSlugs));
-              setForgottenSlugs(uniqueStrings(persisted.forgottenSlugs));
-              setLaterSlugs(uniqueStrings(persisted.laterSlugs ?? []));
-              if (persisted.consecutiveRememberCount !== undefined) {
-                setConsecutiveRememberCount(persisted.consecutiveRememberCount);
-              }
-              setShowHintButton(true);
-              return;
-            }
-          }
-        }
-      } catch {
-      }
-
-      pickRandomWord();
+      if (words.length === 0) return;
+      startCountdown();
+      const first =
+        order === 'sequential'
+          ? pickSequentialStudyWord(words, null)
+          : pickRandomStudyWord(splitWordsByLevel(words), null, 0);
+      if (first) setCurrentWord(first);
     }, 0);
 
     return () => window.clearTimeout(timer);
-  }, [pickRandomWord, wordBySlug, storageKey]);
-
-  const writePersistedState = (
-    slug: string,
-    remembered: string[],
-    forgotten: string[],
-    later: string[],
-    count: number,
-  ) => {
-    if (typeof window === 'undefined') return;
-    try {
-      const nextState: PersistedStudyStateV1 = {
-        v: 1,
-        currentSlug: slug,
-        rememberedSlugs: remembered,
-        forgottenSlugs: forgotten,
-        laterSlugs: later,
-        consecutiveRememberCount: count,
-        updatedAt: Date.now(),
-      };
-      window.sessionStorage.setItem(storageKey, JSON.stringify(nextState));
-    } catch {}
-  };
-
-  useEffect(() => {
-    if (!currentWord) return;
-    writePersistedState(currentWord.slug, rememberedSlugs, forgottenSlugs, laterSlugs, consecutiveRememberCount);
-  }, [currentWord, rememberedSlugs, forgottenSlugs, laterSlugs, consecutiveRememberCount, writePersistedState]);
+  }, [words, order, storageKey, wordBySlug, restoreProgress, resetProgress, setShowHintButton, startCountdown]);
 
   const handleRemembered = () => {
     if (!currentWord) return;
-    setRememberedSlugs((prev) => addUnique(prev, currentWord.slug));
-    setForgottenSlugs((prev) => removeValue(prev, currentWord.slug));
-    setLaterSlugs((prev) => removeValue(prev, currentWord.slug));
-    const newCount = consecutiveRememberCount + 1;
-    setConsecutiveRememberCount(newCount);
-    pickRandomWord(newCount);
+    const newCount = markRemembered(currentWord.slug);
+    advanceToNextWord(newCount);
   };
 
   const handleForgot = () => {
     if (!currentWord) return;
-
-    const newForgotSlugs = addUnique(forgottenSlugs, currentWord.slug);
-    const newRememberedSlugs = removeValue(rememberedSlugs, currentWord.slug);
-    const newLaterSlugs = removeValue(laterSlugs, currentWord.slug);
-    const newCount = 0;
-
-    setForgottenSlugs(newForgotSlugs);
-    setRememberedSlugs(newRememberedSlugs);
-    setLaterSlugs(newLaterSlugs);
-    setConsecutiveRememberCount(newCount);
-
-    // router.push でアンマウントされる前に同期で永続化（useEffect が走らない可能性があるため）
-    writePersistedState(currentWord.slug, newRememberedSlugs, newForgotSlugs, newLaterSlugs, newCount);
-
+    markForgot(currentWord.slug);
     const query = backLink === '/favorites' ? '?from=review' : '?from=study';
     router.push(`/words/${currentWord.slug}${query}`);
   };
 
   const handleLater = () => {
     if (!currentWord) return;
-
-    const newLaterSlugs = addUnique(laterSlugs, currentWord.slug);
-    const newRememberedSlugs = removeValue(rememberedSlugs, currentWord.slug);
-    const newForgotSlugs = removeValue(forgottenSlugs, currentWord.slug);
-
-    setLaterSlugs(newLaterSlugs);
-    setRememberedSlugs(newRememberedSlugs);
-    setForgottenSlugs(newForgotSlugs);
-    // 「あとで」は判断保留なので連続カウントはリセットしない
-    pickRandomWord();
+    markLater(currentWord.slug);
+    advanceToNextWord();
   };
 
   const handleSelectLaterWord = (word: Word) => {
     setCurrentWord(word);
-    if (typeof window !== 'undefined') {
-      startCountdown();
-      // モバイル（lg未満）ではサイドバーがカードの下に表示されるため、
-      // 選択した単語が反映されたカードを画面内へスクロールする
-      if (window.innerWidth < 1024) {
-        cardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
+    startCardCountdown();
+    // モバイル（lg未満）ではサイドバーがカードの下に表示されるため、
+    // 選択した単語が反映されたカードを画面内へスクロールする
+    if (window.innerWidth < 1024) {
+      cardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   };
 
   const handleHint = async () => {
     if (!currentWord) return;
-    
+
     setShowHintButton(false);
     setIsFlipped(true);
     setIsLoadingHint(true);
-    
+
     try {
       const detail = await fetchWordDetail(currentWord.slug);
       if (detail && detail.toeicExamples && detail.toeicExamples.length > 0) {
         setHintExample(detail.toeicExamples[0].english);
       } else {
-        setHintExample("No example available.");
+        setHintExample('No example available.');
       }
     } catch (e) {
       console.error(e);
-      setHintExample("Failed to load example.");
+      setHintExample('Failed to load example.');
     } finally {
       setIsLoadingHint(false);
     }
-  };
-
-  const renderExample = () => {
-    if (!hintExample) return null;
-    
-    const renderContent = () => {
-      if (!currentWord) return <p className="text-xl text-gray-700 text-center leading-[1.6] font-medium max-w-[90%]">{hintExample}</p>;
-
-      const word = currentWord.term;
-      const escapedWord = escapeRegExp(word);
-      const parts = hintExample.split(new RegExp(`(\\b${escapedWord}\\w*)`, 'gi'));
-
-      return (
-        <div className="text-xl text-gray-700 text-center leading-[1.6] font-medium max-w-[90%]">
-          <span className="text-emerald-600 font-extrabold text-[1.1em] mr-2">Sample:</span>
-          {parts.map((part, i) => {
-            const isMatch = new RegExp(`^${escapedWord}\\w*$`, 'i').test(part);
-            return isMatch ? (
-              <span key={i} className="text-gray-900 font-extrabold underline decoration-amber-300 decoration-[3px] bg-amber-200/30 px-[2px] rounded-[2px]">{part}</span>
-            ) : (
-              <span key={i}>{part}</span>
-            );
-          })}
-          <button 
-            className="inline-flex items-center justify-center p-0 border-none bg-transparent cursor-pointer align-middle disabled:opacity-70 disabled:cursor-default ml-2 group" 
-            onClick={() => handlePlaySentenceAudio(hintExample, `hint-example-${currentWord?.slug}`, "en", currentWord?.slug)}
-            disabled={sentenceAudioLoading === `hint-example-${currentWord?.slug}`}
-            aria-label="Play sample audio"
-            style={{ marginLeft: '8px', verticalAlign: 'middle', display: 'inline-flex' }}
-          >
-            <span className="w-[26px] h-[26px] rounded-full inline-flex items-center justify-center bg-gray-100 text-[#5780d8] text-lg leading-none transition-all duration-160 group-hover:translate-y-[-1px] group-hover:shadow-md">
-              {sentenceAudioLoading === `hint-example-${currentWord?.slug}` ? (
-                <Loader2 className="animate-spin" size={14} />
-              ) : (
-                <Volume2 size={14} />
-              )}
-            </span>
-          </button>
-        </div>
-      );
-    };
-
-    return (
-      <div className="flex flex-col items-center gap-1 w-full">
-        {renderContent()}
-      </div>
-    );
   };
 
   if (!currentWord) {
@@ -527,201 +206,56 @@ export default function StudyClient({
             : 'max-w-[600px]'
         }`}
       >
-      <main className="w-full max-w-[600px] flex flex-col gap-8 items-center lg:max-w-none">
-        <header className="flex flex-col gap-3 text-center w-full items-center relative">
-          <Link 
-            href={backLink} 
-            prefetch={false}
-            className="group absolute right-0 -top-4 inline-flex items-center justify-center gap-1.5 h-10 px-5 bg-white border border-gray-200 rounded-full text-slate-600 text-[15px] font-semibold no-underline transition-all duration-200 shadow-sm select-none z-10 hover:bg-gray-50 hover:border-gray-300 hover:text-slate-900 hover:-translate-y-px hover:shadow-md active:translate-y-0 active:shadow-sm"
-          >
-            <ChevronLeft size={18} className="transition-transform group-hover:-translate-x-0.5 text-slate-400 group-hover:text-slate-600" />
-            {backLinkText}
-          </Link>
-          <h1 className="text-[28px] leading-[1.3] text-slate-900 font-bold mt-12 sm:text-[32px]">{pageTitle}</h1>
-          <p className="text-sm leading-[1.6] text-gray-500">
-            表示された単語を知っていますか？
-          </p>
-        </header>
-
-        <section ref={cardRef} className="w-full perspective-[1000px] relative">
-          <div className={`flex flex-col justify-center items-center px-6 py-12 rounded-3xl bg-white/95 border border-gray-200 shadow-[0_10px_25px_rgba(15,23,42,0.08)] transition-all duration-300 min-h-[225px] ${isFlipped ? 'animate-flipIn' : ''}`}>
-            {!isFlipped ? (
-              <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-                <AutoResizingText text={currentWord.term} className="text-5xl font-bold text-gray-900 text-center mb-3 whitespace-nowrap max-w-full overflow-hidden text-ellipsis" />
-              </div>
-            ) : (
-              <div className="flex flex-col items-center gap-4 w-full animate-flipIn">
-                <div className="flex items-center justify-center gap-3 w-full max-w-full">
-                  <div style={{ minWidth: 0, display: 'flex', justifyContent: 'center' }}>
-                    <AutoResizingText text={currentWord.term} className="text-5xl font-bold text-gray-900 text-center mb-0 whitespace-nowrap max-w-full overflow-hidden text-ellipsis" style={{ marginBottom: 0 }} />
-                  </div>
-                  <button 
-                    className="inline-flex items-center justify-center p-0 border-none bg-transparent cursor-pointer disabled:opacity-70 disabled:cursor-default align-middle group" 
-                    onClick={() => currentWord && handlePlayAudio(currentWord.term)}
-                    disabled={audioLoading}
-                    aria-label="Play word audio"
-                  >
-                    <span className="w-[26px] h-[26px] rounded-full inline-flex items-center justify-center bg-gray-100 text-[#5780d8] text-lg leading-none transition-all duration-160 group-hover:translate-y-[-1px] group-hover:shadow-md">
-                      {audioLoading ? (
-                        <Loader2 className="animate-spin" size={14} />
-                      ) : (
-                        <Volume2 size={14} />
-                      )}
-                    </span>
-                  </button>
-                </div>
-                {isLoadingHint ? (
-                  <div className="flex flex-col items-center gap-1 w-full">
-                    <div className="h-5 w-[80%] mx-auto mb-2 bg-blue-100 rounded relative overflow-hidden after:content-[''] after:absolute after:inset-0 after:-translate-x-full after:animate-shimmer after:bg-gradient-to-r after:from-transparent after:via-white/50 after:to-transparent" />
-                    <div className="h-5 w-[60%] mx-auto mb-2 bg-blue-100 rounded relative overflow-hidden after:content-[''] after:absolute after:inset-0 after:-translate-x-full after:animate-shimmer after:bg-gradient-to-r after:from-transparent after:via-white/50 after:to-transparent" />
-                  </div>
-                ) : (
-                  renderExample()
-                )}
-              </div>
-            )}
-          </div>
-          {countdownValue !== null && (
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-30" aria-hidden="true">
-              <div key={countdownKey} className={`inline-block text-[140px] leading-none font-black drop-shadow-lg animate-countdownCenter ${countdownValue === 2 ? 'text-amber-500/40' : 'text-red-500/40'}`}>
-                {countdownValue}
-              </div>
-            </div>
-          )}
-          {showHintButton && !isFlipped && (
-            <div className="absolute inset-0 flex items-start justify-end p-3.5 pointer-events-none z-20 sm:p-2.5">
-              <button 
-                onClick={handleHint} 
-                className="pointer-events-auto relative flex items-center justify-center px-5 py-2.5 bg-white text-slate-700 border-2 border-amber-300 rounded-full text-sm font-bold cursor-pointer transition-all duration-200 shadow-[0_0_15px_rgba(251,191,36,0.3)] hover:bg-amber-50 hover:-translate-y-1 hover:shadow-[0_0_20px_rgba(251,191,36,0.5)] animate-hintPop overflow-hidden group"
-              >
-                <span className="relative z-10 flex items-center gap-1.5">
-                  <span className="animate-pulse text-base">💡</span> ヒントを見る
-                </span>
-                <div className="absolute inset-0 rounded-full bg-amber-200/30 animate-ping opacity-75"></div>
-              </button>
-            </div>
-          )}
-          {isFlipped && (
-            <div className="absolute inset-0 flex items-start justify-end p-3.5 pointer-events-none z-20 sm:p-2.5">
-              <button
-                onClick={() => currentWord && toggleFavorite(currentWord.slug)}
-                className="pointer-events-auto inline-flex items-center justify-center w-11 h-11 rounded-full border border-gray-200 bg-white text-slate-500 cursor-pointer transition-all duration-200 shadow-sm shrink-0 hover:bg-slate-50 hover:border-slate-300 hover:-translate-y-px hover:shadow-md active:translate-y-0"
-                aria-label={
-                  currentWord && isFavorite(currentWord.slug)
-                    ? 'お気に入りから削除'
-                    : 'お気に入りに追加'
-                }
-              >
-                <Star
-                  size={24}
-                  fill={
-                    currentWord && isFavorite(currentWord.slug)
-                      ? '#FFC107'
-                      : 'none'
-                  }
-                  color={
-                    currentWord && isFavorite(currentWord.slug)
-                      ? '#FFC107'
-                      : '#94a3b8'
-                  }
-                  strokeWidth={2}
-                />
-              </button>
-            </div>
-          )}
-        </section>
-
-        <section className="flex flex-col items-center w-full mt-0">
-          <div className="flex flex-wrap gap-4 w-full justify-center sm:gap-6">
-            <button 
-              className="flex flex-col items-center justify-center gap-2 w-24 h-24 rounded-full border-none cursor-pointer transition-all duration-200 shadow-sm bg-green-200 text-green-900 border-2 border-green-300 hover:bg-green-300 hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 sm:h-[120px] sm:w-[120px]"
-              onClick={handleRemembered}
-              aria-label="覚えている"
+        <main className="w-full max-w-[600px] flex flex-col gap-8 items-center lg:max-w-none">
+          <header className="flex flex-col gap-3 text-center w-full items-center relative">
+            <Link
+              href={backLink}
+              prefetch={false}
+              className="group absolute right-0 -top-4 inline-flex items-center justify-center gap-1.5 h-10 px-5 bg-white border border-gray-200 rounded-full text-slate-600 text-[15px] font-semibold no-underline transition-all duration-200 shadow-sm select-none z-10 hover:bg-gray-50 hover:border-gray-300 hover:text-slate-900 hover:-translate-y-px hover:shadow-md active:translate-y-0 active:shadow-sm"
             >
-              <span className="text-[32px] font-bold">💡</span>
-              <span className="text-[10px] font-semibold leading-none sm:text-sm">覚えている</span>
-            </button>
-            
-            <button 
-              className="flex flex-col items-center justify-center gap-2 w-24 h-24 rounded-full border-none cursor-pointer transition-all duration-200 shadow-sm bg-red-200 text-red-900 border-2 border-red-300 hover:bg-red-300 hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 sm:h-[120px] sm:w-[120px]"
-              onClick={handleForgot}
-              aria-label="覚えていない"
-            >
-              <span className="text-[32px] font-bold">❔</span>
-              <span className="text-[10px] font-semibold leading-none sm:text-sm">覚えていない</span>
-            </button>
+              <ChevronLeft size={18} className="transition-transform group-hover:-translate-x-0.5 text-slate-400 group-hover:text-slate-600" />
+              {backLinkText}
+            </Link>
+            <h1 className="text-[28px] leading-[1.3] text-slate-900 font-bold mt-12 sm:text-[32px]">{pageTitle}</h1>
+            <p className="text-sm leading-[1.6] text-gray-500">
+              表示された単語を知っていますか？
+            </p>
+          </header>
 
-            <button
-              className="flex flex-col items-center justify-center gap-2 w-24 h-24 rounded-full border-none cursor-pointer transition-all duration-200 shadow-sm bg-amber-100 text-amber-900 border-2 border-amber-300 hover:bg-amber-200 hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 sm:h-[120px] sm:w-[120px]"
-              onClick={handleLater}
-              aria-label="あとで確認"
-            >
-              <span className="text-[32px] font-bold">⏰</span>
-              <span className="text-[10px] font-semibold leading-none sm:text-sm">あとで</span>
-            </button>
-          </div>
+          <StudyCard
+            cardRef={cardRef}
+            word={currentWord}
+            isFlipped={isFlipped}
+            isLoadingHint={isLoadingHint}
+            hintExample={hintExample}
+            countdownValue={countdownValue}
+            countdownKey={countdownKey}
+            showHintButton={showHintButton}
+            isFavorite={isFavorite(currentWord.slug)}
+            audioLoading={audioLoading}
+            sentenceAudioLoading={sentenceAudioLoading}
+            onHint={handleHint}
+            onToggleFavorite={() => toggleFavorite(currentWord.slug)}
+            onPlayWordAudio={() => handlePlayAudio(currentWord.term)}
+            onPlaySentenceAudio={handlePlaySentenceAudio}
+          />
 
-          {order !== 'sequential' && (
-            <div className="mt-8 flex items-center gap-2 text-[13px] font-medium text-slate-500 bg-white/50 px-4 py-2 rounded-full border border-slate-200 shadow-sm backdrop-blur-sm transition-all duration-300">
-              <span className="text-amber-500 text-base leading-none">💡</span>
-              <span>連続で「覚えている」を選ぶと難易度が上がります</span>
-              {consecutiveRememberCount > 0 && (
-                <span className="ml-1 px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-full text-xs font-bold animate-pulse">
-                  {consecutiveRememberCount}連続中 🔥
-                </span>
-              )}
-            </div>
-          )}
-        </section>
-      </main>
+          <StudyActions
+            onRemembered={handleRemembered}
+            onForgot={handleForgot}
+            onLater={handleLater}
+            showDifficultyTip={order !== 'sequential'}
+            consecutiveRememberCount={consecutiveRememberCount}
+          />
+        </main>
 
-      {laterWords.length > 0 && (
-        <aside className="w-full rounded-3xl border border-gray-200 bg-white/90 p-5 shadow-[0_10px_25px_rgba(15,23,42,0.08)] backdrop-blur-sm lg:sticky lg:top-8">
-          <div className="mb-4 flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
-              <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-amber-100 text-amber-700">
-                <Clock3 size={18} strokeWidth={2.4} />
-              </span>
-              <div>
-                <h2 className="text-base font-bold leading-tight text-slate-900">あとで確認</h2>
-                <p className="text-xs font-medium text-slate-500">{laterWords.length}語を保留中</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="max-h-[420px] space-y-2 overflow-y-auto pr-1">
-            {laterWords.map((word) => {
-              const isActive = currentWord.slug === word.slug;
-
-              return (
-                <button
-                  key={word.slug}
-                  type="button"
-                  onClick={() => handleSelectLaterWord(word)}
-                  className={`group flex w-full items-center justify-between gap-3 rounded-2xl border px-3.5 py-3 text-left transition-all duration-200 ${
-                    isActive
-                      ? 'border-blue-300 bg-blue-50 text-blue-900 shadow-sm'
-                      : 'border-slate-200 bg-white text-slate-700 hover:border-amber-300 hover:bg-amber-50 hover:-translate-y-0.5 hover:shadow-sm'
-                  }`}
-                  aria-current={isActive ? 'true' : undefined}
-                >
-                  <span className="min-w-0">
-                    <span className="block truncate text-sm font-bold">{word.term}</span>
-                    <span className="mt-0.5 block text-xs font-medium text-slate-500">
-                      {word.level === 'important' ? '重要' : word.level === 'medium' ? '中級' : '上級'}
-                    </span>
-                  </span>
-                  <span className={`shrink-0 rounded-full px-2 py-1 text-[11px] font-bold ${
-                    isActive ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-500 group-hover:bg-amber-100 group-hover:text-amber-700'
-                  }`}>
-                    確認
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </aside>
-      )}
+        {laterWords.length > 0 && (
+          <LaterWordsSidebar
+            words={laterWords}
+            currentSlug={currentWord.slug}
+            onSelect={handleSelectLaterWord}
+          />
+        )}
       </div>
     </div>
   );
