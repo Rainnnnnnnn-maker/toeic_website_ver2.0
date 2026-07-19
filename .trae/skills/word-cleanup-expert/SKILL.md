@@ -5,7 +5,7 @@ description: "Deduplicates word lists (prioritizing word.txt) and suggests spell
 
 # Word Cleanup Expert
 
-This skill manages the integrity of the project's word lists: `__doc__/word.txt` (master) and `__doc__/word_mid.txt`.
+This skill manages the integrity of the project's word lists: `__words__/word.txt` (master) and `__words__/word_mid.txt`.
 
 ## Capabilities
 
@@ -22,15 +22,15 @@ This skill manages the integrity of the project's word lists: `__doc__/word.txt`
 ## Usage Instructions
 
 When invoked:
-1.  Read the content of `__doc__/word.txt` and `__doc__/word_mid.txt`.
+1.  Read the content of `__words__/word.txt` and `__words__/word_mid.txt`.
 2.  Perform intersection check (case-insensitive is recommended).
 3.  List duplicates found in `word_mid.txt`.
 4.  List suspected misspelled words with suggestions.
 5.  Ask for user confirmation to proceed with:
     -   Removing duplicates from `word_mid.txt`.
     -   Applying specific spelling corrections (if requested).
-6.  Upon confirmation, write the updated content to `__doc__/word_mid.txt` (and `__doc__/word.txt` if corrections apply there).
+6.  Upon confirmation, write the updated content to `__words__/word_mid.txt` (and `__words__/word.txt` if corrections apply there).
 
 ## File Paths
-- Master List: `__doc__/word.txt`
-- Intermediate List: `__doc__/word_mid.txt`
+- Master List: `__words__/word.txt`
+- Intermediate List: `__words__/word_mid.txt`

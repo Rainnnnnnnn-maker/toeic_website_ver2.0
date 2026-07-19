@@ -30,7 +30,7 @@ npm run test            # Run Vitest unit tests (pure-logic only — see Testing
 
 ### Word List Data Flow
 
-In `NODE_ENV=development`, word lists are read from `__doc__/word.txt`, `__doc__/word_mid.txt`, `__doc__/word_high.txt` (one word per line). In production, they are fetched from Vercel Blob. This branching is centralized entirely in `src/data/words.ts` — do not add any other data loading path.
+In `NODE_ENV=development`, word lists are read from `__words__/word.txt`, `__words__/word_mid.txt`, `__words__/word_high.txt` (one word per line). In production, they are fetched from Vercel Blob. This branching is centralized entirely in `src/data/words.ts` — do not add any other data loading path.
 
 Setting `BLOB_URL_IMPORTANT`, `BLOB_URL_MEDIUM`, `BLOB_URL_HIGH` skips the Blob `list` operation and fetches directly from those URLs (faster, fewer API calls).
 

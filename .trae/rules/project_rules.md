@@ -47,7 +47,7 @@ alwaysApply: true
 - `src/hooks` … `useTTS` など
 - `src/context` … `FavoritesContext`, `ShareTargetContext`
 - `src/types` … 型定義（`WordDetails` 等）
-- `__doc__/` … 開発時の単語リスト（`word.txt` / `word_mid.txt` / `word_high.txt`）
+- `__words__/` … 開発時の単語リスト（`word.txt` / `word_mid.txt` / `word_high.txt`）
 - `public/` … 静的アセット
 - `scripts/` … 補助スクリプト（例: `vercel-ignore.sh`）
 
@@ -63,7 +63,7 @@ alwaysApply: true
 - キャッシュ無効化は `tag`（例: `word-list`）と既存の `/api/revalidate/*` エンドポイントの方針に従う。新規タグを追加する場合は技術ドキュメントを更新する。
 
 ### 4.3 単語データの取り扱い
-- ローカルでは `__doc__/*.txt`、本番では Vercel Blob を参照する分岐は `src/data/words.ts` に集約する。新たな取得経路を増やさない。
+- ローカルでは `__words__/*.txt`、本番では Vercel Blob を参照する分岐は `src/data/words.ts` に集約する。新たな取得経路を増やさない。
 - 単語ファイルを更新する際は、対応する skill（`sort-words-alphabetically`, `deduplicate-high-mid-words`, `sync-words-from-blob`, `word-cleanup-expert`）を活用すること。
 
 ### 4.4 UI / アクセシビリティ

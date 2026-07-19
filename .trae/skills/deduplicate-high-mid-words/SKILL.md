@@ -11,7 +11,7 @@ description: "word_high.txt (or word.txt) と word_mid.txt の重複をチェッ
 
 1.  **対象ファイルの確認**:
     *   プロジェクト内の `word_high.txt` (または `word.txt`) と `word_mid.txt` を探します。
-    *   通常は `__doc__` または `src/data` ディレクトリにあります。
+    *   通常は `__words__` または `src/data` ディレクトリにあります。
 
 2.  **スクリプトの作成と実行**:
     *   プロジェクトルートに一時的な Node.js スクリプト（例: `deduplicate-words.mjs`）を作成します。
@@ -36,7 +36,7 @@ import path from 'path';
 const HIGH_FILENAMES = ['word_high.txt', 'word.txt'];
 const MID_FILENAMES = ['word_mid.txt'];
 // 探索するディレクトリの候補
-const SEARCH_DIRS = ['.', '__doc__', 'src/data', '.doc'];
+const SEARCH_DIRS = ['.', '__words__', 'src/data', '.doc'];
 
 function findFile(filenames) {
   for (const dir of SEARCH_DIRS) {

@@ -1,6 +1,6 @@
 ---
 name: "sync-words-from-blob"
-description: "Vercel Blobから単語ファイルをダウンロードし、ローカルの/__doc__フォルダを更新し、変更ログを記録します。ユーザーが単語ファイルの同期や更新を求めた時に呼び出します。"
+description: "Vercel Blobから単語ファイルをダウンロードし、ローカルの/__words__フォルダを更新し、変更ログを記録します。ユーザーが単語ファイルの同期や更新を求めた時に呼び出します。"
 ---
 
 # Sync Words from Vercel Blob
@@ -23,10 +23,10 @@ description: "Vercel Blobから単語ファイルをダウンロードし、ロ�
         3.  上記が存在しない場合:
             *   `@vercel/blob` の `list` メソッドを使用してファイル情報を取得し、ダウンロード対象とします。
         4.  `fetch` を使用してファイルの内容をダウンロードします。
-        5.  ローカルの `__doc__/word.txt` 等を読み込み、ダウンロードした内容と比較します。
+        5.  ローカルの `__words__/word.txt` 等を読み込み、ダウンロードした内容と比較します。
         6.  差異がある場合:
             *   ファイルを上書き保存します。
-            *   `__doc__` フォルダ内に `change_log_yyyymmddhhmiss.log` を作成し、変更内容を記録します。
+            *   `__words__` フォルダ内に `change_log_yyyymmddhhmiss.log` を作成し、変更内容を記録します。
         7.  差異がない場合:
             *   「変更なし」とログに出力します。
 
@@ -57,7 +57,7 @@ if (fs.existsSync(envPath)) {
   loadEnv('BLOB_URL_HIGH');
 }
 
-const DOC_DIR = path.resolve(process.cwd(), '__doc__');
+const DOC_DIR = path.resolve(process.cwd(), '__words__');
 const TARGET_FILES = [
   { name: 'word.txt', env: 'BLOB_URL_IMPORTANT', key: 'words-file/word.txt' },
   { name: 'word_mid.txt', env: 'BLOB_URL_MEDIUM', key: 'words-file/word_mid.txt' },

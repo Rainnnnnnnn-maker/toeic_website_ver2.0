@@ -101,11 +101,11 @@ TOEIC語彙ラボ is a comprehensive web application for learning essential TOEI
     | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Supabase publishable key (safe for client exposure; data access is protected by RLS). |
 
 4. **Data Setup (Local Development)**
-    For local development (`NODE_ENV=development`), the app reads word lists from the `__doc__` directory by default.
-    Ensure the following files exist in the project root's `__doc__` folder (one word per line):
-    - `__doc__/word.txt` (Important words: TOEIC 600 level)
-    - `__doc__/word_mid.txt` (Medium words: 730–800 level)
-    - `__doc__/word_high.txt` (High words: 800+ level)
+    For local development (`NODE_ENV=development`), the app reads word lists from the `__words__` directory by default.
+    Ensure the following files exist in the project root's `__words__` folder (one word per line):
+    - `__words__/word.txt` (Important words: TOEIC 600 level)
+    - `__words__/word_mid.txt` (Medium words: 730–800 level)
+    - `__words__/word_high.txt` (High words: 800+ level)
 
     > **Note**: In production, the app automatically switches to fetching these files from Vercel Blob (`words-file/word.txt`, `words-file/word_mid.txt`, `words-file/word_high.txt`). Setting `BLOB_URL_*` env vars bypasses the Blob `list` call for faster fetches.
 
@@ -202,4 +202,4 @@ Returns `sitemap.xml` containing all static pages and all word detail URLs.
 - `src/data`: Data fetching logic — `words.ts` (Local vs Blob switching, `getAllWords` / `getTodayRecommendedWords` / `getRelatedWords`) and `word-detail.ts` (multi-layer cached `getWordDetail`, Gemini generation).
 - `src/hooks`: Custom React hooks (e.g., `useTTS`).
 - `src/context`: React Contexts (`AuthContext`, `FavoritesContext`, `ShareTargetContext`).
-- `__doc__`: Local storage for word lists during development.
+- `__words__`: Local storage for word lists during development.

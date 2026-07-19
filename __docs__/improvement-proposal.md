@@ -67,7 +67,7 @@
    │  Vercel Blob │  │  Supabase   │      │ Upstash Redis│
    │ (単語リスト) │  │  PostgreSQL │      │  (L2 Cache)  │
    │              │  │ + Auth      │      │  + Ratelimit │
-   │  __doc__/    │  │ + Storage   │      │              │
+   │ __words__/   │  │ + Storage   │      │              │
    │   word.txt   │  │             │      │  word:<slug> │
    └──────────────┘  └──────┬──────┘      └──────────────┘
                              │

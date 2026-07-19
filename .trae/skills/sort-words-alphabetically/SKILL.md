@@ -5,7 +5,7 @@ description: "Sorts word.txt, word_mid.txt, and word_high.txt alphabetically. Re
 
 # Sort Words Alphabetically
 
-This skill sorts the contents of `__doc__/word.txt`, `__doc__/word_mid.txt`, and `__doc__/word_high.txt` alphabetically. It also ensures that each line contains only the word, removing any numeric prefixes like `1→`.
+This skill sorts the contents of `__words__/word.txt`, `__words__/word_mid.txt`, and `__words__/word_high.txt` alphabetically. It also ensures that each line contains only the word, removing any numeric prefixes like `1→`.
 
 ## Capabilities
 
@@ -17,7 +17,7 @@ This skill sorts the contents of `__doc__/word.txt`, `__doc__/word_mid.txt`, and
 
 When invoked:
 
-1.  Read the contents of `__doc__/word.txt`, `__doc__/word_mid.txt`, and `__doc__/word_high.txt`.
+1.  Read the contents of `__words__/word.txt`, `__words__/word_mid.txt`, and `__words__/word_high.txt`.
 2.  For each file:
     a.  Parse each line.
     b.  Remove any prefix matching the regex `^\d+→`.
@@ -32,6 +32,6 @@ When invoked:
 
 ## File Paths
 
--   `__doc__/word.txt`
--   `__doc__/word_mid.txt`
--   `__doc__/word_high.txt`
+-   `__words__/word.txt`
+-   `__words__/word_mid.txt`
+-   `__words__/word_high.txt`
