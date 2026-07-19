@@ -14,7 +14,7 @@
 
   * `src/components/features/today-words/TodayWordsListenClient.tsx` (Client Component) を新規作成する。
 
-  * `TodayRecommendedWordsClient`と同様に、当日日付のハッシュから今日おすすめの5単語を計算する。
+  * `TodayRecommendedWordsClient`と同様に、当日日付のハッシュから今日おすすめの6単語を計算する。
 
   * `fetchWordDetail` Server Actionを利用して、各単語のWordDetail（発音や例文の情報）を取得する。
 
@@ -28,11 +28,10 @@
 
 * [x] Task 5: 動作確認
 
-  * アプリを起動し、聞き流しモードで5つの単語が正常に連続再生されるか、レイアウト崩れがないか確認する。
+  * アプリを起動し、聞き流しモードで6つの単語が正常に連続再生されるか、レイアウト崩れがないか確認する。
 
 # Task Dependencies
 
 * \[Task 3] depends on \[Task 1], \[Task 2]
 
 * \[Task 5] depends on \[Task 3], \[Task 4]
-

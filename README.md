@@ -18,16 +18,16 @@ TOEIC語彙ラボ is a comprehensive web application for learning essential TOEI
   - **List View**: Browse words by level (Important / Medium / High) with prefix and wildcard (`*`) search.
   - **Study Mode**: Flashcard-style learning with tracking (Remembered / Not Remembered / Later), hint example via AI detail, and an in-session "review later" sidebar for deferred words.
   - **Review Mode**: Focus on words marked as favorites.
-- **Today’s 5 Picks**:
-  - A compact “今日おすすめの5単語” section is shown on the TOP page.
-  - All 5 words are displayed directly in the TOP section without a separate “view all” button.
-  - Picks are determined by UTC date key + word slug hash, so the same day yields the same 5 words.
-  - Selection logic lives server-side in `getTodayRecommendedWords()` as a Cache Component (`'use cache'` + `cacheLife('max')`). TOP / `/today-words` / `/today-words/listen` receive the same cached 5 words, refreshed once per day at JST 7:05 (UTC 22:05) via Vercel Cron (`/api/revalidate/today-words`). The pick count is the shared constant `TODAY_WORDS_COUNT`.
+- **Today’s 6 Picks**:
+  - A compact “今日おすすめの6単語” section is shown on the TOP page.
+  - All 6 words are displayed directly in the TOP section without a separate “view all” button.
+  - Picks are determined by UTC date key + word slug hash, so the same day yields the same 6 words.
+  - Selection logic lives server-side in `getTodayRecommendedWords()` as a Cache Component (`'use cache'` + `cacheLife('max')`). TOP / `/today-words` / `/today-words/listen` receive the same cached 6 words, refreshed once per day at JST 7:05 (UTC 22:05) via Vercel Cron (`/api/revalidate/today-words`). The pick count is the shared constant `TODAY_WORDS_COUNT`.
   - On the TOP page, the daily picks, word-list/stat block, and FAQ block are each rendered behind their own `<Suspense>` boundary. The page shell no longer awaits the full word list before streaming, and each async block has a stable skeleton fallback to reduce layout shift.
-  - Because `cacheLife('max')` never self-expires, the daily rotation depends solely on the Vercel Cron firing; the cron should be monitored, since a stalled cron freezes the same 5 words indefinitely. A time-based fallback (`'days'`) is intentionally not combined with it to avoid double revalidation.
-  - Word-detail navigation does not call `getTodayRecommendedWords()`. Links from the daily-picks UI carry the five selected slugs in the `today` query parameter, and the client navigation validates them against the long-lived word list. This prevents the daily cache tag from propagating to every pre-rendered `/words/[word]` page and avoids roughly 1,350 daily ISR revalidation candidates. If the `today` query is missing or fully invalid (e.g. an old bookmark), the prev/next navigation gracefully falls back to the full word list.
+  - Because `cacheLife('max')` never self-expires, the daily rotation depends solely on the Vercel Cron firing; the cron should be monitored, since a stalled cron freezes the same 6 words indefinitely. A time-based fallback (`'days'`) is intentionally not combined with it to avoid double revalidation.
+  - Word-detail navigation does not call `getTodayRecommendedWords()`. Links from the daily-picks UI carry the six selected slugs in the `today` query parameter, and the client navigation validates them against the long-lived word list. This prevents the daily cache tag from propagating to every pre-rendered `/words/[word]` page and avoids roughly 1,350 daily ISR revalidation candidates. If the `today` query is missing or fully invalid (e.g. an old bookmark), the prev/next navigation gracefully falls back to the full word list.
 - **Listen-and-Repeat Mode (Beta)** (`/today-words/listen`, `/favorites/listen`):
-  - Hands-free auto-play of today's 5 words or favorite words: each word is read out as **word → English example → Japanese example**, then advances to the next word.
+  - Hands-free auto-play of today's 6 words or favorite words: each word is read out as **word → English example → Japanese example**, then advances to the next word.
   - Play / Pause / Skip-Prev / Skip-Next controls. Completion message is shown after the 5th word; pressing play again restarts from the top.
   - Internally, audio sequencing uses a ref-based state machine to guard against `onended` race conditions, and prefetches the current and next word's `WordDetails` for instant example previews.
 - **Favorites**: Save difficult words for later review. Persisted in local storage via `FavoritesContext` for guests; synced to Supabase for signed-in users.
