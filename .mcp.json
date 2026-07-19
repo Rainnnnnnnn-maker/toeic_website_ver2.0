@@ -17,7 +17,7 @@
     },
     "upstash": {
       "command": "npx",
-      "args": ["-y", "@upstash/mcp-server", "run", "${UPSTASH_EMAIL}", "${UPSTASH_API_KEY}"]
+      "args": ["-y", "@upstash/mcp-server@latest", "--email", "${UPSTASH_EMAIL}", "--api-key", "${UPSTASH_API_KEY}"]
     }
   }
 }

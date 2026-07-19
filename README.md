@@ -117,6 +117,27 @@ TOEIC語彙ラボ is a comprehensive web application for learning essential TOEI
 
     Open [http://localhost:3000](http://localhost:3000) with your browser.
 
+### Optional MCP Development Tools
+
+The project-level `.mcp.json` configures Claude Code integrations for Next.js DevTools, Playwright, GitHub, and Upstash. GitHub and Upstash require the following environment variables in the shell that launches Claude Code; values in `.env.local` are not exported to the parent shell automatically.
+
+| Variable | Description |
+| :--- | :--- |
+| `GITHUB_MCP_PAT` | GitHub personal access token. Grant only the repository permissions required for the intended MCP operations. |
+| `UPSTASH_EMAIL` | Email address associated with the Upstash account. |
+| `UPSTASH_API_KEY` | Upstash account API key. Prefer a read-only key unless resource changes are explicitly required. |
+
+For example, export the values before starting Claude Code:
+
+```bash
+export GITHUB_MCP_PAT=<your-github-pat>
+export UPSTASH_EMAIL=<your-upstash-email>
+export UPSTASH_API_KEY=<your-upstash-api-key>
+claude
+```
+
+Claude Code asks for approval before starting project-scoped MCP servers for the first time. Never commit credential values to `.mcp.json` or another tracked file.
+
 ## 📜 Scripts
 
 - `npm run dev`: Starts the development server.
