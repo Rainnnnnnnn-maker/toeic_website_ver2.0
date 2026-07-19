@@ -22,7 +22,7 @@ export type Word = {
 
 async function getWordsLocal(): Promise<WordData> {
   const loadWords = (filename: string, level: 'important' | 'medium' | 'high'): Word[] => {
-    const filePath = path.join(process.cwd(), "__doc__", filename);
+    const filePath = path.join(process.cwd(), "__words__", filename);
     if (!fs.existsSync(filePath)) {
       console.warn(`Local word file not found: ${filePath}`);
       return [];
