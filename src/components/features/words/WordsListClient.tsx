@@ -127,10 +127,9 @@ export default function WordsListClient({ importantWords, mediumWords, highWords
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
             onKeyDown={handleKeyDown}
-            className="w-full flex-1 border border-gray-300 rounded-lg px-3 py-2 pr-9 text-xs bg-white/90 transition-all duration-180 focus:outline-none focus:border-blue-300 focus:ring-4 focus:ring-blue-300/35"
+            className="w-full flex-1 border border-gray-300 rounded-lg px-3 py-2 pr-9 text-base sm:text-[13px] bg-white/90 transition-all duration-180 focus:outline-none focus:border-blue-300 focus:ring-4 focus:ring-blue-300/35"
             placeholder="全単語から検索..."
             aria-label="単語検索"
-            style={{ fontSize: '13px' }} 
           />
           {query && (
             <button
