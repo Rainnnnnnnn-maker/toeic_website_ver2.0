@@ -42,20 +42,7 @@ export async function GET() {
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>${BASE_URL}/favorites</loc>
-    <lastmod>${wordListLastmod}</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>${BASE_URL}/today-words</loc>
-    <lastmod>${wordListLastmod}</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>${BASE_URL}/review</loc>
-    <lastmod>${wordListLastmod}</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
@@ -101,10 +88,13 @@ export async function GET() {
 `;
   }
 
+  // 単語ページは <lastmod> を出力しない。
+  // 全 1,300 語で同一かつ固定の lastmod を出すと、Google は lastmod 自体を信用しなくなり
+  // クロール効率に悪影響が出る。単語詳細の実更新日を管理する仕組みが無いため、
+  // 誤った日付を出すより省略するほうが正しい（lastmod は sitemap の任意項目）。
   for (const w of allWords) {
     xml += `  <url>
     <loc>${BASE_URL}/words/${w.slug}</loc>
-    <lastmod>${wordListLastmod}</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.7</priority>
   </url>
