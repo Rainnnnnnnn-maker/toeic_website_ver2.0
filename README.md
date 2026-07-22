@@ -40,6 +40,7 @@ TOEIC語彙ラボ is a comprehensive web application for learning essential TOEI
 - **Learning Guide Articles** (`/guide`): 10 original long-form articles covering TOEIC vocabulary strategy by score (600/730/860), Part 5 attack patterns, Part 7 speed-reading with discourse markers, Part 3/4 listening pre-read technique, exam-day essentials, last-week 50-point boost plan, the forgetting curve / SRS applied to vocab learning, business vocabulary essentials, 15 synonym-pair distinctions, and the site's word-rank selection criteria. Each article ships with `Article` + `BreadcrumbList` JSON-LD and internal links to relevant `/words/<slug>` pages. The TOP page features a "Latest Guides" card grid linking into the article corpus.
 - **Cookie Consent**: First-visit consent banner aligned with GA4 tracking. Consent is stored in a cookie and read server-side via `CookieConsentGate` (wrapped in `<Suspense>` in the root layout), so the banner is server-rendered for undecided visitors and omitted entirely once accepted/declined — avoiding the late client-only paint that previously made it the LCP element on mobile.
 - **Responsive Design**: Optimized for desktop and mobile devices.
+- **Stronger Page Backgrounds**: The TOP, word index, sign-in, favorites, daily picks, listening, study, and review screens share a more visible blue radial background, while word-detail pages retain their distinct teal hue with increased saturation.
 
 ## 🛠️ Tech Stack
 

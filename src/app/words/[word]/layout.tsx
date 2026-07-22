@@ -15,7 +15,7 @@ export default async function WordLayout({
 
   return (
     <ShareTargetProvider>
-      <div className="min-h-screen w-full flex justify-center py-8 px-4 pb-10 bg-[radial-gradient(circle_at_top,#ccfbf1_0,#f9fafb_45%,#ffffff_100%)] sm:py-12 sm:px-6 sm:pb-14 lg:py-16 lg:px-8 lg:pb-18">
+      <div className="min-h-screen w-full flex justify-center py-8 px-4 pb-10 bg-[radial-gradient(circle_at_top,#99f6e4_0,#f0fdfa_45%,#f8fafc_100%)] sm:py-12 sm:px-6 sm:pb-14 lg:py-16 lg:px-8 lg:pb-18">
         <main className="w-full max-w-[960px] flex flex-col gap-6">
           <Suspense
             fallback={

@@ -22,7 +22,7 @@ export default function ReviewWrapper({ allWords }: Props) {
 
   if (favoriteWords.length === 0) {
     return (
-      <div className="min-h-screen w-full flex justify-center items-center py-8 px-4 bg-[radial-gradient(circle_at_top,#e0f2fe_0,#f9fafb_45%,#ffffff_100%)] sm:py-12 sm:px-6">
+      <div className="min-h-screen w-full flex justify-center items-center py-8 px-4 bg-[radial-gradient(circle_at_top,#bae6fd_0,#eff6ff_45%,#f8fafc_100%)] sm:py-12 sm:px-6">
         <main className="w-full max-w-[600px] flex flex-col gap-8 items-center">
           <header className="flex flex-col gap-3 text-center w-full items-center relative">
             <Link 

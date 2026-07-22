@@ -189,7 +189,7 @@ export default function StudyClient({
 
   if (!currentWord) {
     return (
-      <div className="min-h-screen w-full flex justify-center items-center py-8 px-4 bg-[radial-gradient(circle_at_top,#e0f2fe_0,#f9fafb_45%,#ffffff_100%)]">
+      <div className="min-h-screen w-full flex justify-center items-center py-8 px-4 bg-[radial-gradient(circle_at_top,#bae6fd_0,#eff6ff_45%,#f8fafc_100%)]">
         <div className="w-full max-w-[600px] flex flex-col gap-8 items-center">
           <p className="text-sm leading-[1.6] text-gray-500">読み込み中...</p>
         </div>
@@ -198,7 +198,7 @@ export default function StudyClient({
   }
 
   return (
-    <div className="min-h-screen w-full flex justify-center items-center py-8 px-4 bg-[radial-gradient(circle_at_top,#e0f2fe_0,#f9fafb_45%,#ffffff_100%)] sm:py-12 sm:px-6">
+    <div className="min-h-screen w-full flex justify-center items-center py-8 px-4 bg-[radial-gradient(circle_at_top,#bae6fd_0,#eff6ff_45%,#f8fafc_100%)] sm:py-12 sm:px-6">
       <div
         className={`w-full items-start ${
           laterWords.length > 0
