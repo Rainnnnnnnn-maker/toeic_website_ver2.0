@@ -1,42 +1,52 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import Link from "next/link";
 import { sendGAEvent } from "@next/third-parties/google";
 import { ArrowRight, Search, X } from "lucide-react";
 import type { Word } from "@/data/words";
 import { WordLinkPending } from "@/components/features/words/WordLinkPending";
+import { WORD_LEVEL_INFO, WORD_LEVEL_ORDER } from "@/lib/word-level";
+import type { WordLevel } from "@/lib/word-level";
 
-type LevelFilter = "all" | Word["level"];
+type LevelFilter = "all" | WordLevel;
 
 type Props = {
   readonly words: Word[];
 };
 
 const RESULT_PAGE_SIZE = 36;
+const SEARCH_EVENT_DELAY_MS = 700;
+const SEARCH_EVENT_MIN_LENGTH = 2;
 const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
-const levelMeta = {
+const levelStyles: Readonly<
+  Record<
+    WordLevel,
+    {
+      readonly activeClass: string;
+      readonly badgeClass: string;
+      readonly cardClass: string;
+    }
+  >
+> = {
   important: {
-    label: "最重要",
-    score: "600点",
+    activeClass: "border-blue-600 bg-blue-600 text-white shadow-blue-600/20",
     badgeClass: "bg-blue-100 text-blue-700",
     cardClass: "hover:border-blue-300 hover:bg-blue-50/70",
   },
   medium: {
-    label: "中級",
-    score: "730〜800点",
+    activeClass: "border-violet-600 bg-violet-600 text-white shadow-violet-600/20",
     badgeClass: "bg-violet-100 text-violet-700",
     cardClass: "hover:border-violet-300 hover:bg-violet-50/70",
   },
   high: {
-    label: "上級",
-    score: "800点以上",
+    activeClass: "border-rose-600 bg-rose-600 text-white shadow-rose-600/20",
     badgeClass: "bg-rose-100 text-rose-700",
     cardClass: "hover:border-rose-300 hover:bg-rose-50/70",
   },
-} as const;
+};
 
 function matchesQuery(term: string, query: string): boolean {
   if (!query) return true;
@@ -58,13 +68,14 @@ export function WordsExplorerClient({ words }: Props) {
   const [level, setLevel] = useState<LevelFilter>("all");
   const [letter, setLetter] = useState("all");
   const [visibleCount, setVisibleCount] = useState(RESULT_PAGE_SIZE);
+  const lastTrackedSearchRef = useRef("");
 
   const normalizedQuery = query.trim().toLowerCase();
-  const filteredWords = words.filter((word) => {
-    const matchesLevel = level === "all" || word.level === level;
+  const queryAndLetterMatchedWords = words.filter((word) => {
     const matchesLetter = letter === "all" || word.term[0]?.toUpperCase() === letter;
-    return matchesLevel && matchesLetter && matchesQuery(word.term, normalizedQuery);
+    return matchesLetter && matchesQuery(word.term, normalizedQuery);
   });
+  const filteredWords = queryAndLetterMatchedWords.filter((word) => level === "all" || word.level === level);
 
   if (normalizedQuery && !normalizedQuery.includes("*")) {
     filteredWords.sort((a, b) => {
@@ -75,11 +86,11 @@ export function WordsExplorerClient({ words }: Props) {
   }
 
   const visibleWords = filteredWords.slice(0, visibleCount);
-  const counts = {
-    all: words.length,
-    important: words.filter((word) => word.level === "important").length,
-    medium: words.filter((word) => word.level === "medium").length,
-    high: words.filter((word) => word.level === "high").length,
+  const counts: Record<LevelFilter, number> = {
+    all: queryAndLetterMatchedWords.length,
+    important: queryAndLetterMatchedWords.filter((word) => word.level === "important").length,
+    medium: queryAndLetterMatchedWords.filter((word) => word.level === "medium").length,
+    high: queryAndLetterMatchedWords.filter((word) => word.level === "high").length,
   };
 
   const levelOptions: Array<{
@@ -96,36 +107,40 @@ export function WordsExplorerClient({ words }: Props) {
       count: counts.all,
       activeClass: "border-slate-800 bg-slate-800 text-white shadow-slate-900/15",
     },
-    {
-      id: "important",
-      label: "最重要",
-      score: "600点",
-      count: counts.important,
-      activeClass: "border-blue-600 bg-blue-600 text-white shadow-blue-600/20",
-    },
-    {
-      id: "medium",
-      label: "中級",
-      score: "730〜800点",
-      count: counts.medium,
-      activeClass: "border-violet-600 bg-violet-600 text-white shadow-violet-600/20",
-    },
-    {
-      id: "high",
-      label: "上級",
-      score: "800点以上",
-      count: counts.high,
-      activeClass: "border-rose-600 bg-rose-600 text-white shadow-rose-600/20",
-    },
+    ...WORD_LEVEL_ORDER.map((id) => ({
+      id,
+      label: WORD_LEVEL_INFO[id].label,
+      score: WORD_LEVEL_INFO[id].score,
+      count: counts[id],
+      activeClass: levelStyles[id].activeClass,
+    })),
   ];
+
+  const trackSettledSearch = useEffectEvent((searchTerm: string) => {
+    if (lastTrackedSearchRef.current === searchTerm) return;
+
+    lastTrackedSearchRef.current = searchTerm;
+    sendGAEvent("event", "search", {
+      search_term: searchTerm,
+      result_count: filteredWords.length,
+    });
+  });
+
+  useEffect(() => {
+    if (normalizedQuery.length < SEARCH_EVENT_MIN_LENGTH) {
+      lastTrackedSearchRef.current = "";
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      trackSettledSearch(normalizedQuery);
+    }, SEARCH_EVENT_DELAY_MS);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [normalizedQuery]);
 
   const handleSearchSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!normalizedQuery) return;
-    sendGAEvent("event", "words_search", {
-      search_term: normalizedQuery,
-      result_count: filteredWords.length,
-    });
   };
 
   const handleLevelChange = (nextLevel: LevelFilter) => {
@@ -138,6 +153,7 @@ export function WordsExplorerClient({ words }: Props) {
   };
 
   const handleLetterChange = (nextLetter: string) => {
+    if (nextLetter !== "all") setQuery("");
     setLetter(nextLetter);
     setVisibleCount(RESULT_PAGE_SIZE);
     sendGAEvent("event", "words_filter", {
@@ -194,7 +210,7 @@ export function WordsExplorerClient({ words }: Props) {
             placeholder="英単語を入力（例：implement / impl*）"
             autoComplete="off"
             spellCheck={false}
-            className="h-12 w-full rounded-xl border border-slate-300 bg-white pl-12 pr-20 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+            className="h-12 w-full rounded-xl border border-slate-300 bg-white pl-12 pr-20 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 [&::-webkit-search-cancel-button]:hidden"
           />
           {query && (
             <button
@@ -218,7 +234,11 @@ export function WordsExplorerClient({ words }: Props) {
           </button>
         </form>
 
-        <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4" aria-label="目標スコアで絞り込み">
+        <div
+          className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4"
+          role="group"
+          aria-label="目標スコアで絞り込み"
+        >
           {levelOptions.map((option) => {
             const isActive = option.id === level;
             return (
@@ -253,7 +273,7 @@ export function WordsExplorerClient({ words }: Props) {
               type="button"
               aria-pressed={letter === "all"}
               onClick={() => handleLetterChange("all")}
-              className={`min-h-9 rounded-lg px-3 text-xs font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
+              className={`min-h-10 rounded-lg px-3 text-xs font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
                 letter === "all"
                   ? "bg-slate-800 text-white"
                   : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
@@ -267,7 +287,7 @@ export function WordsExplorerClient({ words }: Props) {
                 type="button"
                 aria-pressed={letter === item}
                 onClick={() => handleLetterChange(item)}
-                className={`size-9 rounded-lg text-xs font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
+                className={`size-10 rounded-lg text-xs font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
                   letter === item
                     ? "bg-blue-600 text-white"
                     : "border border-slate-200 bg-white text-slate-600 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
@@ -298,9 +318,10 @@ export function WordsExplorerClient({ words }: Props) {
 
         {visibleWords.length > 0 ? (
           <>
-            <div id="words-explorer-results" className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
               {visibleWords.map((word) => {
-                const meta = levelMeta[word.level];
+                const info = WORD_LEVEL_INFO[word.level];
+                const styles = levelStyles[word.level];
                 return (
                   <Link
                     key={word.slug}
@@ -312,15 +333,15 @@ export function WordsExplorerClient({ words }: Props) {
                         source: "words_explorer",
                       })
                     }
-                    className={`group relative flex min-h-16 items-center justify-between gap-2 overflow-hidden rounded-xl border border-slate-200 bg-white px-3 py-2.5 no-underline shadow-sm transition hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${meta.cardClass}`}
+                    className={`group relative flex min-h-16 items-center justify-between gap-2 overflow-hidden rounded-xl border border-slate-200 bg-white px-3 py-2.5 no-underline shadow-sm transition hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${styles.cardClass}`}
                   >
                     <WordLinkPending />
                     <span className="min-w-0">
                       <span className="block truncate text-sm font-bold text-slate-900 sm:text-base">{word.term}</span>
                       <span className="mt-1 block text-[10px] text-slate-400">AI解説・例文・発音</span>
                     </span>
-                    <span className={`shrink-0 rounded-full px-1.5 py-0.5 text-[9px] font-bold ${meta.badgeClass}`}>
-                      {meta.score}
+                    <span className={`shrink-0 rounded-full px-1.5 py-0.5 text-[9px] font-bold ${styles.badgeClass}`}>
+                      {info.score}
                     </span>
                   </Link>
                 );

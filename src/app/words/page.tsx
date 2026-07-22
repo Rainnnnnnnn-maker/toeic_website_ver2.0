@@ -18,6 +18,8 @@ import {
 import { getHighWords, getImportantWords, getMediumWords } from "@/data/words";
 import type { Word } from "@/data/words";
 import { WordsExplorerClient } from "@/components/features/words/WordsExplorerClient";
+import { WORD_LEVEL_INFO } from "@/lib/word-level";
+import type { WordLevel } from "@/lib/word-level";
 import { TODAY_WORDS_COUNT } from "@/lib/word-select";
 
 export const metadata: Metadata = {
@@ -53,41 +55,46 @@ function groupByFirstLetter(words: Word[]): Record<string, Word[]> {
 }
 
 type LevelIndexProps = {
-  readonly id: string;
-  readonly title: string;
-  readonly score: string;
-  readonly description: string;
+  readonly level: WordLevel;
   readonly words: Word[];
-  readonly accentClass: string;
-  readonly countClass: string;
 };
 
-function LevelIndex({
-  id,
-  title,
-  score,
-  description,
-  words,
-  accentClass,
-  countClass,
-}: LevelIndexProps) {
+const levelIndexStyles: Readonly<
+  Record<WordLevel, { readonly accentClass: string; readonly countClass: string }>
+> = {
+  important: { accentClass: "bg-blue-600", countClass: "bg-blue-100 text-blue-800" },
+  medium: { accentClass: "bg-violet-600", countClass: "bg-violet-100 text-violet-800" },
+  high: { accentClass: "bg-rose-600", countClass: "bg-rose-100 text-rose-800" },
+};
+
+function LevelIndex({ level, words }: LevelIndexProps) {
+  const info = WORD_LEVEL_INFO[level];
+  const styles = levelIndexStyles[level];
   const groups = groupByFirstLetter(words);
   const letters = Object.keys(groups).sort((a, b) => a.localeCompare(b));
 
   return (
-    <section id={id} className="scroll-mt-24 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <section
+      id={`section-${level}`}
+      className="scroll-mt-24 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
+    >
       <details className="group/level">
         <summary className="flex min-h-24 cursor-pointer list-none items-center justify-between gap-4 px-4 py-5 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500 [&::-webkit-details-marker]:hidden sm:px-6">
           <span className="flex min-w-0 items-start gap-3 sm:items-center">
-            <span aria-hidden="true" className={`mt-1 block size-3 shrink-0 rounded-full sm:mt-0 ${accentClass}`} />
+            <span
+              aria-hidden="true"
+              className={`mt-1 block size-3 shrink-0 rounded-full sm:mt-0 ${styles.accentClass}`}
+            />
             <span className="min-w-0">
               <span className="flex flex-wrap items-center gap-2">
-                <span className="text-base font-bold text-slate-900 sm:text-lg">{title}</span>
-                <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${countClass}`}>
-                  {score} · {words.length}語
+                <span className="text-base font-bold text-slate-900 sm:text-lg">{info.indexTitle}</span>
+                <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${styles.countClass}`}>
+                  TOEIC {info.score} · {words.length}語
                 </span>
               </span>
-              <span className="mt-1 block text-xs leading-relaxed text-slate-500 sm:text-sm">{description}</span>
+              <span className="mt-1 block text-xs leading-relaxed text-slate-500 sm:text-sm">
+                {info.indexDescription}
+              </span>
             </span>
           </span>
           <span className="flex shrink-0 items-center gap-2 text-xs font-bold text-slate-500">
@@ -382,33 +389,9 @@ export default async function WordsListPage() {
           </div>
 
           <div className="flex flex-col gap-3">
-            <LevelIndex
-              id="section-important"
-              title="最重要単語"
-              score="TOEIC 600点"
-              description="スコアアップの土台になる、最初に覚えたい基礎単語"
-              words={importantWords}
-              accentClass="bg-blue-600"
-              countClass="bg-blue-100 text-blue-800"
-            />
-            <LevelIndex
-              id="section-medium"
-              title="中級単語"
-              score="TOEIC 730〜800点"
-              description="Part 5・6・7の正答率向上につながる応用単語"
-              words={mediumWords}
-              accentClass="bg-violet-600"
-              countClass="bg-violet-100 text-violet-800"
-            />
-            <LevelIndex
-              id="section-high"
-              title="高難易度単語"
-              score="TOEIC 800点以上"
-              description="長文読解や高度なビジネス表現に対応する上級単語"
-              words={highWords}
-              accentClass="bg-rose-600"
-              countClass="bg-rose-100 text-rose-800"
-            />
+            <LevelIndex level="important" words={importantWords} />
+            <LevelIndex level="medium" words={mediumWords} />
+            <LevelIndex level="high" words={highWords} />
           </div>
         </section>
 
