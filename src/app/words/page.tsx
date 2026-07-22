@@ -1,18 +1,31 @@
 import Link from "next/link";
 import Script from "next/script";
-import { Home, ChevronRight, BookOpen } from "lucide-react";
 import type { Metadata } from "next";
-import { getImportantWords, getMediumWords, getHighWords } from "@/data/words";
+import {
+  ArrowRight,
+  BookOpen,
+  Bot,
+  BrainCircuit,
+  Check,
+  ChevronDown,
+  ChevronRight,
+  Headphones,
+  Heart,
+  Home,
+  Search,
+  Sparkles,
+} from "lucide-react";
+import { getHighWords, getImportantWords, getMediumWords } from "@/data/words";
 import type { Word } from "@/data/words";
-import { WordLinkPending } from "@/components/features/words/WordLinkPending";
+import { WordsExplorerClient } from "@/components/features/words/WordsExplorerClient";
 import { TODAY_WORDS_COUNT } from "@/lib/word-select";
 
 export const metadata: Metadata = {
   title: {
-    absolute: "TOEIC重要単語 一覧【2026年最新】全1,300語リスト | AI解説付き無料",
+    absolute: "TOEIC重要単語 一覧【2026年最新】1,300語以上 | AI解説付き無料",
   },
   description:
-    "TOEIC頻出単語を全て一覧で確認できます。600点レベルの最重要単語372語・730〜800点の中級単語781語・800点以上の高難易度単語148語を収録。レベル別に整理された単語リストで効率的に学習。各単語をクリックするとAI解説・例文・発音を無料で確認できます。",
+    "TOEIC頻出単語1,300語以上を、目標スコア・アルファベット・英単語検索から探せる無料単語リスト。600点・730〜800点・800点以上のレベル別に整理し、各単語のAI解説・例文・類義語・発音を確認できます。",
   keywords: [
     "TOEIC 重要単語 一覧",
     "TOEIC 単語 リスト",
@@ -39,70 +52,173 @@ function groupByFirstLetter(words: Word[]): Record<string, Word[]> {
   return groups;
 }
 
-type LevelSectionProps = {
+type LevelIndexProps = {
   readonly id: string;
   readonly title: string;
+  readonly score: string;
   readonly description: string;
-  readonly learningGuide?: React.ReactNode;
   readonly words: Word[];
-  readonly badgeClass: string;
-  readonly badgeLabel: string;
+  readonly accentClass: string;
+  readonly countClass: string;
 };
 
-function LevelSection({ id, title, description, learningGuide, words, badgeClass, badgeLabel }: LevelSectionProps) {
+function LevelIndex({
+  id,
+  title,
+  score,
+  description,
+  words,
+  accentClass,
+  countClass,
+}: LevelIndexProps) {
   const groups = groupByFirstLetter(words);
   const letters = Object.keys(groups).sort((a, b) => a.localeCompare(b));
 
   return (
-    <section id={id} className="flex flex-col gap-4 scroll-mt-8">
-      <div className="flex flex-col gap-3">
-        <div className="flex items-center gap-2">
-          <h2 className="text-lg font-bold text-slate-800">{title}</h2>
-          <span className={`text-[11px] px-2 py-0.5 rounded-full font-semibold ${badgeClass}`}>
-            {badgeLabel} · {words.length}語
+    <section id={id} className="scroll-mt-24 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <details className="group/level">
+        <summary className="flex min-h-24 cursor-pointer list-none items-center justify-between gap-4 px-4 py-5 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500 [&::-webkit-details-marker]:hidden sm:px-6">
+          <span className="flex min-w-0 items-start gap-3 sm:items-center">
+            <span aria-hidden="true" className={`mt-1 block size-3 shrink-0 rounded-full sm:mt-0 ${accentClass}`} />
+            <span className="min-w-0">
+              <span className="flex flex-wrap items-center gap-2">
+                <span className="text-base font-bold text-slate-900 sm:text-lg">{title}</span>
+                <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${countClass}`}>
+                  {score} · {words.length}語
+                </span>
+              </span>
+              <span className="mt-1 block text-xs leading-relaxed text-slate-500 sm:text-sm">{description}</span>
+            </span>
           </span>
+          <span className="flex shrink-0 items-center gap-2 text-xs font-bold text-slate-500">
+            <span className="hidden sm:inline">A〜Z索引を開く</span>
+            <ChevronDown className="size-5 transition-transform duration-200 group-open/level:rotate-180" />
+          </span>
+        </summary>
+
+        <div className="border-t border-slate-200 bg-slate-50/70 p-3 sm:p-5">
+          <div className="flex flex-col gap-2">
+            {letters.map((letter) => (
+              <details key={letter} className="group/letter overflow-hidden rounded-xl border border-slate-200 bg-white">
+                <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500 [&::-webkit-details-marker]:hidden">
+                  <span className="flex items-center gap-3">
+                    <span className="flex size-8 items-center justify-center rounded-lg bg-slate-900 text-sm font-bold text-white">
+                      {letter}
+                    </span>
+                    <span className="text-xs font-semibold text-slate-500">{groups[letter].length}語</span>
+                  </span>
+                  <ChevronDown className="size-4 text-slate-400 transition-transform duration-200 group-open/letter:rotate-180" />
+                </summary>
+                <div className="grid grid-cols-2 gap-2 border-t border-slate-100 bg-slate-50/50 p-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+                  {groups[letter].map((word) => (
+                    <Link
+                      key={word.slug}
+                      href={`/words/${word.slug}`}
+                      prefetch={false}
+                      className="flex min-h-11 items-center rounded-lg border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 no-underline shadow-sm transition hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1"
+                    >
+                      <span className="truncate">{word.term}</span>
+                    </Link>
+                  ))}
+                </div>
+              </details>
+            ))}
+          </div>
         </div>
-        <p className="text-sm leading-relaxed text-slate-600">{description}</p>
-        {learningGuide && (
-          <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm mt-1 text-sm text-slate-700 leading-relaxed">
-            <h4 className="font-bold text-slate-800 mb-2 flex items-center gap-2">
-              <span className="text-blue-600">💡</span> 学習のポイント
-            </h4>
-            {learningGuide}
-          </div>
-        )}
+      </details>
+    </section>
+  );
+}
+
+function LearningGuides({
+  importantCount,
+  mediumCount,
+  highCount,
+}: {
+  readonly importantCount: number;
+  readonly mediumCount: number;
+  readonly highCount: number;
+}) {
+  return (
+    <section aria-labelledby="learning-guide-title" className="rounded-3xl border border-slate-200 bg-white/85 p-5 shadow-sm sm:p-7">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="text-xs font-bold tracking-[0.16em] text-blue-600">LEARNING GUIDE</p>
+          <h2 id="learning-guide-title" className="mt-1 text-xl font-bold text-slate-900">
+            目標スコア別の学習ポイント
+          </h2>
+        </div>
+        <Link
+          href="/guide/toeic-vocab-by-score"
+          prefetch={false}
+          className="inline-flex items-center gap-1 text-sm font-bold text-blue-600 no-underline transition hover:text-blue-800"
+        >
+          詳しいスコア別戦略
+          <ArrowRight className="size-4" />
+        </Link>
       </div>
-      <div className="flex flex-col gap-5">
-        {letters.map((letter) => (
-          <div key={letter}>
-            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 border-b border-slate-100 pb-1">
-              {letter}
-            </h3>
-            <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-              {groups[letter].map((word) => (
-                <Link
-                  key={word.slug}
-                  href={`/words/${word.slug}`}
-                  prefetch={false}
-                  className="relative text-sm text-slate-700 font-medium px-2.5 py-1.5 rounded-md bg-white border border-slate-200 hover:border-blue-300 hover:text-blue-700 hover:bg-blue-50 transition-all duration-150 no-underline truncate"
-                >
-                  {word.term}
-                  <WordLinkPending />
-                </Link>
-              ))}
-            </div>
-          </div>
-        ))}
+
+      <div className="mt-5 grid gap-3 lg:grid-cols-3">
+        <details className="group rounded-2xl border border-blue-200 bg-blue-50/70 p-4">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-3 font-bold text-blue-950 [&::-webkit-details-marker]:hidden">
+            <span>600点を目指す方</span>
+            <ChevronDown className="size-4 transition-transform group-open:rotate-180" />
+          </summary>
+          <p className="mt-3 text-sm leading-7 text-slate-700">
+            まずは最重要単語{importantCount}語を優先してください。問題文や選択肢の核になるため、
+            <strong>英単語を見たら1秒で意味が浮かぶ</strong>状態まで反復し、品詞の違いもセットで覚えるとPart 5対策に効果的です。
+          </p>
+        </details>
+
+        <details className="group rounded-2xl border border-violet-200 bg-violet-50/70 p-4">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-3 font-bold text-violet-950 [&::-webkit-details-marker]:hidden">
+            <span>730〜800点を目指す方</span>
+            <ChevronDown className="size-4 transition-transform group-open:rotate-180" />
+          </summary>
+          <p className="mt-3 text-sm leading-7 text-slate-700">
+            最重要単語に加えて中級単語{mediumCount}語まで広げましょう。Part 7では言い換えが多いため、
+            <strong>類義語やコロケーションと一緒に覚える</strong>ことで、長文中のパラフレーズを見抜きやすくなります。
+          </p>
+        </details>
+
+        <details className="group rounded-2xl border border-rose-200 bg-rose-50/70 p-4">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-3 font-bold text-rose-950 [&::-webkit-details-marker]:hidden">
+            <span>800点以上を目指す方</span>
+            <ChevronDown className="size-4 transition-transform group-open:rotate-180" />
+          </summary>
+          <p className="mt-3 text-sm leading-7 text-slate-700">
+            高難易度単語{highCount}語では、法律・金融・人事など特定のビジネス文脈で使われる語彙も扱います。出現頻度だけでなく、
+            <strong>長文の決定的な手がかりになる単語</strong>として例文の中で理解してください。
+          </p>
+        </details>
+      </div>
+
+      <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm leading-7 text-slate-600 sm:p-5">
+        <h3 className="font-bold text-slate-900">TOEIC単語を効率よく定着させるには</h3>
+        <p className="mt-2">
+          1日10〜20語を目安に、新しい単語の確認と前日・3日前・1週間前の復習を組み合わせるのがおすすめです。近年のビジネスシーンで一般化したリモートワーク、オンライン会議、サプライチェーンなどの語彙も、実際の文脈と一緒に覚えましょう。
+        </p>
+        <Link
+          href="/guide/forgetting-curve"
+          prefetch={false}
+          className="mt-3 inline-flex items-center gap-1 font-bold text-blue-600 no-underline hover:text-blue-800"
+        >
+          忘却曲線を活用した復習方法を見る
+          <ArrowRight className="size-4" />
+        </Link>
       </div>
     </section>
   );
 }
 
 export default async function WordsListPage() {
-  const importantWords = await getImportantWords();
-  const mediumWords = await getMediumWords();
-  const highWords = await getHighWords();
-  const totalCount = importantWords.length + mediumWords.length + highWords.length;
+  const [importantWords, mediumWords, highWords] = await Promise.all([
+    getImportantWords(),
+    getMediumWords(),
+    getHighWords(),
+  ]);
+  const allWords = [...importantWords, ...mediumWords, ...highWords];
+  const totalCount = allWords.length;
 
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
@@ -120,16 +236,16 @@ export default async function WordsListPage() {
     description: "TOEIC L&Rテストに頻出する重要単語の完全リスト（レベル別）",
     numberOfItems: totalCount,
     url: "https://www.toeic-words.com/words",
-    itemListElement: importantWords.slice(0, 50).map((w, i) => ({
+    itemListElement: importantWords.slice(0, 50).map((word, index) => ({
       "@type": "ListItem",
-      position: i + 1,
-      name: w.term,
-      url: `https://www.toeic-words.com/words/${w.slug}`,
+      position: index + 1,
+      name: word.term,
+      url: `https://www.toeic-words.com/words/${word.slug}`,
     })),
   };
 
   return (
-    <div className="relative min-h-screen w-full flex justify-center py-8 px-4 bg-[radial-gradient(circle_at_top,#bae6fd_0,#eff6ff_45%,#f8fafc_100%)] sm:py-12 sm:px-6 lg:py-8 lg:px-8 lg:pb-16">
+    <div className="relative min-h-screen w-full overflow-clip bg-[radial-gradient(circle_at_top,#bae6fd_0,#eff6ff_45%,#f8fafc_100%)] px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:pb-16">
       <Script
         id="ldjson-breadcrumb"
         type="application/ld+json"
@@ -140,140 +256,200 @@ export default async function WordsListPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
       />
-      <main className="w-full max-w-[960px] flex flex-col gap-8">
-        {/* ヘッダー */}
-        <header className="flex flex-col gap-3">
-          <nav className="flex items-center gap-1.5 text-sm mb-1">
-            <Link 
-              href="/" 
-              className="flex items-center gap-1 text-slate-500 hover:text-blue-600 hover:bg-blue-50 px-2 py-1 -ml-2 rounded-md transition-colors no-underline font-medium"
-            >
-              <Home className="w-4 h-4" />
-              ホーム
-            </Link>
-            <ChevronRight className="w-4 h-4 text-slate-400" />
-            <div className="flex items-center gap-1.5 text-slate-800 bg-white border border-slate-200 shadow-sm px-2.5 py-1 rounded-md font-semibold">
-              <BookOpen className="w-4 h-4 text-blue-600" />
-              単語一覧
+
+      <main className="relative mx-auto flex w-full max-w-[1120px] flex-col gap-8 sm:gap-10">
+        <nav aria-label="パンくず" className="flex items-center gap-1.5 text-sm">
+          <Link
+            href="/"
+            prefetch={false}
+            className="-ml-2 flex items-center gap-1 rounded-lg px-2 py-1 font-medium text-slate-500 no-underline transition hover:bg-white/70 hover:text-blue-700"
+          >
+            <Home className="size-4" />
+            ホーム
+          </Link>
+          <ChevronRight className="size-4 text-slate-400" />
+          <span className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white/90 px-2.5 py-1 font-semibold text-slate-800 shadow-sm">
+            <BookOpen className="size-4 text-blue-600" />
+            単語一覧
+          </span>
+        </nav>
+
+        <header className="relative overflow-hidden rounded-3xl border border-white/80 bg-gradient-to-br from-white via-blue-50 to-indigo-100 shadow-[0_28px_80px_-40px_rgba(30,64,175,0.45)]">
+          <div aria-hidden="true" className="absolute -right-24 -top-28 size-72 rounded-full bg-blue-300/25 blur-3xl" />
+          <div aria-hidden="true" className="absolute -bottom-32 left-1/3 size-64 rounded-full bg-violet-300/20 blur-3xl" />
+
+          <div className="relative grid gap-8 p-5 sm:p-8 lg:grid-cols-[minmax(0,1.45fr)_minmax(300px,0.75fr)] lg:items-center lg:p-10">
+            <div>
+              <p className="text-xs font-bold tracking-[0.16em] text-blue-700">TOEIC語彙ラボ · COMPLETE INDEX</p>
+              <h1 className="mt-3 text-[28px] font-bold leading-tight tracking-tight text-slate-950 sm:text-[36px] lg:text-[42px]">
+                TOEIC重要単語
+                <span className="mt-1 block text-blue-700">
+                  全{totalCount.toLocaleString("ja-JP")}語から、
+                  <span className="block">今覚える単語を探す</span>
+                </span>
+              </h1>
+              <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
+                600点・730〜800点・800点以上の目標別に整理したTOEIC頻出単語リストです。検索、頭文字、レベルから絞り込み、各単語のAI解説・例文・類義語・発音を無料で確認できます。
+              </p>
+
+              <Link
+                href="#word-explorer"
+                className="mt-5 flex min-h-12 items-center justify-between rounded-xl bg-slate-900 px-4 text-sm font-bold text-white no-underline shadow-lg shadow-slate-900/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2 sm:hidden"
+              >
+                <span className="flex items-center gap-2">
+                  <Search className="size-4" />
+                  全{totalCount.toLocaleString("ja-JP")}語から検索する
+                </span>
+                <ArrowRight className="size-4" />
+              </Link>
+
+              <div className="mt-4 flex flex-wrap gap-2 sm:mt-5">
+                {[
+                  { icon: Check, label: "完全無料・登録不要" },
+                  { icon: Headphones, label: "発音・例文つき" },
+                  { icon: Bot, label: "AIによる詳しい解説" },
+                ].map(({ icon: Icon, label }) => (
+                  <span
+                    key={label}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-white bg-white/80 px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm"
+                  >
+                    <Icon className="size-3.5 text-blue-600" />
+                    {label}
+                  </span>
+                ))}
+              </div>
             </div>
-          </nav>
-          <h1 className="text-[22px] leading-[1.3] text-slate-900 font-bold sm:text-[26px]">
-            TOEIC重要単語 全一覧【2026年最新】
-          </h1>
-          <p className="text-sm leading-[1.7] text-slate-500 max-w-2xl">
-            TOEIC L&Rテストに頻出する重要単語を全{totalCount}語収録。レベル別（600点・730点・800点）に整理されており、各単語のAI解説・例文・類義語・発音を無料で確認できます。
-          </p>
+
+            <aside className="rounded-2xl border border-white bg-white/80 p-4 shadow-xl shadow-blue-950/5 backdrop-blur-sm sm:p-5">
+              <div className="flex items-start gap-3">
+                <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-700">
+                  <Sparkles className="size-5" />
+                </span>
+                <div>
+                  <p className="text-sm font-bold text-slate-900">どこから始めるか迷ったら</p>
+                  <p className="mt-1 text-xs leading-relaxed text-slate-500">
+                    まずは今日の{TODAY_WORDS_COUNT}語を、5分で確認してみましょう。
+                  </p>
+                </div>
+              </div>
+
+              <Link
+                href="/today-words"
+                prefetch={false}
+                className="mt-4 flex min-h-12 items-center justify-between rounded-xl bg-gradient-to-r from-blue-700 to-indigo-600 px-4 text-sm font-bold text-white no-underline shadow-lg shadow-blue-600/20 transition hover:-translate-y-0.5 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
+              >
+                今日のおすすめ{TODAY_WORDS_COUNT}単語
+                <ArrowRight className="size-4" />
+              </Link>
+              <Link
+                href="/study"
+                prefetch={false}
+                className="mt-2 flex min-h-12 items-center justify-between rounded-xl border border-slate-300 bg-white px-4 text-sm font-bold text-slate-800 no-underline transition hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+              >
+                <span className="flex items-center gap-2">
+                  <BrainCircuit className="size-4 text-blue-600" />
+                  暗記テストを始める
+                </span>
+                <ArrowRight className="size-4" />
+              </Link>
+              <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-xs font-semibold">
+                <Link href="/favorites" prefetch={false} className="inline-flex items-center gap-1 text-slate-600 no-underline hover:text-amber-600">
+                  <Heart className="size-3.5" />
+                  お気に入り
+                </Link>
+                <Link href="/guide" prefetch={false} className="inline-flex items-center gap-1 text-slate-600 no-underline hover:text-blue-700">
+                  <BookOpen className="size-3.5" />
+                  学習ガイド
+                </Link>
+              </div>
+            </aside>
+          </div>
         </header>
 
-        {/* 統計バー */}
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <Link href="#section-important" className="bg-white rounded-xl border border-slate-200 p-4 text-center shadow-sm cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all duration-150 no-underline">
-            <div className="text-2xl font-bold text-slate-800">{totalCount}</div>
-            <div className="text-xs text-slate-500 mt-0.5">収録単語数</div>
-          </Link>
-          <Link href="#section-important" className="bg-blue-50 rounded-xl border border-blue-200 p-4 text-center shadow-sm cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all duration-150 no-underline">
-            <div className="text-2xl font-bold text-blue-700">{importantWords.length}</div>
-            <div className="text-xs text-blue-600 mt-0.5">最重要単語</div>
-          </Link>
-          <Link href="#section-medium" className="bg-purple-50 rounded-xl border border-purple-200 p-4 text-center shadow-sm cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all duration-150 no-underline">
-            <div className="text-2xl font-bold text-purple-700">{mediumWords.length}</div>
-            <div className="text-xs text-purple-600 mt-0.5">中級単語</div>
-          </Link>
-          <Link href="#section-high" className="bg-red-50 rounded-xl border border-red-200 p-4 text-center shadow-sm cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all duration-150 no-underline">
-            <div className="text-2xl font-bold text-red-700">{highWords.length}</div>
-            <div className="text-xs text-red-600 mt-0.5">高難易度単語</div>
-          </Link>
-        </div>
+        <WordsExplorerClient words={allWords} />
 
-        {/* クイックアクション */}
-        <div className="flex gap-3 flex-wrap">
-          <Link
-            href="/study"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors no-underline"
-          >
-            暗記モードで学習する
-          </Link>
-          <Link
-            href="/today-words"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-white text-slate-700 border border-slate-200 rounded-lg font-semibold text-sm hover:bg-slate-50 transition-colors no-underline"
-          >
-            今日のおすすめ{TODAY_WORDS_COUNT}単語
-          </Link>
-        </div>
+        <section aria-labelledby="complete-index-title" className="flex flex-col gap-5">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-xs font-bold tracking-[0.16em] text-blue-700">COMPLETE A–Z INDEX</p>
+              <h2 id="complete-index-title" className="mt-1 text-2xl font-bold text-slate-900">
+                全{totalCount.toLocaleString("ja-JP")}語の完全索引
+              </h2>
+            </div>
+            <p className="max-w-md text-sm leading-relaxed text-slate-500 sm:text-right">
+              SEOと探しやすさを両立するため、すべての単語をレベル別・アルファベット順で掲載しています。
+            </p>
+          </div>
 
-        {/* 単語一覧セクション */}
-        <div className="flex flex-col gap-12">
-          <LevelSection
-            id="section-important"
-            title="最重要単語（TOEIC 600点レベル）"
-            description="TOEICスコアアップのために最初に覚えるべき基礎単語。このリストを完璧にすることで600点突破を目指せます。ビジネス英語の基本となる動詞・名詞・形容詞を中心に厳選しています。"
-            learningGuide={
-              <p>
-                TOEIC 600点の壁を越えるには、リスニング（Part 1〜4）とリーディング（Part 5〜6）で確実に正解できる基礎力が不可欠です。このレベルの単語は、問題文や選択肢の核となるため、<strong>「英単語を見たら1秒で日本語の意味が浮かぶ」</strong>状態になるまで反復練習しましょう。特に品詞（名詞・動詞・形容詞など）の違いを意識して覚えると、Part 5の文法問題で大きなアドバンテージになります。
-              </p>
-            }
-            words={importantWords}
-            badgeClass="bg-blue-100 text-blue-800"
-            badgeLabel="最重要"
-          />
-          <LevelSection
-            id="section-medium"
-            title="中級単語（TOEIC 730〜800点レベル）"
-            description="さらなるスコアアップを目指すための応用単語。Part 5・Part 6・Part 7の正答率向上に直結する語彙です。ビジネス文書・会議・交渉などのシーンで使われる中〜上級単語を収録しています。"
-            learningGuide={
-              <p>
-                730点以上を目指す学習者にとって最大の課題は、Part 7の長文読解（特に言い換え問題や推測問題）です。このスコア帯の単語は、パッセージ内で別の表現にパラフレーズ（言い換え）されることが多いため、<strong>単語単体ではなく「類義語」や「コロケーション（よく使われるフレーズ）」とセットで覚える</strong>のがコツです。AI解説を活用して、微妙なニュアンスの違いまで理解を深めましょう。
-              </p>
-            }
-            words={mediumWords}
-            badgeClass="bg-purple-100 text-purple-800"
-            badgeLabel="中級"
-          />
-          <LevelSection
-            id="section-high"
-            title="高難易度単語（TOEIC 800点以上レベル）"
-            description="800点以上の高スコアを目指すための上級単語。Part 7の長文読解や高度なビジネス表現に対応するための語彙力強化に特化した単語リストです。"
-            learningGuide={
-              <p>
-                800点以上のハイスコア、さらには900点超えを狙うためには、ビジネスの専門用語や、特定の文脈でしか使われない難語（法律、金融、人事など）をカバーする必要があります。出現頻度自体は低いものの、<strong>長文の決定的な手がかりになる単語</strong>ばかりです。学習モードだけでなく、実際のTOEIC形式の長文の中でどう使われるかを想像しながら学習を進めてください。
-              </p>
-            }
-            words={highWords}
-            badgeClass="bg-red-100 text-red-800"
-            badgeLabel="上級"
-          />
-        </div>
-
-        {/* 学習ガイド */}
-        <section className="pt-8 border-t border-slate-200 flex flex-col gap-4">
-          <h2 className="text-base font-bold text-slate-800">TOEIC単語の効率的な学習法</h2>
-          <p className="text-sm leading-[1.8] text-slate-600">
-            TOEIC L&Rテストのスコアアップには語彙力が直結します。当サイトはTOEIC頻出単語{totalCount}語をレベル別に収録し、それぞれAI解説・例文・発音つきで無料提供しています。
-          </p>
-          <h3 className="text-sm font-bold text-slate-700">近年のビジネス英語トレンド</h3>
-          <p className="text-sm leading-[1.8] text-slate-600">
-            近年のビジネスシーンでは「リモートワーク」「オンライン会議」「サプライチェーン」などデジタル・グローバル化に伴う語彙が一般化しています。従来の重要単語に加え、こうした現代的なビジネス文脈で使われる単語も本リストに含めています。
-          </p>
-          <h3 className="text-sm font-bold text-slate-700">レベル別の優先順位</h3>
-          <p className="text-sm leading-[1.8] text-slate-600">
-            600点突破を目指す方はまず最重要単語（{importantWords.length}語）を優先してください。730〜800点を目指す方は中級単語（{mediumWords.length}語）まで、800点超えを狙う方は高難易度単語（{highWords.length}語）も含めた全語彙の習得が効果的です。
-          </p>
-        </section>
-
-        {/* フッターCTA */}
-        <section className="mt-4 pt-8 border-t border-slate-200">
-          <h2 className="text-base font-bold text-slate-800 mb-3">TOEIC単語学習をさらに効率化</h2>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <Link href="/study" className="flex flex-col gap-1 p-4 bg-white rounded-xl border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all no-underline">
-              <span className="text-sm font-bold text-slate-800">暗記テストモード</span>
-              <span className="text-xs text-slate-500">ランダム出題で効率的に単語を定着させましょう</span>
-            </Link>
-            <Link href="/today-words" className="flex flex-col gap-1 p-4 bg-white rounded-xl border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all no-underline">
-              <span className="text-sm font-bold text-slate-800">今日のおすすめ単語</span>
-              <span className="text-xs text-slate-500">毎日{TODAY_WORDS_COUNT}語ずつスキマ時間に学習する習慣をつけよう</span>
-            </Link>
+          <div className="flex flex-col gap-3">
+            <LevelIndex
+              id="section-important"
+              title="最重要単語"
+              score="TOEIC 600点"
+              description="スコアアップの土台になる、最初に覚えたい基礎単語"
+              words={importantWords}
+              accentClass="bg-blue-600"
+              countClass="bg-blue-100 text-blue-800"
+            />
+            <LevelIndex
+              id="section-medium"
+              title="中級単語"
+              score="TOEIC 730〜800点"
+              description="Part 5・6・7の正答率向上につながる応用単語"
+              words={mediumWords}
+              accentClass="bg-violet-600"
+              countClass="bg-violet-100 text-violet-800"
+            />
+            <LevelIndex
+              id="section-high"
+              title="高難易度単語"
+              score="TOEIC 800点以上"
+              description="長文読解や高度なビジネス表現に対応する上級単語"
+              words={highWords}
+              accentClass="bg-rose-600"
+              countClass="bg-rose-100 text-rose-800"
+            />
           </div>
         </section>
+
+        <LearningGuides
+          importantCount={importantWords.length}
+          mediumCount={mediumWords.length}
+          highCount={highWords.length}
+        />
+
+        <section className="grid gap-3 sm:grid-cols-2">
+          <Link
+            href="/study"
+            prefetch={false}
+            className="group flex items-center justify-between rounded-2xl border border-blue-200 bg-blue-700 p-5 text-white no-underline shadow-lg shadow-blue-700/15 transition hover:-translate-y-0.5 hover:bg-blue-800"
+          >
+            <span>
+              <span className="block text-base font-bold">暗記テストモード</span>
+              <span className="mt-1 block text-xs text-blue-100">ランダム出題で覚えた単語をチェック</span>
+            </span>
+            <BrainCircuit className="size-6 transition-transform group-hover:scale-110" />
+          </Link>
+          <Link
+            href="/today-words/listen"
+            prefetch={false}
+            className="group flex items-center justify-between rounded-2xl border border-emerald-200 bg-white p-5 text-slate-900 no-underline shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-md"
+          >
+            <span>
+              <span className="block text-base font-bold">今日の単語を聞き流す</span>
+              <span className="mt-1 block text-xs text-slate-500">単語・英語例文・日本語訳を連続再生</span>
+            </span>
+            <Headphones className="size-6 text-emerald-600 transition-transform group-hover:scale-110" />
+          </Link>
+        </section>
+
+        <Link
+          href="#word-explorer"
+          className="mx-auto inline-flex min-h-11 items-center gap-2 rounded-full border border-slate-300 bg-white/80 px-5 text-sm font-bold text-slate-700 no-underline shadow-sm transition hover:border-blue-300 hover:text-blue-700"
+        >
+          <Search className="size-4" />
+          単語検索へ戻る
+        </Link>
       </main>
     </div>
   );
