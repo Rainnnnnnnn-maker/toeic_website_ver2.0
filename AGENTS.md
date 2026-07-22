@@ -15,6 +15,18 @@ npm run test            # Run Vitest unit tests (pure-logic only — see Testing
 
 **CI runs `npm run lint` and `npm run test`.** The `npm run build` step in `.github/workflows/ci.yml` is commented out and should be run locally before pushing.
 
+### Build Troubleshooting (Repository-Specific) CODEX
+
+Production builds switch the word-list loader to Vercel Blob, so a complete build requires outbound network access to the configured `BLOB_URL_*` / Vercel Blob host.
+
+- Start with one normal `npm run build` attempt. Do not run build, lint, and tests concurrently when diagnosing a build problem.
+- If Turbopack remains at `Creating an optimized production build ...` with no new output for 60 seconds, treat it as stalled. Stop it once and switch to `npm run build -- --webpack`; do not repeatedly retry Turbopack.
+- Continue subsequent retries with the same Webpack command so each retry changes only one variable.
+- If TypeScript reports a nonexistent implicit type library such as `chai 2`, inspect `node_modules/@types` for empty duplicate directories ending in ` 2`. This is a corrupted local dependency tree, not a `tsconfig` issue. Run `npm ci` once, then retry the Webpack build; do not edit TypeScript configuration to mask it.
+- If page-data collection fails with `ENOTFOUND` for `*.public.blob.vercel-storage.com`, rerun the same Webpack build with network/escalated sandbox permission immediately. Do not retry inside the restricted sandbox.
+- A known-good Webpack build (2026-07-22) compiled in about 2 seconds, type-checked in about 2 seconds, and generated 2,778 static pages in about 13 seconds. The page count alone is not a reason to wait through a silent multi-minute compile.
+- Retry budget: one normal build, at most one dependency cleanup when evidence requires it, and one network-enabled Webpack build. If that still fails, report the exact failing stage instead of looping.
+
 ## Architecture
 
 ### Tech Stack
