@@ -1,6 +1,6 @@
 # AGENTS.md
 
-This file provides guidance to Codex (Codex.ai/code) when working with code in this repository.
+This file is the single source of truth for coding-agent guidance in this repository. Codex reads it directly; Claude Code reads it through the `@AGENTS.md` import in `CLAUDE.md`. Add project guidance here — never to `CLAUDE.md`.
 
 ## Commands
 
@@ -15,7 +15,7 @@ npm run test            # Run Vitest unit tests (pure-logic only — see Testing
 
 **CI runs `npm run lint` and `npm run test`.** The `npm run build` step in `.github/workflows/ci.yml` is commented out and should be run locally before pushing.
 
-### Build Troubleshooting (Repository-Specific) CODEX
+### Build Troubleshooting (Repository-Specific)
 
 Production builds switch the word-list loader to Vercel Blob, so a complete build requires outbound network access to the configured `BLOB_URL_*` / Vercel Blob host.
 
@@ -97,13 +97,18 @@ All revalidation endpoints require `?token=<REVALIDATION_TOKEN>`:
 - `src/app/words/[word]/` — SSG word detail pages (`generateStaticParams` generates all slugs at build time)
 - `src/app/api/` — Route Handlers only; no UI logic here
 
+### Project Skills
+Repository-specific skills live in `.trae/skills/`, symlinked into `.claude/skills/` and `~/.codex/skills/` so every agent resolves the same `SKILL.md`. Edit the files under `.trae/skills/` only — never the symlinks.
+
+Word-list operations (syncing from Vercel Blob, alphabetical sorting, deduplication) each have a dedicated skill. Read the relevant `SKILL.md` before editing `__words__/*.txt` by hand. Do not maintain a list of skill names here; each skill's `description` frontmatter is the single source of truth and agents load it automatically.
+
 ### Document Update Rule
 Any feature change must update **both** `README.md` and `.trae/documents/技術ドキュメント.md` (including the "最終更新日") in the same commit or PR.
 
 ### Testing
 **Unit tests (Vitest) cover pure logic only**; integration/UI is still verified by manual smoke test.
 
-- Pure, side-effect-free logic lives in `src/lib/*.ts` and is unit-tested in `src/lib/(tests)/*.test.ts` files (`environment: "node"`, no secrets required). Current suites: `word-select` (parsing/dedup, FNV-1a hash, JST day key, daily selection), `word-detail-parse` (Gemini JSON extraction + normalization), `tts-utils` (text normalization, slug sanitization, cache keys, example allowlist matching), `listen-utils` (`pickExample` fallback).
+- Pure, side-effect-free logic lives in `src/lib/*.ts` and is unit-tested in `src/lib/(tests)/*.test.ts` files (`environment: "node"`, no secrets required). Current suites: `word-select` (parsing/dedup, FNV-1a hash, JST day key, daily selection), `word-detail-parse` (Gemini JSON extraction + normalization), `tts-utils` (text normalization, slug sanitization, cache keys, example allowlist matching), `listen-utils` (`pickExample` fallback), `favorites-sync` (stored-favorites parsing, merge logic), `safe-compare` (constant-time token comparison), `study-utils` (study-mode pool selection/re-draw with injectable random, persisted-state parsing, sentence highlight splitting).
 - When extracting testable logic out of a `server-only` module, put the pure function in `src/lib/` (no `server-only`, type-only imports for server types) and have the server module import it — never duplicate.
 - Do **not** add tests that require Gemini/Redis/Blob/TTS or render React components; cover those by manual testing.
 
