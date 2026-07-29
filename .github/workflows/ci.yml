@@ -28,7 +28,15 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - run: npm audit --audit-level=high
+
+      # 本番依存に high 以上があればCIを落とす（ここは常にクリーンに保つ）
+      - name: Audit production dependencies (blocking)
+        run: npm audit --audit-level=high --omit=dev
+
+      # dev依存を含む全体。受容済みアドバイザリのみ除外し、それ以外の high 以上は落とす。
+      # 除外理由と見直し期限は scripts/check-audit.mjs の ALLOWLIST を参照。
+      - name: Audit all dependencies (allowlisted)
+        run: npm run audit:ci
 
   #--------------------------------------------------------------------------------------------#
   # nodejs-linter

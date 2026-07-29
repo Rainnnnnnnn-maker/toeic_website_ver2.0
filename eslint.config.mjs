@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // vitest --coverage の生成物（lcov-report は生の JS を含む）
+    "coverage/**",
   ]),
 ]);
 

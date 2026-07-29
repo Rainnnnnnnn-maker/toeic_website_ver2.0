@@ -4,6 +4,7 @@ import {
   createContext,
   use,
   useEffect,
+  useRef,
   useState,
   ReactNode,
 } from "react";
@@ -13,6 +14,7 @@ import { createClient } from "@/lib/supabase/client";
 type AuthContextType = {
   user: User | null;
   isAuthLoading: boolean;
+  authEpoch: number;
   signOut: () => Promise<void>;
 };
 
@@ -21,6 +23,10 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthLoading, setIsAuthLoading] = useState(true);
+  // ユーザーIDが切り替わるたびに増やし、同じユーザーが再ログインした場合も
+  // 以前のログインセッションで取得したクライアント状態を再利用しないための世代番号。
+  const [authEpoch, setAuthEpoch] = useState(0);
+  const currentUserIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     const supabase = createClient();
@@ -28,7 +34,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+      const nextUser = session?.user ?? null;
+      const nextUserId = nextUser?.id ?? null;
+      if (nextUserId !== currentUserIdRef.current) {
+        currentUserIdRef.current = nextUserId;
+        setAuthEpoch((current) => current + 1);
+      }
+      setUser(nextUser);
       setIsAuthLoading(false);
     });
     return () => subscription.unsubscribe();
@@ -43,7 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext value={{ user, isAuthLoading, signOut }}>
+    <AuthContext value={{ user, isAuthLoading, authEpoch, signOut }}>
       {children}
     </AuthContext>
   );

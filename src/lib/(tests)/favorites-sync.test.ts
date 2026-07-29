@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   buildFavoriteRows,
+  isCurrentFavoriteSession,
+  isPreviousFavoriteSession,
   mergeFavorites,
   parseStoredFavorites,
   shouldMergeLocalFavorites,
@@ -90,6 +92,26 @@ describe("shouldMergeLocalFavorites", () => {
 
   it("印が別人ならマージ不可（アカウント間の混入防止）", () => {
     expect(shouldMergeLocalFavorites("user-1", "user-2")).toBe(false);
+  });
+});
+
+describe("favorite auth session", () => {
+  it("同じユーザー・同じ認証世代だけを現在のremoteとして扱う", () => {
+    const session = { userId: "user-1", authEpoch: 3 };
+
+    expect(isCurrentFavoriteSession(session, "user-1", 3)).toBe(true);
+    expect(isCurrentFavoriteSession(session, "user-1", 5)).toBe(false);
+    expect(isCurrentFavoriteSession(session, "user-2", 3)).toBe(false);
+    expect(isCurrentFavoriteSession(session, null, 4)).toBe(false);
+  });
+
+  it("ログアウト直前の認証世代だけを書き戻し対象にする", () => {
+    const session = { userId: "user-1", authEpoch: 3 };
+
+    expect(isPreviousFavoriteSession(session, null, 4)).toBe(true);
+    expect(isPreviousFavoriteSession(session, null, 6)).toBe(false);
+    expect(isPreviousFavoriteSession(session, "user-1", 3)).toBe(false);
+    expect(isPreviousFavoriteSession(null, null, 4)).toBe(false);
   });
 });
 

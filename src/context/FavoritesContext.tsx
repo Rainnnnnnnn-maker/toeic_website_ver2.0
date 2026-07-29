@@ -4,22 +4,31 @@ import {
   createContext,
   use,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
+  useSyncExternalStore,
   ReactNode,
 } from "react";
 import { sendGAEvent } from "@next/third-parties/google";
 import { useAuth } from "@/context/AuthContext";
 import { createClient } from "@/lib/supabase/client";
 import {
-  FAVORITES_STORAGE_KEY,
-  FAVORITES_MERGED_AT_KEY,
-  FAVORITES_OWNER_KEY,
-  parseStoredFavorites,
+  isCurrentFavoriteSession,
+  isPreviousFavoriteSession,
   mergeFavorites,
   buildFavoriteRows,
   shouldMergeLocalFavorites,
 } from "@/lib/favorites-sync";
+import {
+  subscribeLocalFavorites,
+  getLocalFavoritesSnapshot,
+  getLocalFavoritesServerSnapshot,
+  writeLocalFavorites,
+  readLocalFavoritesOwner,
+  setLocalFavoritesOwner,
+  clearMergedLocalFavorites,
+} from "@/lib/favorites-store";
 
 type FavoritesContextType = {
   favorites: string[];
@@ -34,100 +43,75 @@ const FavoritesContext = createContext<FavoritesContextType | undefined>(
   undefined
 );
 
+// ログアウト時の localStorage 書き戻しはペイント前に完了させる必要がある。
+// useEffect だと「リモート表示 → 空の localStorage」の1フレームが描画され、
+// D-2 で修正した「ログアウトでお気に入りが消えたように見える」症状が再発する。
+// SSR では layout effect は動かず、かつログアウト遷移も起きないため useEffect で代替する。
+const useIsomorphicLayoutEffect =
+  typeof window !== "undefined" ? useLayoutEffect : useEffect;
+
 export function FavoritesProvider({ children }: { children: ReactNode }) {
-  const { user } = useAuth();
+  const { user, authEpoch } = useAuth();
   const userId = user?.id ?? null;
-  const [favorites, setFavorites] = useState<string[]>([]);
-  const [isLoaded, setIsLoaded] = useState(false);
-  // "local" = localStorage が正、"remote" = Supabase が正（ログイン済みで読み込み完了後）
-  const [source, setSource] = useState<"local" | "remote">("local");
-  // ログアウト時の書き戻しで最新値を参照するための ref（effect の依存に入れると再同期が走るため）
-  const favoritesRef = useRef<string[]>([]);
-  const sourceRef = useRef<"local" | "remote">("local");
-  // ログアウト後（userId が null になった後）に「誰のデータだったか」を書き戻すための ref
-  const lastUserIdRef = useRef<string | null>(null);
+  // localStorage を外部ストアとして直接購読する。これによりマウント時に
+  // effect から setState する必要がなくなる（react-hooks/set-state-in-effect）。
+  // ハイドレーション中はサーバースナップショット（空配列）が使われるため不整合も起きない。
+  const localFavorites = useSyncExternalStore(
+    subscribeLocalFavorites,
+    getLocalFavoritesSnapshot,
+    getLocalFavoritesServerSnapshot
+  );
+  // Supabase から読み込んだお気に入りと、その持ち主。
+  // 「どちらを正とするか」を別の state で持つとログアウト時に effect 内から
+  // setState する必要が出るため、userId との一致で導出する。
+  const [remote, setRemote] = useState<{
+    userId: string;
+    authEpoch: number;
+    favorites: string[];
+  } | null>(null);
 
+  // 同じユーザーでもログアウトを挟んだ古いremoteは再利用せず、
+  // 現在の認証世代でSupabaseから取得済みの場合だけremoteを正とする。
+  const isRemote = isCurrentFavoriteSession(remote, userId, authEpoch);
+  const favorites = isRemote ? remote.favorites : localFavorites;
+
+  // ログアウト検知用。remote 自体はログアウトでは変化しないため、
+  // 「直前までリモートを表示していたか」を effect 内から安全に参照できる。
+  const remoteRef = useRef(remote);
+
+  useIsomorphicLayoutEffect(() => {
+    remoteRef.current = remote;
+  }, [remote]);
+
+  // ログアウト直後: アカウントのお気に入りを localStorage へ書き戻して引き継ぐ
+  // （D-2 改定 2026-07-12: ログアウトで「消えたように見える」問題への対応）
+  // 持ち主のユーザー ID も記録し、同じブラウザで別アカウントがログインした際に
+  // このデータが他人のアカウントへマージされるのを防ぐ。
+  // remote は userId が null になっても変化しないため、直前の値を ref から取得できる。
+  useIsomorphicLayoutEffect(() => {
+    if (userId) return;
+    const previous = remoteRef.current;
+    if (!isPreviousFavoriteSession(previous, userId, authEpoch)) return;
+    writeLocalFavorites(previous.favorites);
+    setLocalFavoritesOwner(previous.userId);
+    // 表示は isRemote === false により自動的に localFavorites へ切り替わる
+  }, [userId, authEpoch]);
+
+  // ログイン時に Supabase からお気に入りを読み込む
   useEffect(() => {
-    favoritesRef.current = favorites;
-  }, [favorites]);
-
-  useEffect(() => {
-    sourceRef.current = source;
-  }, [source]);
-
-  useEffect(() => {
-    if (userId) {
-      lastUserIdRef.current = userId;
-    }
-  }, [userId]);
-
-  // Load from local storage on mount
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem(FAVORITES_STORAGE_KEY);
-      setFavorites(parseStoredFavorites(stored));
-    } catch (error) {
-      console.error("Failed to load favorites from localStorage", error);
-    } finally {
-      setIsLoaded(true);
-    }
-  }, []);
-
-  // ログイン/ログアウトに応じてお気に入りの取得元を切り替える
-  useEffect(() => {
-    if (!isLoaded) return;
-
-    if (!userId) {
-      if (sourceRef.current === "remote") {
-        // ログアウト直後: アカウントのお気に入りを localStorage へ書き戻して引き継ぐ
-        // （D-2 改定 2026-07-12: ログアウトで「消えたように見える」問題への対応）
-        // 持ち主のユーザー ID も記録し、同じブラウザで別アカウントがログインした際に
-        // このデータが他人のアカウントへマージされるのを防ぐ。
-        try {
-          localStorage.setItem(
-            FAVORITES_STORAGE_KEY,
-            JSON.stringify(favoritesRef.current)
-          );
-          if (lastUserIdRef.current) {
-            localStorage.setItem(FAVORITES_OWNER_KEY, lastUserIdRef.current);
-          }
-        } catch (error) {
-          console.error("Failed to write favorites back to localStorage", error);
-        }
-        setSource("local");
-        // favorites の state は書き戻した内容と一致しているのでそのまま
-      } else {
-        // 初期マウントなど、もともと未ログインの場合: localStorage の内容を表示
-        setSource("local");
-        try {
-          setFavorites(
-            parseStoredFavorites(localStorage.getItem(FAVORITES_STORAGE_KEY))
-          );
-        } catch (error) {
-          console.error("Failed to load favorites from localStorage", error);
-        }
-      }
-      return;
-    }
+    if (!userId) return;
 
     let cancelled = false;
     const supabase = createClient();
 
     const syncFromServer = async () => {
-      let localFavorites: string[] = [];
-      let canMergeLocal = true;
-      try {
-        localFavorites = parseStoredFavorites(
-          localStorage.getItem(FAVORITES_STORAGE_KEY)
-        );
-        // 別アカウントがログアウト時に書き戻したデータは、このアカウントへマージしない
-        canMergeLocal = shouldMergeLocalFavorites(
-          localStorage.getItem(FAVORITES_OWNER_KEY),
-          userId
-        );
-      } catch (error) {
-        console.error("Failed to read favorites from localStorage", error);
-      }
+      // ハイドレーション時のスナップショットではなく、実行時点の localStorage を読む
+      const storedFavorites = getLocalFavoritesSnapshot();
+      // 別アカウントがログアウト時に書き戻したデータは、このアカウントへマージしない
+      const canMergeLocal = shouldMergeLocalFavorites(
+        readLocalFavoritesOwner(),
+        userId
+      );
 
       const { data, error } = await supabase
         .from("favorites")
@@ -141,16 +125,16 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      const remote = (data ?? []).map(
+      const remoteSlugs = (data ?? []).map(
         (row: { word_slug: string }) => row.word_slug
       );
 
       // D-4: 初回ログイン時、localStorage のお気に入りをサーバーへマージ
       // （別アカウントの書き戻しデータの場合はマージも表示への合流もしない）
-      if (canMergeLocal && localFavorites.length > 0) {
+      if (canMergeLocal && storedFavorites.length > 0) {
         const { error: mergeError } = await supabase
           .from("favorites")
-          .upsert(buildFavoriteRows(userId, localFavorites), {
+          .upsert(buildFavoriteRows(userId, storedFavorites), {
             onConflict: "user_id,word_slug",
             ignoreDuplicates: true,
           });
@@ -163,26 +147,17 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
             mergeError
           );
         } else {
-          try {
-            localStorage.removeItem(FAVORITES_STORAGE_KEY);
-            localStorage.removeItem(FAVORITES_OWNER_KEY);
-            localStorage.setItem(
-              FAVORITES_MERGED_AT_KEY,
-              new Date().toISOString()
-            );
-          } catch (storageError) {
-            console.error(
-              "Failed to clear merged favorites from localStorage",
-              storageError
-            );
-          }
+          clearMergedLocalFavorites();
         }
       }
 
-      setFavorites(
-        canMergeLocal ? mergeFavorites(remote, localFavorites) : remote
-      );
-      setSource("remote");
+      setRemote({
+        userId,
+        authEpoch,
+        favorites: canMergeLocal
+          ? mergeFavorites(remoteSlugs, storedFavorites)
+          : remoteSlugs,
+      });
     };
 
     syncFromServer();
@@ -190,17 +165,17 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true;
     };
-  }, [userId, isLoaded]);
+  }, [userId, authEpoch]);
 
-  // Save to local storage whenever favorites change (未ログイン時のみ)
-  useEffect(() => {
-    if (!isLoaded || source !== "local") return;
-    try {
-      localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(favorites));
-    } catch (error) {
-      console.error("Failed to save favorites to localStorage", error);
-    }
-  }, [favorites, isLoaded, source]);
+  // 未ログイン時の更新は localStorage を直接書き換える（ストアが再購読を通知する）。
+  // 変更のたびに保存用 effect を回す必要がなくなるため、書き込み漏れも起きない。
+  const updateLocalFavorites = (
+    updater: (current: string[]) => string[]
+  ): void => {
+    // 同一レンダー内で連続操作されてもクロージャの古い値を使わないよう、
+    // 書き込み直前の localStorage を読み直す
+    writeLocalFavorites(updater(getLocalFavoritesSnapshot()));
+  };
 
   // ログイン中のみ、サーバーへ変更を反映する（楽観的更新の裏側）
   const syncAddToServer = (slug: string) => {
@@ -241,16 +216,34 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
       });
   };
 
+  // リモート表示中はサーバー由来の state を、未ログイン時は localStorage を更新する
+  const updateRemoteFavorites = (
+    updater: (current: string[]) => string[]
+  ): void => {
+    setRemote((prev) =>
+      prev === null ? prev : { ...prev, favorites: updater(prev.favorites) }
+    );
+  };
+
   const addFavorite = (slug: string) => {
-    setFavorites((prev) => {
-      if (prev.includes(slug)) return prev;
-      return [...prev, slug];
-    });
+    const add = (current: string[]) =>
+      current.includes(slug) ? current : [...current, slug];
+    if (isRemote) {
+      updateRemoteFavorites(add);
+    } else {
+      updateLocalFavorites(add);
+    }
     syncAddToServer(slug);
   };
 
   const removeFavorite = (slug: string) => {
-    setFavorites((prev) => prev.filter((item) => item !== slug));
+    const remove = (current: string[]) =>
+      current.filter((item) => item !== slug);
+    if (isRemote) {
+      updateRemoteFavorites(remove);
+    } else {
+      updateLocalFavorites(remove);
+    }
     syncRemoveFromServer(slug);
   };
 
@@ -265,7 +258,11 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
   };
 
   const clearFavorites = () => {
-    setFavorites([]);
+    if (isRemote) {
+      updateRemoteFavorites(() => []);
+    } else {
+      updateLocalFavorites(() => []);
+    }
     syncClearOnServer();
   };
 

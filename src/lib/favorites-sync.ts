@@ -9,6 +9,11 @@ export const FAVORITES_MERGED_AT_KEY = "toeic_favorites_merged_at";
 // マージしてしまう混入を防ぐための印。
 export const FAVORITES_OWNER_KEY = "toeic_favorites_owner";
 
+export type FavoriteSession = {
+  userId: string;
+  authEpoch: number;
+};
+
 function dedupe(slugs: string[]): string[] {
   return [...new Set(slugs)];
 }
@@ -41,6 +46,34 @@ export function shouldMergeLocalFavorites(
   userId: string
 ): boolean {
   return ownerRaw === null || ownerRaw === "" || ownerRaw === userId;
+}
+
+// userId が同じでも、ログアウトを挟んだ古いログインセッションのremoteは再利用しない。
+export function isCurrentFavoriteSession(
+  session: FavoriteSession | null,
+  userId: string | null,
+  authEpoch: number
+): session is FavoriteSession {
+  return (
+    session !== null &&
+    userId !== null &&
+    session.userId === userId &&
+    session.authEpoch === authEpoch
+  );
+}
+
+// ログアウト時に書き戻してよいのは、直前の認証世代で取得済みのremoteだけ。
+// さらに古いremoteを書き戻すと、ゲスト中に追加したlocalStorageを上書きしてしまう。
+export function isPreviousFavoriteSession(
+  session: FavoriteSession | null,
+  userId: string | null,
+  authEpoch: number
+): session is FavoriteSession {
+  return (
+    session !== null &&
+    userId === null &&
+    session.authEpoch === authEpoch - 1
+  );
 }
 
 // Supabase favorites テーブルへの upsert 行を組み立てる。
