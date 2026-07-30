@@ -4,13 +4,17 @@ import { useEffect, useEffectEvent, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import Link from "next/link";
 import { sendGAEvent } from "@next/third-parties/google";
-import { ArrowRight, Search, X } from "lucide-react";
+import { ArrowRight, Search, Sparkles, X } from "lucide-react";
 import type { Word } from "@/data/words";
 import { WordLinkPending } from "@/components/features/words/WordLinkPending";
+import { SemanticSearchPanel } from "@/components/features/words/SemanticSearchPanel";
+import { WORD_LEVEL_CARD_STYLES } from "@/components/features/words/wordLevelStyles";
 import { WORD_LEVEL_INFO, WORD_LEVEL_ORDER } from "@/lib/word-level";
 import type { WordLevel } from "@/lib/word-level";
 
 type LevelFilter = "all" | WordLevel;
+
+type SearchMode = "term" | "meaning";
 
 type Props = {
   readonly words: Word[];
@@ -21,32 +25,7 @@ const SEARCH_EVENT_DELAY_MS = 700;
 const SEARCH_EVENT_MIN_LENGTH = 2;
 const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
-const levelStyles: Readonly<
-  Record<
-    WordLevel,
-    {
-      readonly activeClass: string;
-      readonly badgeClass: string;
-      readonly cardClass: string;
-    }
-  >
-> = {
-  important: {
-    activeClass: "border-blue-600 bg-blue-600 text-white shadow-blue-600/20",
-    badgeClass: "bg-blue-100 text-blue-700",
-    cardClass: "hover:border-blue-300 hover:bg-blue-50/70",
-  },
-  medium: {
-    activeClass: "border-violet-600 bg-violet-600 text-white shadow-violet-600/20",
-    badgeClass: "bg-violet-100 text-violet-700",
-    cardClass: "hover:border-violet-300 hover:bg-violet-50/70",
-  },
-  high: {
-    activeClass: "border-rose-600 bg-rose-600 text-white shadow-rose-600/20",
-    badgeClass: "bg-rose-100 text-rose-700",
-    cardClass: "hover:border-rose-300 hover:bg-rose-50/70",
-  },
-};
+const levelStyles = WORD_LEVEL_CARD_STYLES;
 
 function matchesQuery(term: string, query: string): boolean {
   if (!query) return true;
@@ -64,11 +43,21 @@ function matchesQuery(term: string, query: string): boolean {
 }
 
 export function WordsExplorerClient({ words }: Props) {
+  const [searchMode, setSearchMode] = useState<SearchMode>("term");
   const [query, setQuery] = useState("");
   const [level, setLevel] = useState<LevelFilter>("all");
   const [letter, setLetter] = useState("all");
   const [visibleCount, setVisibleCount] = useState(RESULT_PAGE_SIZE);
   const lastTrackedSearchRef = useRef("");
+
+  const handleModeChange = (nextMode: SearchMode) => {
+    if (nextMode === searchMode) return;
+    setSearchMode(nextMode);
+    sendGAEvent("event", "words_filter", {
+      filter_type: "search_mode",
+      filter_value: nextMode,
+    });
+  };
 
   const normalizedQuery = query.trim().toLowerCase();
   const queryAndLetterMatchedWords = words.filter((word) => {
@@ -184,122 +173,165 @@ export function WordsExplorerClient({ words }: Props) {
             </h2>
           </div>
           <p className="text-xs leading-relaxed text-slate-500 sm:max-w-[310px] sm:text-right">
-            単語の先頭一致とワイルドカード（*）検索に対応しています。
+            英単語の先頭一致・ワイルドカード（*）検索と、日本語の意味からのAI検索に対応しています。
           </p>
         </div>
       </div>
 
       <div className="sticky top-0 z-20 border-b border-slate-200 bg-white/95 px-4 py-4 shadow-[0_10px_24px_-20px_rgba(15,23,42,0.5)] backdrop-blur-md sm:px-6 lg:px-8">
-        <form onSubmit={handleSearchSubmit} role="search" className="relative">
-          <label htmlFor="words-search" className="sr-only">
-            TOEIC英単語を検索
-          </label>
-          <Search
-            aria-hidden="true"
-            className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-slate-400"
-          />
-          <input
-            id="words-search"
-            type="search"
-            value={query}
-            onChange={(event) => {
-              setQuery(event.target.value);
-              setLetter("all");
-              setVisibleCount(RESULT_PAGE_SIZE);
-            }}
-            placeholder="英単語を入力（例：implement / impl*）"
-            autoComplete="off"
-            spellCheck={false}
-            className="h-12 w-full rounded-xl border border-slate-300 bg-white pl-12 pr-20 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 [&::-webkit-search-cancel-button]:hidden"
-          />
-          {query && (
-            <button
-              type="button"
-              onClick={() => {
-                setQuery("");
-                setVisibleCount(RESULT_PAGE_SIZE);
-              }}
-              aria-label="検索語をクリア"
-              className="absolute right-12 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-            >
-              <X className="size-4" />
-            </button>
-          )}
+        <div className="mb-3 grid grid-cols-2 gap-2" role="group" aria-label="検索モード切替">
           <button
-            type="submit"
-            aria-label="検索する"
-            className="absolute right-2 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-lg bg-blue-600 text-white transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+            type="button"
+            aria-pressed={searchMode === "term"}
+            onClick={() => handleModeChange("term")}
+            className={`flex min-h-11 items-center justify-center gap-2 rounded-xl border px-3 text-sm font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${
+              searchMode === "term"
+                ? "border-slate-800 bg-slate-800 text-white shadow-lg shadow-slate-900/15"
+                : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50"
+            }`}
           >
-            <ArrowRight className="size-4" />
+            <Search className="size-4" />
+            英単語で探す
           </button>
-        </form>
-
-        <div
-          className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4"
-          role="group"
-          aria-label="目標スコアで絞り込み"
-        >
-          {levelOptions.map((option) => {
-            const isActive = option.id === level;
-            return (
-              <button
-                key={option.id}
-                type="button"
-                aria-pressed={isActive}
-                onClick={() => handleLevelChange(option.id)}
-                className={`min-h-14 rounded-xl border px-3 py-2 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${
-                  isActive
-                    ? `${option.activeClass} shadow-lg`
-                    : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
-                }`}
-              >
-                <span className="flex items-baseline justify-between gap-2">
-                  <span className="text-sm font-bold">{option.label}</span>
-                  <span className={`text-sm font-bold ${isActive ? "text-white" : "text-slate-900"}`}>
-                    {option.count}
-                  </span>
-                </span>
-                <span className={`mt-0.5 block text-[11px] ${isActive ? "text-white/80" : "text-slate-500"}`}>
-                  {option.score}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-
-        <div className="mt-3 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          <div className="flex min-w-max gap-1" role="group" aria-label="頭文字で絞り込み">
-            <button
-              type="button"
-              aria-pressed={letter === "all"}
-              onClick={() => handleLetterChange("all")}
-              className={`min-h-10 rounded-lg px-3 text-xs font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
-                letter === "all"
-                  ? "bg-slate-800 text-white"
-                  : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+          <button
+            type="button"
+            aria-pressed={searchMode === "meaning"}
+            onClick={() => handleModeChange("meaning")}
+            className={`flex min-h-11 items-center justify-center gap-2 rounded-xl border px-3 text-sm font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2 ${
+              searchMode === "meaning"
+                ? "border-violet-600 bg-violet-600 text-white shadow-lg shadow-violet-600/20"
+                : "border-slate-200 bg-white text-slate-600 hover:border-violet-200 hover:bg-violet-50 hover:text-violet-700"
+            }`}
+          >
+            <Sparkles className="size-4" />
+            意味で探す
+            <span
+              className={`rounded-full px-1.5 py-0.5 text-[9px] font-bold ${
+                searchMode === "meaning" ? "bg-white/20 text-white" : "bg-violet-100 text-violet-700"
               }`}
             >
-              A–Z
-            </button>
-            {LETTERS.map((item) => (
+              AI
+            </span>
+          </button>
+        </div>
+
+        {searchMode === "term" && (
+          <>
+          <form onSubmit={handleSearchSubmit} role="search" className="relative">
+            <label htmlFor="words-search" className="sr-only">
+              TOEIC英単語を検索
+            </label>
+            <Search
+              aria-hidden="true"
+              className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-slate-400"
+            />
+            <input
+              id="words-search"
+              type="search"
+              value={query}
+              onChange={(event) => {
+                setQuery(event.target.value);
+                setLetter("all");
+                setVisibleCount(RESULT_PAGE_SIZE);
+              }}
+              placeholder="英単語を入力（例：implement / impl*）"
+              autoComplete="off"
+              spellCheck={false}
+              className="h-12 w-full rounded-xl border border-slate-300 bg-white pl-12 pr-20 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 [&::-webkit-search-cancel-button]:hidden"
+            />
+            {query && (
               <button
-                key={item}
                 type="button"
-                aria-pressed={letter === item}
-                onClick={() => handleLetterChange(item)}
-                className={`size-10 rounded-lg text-xs font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
-                  letter === item
-                    ? "bg-blue-600 text-white"
-                    : "border border-slate-200 bg-white text-slate-600 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+                onClick={() => {
+                  setQuery("");
+                  setVisibleCount(RESULT_PAGE_SIZE);
+                }}
+                aria-label="検索語をクリア"
+                className="absolute right-12 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+              >
+                <X className="size-4" />
+              </button>
+            )}
+            <button
+              type="submit"
+              aria-label="検索する"
+              className="absolute right-2 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-lg bg-blue-600 text-white transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+            >
+              <ArrowRight className="size-4" />
+            </button>
+          </form>
+
+          <div
+            className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4"
+            role="group"
+            aria-label="目標スコアで絞り込み"
+          >
+            {levelOptions.map((option) => {
+              const isActive = option.id === level;
+              return (
+                <button
+                  key={option.id}
+                  type="button"
+                  aria-pressed={isActive}
+                  onClick={() => handleLevelChange(option.id)}
+                  className={`min-h-14 rounded-xl border px-3 py-2 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${
+                    isActive
+                      ? `${option.activeClass} shadow-lg`
+                      : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
+                  }`}
+                >
+                  <span className="flex items-baseline justify-between gap-2">
+                    <span className="text-sm font-bold">{option.label}</span>
+                    <span className={`text-sm font-bold ${isActive ? "text-white" : "text-slate-900"}`}>
+                      {option.count}
+                    </span>
+                  </span>
+                  <span className={`mt-0.5 block text-[11px] ${isActive ? "text-white/80" : "text-slate-500"}`}>
+                    {option.score}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="mt-3 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div className="flex min-w-max gap-1" role="group" aria-label="頭文字で絞り込み">
+              <button
+                type="button"
+                aria-pressed={letter === "all"}
+                onClick={() => handleLetterChange("all")}
+                className={`min-h-10 rounded-lg px-3 text-xs font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
+                  letter === "all"
+                    ? "bg-slate-800 text-white"
+                    : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
                 }`}
               >
-                {item}
+                A–Z
               </button>
-            ))}
+              {LETTERS.map((item) => (
+                <button
+                  key={item}
+                  type="button"
+                  aria-pressed={letter === item}
+                  onClick={() => handleLetterChange(item)}
+                  className={`size-10 rounded-lg text-xs font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
+                    letter === item
+                      ? "bg-blue-600 text-white"
+                      : "border border-slate-200 bg-white text-slate-600 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+                  }`}
+                >
+                  {item}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+          </>
+        )}
       </div>
 
+      {searchMode === "meaning" ? (
+        <SemanticSearchPanel />
+      ) : (
       <div className="px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
           <p aria-live="polite" className="text-sm font-semibold text-slate-700">
@@ -374,6 +406,7 @@ export function WordsExplorerClient({ words }: Props) {
           </div>
         )}
       </div>
+      )}
     </section>
   );
 }

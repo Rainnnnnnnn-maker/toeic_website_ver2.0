@@ -1,5 +1,6 @@
 import "server-only";
 import type { WordDetails } from "@/types/word";
+import { parseStoredWordDetails } from "./word-detail-parse";
 import { getRedis } from "./upstash";
 
 export function cacheKeyForWord(word: string): string {
@@ -17,25 +18,7 @@ export async function getWordDetails(word: string): Promise<WordDetails | null> 
   const redis = getRedis();
   const key = cacheKeyForWord(word);
   const value = await redis.get<string | WordDetails>(key);
-  if (!value) return null;
-  try {
-    let obj: unknown = value;
-    if (typeof value === "string") {
-      obj = JSON.parse(value) as unknown;
-    }
-    if (
-      obj &&
-      typeof obj === "object" &&
-      "word" in obj &&
-      "meanings" in obj &&
-      Array.isArray((obj as { meanings?: unknown }).meanings)
-    ) {
-      return obj as WordDetails;
-    }
-    return null;
-  } catch {
-    return null;
-  }
+  return parseStoredWordDetails(value);
 }
 
 export async function setWordDetails(word: string, data: WordDetails): Promise<void> {

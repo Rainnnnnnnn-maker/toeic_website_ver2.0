@@ -4,53 +4,7 @@ import { getWordBySlug } from "@/data/words";
 import { getWordDetails as getRedisWordDetails, setWordDetails as setRedisWordDetails } from "@/lib/wordCache";
 import { cacheLife, cacheTag } from "next/cache";
 import { WordDetails } from "@/types/word";
-import { parseJsonFromText, normalizePayload } from "@/lib/word-detail-parse";
-
-const systemPrompt = `
-Return ONLY a JSON object for "\${word}" with the following fields:
-{
-  "word": "\${word}",
-  "pronunciation": "IPA",
-  "meanings": [
-    {
-      "partOfSpeech": "品詞",
-      "meaning": "日本語の要約（1〜3文、頻度順）",
-      "detailedMeanings": [
-        {
-          "number": 1,
-          "definition": "短い日本語定義",
-          "example": "英語例文",
-          "exampleJapanese": "日本語訳",
-          "context": "使用場面",
-          "frequency": "高/中/低",
-          "synonyms": ["..."],
-          "grammarPattern": "代表的な文型"
-        }
-      ]
-    }
-  ],
-  "wordForms": [{ "form": "xxxx", "type": "語形" }],
-  "synonyms": ["..."],
-  "nuance": "1〜2文で簡潔に",
-  "toeicExamples": [
-    { "english": "English sentence", "japanese": "日本語訳" }
-  ],
-  "englishDefinition": "短い英語定義",
-  "japaneseTranslation": "日本語訳",
-  "etymology": "語源・成り立ち（例: re(再び) + spect(見る)）",
-  "collocations": ["よく使われるコロケーション1", "コロケーション2"]
-}
-
-Constraints:
-- partOfSpeech は日本語で出力する
-- meaning は日本語で出力する
-- meanings は品詞ごとに1〜2文で簡潔に
-- definition は短い日本語で出力する
-- englishDefinition は短い英語で出力する
-- 語形変化は最大5件、類義語は最大5件、toeicExamples は3〜5件、collocationsは2〜3件
-- etymology は単語の成り立ちや記憶のフックになる情報を日本語で1〜2文で出力する
-- JSON以外のテキストは出力しない
-`;
+import { generateWordDetail } from "@/lib/word-detail-gemini";
 
 async function fetchWordDetailFromGemini(term: string): Promise<WordDetails> {
   const apiKey = process.env.GEMINI_API_KEY;
@@ -59,57 +13,13 @@ async function fetchWordDetailFromGemini(term: string): Promise<WordDetails> {
   }
 
   const client = new GoogleGenAI({ apiKey });
-  const promptBase = systemPrompt.replaceAll("${word}", term);
-  const prompts = [
-    {
-      maxOutputTokens: 1536,
-      prompt: promptBase,
-    },
-    {
-      maxOutputTokens: 2048,
-      prompt:
-        promptBase +
-        "\n\nIMPORTANT:\n- Output MUST be a single complete JSON object.\n- If output would be long, reduce toeicExamples to 3 and synonyms to 3.\n- Keep JSON valid and complete (no truncation).\n",
-    },
-  ];
-
-  let data: WordDetails | null = null;
-  let lastError: unknown;
-
-  for (const attempt of prompts) {
-    try {
-      const response = await client.models.generateContent({
-        model: "gemini-2.5-flash-lite",
-        contents: attempt.prompt,
-        config: {
-          temperature: 0.2,
-          maxOutputTokens: attempt.maxOutputTokens,
-          responseMimeType: "application/json",
-        },
-      });
-      const text = response.text;
-      if (!text) {
-        throw new Error("Empty response from Gemini");
-      }
-      const raw = parseJsonFromText(text);
-      data = normalizePayload(term, raw);
-      break;
-    } catch (e) {
-      lastError = e;
-    }
-  }
-
-  if (!data) {
-    throw lastError instanceof Error
-      ? lastError
-      : new Error("Failed to generate a valid JSON response from Gemini");
-  }
-
-  return data;
+  return generateWordDetail(client, term);
 }
 
-// Internal function to fetch data (Redis -> Gemini -> Redis)
-async function getWordDetailInternal(slug: string): Promise<WordDetails | null> {
+// L1 を経由せずに取得する内部フロー (Redis -> Gemini -> Redis)。
+// 通常は getWordDetail を使うこと。/api/revalidate/word の vector 再生成のように
+// 「パージ直後に必ず最新の内容を取得したい」場面だけ getWordDetailFresh を使う。
+export async function getWordDetailFresh(slug: string): Promise<WordDetails | null> {
   const entry = await getWordBySlug(slug);
   if (!entry) return null;
 
@@ -151,5 +61,5 @@ export async function getWordDetail(slug: string) {
   // Vercel の ISR Writes を節約する。更新時は /api/revalidate/word でオンデマンドにパージする。
   cacheLife("max");
 
-  return getWordDetailInternal(slug);
+  return getWordDetailFresh(slug);
 }

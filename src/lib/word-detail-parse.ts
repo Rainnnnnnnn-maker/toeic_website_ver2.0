@@ -6,6 +6,33 @@ import type { RawWordPayload, WordDetails } from "@/types/word";
  * `src/data/word-detail.ts` から利用される。
  */
 
+/**
+ * Redis（L2）に保存された値を WordDetails として解釈する。
+ * 文字列なら JSON.parse し、最低限の形（word / meanings 配列）を検証する。
+ * 不正な値は null を返す。`src/lib/wordCache.ts` と `scripts/embed-words.ts` で共有。
+ */
+export function parseStoredWordDetails(value: unknown): WordDetails | null {
+  if (!value) return null;
+  try {
+    let obj: unknown = value;
+    if (typeof value === "string") {
+      obj = JSON.parse(value) as unknown;
+    }
+    if (
+      obj &&
+      typeof obj === "object" &&
+      "word" in obj &&
+      "meanings" in obj &&
+      Array.isArray((obj as { meanings?: unknown }).meanings)
+    ) {
+      return obj as WordDetails;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 /** コードフェンス除去 → 最初の `{`〜最後の `}` を切り出して JSON.parse する。 */
 export function parseJsonFromText(text: string): RawWordPayload {
   const trimmed = text.trim();
