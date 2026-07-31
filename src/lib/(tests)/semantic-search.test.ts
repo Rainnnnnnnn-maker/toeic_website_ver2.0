@@ -79,7 +79,7 @@ describe("semanticQueryCacheKey", () => {
 
   it("differs for different queries and uses the versioned prefix", () => {
     const a = semanticQueryCacheKey("延期する", 3);
-    const b = semanticQueryCacheKey("謝罪する", 3);
+    const b = semanticQueryCacheKey("感謝する", 3);
     expect(a).not.toBe(b);
     expect(a).toMatch(/^semsearch:v3:3:[0-9a-f]{16}$/);
   });

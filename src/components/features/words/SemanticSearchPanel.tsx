@@ -14,7 +14,7 @@ type SearchStatus = "idle" | "loading" | "success" | "error";
 
 const QUERY_MAX_LENGTH = 100;
 
-const EXAMPLE_QUERIES = ["延期する", "謝罪メールで使う単語", "会議の日程調整", "お金・支払いに関する単語"] as const;
+const EXAMPLE_QUERIES = ["延期する", "感謝を伝えるメールで使う単語", "会議の日程調整", "お金・支払いに関する単語"] as const;
 
 export function SemanticSearchPanel() {
   const [query, setQuery] = useState("");
@@ -93,7 +93,7 @@ export function SemanticSearchPanel() {
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           maxLength={QUERY_MAX_LENGTH}
-          placeholder="例：延期する / 謝罪メールで使う単語"
+          placeholder="例：延期する / 感謝を伝えるメールで使う単語"
           autoComplete="off"
           spellCheck={false}
           className="h-12 w-full rounded-xl border border-slate-300 bg-white pl-12 pr-20 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-violet-500 focus:ring-4 focus:ring-violet-100 [&::-webkit-search-cancel-button]:hidden"
