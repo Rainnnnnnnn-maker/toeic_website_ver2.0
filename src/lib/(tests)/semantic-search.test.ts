@@ -1,11 +1,15 @@
 import { describe, expect, it } from "vitest";
 import type { WordDetails } from "@/types/word";
 import {
+  DEFAULT_SEMANTIC_MIN_SCORE,
   EMBEDDING_DIMENSION,
   buildEmbeddingText,
+  filterSemanticSearchResults,
   normalizeSemanticQuery,
   normalizeVector,
+  parseSemanticIndexVersion,
   parseSemanticSearchResults,
+  resolveSemanticMinScore,
   semanticQueryCacheKey,
   toSemanticSearchResults,
 } from "@/lib/semantic-search";
@@ -67,15 +71,67 @@ describe("normalizeSemanticQuery", () => {
 });
 
 describe("semanticQueryCacheKey", () => {
-  it("is stable for the same query", () => {
-    expect(semanticQueryCacheKey("延期する")).toBe(semanticQueryCacheKey("延期する"));
+  it("is stable for the same query and index version", () => {
+    expect(semanticQueryCacheKey("延期する", 3)).toBe(
+      semanticQueryCacheKey("延期する", 3)
+    );
   });
 
-  it("differs for different queries and uses the semsearch prefix", () => {
-    const a = semanticQueryCacheKey("延期する");
-    const b = semanticQueryCacheKey("謝罪する");
+  it("differs for different queries and uses the versioned prefix", () => {
+    const a = semanticQueryCacheKey("延期する", 3);
+    const b = semanticQueryCacheKey("謝罪する", 3);
     expect(a).not.toBe(b);
-    expect(a).toMatch(/^semsearch:v1:[0-9a-f]{16}$/);
+    expect(a).toMatch(/^semsearch:v3:3:[0-9a-f]{16}$/);
+  });
+
+  it("differs when the vector index version changes", () => {
+    expect(semanticQueryCacheKey("延期する", 3)).not.toBe(
+      semanticQueryCacheKey("延期する", 4)
+    );
+  });
+});
+
+describe("parseSemanticIndexVersion", () => {
+  it("accepts non-negative safe integers and their string representation", () => {
+    expect(parseSemanticIndexVersion(12)).toBe(12);
+    expect(parseSemanticIndexVersion("12")).toBe(12);
+  });
+
+  it("falls back to zero for invalid values", () => {
+    expect(parseSemanticIndexVersion(-1)).toBe(0);
+    expect(parseSemanticIndexVersion("1.5")).toBe(0);
+    expect(parseSemanticIndexVersion("invalid")).toBe(0);
+    expect(parseSemanticIndexVersion(null)).toBe(0);
+  });
+});
+
+describe("semantic minimum score", () => {
+  const results = [
+    {
+      slug: "postpone",
+      term: "postpone",
+      level: "important" as const,
+      japaneseTranslation: "延期する",
+      score: 0.91,
+    },
+    {
+      slug: "advance",
+      term: "advance",
+      level: "medium" as const,
+      japaneseTranslation: "前進させる",
+      score: 0.81,
+    },
+  ];
+
+  it("resolves a configured score and falls back for empty or invalid values", () => {
+    expect(resolveSemanticMinScore("0.85")).toBe(0.85);
+    expect(resolveSemanticMinScore(undefined)).toBe(DEFAULT_SEMANTIC_MIN_SCORE);
+    expect(resolveSemanticMinScore("")).toBe(DEFAULT_SEMANTIC_MIN_SCORE);
+    expect(resolveSemanticMinScore("1.1")).toBe(DEFAULT_SEMANTIC_MIN_SCORE);
+  });
+
+  it("filters low-score results while preserving relevance order", () => {
+    expect(filterSemanticSearchResults(results, 0.82)).toEqual([results[0]]);
   });
 });
 
