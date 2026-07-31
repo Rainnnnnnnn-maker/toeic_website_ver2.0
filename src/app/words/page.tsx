@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import Script from "next/script";
 import type { Metadata } from "next";
@@ -373,7 +374,17 @@ export default async function WordsListPage() {
           </div>
         </header>
 
-        <WordsExplorerClient words={allWords} />
+        <Suspense
+          fallback={
+            <section
+              id="word-explorer"
+              aria-label="単語検索を読み込み中"
+              className="min-h-64 scroll-mt-3 animate-pulse rounded-3xl border border-slate-200 bg-white/90"
+            />
+          }
+        >
+          <WordsExplorerClient words={allWords} />
+        </Suspense>
 
         <section aria-labelledby="complete-index-title" className="flex flex-col gap-5">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">

@@ -1,55 +1,77 @@
 import { describe, expect, it } from "vitest";
 import {
-  SEMANTIC_QUERY_MAX_LENGTH,
   buildSemanticSearchUrl,
+  isValidSemanticLaunchId,
+  normalizeSemanticLaunchQuery,
   parseSemanticLaunchParams,
 } from "@/lib/semantic-launch";
 
 describe("buildSemanticSearchUrl", () => {
-  it("builds an encoded /words URL targeting the meaning tab", () => {
-    expect(buildSemanticSearchUrl("延期する")).toBe(
-      `/words?mode=meaning&q=${encodeURIComponent("延期する")}#word-explorer`
+  it("builds a /words URL with only an opaque launch id", () => {
+    expect(buildSemanticSearchUrl("550e8400-e29b-41d4-a716-446655440000")).toBe(
+      "/words?mode=meaning&launch=550e8400-e29b-41d4-a716-446655440000#word-explorer"
     );
   });
 
-  it("trims and truncates the query to the max length", () => {
-    const url = buildSemanticSearchUrl(`  ${"あ".repeat(SEMANTIC_QUERY_MAX_LENGTH + 20)}  `);
-    const query = decodeURIComponent(url.split("q=")[1].split("#")[0]);
-    expect(query).toBe("あ".repeat(SEMANTIC_QUERY_MAX_LENGTH));
+  it("never places invalid or raw query text in the URL", () => {
+    expect(buildSemanticSearchUrl("延期する")).toBe(
+      "/words?mode=meaning#word-explorer"
+    );
   });
 });
 
 describe("parseSemanticLaunchParams", () => {
-  it("extracts meaning mode and query from a search string", () => {
-    const search = `?mode=meaning&q=${encodeURIComponent("延期する")}`;
-    expect(parseSemanticLaunchParams(search)).toEqual({ mode: "meaning", query: "延期する" });
+  it("extracts meaning mode and a valid opaque launch id", () => {
+    const search = "?mode=meaning&launch=abc_DEF-123";
+    expect(parseSemanticLaunchParams(search)).toEqual({
+      mode: "meaning",
+      launchId: "abc_DEF-123",
+    });
   });
 
   it("round-trips with buildSemanticSearchUrl", () => {
-    const url = buildSemanticSearchUrl("感謝を伝えるメールで使う単語");
+    const url = buildSemanticSearchUrl("550e8400-e29b-41d4-a716-446655440000");
     const search = url.slice(url.indexOf("?"), url.indexOf("#"));
     expect(parseSemanticLaunchParams(search)).toEqual({
       mode: "meaning",
-      query: "感謝を伝えるメールで使う単語",
+      launchId: "550e8400-e29b-41d4-a716-446655440000",
     });
   });
 
   it("defaults to term mode without params or with other modes", () => {
-    expect(parseSemanticLaunchParams("")).toEqual({ mode: "term", query: "" });
-    expect(parseSemanticLaunchParams("?mode=term&q=abc")).toEqual({ mode: "term", query: "" });
-    expect(parseSemanticLaunchParams("?q=abc")).toEqual({ mode: "term", query: "" });
-  });
-
-  it("returns meaning mode with empty query when q is missing or blank", () => {
-    expect(parseSemanticLaunchParams("?mode=meaning")).toEqual({ mode: "meaning", query: "" });
-    expect(parseSemanticLaunchParams("?mode=meaning&q=%20%20")).toEqual({
-      mode: "meaning",
-      query: "",
+    expect(parseSemanticLaunchParams("")).toEqual({ mode: "term", launchId: "" });
+    expect(parseSemanticLaunchParams("?mode=term&launch=abc")).toEqual({
+      mode: "term",
+      launchId: "",
+    });
+    expect(parseSemanticLaunchParams("?launch=abc")).toEqual({
+      mode: "term",
+      launchId: "",
     });
   });
 
-  it("truncates an overly long query", () => {
-    const search = `?mode=meaning&q=${"a".repeat(SEMANTIC_QUERY_MAX_LENGTH + 50)}`;
-    expect(parseSemanticLaunchParams(search).query).toBe("a".repeat(SEMANTIC_QUERY_MAX_LENGTH));
+  it("ignores missing or invalid launch ids", () => {
+    expect(parseSemanticLaunchParams("?mode=meaning")).toEqual({
+      mode: "meaning",
+      launchId: "",
+    });
+    expect(parseSemanticLaunchParams("?mode=meaning&launch=検索語")).toEqual({
+      mode: "meaning",
+      launchId: "",
+    });
+  });
+});
+
+describe("semantic launch validation", () => {
+  it("normalizes a query without exposing it to URL helpers", () => {
+    expect(normalizeSemanticLaunchQuery(`  ${"あ".repeat(120)}  `)).toBe("あ".repeat(100));
+  });
+
+  it("accepts URL-safe ids up to 64 characters", () => {
+    expect(isValidSemanticLaunchId("abc_DEF-123")).toBe(true);
+    expect(isValidSemanticLaunchId("a".repeat(64))).toBe(true);
+    expect(isValidSemanticLaunchId("")).toBe(false);
+    expect(isValidSemanticLaunchId("a".repeat(65))).toBe(false);
+    expect(isValidSemanticLaunchId("検索語")).toBe(false);
   });
 });

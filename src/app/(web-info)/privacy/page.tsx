@@ -55,7 +55,7 @@ export default function PrivacyPage() {
           </p>
           <p className="mt-2">
             「意味で探す」機能を利用した場合、入力した検索語は、意味の近い単語を検索するための数値データへ変換する目的で Google Gemini API
-            に送信されます。当サイトのRedis検索結果キャッシュおよびGoogle Analyticsには検索語本文を保存・送信せず、検索結果キャッシュには検索語から生成したハッシュ値のみを使用します。個人情報、機密情報、第三者に関する非公開情報は入力しないでください。Googleにおけるデータの取り扱いは、
+            に送信されます。TOPページから検索した場合、検索語は同じタブのセッションストレージに一時保存され、タブを閉じると削除されます。遷移先URLには検索語ではなく無作為な識別子だけを含めます。当サイトのRedis検索結果キャッシュおよびGoogle Analyticsには検索語本文を保存・送信せず、検索結果キャッシュには検索語から生成したハッシュ値のみを使用します。個人情報、機密情報、第三者に関する非公開情報は入力しないでください。Googleにおけるデータの取り扱いは、
             <a
               href="https://ai.google.dev/gemini-api/terms"
               target="_blank"
@@ -220,7 +220,7 @@ export default function PrivacyPage() {
         </section>
 
         <p className="pt-4 text-xs text-black/40 dark:text-white/40">
-          最終更新日：2026年7月30日
+          最終更新日：2026年7月31日
         </p>
       </div>
     </>

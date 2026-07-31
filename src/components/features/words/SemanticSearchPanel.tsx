@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useEffectEvent, useState } from "react";
-import type { FormEvent } from "react";
+import type { SubmitEvent } from "react";
 import Link from "next/link";
 import { sendGAEvent } from "@next/third-parties/google";
 import { ArrowRight, LoaderCircle, Sparkles, X } from "lucide-react";
@@ -19,7 +19,9 @@ type SearchOutcome =
   | { ok: true; results: SemanticSearchResult[] }
   | { ok: false; message: string };
 
-async function fetchSemanticResults(query: string): Promise<SearchOutcome> {
+const inFlightSearches = new Map<string, Promise<SearchOutcome>>();
+
+async function requestSemanticResults(query: string): Promise<SearchOutcome> {
   try {
     const response = await fetch("/api/search/semantic", {
       method: "POST",
@@ -47,8 +49,22 @@ async function fetchSemanticResults(query: string): Promise<SearchOutcome> {
   }
 }
 
+function fetchSemanticResults(query: string): Promise<SearchOutcome> {
+  const inFlight = inFlightSearches.get(query);
+  if (inFlight) return inFlight;
+
+  const request = requestSemanticResults(query);
+  inFlightSearches.set(query, request);
+  void request.finally(() => {
+    if (inFlightSearches.get(query) === request) {
+      inFlightSearches.delete(query);
+    }
+  });
+  return request;
+}
+
 type Props = {
-  /** TOP の AI 検索カードから `/words?mode=meaning&q=...` で渡された初期クエリ。マウント時に1回だけ自動実行する。 */
+  /** TOP の AI 検索カードから同一タブ内で渡された初期クエリ。マウント時に1回だけ自動実行する。 */
   readonly initialQuery?: string;
 };
 
@@ -81,7 +97,8 @@ export function SemanticSearchPanel({ initialQuery = "" }: Props) {
     applyOutcome(searched, outcome, "url");
   });
 
-  // TOP からの遷移時（?mode=meaning&q=...）はマウント時に1回だけ自動検索する。
+  // TOP からの遷移時は、sessionStorage から復元したクエリをマウント時に1回だけ自動検索する。
+  // 開発時の Strict Mode 再実行では同じ in-flight Promise を共有し、API への二重送信を防ぐ。
   // setState はすべて await 後（非同期）なので set-state-in-effect には該当しない。
   useEffect(() => {
     if (!trimmedInitialQuery) return;
@@ -107,7 +124,7 @@ export function SemanticSearchPanel({ initialQuery = "" }: Props) {
     applyOutcome(trimmed, outcome, "form");
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
     void runSearch(query);
   };

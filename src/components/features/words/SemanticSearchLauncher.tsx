@@ -1,39 +1,43 @@
 "use client";
 
-import { useState } from "react";
-import type { FormEvent } from "react";
+import { useState, useTransition } from "react";
+import type { SubmitEvent } from "react";
 import { useRouter } from "next/navigation";
 import { sendGAEvent } from "@next/third-parties/google";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, LoaderCircle, Sparkles } from "lucide-react";
 import {
   SEMANTIC_QUERY_MAX_LENGTH,
   buildSemanticSearchUrl,
 } from "@/lib/semantic-launch";
+import { createSemanticLaunch } from "@/lib/semantic-launch-store";
 
 const EXAMPLE_QUERIES = ["延期する", "感謝を伝えるメールで使う単語", "会議の日程調整"] as const;
 
 /**
  * TOP ページ用の AI 意味検索カード。
  * 結果表示は持たず、送信で /words の「意味で探す」タブへ遷移して自動実行する
- * （結果 UI を SemanticSearchPanel の1箇所に保ち、検索 URL を共有可能にするため）。
+ * （結果 UI を SemanticSearchPanel の1箇所に保つため）。
  */
 export function SemanticSearchLauncher() {
   const router = useRouter();
   const [query, setQuery] = useState("");
-  const [isNavigating, setIsNavigating] = useState(false);
+  const [isNavigating, startNavigation] = useTransition();
 
   const launch = (rawQuery: string) => {
     const trimmed = rawQuery.trim();
     if (!trimmed || isNavigating) return;
-    setIsNavigating(true);
+    const launchId = createSemanticLaunch(trimmed);
+    if (!launchId) return;
     sendGAEvent("event", "semantic_search_launch", {
       query_length: Array.from(trimmed).length,
       source: "top",
     });
-    router.push(buildSemanticSearchUrl(trimmed));
+    startNavigation(() => {
+      router.push(buildSemanticSearchUrl(launchId));
+    });
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
     launch(query);
   };
@@ -73,10 +77,15 @@ export function SemanticSearchLauncher() {
         <button
           type="submit"
           aria-label="意味で検索する"
+          aria-busy={isNavigating}
           disabled={isNavigating || !query.trim()}
           className="absolute right-2 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-lg bg-violet-600 text-white transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2"
         >
-          <ArrowRight className="size-4" />
+          {isNavigating ? (
+            <LoaderCircle className="size-4 animate-spin" />
+          ) : (
+            <ArrowRight className="size-4" />
+          )}
         </button>
       </form>
 
@@ -93,6 +102,10 @@ export function SemanticSearchLauncher() {
           </button>
         ))}
       </div>
+
+      <p className="mt-2.5 text-[11px] leading-relaxed text-slate-500">
+        検索語はGemini APIへ送信されます。個人情報・機密情報は入力しないでください。
+      </p>
     </section>
   );
 }

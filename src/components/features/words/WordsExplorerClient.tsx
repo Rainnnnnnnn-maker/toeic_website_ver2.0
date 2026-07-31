@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useEffectEvent, useRef, useState, useSyncExternalStore } from "react";
-import type { FormEvent } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
+import type { SubmitEvent } from "react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { sendGAEvent } from "@next/third-parties/google";
 import { ArrowRight, Search, Sparkles, X } from "lucide-react";
 import type { Word } from "@/data/words";
@@ -12,6 +13,7 @@ import { WORD_LEVEL_CARD_STYLES } from "@/components/features/words/wordLevelSty
 import { WORD_LEVEL_INFO, WORD_LEVEL_ORDER } from "@/lib/word-level";
 import type { WordLevel } from "@/lib/word-level";
 import { parseSemanticLaunchParams } from "@/lib/semantic-launch";
+import { getSemanticLaunchQuery } from "@/lib/semantic-launch-store";
 
 type LevelFilter = "all" | WordLevel;
 
@@ -27,10 +29,6 @@ const SEARCH_EVENT_MIN_LENGTH = 2;
 const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
 const levelStyles = WORD_LEVEL_CARD_STYLES;
-
-const subscribeToNothing = () => () => {};
-const getLocationSearch = () => window.location.search;
-const getServerLocationSearch = () => "";
 
 function matchesQuery(term: string, query: string): boolean {
   if (!query) return true;
@@ -48,19 +46,11 @@ function matchesQuery(term: string, query: string): boolean {
 }
 
 export function WordsExplorerClient({ words }: Props) {
-  // TOP の AI 検索カードからの遷移（/words?mode=meaning&q=...）を初期状態へ反映する。
-  // SSR/プリレンダーでは空文字（term モード）で描画し、ハイドレーション後に
-  // useSyncExternalStore がクライアントの実 URL で再描画するため、
-  // setState-in-effect を使わずに済み、/words の静的レンダリングも保たれる。
-  const locationSearch = useSyncExternalStore(
-    subscribeToNothing,
-    getLocationSearch,
-    getServerLocationSearch
-  );
-  const launchParams = parseSemanticLaunchParams(locationSearch);
-
-  const [searchModeOverride, setSearchModeOverride] = useState<SearchMode | null>(null);
-  const searchMode = searchModeOverride ?? launchParams.mode;
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const launchParams = parseSemanticLaunchParams(`?${searchParams.toString()}`);
+  const initialSemanticQuery = getSemanticLaunchQuery(launchParams.launchId);
+  const searchMode = launchParams.mode;
   const [query, setQuery] = useState("");
   const [level, setLevel] = useState<LevelFilter>("all");
   const [letter, setLetter] = useState("all");
@@ -69,7 +59,17 @@ export function WordsExplorerClient({ words }: Props) {
 
   const handleModeChange = (nextMode: SearchMode) => {
     if (nextMode === searchMode) return;
-    setSearchModeOverride(nextMode);
+    const nextParams = new URLSearchParams(searchParams.toString());
+    if (nextMode === "meaning") {
+      nextParams.set("mode", "meaning");
+    } else {
+      nextParams.delete("mode");
+    }
+    nextParams.delete("launch");
+    const nextSearch = nextParams.toString();
+    router.replace(`/words${nextSearch ? `?${nextSearch}` : ""}#word-explorer`, {
+      scroll: false,
+    });
     sendGAEvent("event", "words_filter", {
       filter_type: "search_mode",
       filter_value: nextMode,
@@ -145,7 +145,7 @@ export function WordsExplorerClient({ words }: Props) {
     return () => window.clearTimeout(timeoutId);
   }, [normalizedQuery]);
 
-  const handleSearchSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSearchSubmit = (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
   };
 
@@ -347,7 +347,10 @@ export function WordsExplorerClient({ words }: Props) {
       </div>
 
       {searchMode === "meaning" ? (
-        <SemanticSearchPanel initialQuery={launchParams.query} />
+        <SemanticSearchPanel
+          key={launchParams.launchId || "manual"}
+          initialQuery={initialSemanticQuery}
+        />
       ) : (
       <div className="px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
