@@ -27,6 +27,7 @@ import { generateWordDetail } from "../src/lib/word-detail-gemini";
 import {
   EMBEDDING_DIMENSION,
   EMBEDDING_MODEL,
+  SEMANTIC_INDEX_VERSION_KEY,
   buildEmbeddingText,
   normalizeVector,
   type WordVectorMetadata,
@@ -248,9 +249,13 @@ async function main(): Promise<void> {
     console.log(`  upserted ${Math.min(i + UPSERT_BATCH, targets.length)}/${targets.length}`);
   }
 
+  // 全 upsert 完了後に世代を進め、部分インデックス時などの旧検索結果を参照不能にする。
+  const semanticIndexVersion = await redis.incr(SEMANTIC_INDEX_VERSION_KEY);
+
   const info = await index.info();
   console.log("\n=== Summary ===");
   console.log(`upserted: ${targets.length}`);
+  console.log(`semantic index version: ${semanticIndexVersion}`);
   console.log(`generation failures: ${failures.length}`);
   for (const f of failures) console.log(`  - ${f.slug}: ${f.error}`);
   console.log(`index vector count: ${info.vectorCount} (dimension: ${info.dimension})`);

@@ -4,12 +4,15 @@ import { getRedis } from "@/lib/upstash";
 import { isSameHost } from "@/lib/tts-utils";
 import { embedText } from "@/lib/embeddings";
 import { getVectorIndex, isVectorConfigured } from "@/lib/vector";
+import { getSemanticIndexVersion } from "@/lib/semantic-index-version";
 import {
   SEMANTIC_CACHE_TTL_SECONDS,
   SEMANTIC_QUERY_MAX_LENGTH,
   SEMANTIC_SEARCH_TOP_K,
+  filterSemanticSearchResults,
   normalizeSemanticQuery,
   parseSemanticSearchResults,
+  resolveSemanticMinScore,
   semanticQueryCacheKey,
   toSemanticSearchResults,
   type SemanticSearchResult,
@@ -82,6 +85,16 @@ async function cacheResults(cacheKey: string, results: SemanticSearchResult[]): 
   }
 }
 
+async function readSemanticIndexVersion(): Promise<number | null> {
+  try {
+    return await getSemanticIndexVersion();
+  } catch (e) {
+    // 世代が読めない状態で既存キャッシュを使うと、更新前の結果を返す恐れがある。
+    console.warn("Semantic search index version read failed; bypassing result cache:", e);
+    return null;
+  }
+}
+
 function extractIp(request: Request): string {
   return (
     request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
@@ -122,12 +135,20 @@ export async function POST(request: Request) {
   }
 
   const { query } = parseResult;
-  const cacheKey = semanticQueryCacheKey(query);
+  const minScore = resolveSemanticMinScore(process.env.SEMANTIC_SEARCH_MIN_SCORE);
+  const indexVersion = await readSemanticIndexVersion();
+  const cacheKey =
+    indexVersion === null ? null : semanticQueryCacheKey(query, indexVersion);
 
   // キャッシュヒットはレート制限を消費しない（TTS と同じ方針）
-  const cached = await getCachedResults(cacheKey);
-  if (cached) {
-    return Response.json({ results: cached, cached: true });
+  if (cacheKey) {
+    const cached = await getCachedResults(cacheKey);
+    if (cached) {
+      return Response.json({
+        results: filterSemanticSearchResults(cached, minScore),
+        cached: true,
+      });
+    }
   }
 
   const ip = extractIp(request);
@@ -146,11 +167,13 @@ export async function POST(request: Request) {
       topK: SEMANTIC_SEARCH_TOP_K,
       includeMetadata: true,
     });
-    const results = toSemanticSearchResults(matches);
+    const candidates = toSemanticSearchResults(matches);
+    const results = filterSemanticSearchResults(candidates, minScore);
 
-    // インデックス投入前などの空結果を7日間キャッシュしないよう、結果がある場合のみ保存
-    if (results.length > 0) {
-      await cacheResults(cacheKey, results);
+    // top-K候補を保存し、現在の閾値は読み出しごとに適用する。
+    // これにより環境変数で閾値を変更しても、旧フィルタ済み結果に固定されない。
+    if (cacheKey && candidates.length > 0) {
+      await cacheResults(cacheKey, candidates);
     }
 
     return Response.json({ results, cached: false });

@@ -20,10 +20,14 @@ export const EMBEDDING_MODEL = "gemini-embedding-001";
 export const EMBEDDING_DIMENSION = 768;
 /** 近傍検索で返す件数。 */
 export const SEMANTIC_SEARCH_TOP_K = 10;
+/** 無関係な近傍候補を除外する既定の最低類似度。 */
+export const DEFAULT_SEMANTIC_MIN_SCORE = 0.82;
 /** 検索クエリの最大文字数（正規化後）。 */
 export const SEMANTIC_QUERY_MAX_LENGTH = 100;
 /** 検索結果の Redis キャッシュ TTL（秒）。 */
 export const SEMANTIC_CACHE_TTL_SECONDS = 7 * 24 * 60 * 60;
+/** Vector コーパス更新時に増分する Redis キー。 */
+export const SEMANTIC_INDEX_VERSION_KEY = "semsearch:index-version";
 
 /** Upstash Vector に保存するメタデータ。結果表示に必要な最小限の情報を持つ。 */
 export type WordVectorMetadata = {
@@ -52,10 +56,30 @@ export function normalizeSemanticQuery(raw: string): string {
   return raw.normalize("NFKC").replace(/\s+/g, " ").trim().toLowerCase();
 }
 
-/** 正規化済みクエリから Redis キャッシュキーを生成する。 */
-export function semanticQueryCacheKey(normalizedQuery: string): string {
+/** Redis 値を安全な非負整数のコーパス世代へ変換する。 */
+export function parseSemanticIndexVersion(raw: unknown): number {
+  const value =
+    typeof raw === "number"
+      ? raw
+      : typeof raw === "string" && /^\d+$/.test(raw)
+        ? Number(raw)
+        : Number.NaN;
+  return Number.isSafeInteger(value) && value >= 0 ? value : 0;
+}
+
+/** 正規化済みクエリと Vector コーパス世代から Redis キャッシュキーを生成する。 */
+export function semanticQueryCacheKey(normalizedQuery: string, indexVersion: number): string {
   const hash = createHash("sha256").update(normalizedQuery).digest("hex").slice(0, 16);
-  return `semsearch:v1:${hash}`;
+  return `semsearch:v3:${parseSemanticIndexVersion(indexVersion)}:${hash}`;
+}
+
+/** 環境変数の最低類似度を 0〜1 の範囲で解決する。 */
+export function resolveSemanticMinScore(raw: string | undefined): number {
+  if (!raw?.trim()) return DEFAULT_SEMANTIC_MIN_SCORE;
+  const value = Number(raw);
+  return Number.isFinite(value) && value >= 0 && value <= 1
+    ? value
+    : DEFAULT_SEMANTIC_MIN_SCORE;
 }
 
 /** ベクトルを L2 正規化する。ゼロベクトルはそのまま返す。 */
@@ -164,6 +188,14 @@ export function toSemanticSearchResults(matches: VectorMatch[]): SemanticSearchR
     });
   }
   return results;
+}
+
+/** 最低類似度未満の候補を除外する。入力順（関連度順）は維持する。 */
+export function filterSemanticSearchResults(
+  results: SemanticSearchResult[],
+  minScore: number
+): SemanticSearchResult[] {
+  return results.filter((result) => Number.isFinite(result.score) && result.score >= minScore);
 }
 
 /**

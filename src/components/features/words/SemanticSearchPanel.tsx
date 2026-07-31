@@ -58,7 +58,7 @@ export function SemanticSearchPanel() {
       setSearchedQuery(trimmed);
       setStatus("success");
       sendGAEvent("event", "semantic_search", {
-        search_term: trimmed,
+        query_length: Array.from(trimmed).length,
         result_count: nextResults.length,
       });
     } catch {
@@ -123,7 +123,7 @@ export function SemanticSearchPanel() {
       </form>
 
       <p className="mt-2 text-xs leading-relaxed text-slate-500">
-        日本語の意味や使う場面から、AIが関連の強い単語を探します。
+        日本語の意味や使う場面から、AIが関連の強い単語を探します。検索語はGemini APIへ送信されるため、個人情報・機密情報は入力しないでください。
       </p>
 
       <div className="mt-3 flex flex-wrap gap-2">
@@ -192,13 +192,8 @@ export function SemanticSearchPanel() {
                         {result.japaneseTranslation || "AI解説・例文・発音"}
                       </span>
                     </span>
-                    <span className="flex shrink-0 flex-col items-end gap-1">
-                      <span className={`rounded-full px-1.5 py-0.5 text-[9px] font-bold ${styles.badgeClass}`}>
-                        {info.score}
-                      </span>
-                      <span className="text-[10px] font-semibold text-slate-400">
-                        関連度 {Math.round(result.score * 100)}%
-                      </span>
+                    <span className={`shrink-0 rounded-full px-1.5 py-0.5 text-[9px] font-bold ${styles.badgeClass}`}>
+                      {info.score}
                     </span>
                   </Link>
                 );

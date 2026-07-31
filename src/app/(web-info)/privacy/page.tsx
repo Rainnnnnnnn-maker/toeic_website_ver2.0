@@ -43,12 +43,37 @@ export default function PrivacyPage() {
             <li>
               ログイン機能（任意）を利用した場合の、メールアドレス等のアカウント情報
             </li>
+            <li>
+              「意味で探す」機能に入力した検索語
+            </li>
           </ul>
           <p className="mt-2">
             当サイトは会員登録なしですべての機能を利用できます。未ログインの場合、氏名・メールアドレス等の個人情報を直接収集することはなく、お気に入り機能はブラウザのローカルストレージに保存され、サーバーには送信されません。
           </p>
           <p className="mt-2">
             複数の端末でお気に入りを同期するための任意のログイン機能（Google アカウント連携）を利用した場合は、メールアドレス等のアカウント情報と、お気に入りに登録した単語が、当サイトが利用する認証・データベースサービス（Supabase）のサーバーに保存されます。これらの情報は、お気に入りの同期および本人確認の目的にのみ利用します。
+          </p>
+          <p className="mt-2">
+            「意味で探す」機能を利用した場合、入力した検索語は、意味の近い単語を検索するための数値データへ変換する目的で Google Gemini API
+            に送信されます。当サイトのRedis検索結果キャッシュおよびGoogle Analyticsには検索語本文を保存・送信せず、検索結果キャッシュには検索語から生成したハッシュ値のみを使用します。個人情報、機密情報、第三者に関する非公開情報は入力しないでください。Googleにおけるデータの取り扱いは、
+            <a
+              href="https://ai.google.dev/gemini-api/terms"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 underline hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+            >
+              Gemini API追加利用規約
+            </a>
+            および
+            <a
+              href="https://policies.google.com/privacy?hl=ja"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 underline hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+            >
+              Googleプライバシーポリシー
+            </a>
+            をご確認ください。
           </p>
         </section>
 
@@ -195,7 +220,7 @@ export default function PrivacyPage() {
         </section>
 
         <p className="pt-4 text-xs text-black/40 dark:text-white/40">
-          最終更新日：2026年7月12日
+          最終更新日：2026年7月30日
         </p>
       </div>
     </>

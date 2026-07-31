@@ -7,6 +7,7 @@ import { getWordBySlug } from '@/data/words';
 import { getWordDetailFresh } from '@/data/word-detail';
 import { upsertWordEmbedding } from '@/lib/word-embedding';
 import { isVectorConfigured } from '@/lib/vector';
+import { bumpSemanticIndexVersion } from '@/lib/semantic-index-version';
 
 export async function GET(request: NextRequest) {
   const token = request.nextUrl.searchParams.get('token');
@@ -37,11 +38,13 @@ export async function GET(request: NextRequest) {
     //    L1 パージ直後のため getWordDetailFresh で L2/L3 から最新内容を取得し、
     //    表示内容と embedding のズレを防ぐ。upstash=true と併用すると Gemini で再生成される。
     let vectorUpdated = false;
+    let semanticIndexVersion: number | null = null;
     if (refreshVector && isVectorConfigured()) {
       const entry = await getWordBySlug(slug);
       const detail = entry ? await getWordDetailFresh(slug) : null;
       if (entry && detail) {
         await upsertWordEmbedding(entry, detail);
+        semanticIndexVersion = await bumpSemanticIndexVersion();
         vectorUpdated = true;
       }
     }
@@ -50,6 +53,7 @@ export async function GET(request: NextRequest) {
       revalidated: true,
       slug,
       vectorUpdated,
+      semanticIndexVersion,
       message: `Cache for word '${slug}' has been cleared.`
     });
   } catch (error) {
