@@ -34,8 +34,9 @@ Production builds switch the word-list loader to Vercel Blob, so a complete buil
 - **React 19** with React Compiler (automatic memoization via `babel-plugin-react-compiler`) — do not add `useMemo`/`useCallback` manually
 - **Tailwind CSS 3.4** — utility-first only; minimize arbitrary CSS
 - **TypeScript 5** strict mode — import alias `@/` maps to `src/`
-- **AI**: Google Gemini (`@google/genai`, model: `gemini-2.5-flash-lite`)
+- **AI**: Google Gemini (`@google/genai`, models: `gemini-2.5-flash-lite` for word details, `gemini-embedding-001` for semantic-search embeddings)
 - **Cache L2**: Upstash Redis (`@upstash/redis`)
+- **Vector Search**: Upstash Vector (`@upstash/vector`) — 768-dim cosine index for semantic word search
 - **Storage**: Vercel Blob (word lists in production)
 - **TTS**: Google Cloud Text-to-Speech (HTTP API)
 - **Deploy**: Vercel (preview on all branches; production via manual `workflow_dispatch`)
@@ -75,6 +76,16 @@ The TTS endpoint has a strict allowlist to prevent quota abuse:
 - Rate limit: 30 req/min per IP via Upstash Ratelimit (sliding window); cached results bypass the counter.
 - TTS cache keys: `tts:en:word:<slug>` for single words; `tts:<lang>:<wordSlugTag>:<sha256_12>` for sentences (30-day TTL).
 
+### Semantic Search（意味で探す）
+
+`POST /api/search/semantic` finds words by meaning (Japanese/English queries) via Upstash Vector:
+
+- Each word = one document: `buildEmbeddingText` (in `src/lib/semantic-search.ts`, pure) composes WordDetails (definitions, synonyms, examples) into text, embedded with `gemini-embedding-001` at **768 dims** (`EMBEDDING_DIMENSION`). Non-3072-dim outputs are NOT pre-normalized by Gemini, so `normalizeVector` (L2) is always applied before upsert/query. The Upstash Vector index must be created with 768 dims / cosine.
+- Backfill: `npm run embed:words` (`scripts/embed-words.ts`, standalone via `tsx --env-file=.env.local`). Reads WordDetails from Redis (`word:<slug>`), generates missing ones with Gemini, then embeds and upserts (metadata: `slug`/`term`/`level`/`japaneseTranslation`). Flags: `--dry-run`, `--limit=N`, `--only-cached`. A successful upsert increments the Redis generation key `semsearch:index-version`.
+- Keeping vectors in sync: `/api/revalidate/word?...&vector=true` re-fetches the detail via `getWordDetailFresh` (L1-bypassing export from `src/data/word-detail.ts`) and re-upserts the embedding. A successful upsert increments `semsearch:index-version`; WordDetails regeneration without `vector=true` leaves the old embedding in place.
+- Query path: normalize (NFKC/trim/lowercase) → read the Vector generation → Redis top-K candidate cache (`semsearch:v3:<indexVersion>:<sha256_16>`, 7-day TTL, empty candidate sets never cached; bypassed when generation lookup fails) → rate limit 20 req/min per IP (`rl:semsearch`, cached queries bypass) → embed query (`RETRIEVAL_QUERY`) → `vector.query(topK=10)` → cache valid candidates → filter candidates below `SEMANTIC_SEARCH_MIN_SCORE` (default `0.82`, reapplied on every cache read) → slugs/metadata back to the client. Requires the same `X-App-Source: toeic-client` + same-origin headers as `/api/tts`. The query text is sent to Gemini but not to GA4; analytics receives only query length and result count.
+- UI: 「意味で探す」tab in `WordsExplorerClient` renders `SemanticSearchPanel` (client). Results link to `/words/[slug]`. The TOP page hosts `SemanticSearchLauncher` (no results UI). It saves the query in same-tab `sessionStorage` via `semantic-launch-store.ts`, then navigates with only an opaque ID (`/words?mode=meaning&launch=...#word-explorer`) so the query never enters request URLs or GA4 `page_location`. `WordsExplorerClient` reads params with Next.js `useSearchParams` inside a Suspense boundary, so browser back/forward updates the UI. `SemanticSearchPanel` auto-runs `initialQuery` once and shares identical in-flight requests to absorb React Strict Mode effect replays. URL validation/pure logic lives in `src/lib/semantic-launch.ts`.
+
 ### Cache Invalidation APIs
 
 All revalidation endpoints require `?token=<REVALIDATION_TOKEN>`:
@@ -83,7 +94,7 @@ All revalidation endpoints require `?token=<REVALIDATION_TOKEN>`:
 |---|---|
 | `GET /api/revalidate/words` | L1 `word-list` tag (word lists) |
 | `GET /api/revalidate/today-words` | L1 `today-recommended-words` tag (also accepts `Authorization: Bearer <CRON_SECRET>`) |
-| `GET /api/revalidate/word?slug=<slug>` | L1 `word-detail-<slug>` tag; add `&upstash=true` to also clear L2 |
+| `GET /api/revalidate/word?slug=<slug>` | L1 `word-detail-<slug>` tag; add `&upstash=true` to also clear L2; add `&vector=true` to re-embed/upsert into Upstash Vector and increment the semantic-index generation |
 | `GET /api/revalidate/upstash-word?key=word:<slug>` | L2 Redis key only |
 
 ### Listen Mode (Audio Sequencing)
@@ -108,7 +119,7 @@ Any feature change must update **both** `README.md` and `.trae/documents/技術�
 ### Testing
 **Unit tests (Vitest) cover pure logic only**; integration/UI is still verified by manual smoke test.
 
-- Pure, side-effect-free logic lives in `src/lib/*.ts` and is unit-tested in `src/lib/(tests)/*.test.ts` files (`environment: "node"`, no secrets required). Current suites: `word-select` (parsing/dedup, FNV-1a hash, JST day key, daily selection), `word-detail-parse` (Gemini JSON extraction + normalization), `tts-utils` (text normalization, slug sanitization, cache keys, example allowlist matching), `listen-utils` (`pickExample` fallback), `favorites-sync` (stored-favorites parsing, merge logic), `safe-compare` (constant-time token comparison), `study-utils` (study-mode pool selection/re-draw with injectable random, persisted-state parsing, sentence highlight splitting).
+- Pure, side-effect-free logic lives in `src/lib/*.ts` and is unit-tested in `src/lib/(tests)/*.test.ts` files (`environment: "node"`, no secrets required). Current suites: `word-select` (parsing/dedup, FNV-1a hash, JST day key, daily selection), `word-detail-parse` (Gemini JSON extraction + normalization), `tts-utils` (text normalization, slug sanitization, cache keys, example allowlist matching), `listen-utils` (`pickExample` fallback), `favorites-sync` (stored-favorites parsing, merge logic), `safe-compare` (constant-time token comparison), `study-utils` (study-mode pool selection/re-draw with injectable random, persisted-state parsing, sentence highlight splitting), `semantic-search` (query normalization, index-versioned cache keys, minimum-score filtering, vector normalization, embedding-document building, vector-match/cached-result parsing).
 - When extracting testable logic out of a `server-only` module, put the pure function in `src/lib/` (no `server-only`, type-only imports for server types) and have the server module import it — never duplicate.
 - Do **not** add tests that require Gemini/Redis/Blob/TTS or render React components; cover those by manual testing.
 
@@ -130,6 +141,9 @@ Required in `.env.local` for local development:
 | `TTS_API_KEY` | Google Cloud TTS |
 | `UPSTASH_REDIS_REST_URL` | L2 cache |
 | `UPSTASH_REDIS_REST_TOKEN` | L2 cache |
+| `UPSTASH_VECTOR_REST_URL` | Semantic search (768-dim cosine index) |
+| `UPSTASH_VECTOR_REST_TOKEN` | Semantic search |
+| `SEMANTIC_SEARCH_MIN_SCORE` | Optional semantic-search minimum similarity score (default: `0.82`) |
 | `BLOB_READ_WRITE_TOKEN` | Vercel Blob (production word lists) |
 | `REVALIDATION_TOKEN` | Protects `/api/revalidate/*` endpoints |
 | `NEXT_PUBLIC_GA_ID` | Google Analytics 4 |

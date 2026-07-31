@@ -20,8 +20,12 @@ export default defineConfig({
         "src/lib/og-utils.ts",
         "src/lib/upstash.ts",
         "src/lib/wordCache.ts",
+        "src/lib/vector.ts",
+        "src/lib/embeddings.ts",
+        "src/lib/semantic-index-version.ts",
+        "src/lib/word-embedding.ts",
+        "src/lib/word-detail-gemini.ts",
       ],
     },
   },
 });
-

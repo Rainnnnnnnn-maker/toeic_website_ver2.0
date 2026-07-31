@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { parseJsonFromText, normalizePayload } from "../word-detail-parse";
+import { parseJsonFromText, normalizePayload, parseStoredWordDetails } from "../word-detail-parse";
 import type { RawWordPayload } from "@/types/word";
 
 describe("parseJsonFromText", () => {
@@ -84,5 +84,26 @@ describe("normalizePayload", () => {
     expect(out.meanings[0].detailedMeanings[0].number).toBe(0);
     expect(out.meanings[0].detailedMeanings[0].definition).toBe("d");
     expect(out.meanings[0].detailedMeanings[0].synonyms).toEqual([]);
+  });
+});
+
+describe("parseStoredWordDetails", () => {
+  const validDetail = { word: "respect", meanings: [] };
+
+  it("accepts an already-deserialized object with word and meanings array", () => {
+    const out = parseStoredWordDetails(validDetail);
+    expect(out?.word).toBe("respect");
+  });
+
+  it("parses a JSON string (Redis cache value)", () => {
+    const out = parseStoredWordDetails(JSON.stringify(validDetail));
+    expect(out?.word).toBe("respect");
+  });
+
+  it("returns null for null, invalid JSON, and malformed shapes", () => {
+    expect(parseStoredWordDetails(null)).toBeNull();
+    expect(parseStoredWordDetails("not json")).toBeNull();
+    expect(parseStoredWordDetails({ word: "respect" })).toBeNull();
+    expect(parseStoredWordDetails({ word: "respect", meanings: "x" })).toBeNull();
   });
 });

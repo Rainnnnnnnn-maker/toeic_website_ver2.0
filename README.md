@@ -13,7 +13,7 @@ TOEIC語彙ラボ is a comprehensive web application for learning essential TOEI
   - **L1**: Next.js Data Cache (`"use cache"` + `cacheLife("max")`, revalidated on demand via `/api/revalidate/*`) for instant access.
   - **L2**: **Upstash Redis** for persistent, shared caching across users.
   - **L3**: On-demand AI generation for missing words.
-- **Pronunciation Support**: High-quality audio via **Google Cloud Text-to-Speech** (supports both words and sentences, English & Japanese voices).
+- **Semantic Search（意味で探す）**: The `/words` explorer has a second search tab that finds words by **meaning** — Japanese queries like「延期する」or「感謝を伝えるメールで使う単語」work. Each word's AI-generated `WordDetails` (definitions, synonyms, examples) is embedded as one document with `gemini-embedding-001` (768 dims, L2-normalized) and stored in **Upstash Vector**; queries are embedded the same way and matched via cosine top-K (`POST /api/search/semantic`). Candidates below the configurable similarity threshold (default `0.82`) are omitted. Results are cached in Redis for 7 days using both the normalized-query hash and a Vector-index generation; bulk or per-word vector updates advance the generation so stale results stop being addressable immediately. Requests are rate-limited per IP and results link straight to `/words/[slug]`. The TOP page has a lightweight launcher card (`SemanticSearchLauncher`, placed above the daily picks) that transfers the query through same-tab `sessionStorage` and navigates with only an opaque launch ID (`/words?mode=meaning&launch=...#word-explorer`). The query text therefore stays out of Vercel request URLs and GA4 `page_location`; GA4 custom events also receive only query length, never the text. `useSearchParams` keeps the explorer synchronized with browser history, while an in-flight request map prevents React Strict Mode from issuing duplicate semantic-search requests.
 - **Study Modes**:
   - **List View**: Browse words by level (Important / Medium / High), initial letter, prefix, and wildcard (`*`) search. `/words` initially renders 36 compact result cards with “load more”, while the complete A–Z index stays available below.
   - **Study Mode**: Flashcard-style learning with tracking (Remembered / Not Remembered / Later), hint example via AI detail, and an in-session "review later" sidebar for deferred words.
@@ -34,7 +34,7 @@ TOEIC語彙ラボ is a comprehensive web application for learning essential TOEI
   - Local storage is subscribed to as an external store (`src/lib/favorites-store.ts` + `useSyncExternalStore`) rather than being loaded through a mount effect, so no `setState` happens inside an effect and SSR/hydration stays consistent via `getServerSnapshot()`. If browser storage is unavailable, an in-memory fallback keeps favorites usable for the current tab.
   - Remote favorites are tagged with both the user ID and an authentication epoch. This prevents stale Supabase state from an earlier login from hiding or overwriting favorites added while signed out, even when the same account signs back in and the refresh request fails.
 - **Optional Sign-In & Favorites Sync (Supabase)**: Google sign-in (`/login`) is fully optional — all features work without an account. The login page provides a TOP-page return button in both signed-in and signed-out states. Signing in stores favorites in Supabase Postgres (RLS-protected `favorites` table) so they sync across devices. On first login, locally stored favorites are merged into the account (upsert with `ignoreDuplicates`), and local storage is cleared only after a successful merge. On sign-out, the account's favorites are copied back to local storage so they stay visible, tagged with the owner's user id so that a different account signing in on the same browser never inherits them. Auth state is resolved client-side (`onAuthStateChange`) to keep pages statically cacheable; the session cookie exchange happens in `/auth/callback`.
-- **Analytics Events**: GA4 tracks settled word-explorer queries with the recommended `search` event (700 ms debounce, 2+ characters, duplicate suppression), level/letter filters (`words_filter`), and detail opens (`word_detail_open`) in addition to existing favorite/share events.
+- **Analytics Events**: GA4 tracks settled word-explorer queries with the recommended `search` event (700 ms debounce, 2+ characters, duplicate suppression), semantic searches (`semantic_search` with query length and result count; the query text is not sent), level/letter/search-mode filters (`words_filter`), and detail opens (`word_detail_open`, with `source: semantic_search` for meaning-search results) in addition to existing favorite/share events.
 - **Social Share**: Share word details via Twitter, Facebook, and LINE (`react-share`), with GA4 event tracking.
 - **PWA Ready**: Installable on mobile and desktop via `manifest.ts`.
 - **Dynamic OGP**: Per-word Open Graph images generated on-the-fly via `src/app/words/[word]/opengraph-image.tsx`.
@@ -52,8 +52,9 @@ TOEIC語彙ラボ is a comprehensive web application for learning essential TOEI
 - **UI**: React 19, [Tailwind CSS v3.4](https://tailwindcss.com/) (Utility-first CSS), Lucide React
 - **Compiler**: React Compiler (`babel-plugin-react-compiler`) for automatic memoization
 - **Social**: react-share
-- **AI**: Google Gemini (`@google/genai` / `GoogleGenAI`) - model: `gemini-2.5-flash-lite`
+- **AI**: Google Gemini (`@google/genai` / `GoogleGenAI`) - models: `gemini-2.5-flash-lite` (word details), `gemini-embedding-001` (semantic search embeddings)
 - **Database / Cache**: Upstash Redis (`@upstash/redis`)
+- **Vector Search**: Upstash Vector (`@upstash/vector`) - 768-dim cosine index for semantic word search
 - **Auth / User Data**: [Supabase](https://supabase.com/) (`@supabase/supabase-js` + `@supabase/ssr`) — Google sign-in and RLS-protected favorites sync
 - **Storage**: Vercel Blob (`@vercel/blob`) - for word lists
 - **Analytics**: Google Analytics 4 (via `@next/third-parties`), Vercel Analytics & Speed Insights
@@ -94,6 +95,9 @@ TOEIC語彙ラボ is a comprehensive web application for learning essential TOEI
     | `TTS_API_KEY` | Google Cloud Text-to-Speech API Key for audio. |
     | `UPSTASH_REDIS_REST_URL` | Upstash Redis REST URL. |
     | `UPSTASH_REDIS_REST_TOKEN` | Upstash Redis REST Token. |
+    | `UPSTASH_VECTOR_REST_URL` | Upstash Vector REST URL (semantic search). The index must be created with **768 dimensions / cosine** metric. |
+    | `UPSTASH_VECTOR_REST_TOKEN` | Upstash Vector REST Token (semantic search). |
+    | `SEMANTIC_SEARCH_MIN_SCORE` | (Optional) Minimum cosine-similarity score returned by semantic search (default: `0.82`, range: `0`–`1`). |
     | `BLOB_READ_WRITE_TOKEN` | Vercel Blob Token (for fetching word lists in production). |
     | `BLOB_URL_IMPORTANT` | (Optional) Direct URL for `word.txt` in Blob. Skips the Blob `list` call when set. |
     | `BLOB_URL_MEDIUM` | (Optional) Direct URL for `word_mid.txt` in Blob. |
@@ -148,7 +152,8 @@ Claude Code asks for approval before starting project-scoped MCP servers for the
 - `npm run build`: Builds the application for production.
 - `npm run start`: Starts the production server.
 - `npm run lint`: Runs ESLint.
-- `npm run test`: Runs Vitest unit tests. These cover **pure logic only** (word selection/parsing, Gemini response normalization, TTS cache keys & example allowlist, listen-mode example fallback, favorites sync/auth-session selection, audit-report validation, study-mode word selection & persisted-state parsing) and run in CI alongside `npm run lint`. Integration and UI changes are still verified by manual smoke testing.
+- `npm run test`: Runs Vitest unit tests. These cover **pure logic only** (word selection/parsing, Gemini response normalization, TTS cache keys & example allowlist, listen-mode example fallback, favorites sync/auth-session selection, audit-report validation, study-mode word selection & persisted-state parsing, semantic-search query normalization / index-versioned cache keys / score filtering / embedding-document building / result parsing) and run in CI alongside `npm run lint`. Integration and UI changes are still verified by manual smoke testing.
+- `npm run embed:words`: Embeds all WordDetails into Upstash Vector for semantic search (`tsx --env-file=.env.local scripts/embed-words.ts`). Reads WordDetails from Redis first and generates missing ones with Gemini. Supports `-- --dry-run`, `-- --limit=N`, and `-- --only-cached`. A successful upsert advances the semantic-index generation, invalidating all prior result-cache keys without a Redis key scan. Run once for the initial backfill and re-run after bulk word-list changes.
 - `npm run audit:ci`: Dependency-vulnerability gate used by CI. `npm audit` cannot exclude individual advisories, so `scripts/check-audit.mjs` skips only explicitly accepted ones (each with a reason and a review deadline) and fails on any other high/critical finding. Audit API errors, unsupported/malformed reports, and unresolved high/critical advisory paths also fail closed. Production dependencies are gated separately and strictly via `npm audit --audit-level=high --omit=dev`.
 
 ## 🔄 API Endpoints
@@ -174,10 +179,11 @@ Clears L1 (Next.js Data Cache) for a specific word. To also clear L2 (Upstash Re
 - **Parameters**: 
   - `slug` (The word to revalidate)
   - `upstash` (Optional, set to `true` to also clear Upstash Redis cache)
+  - `vector` (Optional, set to `true` to re-embed the word and upsert it into Upstash Vector after the caches are cleared, keeping semantic search in sync with the regenerated content. A successful upsert also advances the semantic-index generation so cached search results are invalidated immediately. Combine with `upstash=true` to force a full Gemini regeneration first.)
 - **Usage**:
 
   ```bash
-  curl "https://<your-site>/api/revalidate/word?token=<REVALIDATION_TOKEN>&slug=additional&upstash=true"
+  curl "https://<your-site>/api/revalidate/word?token=<REVALIDATION_TOKEN>&slug=additional&upstash=true&vector=true"
   ```
 
 ### Delete Upstash Word Cache Key (L2 Only)
@@ -210,6 +216,22 @@ Generates audio for words or sentences.
   - Example sentences must exactly match (after whitespace normalization) one of the cached `WordDetails.toeicExamples` or `meanings[].detailedMeanings[].example` entries for the given `wordSlug`. This blocks Referer-spoofing attacks from synthesizing arbitrary text against the Google Cloud TTS quota.
 - **Rate limit**: 30 req/min per IP via Upstash Ratelimit (sliding window). Cached results bypass the counter.
 
+### Semantic Search
+
+Finds vocabulary words by meaning (Japanese or English queries) via embedding similarity.
+
+- **Endpoint**: `POST /api/search/semantic`
+- **Headers**:
+  - `Content-Type: application/json`
+  - `X-App-Source: toeic-client`
+- **Body**: `{ "query": "延期する" }` (max 100 chars after normalization)
+- **Response**: `{ "results": [{ "slug", "term", "level", "japaneseTranslation", "score" }], "cached": boolean }` — up to 10 results in cosine-similarity order after applying the minimum-score filter.
+- **Relevance threshold**: Results below `SEMANTIC_SEARCH_MIN_SCORE` are omitted (default `0.82`). The UI deliberately does not label raw vector scores as percentages.
+- **Caching**: Valid top-K candidates are cached in Redis (`semsearch:v3:<indexVersion>:<sha256_16>` of the NFKC-normalized query, 7-day TTL), and the current minimum-score filter is reapplied on every read so threshold changes take effect without a cache purge. `npm run embed:words` and successful `/api/revalidate/word?...&vector=true` updates increment `semsearch:index-version`, making earlier cache keys unreachable immediately. Cached queries bypass the rate limiter; an empty candidate set is not cached. If the index version cannot be read, the API bypasses the result cache.
+- **Privacy**: The query is sent to Gemini to create its embedding. The Redis result-cache key contains only a SHA-256-derived prefix, and the `semantic_search` GA4 event sends only query length and result count—not the query text.
+- **Rate limit**: 20 req/min per IP via Upstash Ratelimit (sliding window, prefix `rl:semsearch`).
+- **503**: Returned when `UPSTASH_VECTOR_REST_URL` / `UPSTASH_VECTOR_REST_TOKEN` are not configured.
+
 ### Sitemap
 
 Returns `sitemap.xml` containing all static pages and all word detail URLs.
@@ -226,7 +248,7 @@ Returns `sitemap.xml` containing all static pages and all word detail URLs.
 - `src/proxy.ts`: Supabase Auth session refresh, with the matcher minimized to `/login` and `/auth/*` to keep Vercel Middleware usage low.
 - `src/actions`: Server Actions (e.g., `fetchWordDetail` wrapping the cached `getWordDetail`).
 - `src/components`: React components organized by feature (`features/words`, `features/today-words`, `auth`, `favorites`, `review`, `study`, `sns`) and common UI (`common/` — `Footer`, `TabNavigation`, `CookieConsent` / `CookieConsentGate`).
-- `src/lib`: Utility functions and API clients (Upstash Redis, Redis-backed word cache, Supabase browser/server clients, favorites-sync pure logic, JSON-LD, OG utils).
+- `src/lib`: Utility functions and API clients (Upstash Redis, Upstash Vector, Gemini embeddings, Redis-backed word cache, Supabase browser/server clients, favorites-sync / semantic-search pure logic, JSON-LD, OG utils).
 - `src/types`: TypeScript type definitions (e.g., `WordDetails`).
 - `src/data`: Data fetching logic — `words.ts` (Local vs Blob switching, `getAllWords` / `getTodayRecommendedWords` / `getRelatedWords`) and `word-detail.ts` (multi-layer cached `getWordDetail`, Gemini generation).
 - `src/hooks`: Custom React hooks (e.g., `useTTS`).
