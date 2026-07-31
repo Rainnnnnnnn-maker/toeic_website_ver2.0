@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useEffectEvent, useState } from "react";
 import type { FormEvent } from "react";
 import Link from "next/link";
 import { sendGAEvent } from "@next/third-parties/google";
@@ -8,20 +8,93 @@ import { ArrowRight, LoaderCircle, Sparkles, X } from "lucide-react";
 import { WordLinkPending } from "@/components/features/words/WordLinkPending";
 import { WORD_LEVEL_CARD_STYLES } from "@/components/features/words/wordLevelStyles";
 import { WORD_LEVEL_INFO } from "@/lib/word-level";
+import { SEMANTIC_QUERY_MAX_LENGTH } from "@/lib/semantic-launch";
 import type { SemanticSearchResult } from "@/lib/semantic-search";
 
 type SearchStatus = "idle" | "loading" | "success" | "error";
 
-const QUERY_MAX_LENGTH = 100;
-
 const EXAMPLE_QUERIES = ["延期する", "感謝を伝えるメールで使う単語", "会議の日程調整", "お金・支払いに関する単語"] as const;
 
-export function SemanticSearchPanel() {
-  const [query, setQuery] = useState("");
-  const [status, setStatus] = useState<SearchStatus>("idle");
+type SearchOutcome =
+  | { ok: true; results: SemanticSearchResult[] }
+  | { ok: false; message: string };
+
+async function fetchSemanticResults(query: string): Promise<SearchOutcome> {
+  try {
+    const response = await fetch("/api/search/semantic", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-App-Source": "toeic-client",
+      },
+      body: JSON.stringify({ query }),
+    });
+
+    if (!response.ok) {
+      if (response.status === 429) {
+        return { ok: false, message: "検索が混み合っています。1分ほど待ってからお試しください。" };
+      }
+      if (response.status === 503) {
+        return { ok: false, message: "意味検索は現在準備中です。しばらくしてからお試しください。" };
+      }
+      return { ok: false, message: "検索に失敗しました。時間をおいてお試しください。" };
+    }
+
+    const data = (await response.json()) as { results?: SemanticSearchResult[] };
+    return { ok: true, results: Array.isArray(data.results) ? data.results : [] };
+  } catch {
+    return { ok: false, message: "検索に失敗しました。通信環境をご確認ください。" };
+  }
+}
+
+type Props = {
+  /** TOP の AI 検索カードから `/words?mode=meaning&q=...` で渡された初期クエリ。マウント時に1回だけ自動実行する。 */
+  readonly initialQuery?: string;
+};
+
+export function SemanticSearchPanel({ initialQuery = "" }: Props) {
+  const trimmedInitialQuery = initialQuery.trim().slice(0, SEMANTIC_QUERY_MAX_LENGTH);
+  const [query, setQuery] = useState(trimmedInitialQuery);
+  const [status, setStatus] = useState<SearchStatus>(trimmedInitialQuery ? "loading" : "idle");
   const [results, setResults] = useState<SemanticSearchResult[]>([]);
   const [errorMessage, setErrorMessage] = useState("");
   const [searchedQuery, setSearchedQuery] = useState("");
+
+  const applyOutcome = (searched: string, outcome: SearchOutcome, source: "form" | "url") => {
+    if (outcome.ok) {
+      setResults(outcome.results);
+      setSearchedQuery(searched);
+      setErrorMessage("");
+      setStatus("success");
+      sendGAEvent("event", "semantic_search", {
+        query_length: Array.from(searched).length,
+        result_count: outcome.results.length,
+        source,
+      });
+    } else {
+      setErrorMessage(outcome.message);
+      setStatus("error");
+    }
+  };
+
+  const applyInitialOutcome = useEffectEvent((searched: string, outcome: SearchOutcome) => {
+    applyOutcome(searched, outcome, "url");
+  });
+
+  // TOP からの遷移時（?mode=meaning&q=...）はマウント時に1回だけ自動検索する。
+  // setState はすべて await 後（非同期）なので set-state-in-effect には該当しない。
+  useEffect(() => {
+    if (!trimmedInitialQuery) return;
+    let cancelled = false;
+    void (async () => {
+      const outcome = await fetchSemanticResults(trimmedInitialQuery);
+      if (cancelled) return;
+      applyInitialOutcome(trimmedInitialQuery, outcome);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [trimmedInitialQuery]);
 
   const runSearch = async (rawQuery: string) => {
     const trimmed = rawQuery.trim();
@@ -30,41 +103,8 @@ export function SemanticSearchPanel() {
     setStatus("loading");
     setErrorMessage("");
 
-    try {
-      const response = await fetch("/api/search/semantic", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-App-Source": "toeic-client",
-        },
-        body: JSON.stringify({ query: trimmed }),
-      });
-
-      if (!response.ok) {
-        if (response.status === 429) {
-          setErrorMessage("検索が混み合っています。1分ほど待ってからお試しください。");
-        } else if (response.status === 503) {
-          setErrorMessage("意味検索は現在準備中です。しばらくしてからお試しください。");
-        } else {
-          setErrorMessage("検索に失敗しました。時間をおいてお試しください。");
-        }
-        setStatus("error");
-        return;
-      }
-
-      const data = (await response.json()) as { results?: SemanticSearchResult[] };
-      const nextResults = Array.isArray(data.results) ? data.results : [];
-      setResults(nextResults);
-      setSearchedQuery(trimmed);
-      setStatus("success");
-      sendGAEvent("event", "semantic_search", {
-        query_length: Array.from(trimmed).length,
-        result_count: nextResults.length,
-      });
-    } catch {
-      setErrorMessage("検索に失敗しました。通信環境をご確認ください。");
-      setStatus("error");
-    }
+    const outcome = await fetchSemanticResults(trimmed);
+    applyOutcome(trimmed, outcome, "form");
   };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -92,7 +132,7 @@ export function SemanticSearchPanel() {
           type="search"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          maxLength={QUERY_MAX_LENGTH}
+          maxLength={SEMANTIC_QUERY_MAX_LENGTH}
           placeholder="例：延期する / 感謝を伝えるメールで使う単語"
           autoComplete="off"
           spellCheck={false}

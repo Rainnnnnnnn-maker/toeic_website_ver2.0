@@ -22,8 +22,8 @@ export const EMBEDDING_DIMENSION = 768;
 export const SEMANTIC_SEARCH_TOP_K = 10;
 /** 無関係な近傍候補を除外する既定の最低類似度。 */
 export const DEFAULT_SEMANTIC_MIN_SCORE = 0.82;
-/** 検索クエリの最大文字数（正規化後）。 */
-export const SEMANTIC_QUERY_MAX_LENGTH = 100;
+/** 検索クエリの最大文字数（正規化後）。定義はクライアント安全な semantic-launch.ts 側。 */
+export { SEMANTIC_QUERY_MAX_LENGTH } from "./semantic-launch";
 /** 検索結果の Redis キャッシュ TTL（秒）。 */
 export const SEMANTIC_CACHE_TTL_SECONDS = 7 * 24 * 60 * 60;
 /** Vector コーパス更新時に増分する Redis キー。 */

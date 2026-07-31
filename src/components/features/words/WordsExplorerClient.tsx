@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useEffectEvent, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState, useSyncExternalStore } from "react";
 import type { FormEvent } from "react";
 import Link from "next/link";
 import { sendGAEvent } from "@next/third-parties/google";
@@ -11,6 +11,7 @@ import { SemanticSearchPanel } from "@/components/features/words/SemanticSearchP
 import { WORD_LEVEL_CARD_STYLES } from "@/components/features/words/wordLevelStyles";
 import { WORD_LEVEL_INFO, WORD_LEVEL_ORDER } from "@/lib/word-level";
 import type { WordLevel } from "@/lib/word-level";
+import { parseSemanticLaunchParams } from "@/lib/semantic-launch";
 
 type LevelFilter = "all" | WordLevel;
 
@@ -26,6 +27,10 @@ const SEARCH_EVENT_MIN_LENGTH = 2;
 const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
 const levelStyles = WORD_LEVEL_CARD_STYLES;
+
+const subscribeToNothing = () => () => {};
+const getLocationSearch = () => window.location.search;
+const getServerLocationSearch = () => "";
 
 function matchesQuery(term: string, query: string): boolean {
   if (!query) return true;
@@ -43,7 +48,19 @@ function matchesQuery(term: string, query: string): boolean {
 }
 
 export function WordsExplorerClient({ words }: Props) {
-  const [searchMode, setSearchMode] = useState<SearchMode>("term");
+  // TOP の AI 検索カードからの遷移（/words?mode=meaning&q=...）を初期状態へ反映する。
+  // SSR/プリレンダーでは空文字（term モード）で描画し、ハイドレーション後に
+  // useSyncExternalStore がクライアントの実 URL で再描画するため、
+  // setState-in-effect を使わずに済み、/words の静的レンダリングも保たれる。
+  const locationSearch = useSyncExternalStore(
+    subscribeToNothing,
+    getLocationSearch,
+    getServerLocationSearch
+  );
+  const launchParams = parseSemanticLaunchParams(locationSearch);
+
+  const [searchModeOverride, setSearchModeOverride] = useState<SearchMode | null>(null);
+  const searchMode = searchModeOverride ?? launchParams.mode;
   const [query, setQuery] = useState("");
   const [level, setLevel] = useState<LevelFilter>("all");
   const [letter, setLetter] = useState("all");
@@ -52,7 +69,7 @@ export function WordsExplorerClient({ words }: Props) {
 
   const handleModeChange = (nextMode: SearchMode) => {
     if (nextMode === searchMode) return;
-    setSearchMode(nextMode);
+    setSearchModeOverride(nextMode);
     sendGAEvent("event", "words_filter", {
       filter_type: "search_mode",
       filter_value: nextMode,
@@ -330,7 +347,7 @@ export function WordsExplorerClient({ words }: Props) {
       </div>
 
       {searchMode === "meaning" ? (
-        <SemanticSearchPanel />
+        <SemanticSearchPanel initialQuery={launchParams.query} />
       ) : (
       <div className="px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-2">

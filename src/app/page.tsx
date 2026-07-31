@@ -7,6 +7,7 @@ import WordsListClient from "@/components/features/words/WordsListClient";
 import { SnsShareButtons } from "@/components/features/sns/SnsShareButtons";
 import { AuthStatus } from "@/components/features/auth/AuthStatus";
 import TodayRecommendedWordsClient from "@/components/features/words/TodayRecommendedWordsClient";
+import { SemanticSearchLauncher } from "@/components/features/words/SemanticSearchLauncher";
 import { getLatestGuideArticles } from "@/data/guide-articles";
 import { TODAY_WORDS_COUNT } from "@/lib/word-select";
 
@@ -306,6 +307,7 @@ export default function Home() {
             </Link>
           </div>
         </header>
+        <SemanticSearchLauncher />
         <Suspense fallback={<TodayRecommendedWordsFallback />}>
           <TodayRecommendedWordsSection />
         </Suspense>
