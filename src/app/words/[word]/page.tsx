@@ -7,6 +7,7 @@ import { Metadata } from "next";
 import { getWordBySlug, getAllWords, getRelatedWords } from "@/data/words";
 import { getWordDetail } from "@/data/word-detail";
 import { generateWordDetailJsonLd } from "@/lib/json-ld";
+import { isAdsenseReviewMode } from "@/lib/adsense-review";
 import Loading from "./loading";
 
 // Vercel Hobbyプランの制限対策 (60秒)
@@ -96,6 +97,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       absolute: title,
     },
     description,
+    // AdSense審査モード中は単語詳細ページを検索インデックスから外す
+    ...(isAdsenseReviewMode() && {
+      robots: { index: false, follow: true },
+    }),
     openGraph: {
       title,
       description,

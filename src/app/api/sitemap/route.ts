@@ -1,9 +1,11 @@
 import { getAllWords } from "@/data/words";
-import { GUIDE_ARTICLES } from "@/data/guide-articles";
+import { getPublishedGuideArticles } from "@/data/guide-articles";
+import { isAdsenseReviewMode } from "@/lib/adsense-review";
 
 const BASE_URL = "https://www.toeic-words.com";
 const WORD_LIST_LASTMOD = "2026-04-26";
 const STATIC_PAGE_LASTMOD = "2026-04-26";
+const publishedGuideArticles = getPublishedGuideArticles();
 
 function formatLastmod(date: string): string {
   return new Date(date).toISOString();
@@ -12,15 +14,16 @@ function formatLastmod(date: string): string {
 const wordListLastmod = formatLastmod(WORD_LIST_LASTMOD);
 const staticPageLastmod = formatLastmod(STATIC_PAGE_LASTMOD);
 const guideLastmod = formatLastmod(
-  GUIDE_ARTICLES.reduce(
+  publishedGuideArticles.reduce(
     (latest, article) => article.updatedAt > latest ? article.updatedAt : latest,
     STATIC_PAGE_LASTMOD
   )
 );
 
 export async function GET() {
-  const allWords = await getAllWords();
-  
+  // AdSense審査モード中は単語詳細ページ(noindex対象)をsitemapに載せない
+  const allWords = isAdsenseReviewMode() ? [] : await getAllWords();
+
   let xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
@@ -78,7 +81,7 @@ export async function GET() {
   </url>
 `;
 
-  for (const article of GUIDE_ARTICLES) {
+  for (const article of publishedGuideArticles) {
     xml += `  <url>
     <loc>${BASE_URL}/guide/${article.slug}</loc>
     <lastmod>${formatLastmod(article.updatedAt)}</lastmod>

@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { TODAY_WORDS_COUNT } from "@/lib/word-select";
 
 export const metadata: Metadata = {
   title: "当サイトについて｜運営方針・単語選定基準・更新ポリシー",
   description:
-    "TOEIC 重要単語は、TOEIC 頻出 1,300 語以上を効率的に学習できる無料サービスです。運営者情報、単語選定の根拠、解説作成と品質管理のフロー、サイトの更新方針について説明します。",
+    "TOEIC 重要単語は、TOEIC学習向け英単語1,300語以上を確認できる無料サービスです。運営者、独自のランク、AI解説の生成・確認方法、更新方針を説明します。",
   alternates: {
     canonical: "https://www.toeic-words.com/about",
   },
@@ -27,7 +28,7 @@ export default function AboutPage() {
         <section>
           <h2 className="mb-3 text-lg font-semibold">TOEIC重要単語とは</h2>
           <p>
-            「TOEIC重要単語」は、TOEIC L&amp;R 試験に頻出する英単語を効率的に学習できる無料の Web サービスです。1,300 語以上の頻出単語を「important（基礎）／ mid（中級）／ high（上級）」の 3 段階に分類し、各単語にビジネス文脈に最適化した意味・ニュアンス解説、複数の例文、ネイティブ発音音声を提供しています。解説は運営者がチェックし、気になる箇所は修正しながら掲載しています。
+            「TOEIC重要単語」は、TOEIC L&amp;R の学習に使う英単語を効率的に確認できる無料の Web サービスです。1,300 語以上を「important（基礎）／ mid（中級）／ high（上級）」の 3 段階に分類し、各単語にビジネス場面を想定した意味・ニュアンス解説、例文、発音音声を提供しています。3 段階の分類は学習順を決めるための当サイト独自の目安で、IIBC・ETS 公式の頻度・スコア分類ではありません。
           </p>
           <p className="mt-2">
             会員登録は不要で、すべての機能を無料で利用できます。お気に入り情報はブラウザのローカルストレージに保存され、サーバーには送信されません。複数の端末でお気に入りを同期したい方向けに、任意の Google ログイン機能も提供しています（ログインした場合のみ、お気に入りがサーバーに保存されます）。
@@ -49,7 +50,7 @@ export default function AboutPage() {
           <ul className="list-inside list-disc space-y-2">
             <li>
               <strong>レベル別単語一覧</strong>
-              {"：目標スコア（600・730・860 点）に合わせて 3 段階に分類された頻出単語"}
+              {"：学習範囲を選ぶため、600・730〜800・800 点以上を目安に 3 段階へ分類した収録語"}
             </li>
             <li>
               <strong>AI 解説</strong>
@@ -72,12 +73,12 @@ export default function AboutPage() {
               {"：お気に入り登録した単語のみを集中的に復習"}
             </li>
             <li>
-              <strong>今日のおすすめ 5 単語</strong>
-              {"：日付固定ロジックで毎日同じ 5 語をおすすめ"}
+              <strong>今日のおすすめ {TODAY_WORDS_COUNT} 単語</strong>
+              {`：日付固定ロジックで、その日の ${TODAY_WORDS_COUNT} 語をおすすめ`}
             </li>
             <li>
               <strong>聞き流しモード</strong>
-              {"：今日の 5 単語を「単語 → 英文例 → 日本語訳」の順に自動再生"}
+              {`：今日の ${TODAY_WORDS_COUNT} 単語を「単語 → 英文例 → 日本語訳」の順に自動再生`}
             </li>
             <li>
               <strong>学習ガイド</strong>
@@ -96,13 +97,13 @@ export default function AboutPage() {
         <section>
           <h2 className="mb-3 text-lg font-semibold">単語選定の根拠</h2>
           <p>
-            収録単語は、以下の複数ソースに基づき、TOEIC 頻出度を集計したうえでランクを決定しています。
+            収録語と 3 段階のランクは、学習時の優先順位を付けるために運営者が整理したものです。IIBC・ETS が公表する公式の頻度表やスコア別語彙表ではなく、特定教材の出現回数を再現したデータでもありません。
           </p>
           <ul className="mt-2 list-inside list-disc space-y-1">
-            <li>TOEIC 公式問題集（複数年版）に出現する語彙の頻度集計</li>
-            <li>市販の TOEIC 頻出語彙集における必出ランク</li>
-            <li>コーパス分析（COCA・BNC）におけるビジネス語彙の頻度</li>
-            <li>過去の受験者がつまずきやすいと報告した単語</li>
+            <li>important：最初に意味を確認したい基礎語</li>
+            <li>mid：基礎語の次に学ぶ中級語・派生語</li>
+            <li>high：専門的な場面や細かなニュアンスまで広げる上級語</li>
+            <li>実際の模試で間違えた語は、ランクにかかわらず優先</li>
           </ul>
           <p className="mt-3">
             選定基準とランクの定義については、
@@ -119,7 +120,7 @@ export default function AboutPage() {
         <section>
           <h2 className="mb-3 text-lg font-semibold">解説の作成方針と品質管理</h2>
           <p>
-            各単語の意味・ニュアンス・例文は、TOEIC のビジネス文脈に限定したプロンプト設計のもとで下書きを作成し、運営者が掲載前後に内容を目視で確認しています。気になった箇所は適宜修正し、品質を維持するように運用しています。
+            各単語の意味・ニュアンス・例文は Google Gemini を使って生成しています。形式の自動整合性チェックを行い、運営者が確認できた箇所や報告を受けた箇所から修正しています。全ページの人手確認が完了しているわけではありません。
           </p>
           <ol className="mt-2 list-inside list-decimal space-y-1">
             <li>
@@ -129,13 +130,10 @@ export default function AboutPage() {
               必須フィールド・例文数・形式の整合性を自動チェック
             </li>
             <li>
-              運営者が単語ページを実際に閲覧して内容を目視確認し、不自然な訳語・例文・コロケーションを発見次第修正
+              優先度の高いページや指摘を受けたページを運営者が確認し、不自然な訳語・例文・コロケーションを修正
             </li>
             <li>
               閲覧者から誤りの指摘を受けた場合は、該当単語のキャッシュをクリアし、解説を再作成・再確認
-            </li>
-            <li>
-              修正の経緯は GitHub のコミット履歴に記録し、変更内容を追跡可能な形で管理
             </li>
           </ol>
           <p className="mt-3">
@@ -150,7 +148,7 @@ export default function AboutPage() {
           </p>
         </section>
 
-        <section>
+        <section id="operator">
           <h2 className="mb-3 text-lg font-semibold">運営者情報</h2>
           <ul className="list-inside list-disc space-y-1">
             <li>
@@ -173,11 +171,11 @@ export default function AboutPage() {
             </li>
             <li>
               <strong>最終更新</strong>
-              {"：2026 年 7 月（コンテンツ・機能ともに継続的に更新中）"}
+              {"：2026 年 8 月（コンテンツ・機能ともに継続的に更新中）"}
             </li>
             <li>
               <strong>収益化</strong>
-              {"：Google AdSense 広告による無料運営"}
+              {"：広告掲載を準備中（単語詳細ページには広告を掲載しない方針）"}
             </li>
             <li>
               <strong>ソースコード</strong>
@@ -190,7 +188,7 @@ export default function AboutPage() {
           <h2 className="mb-3 text-lg font-semibold">サイトの更新方針</h2>
           <ul className="list-inside list-disc space-y-1">
             <li>
-              新しい TOEIC 出題傾向に応じて、収録単語の追加・削除を随時実施
+              収録漏れや学習上の必要性を確認し、単語の追加・削除を随時実施
             </li>
             <li>
               AI 解説のプロンプトは、ユーザーからの指摘を受けて継続的に改善

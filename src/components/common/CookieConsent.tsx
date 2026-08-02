@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   CONSENT_COOKIE_MAX_AGE,
   CONSENT_COOKIE_NAME,
@@ -14,15 +15,18 @@ function setConsentCookie(value: ConsentValue) {
 
 export function CookieConsent() {
   const [dismissed, setDismissed] = useState(false);
+  const router = useRouter();
 
   const handleAccept = () => {
     setConsentCookie("true");
     setDismissed(true);
+    router.refresh();
   };
 
   const handleDecline = () => {
     setConsentCookie("declined");
     setDismissed(true);
+    router.refresh();
   };
 
   if (dismissed) return null;
@@ -31,7 +35,7 @@ export function CookieConsent() {
     <div className="fixed inset-x-0 bottom-0 z-50 border-t border-black/10 bg-white/95 p-4 shadow-lg backdrop-blur-sm dark:border-white/10 dark:bg-black/95">
       <div className="mx-auto flex max-w-5xl flex-col items-center gap-3 sm:flex-row sm:justify-between">
         <p className="text-center text-xs leading-relaxed text-black/70 dark:text-white/70 sm:text-left">
-          当サイトでは、サービスの向上のためにCookieを使用しています。サイトの利用を続けることで、Cookieの使用に同意したものとみなします。詳しくは
+          当サイトでは、利用状況の分析（Google Analytics）にCookieを使用します。許可しない場合も、単語学習機能はそのまま利用できます。詳しくは
           <Link
             href="/privacy"
             prefetch={false}

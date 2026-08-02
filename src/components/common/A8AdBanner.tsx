@@ -1,4 +1,10 @@
+import { isAdsenseReviewMode } from "@/lib/adsense-review";
+
 export const A8AdBanner468x60 = () => {
+  // AdSense審査モード中はアフィリエイトバナーを出さない
+  if (isAdsenseReviewMode()) {
+    return null;
+  }
   return (
     <div className="w-full flex justify-center my-6 px-4">
       <div
@@ -34,6 +40,9 @@ export const A8AdBanner468x60 = () => {
 };
 
 export const A8AdBanner728x90 = () => {
+  if (isAdsenseReviewMode()) {
+    return null;
+  }
   return (
     <div className="w-full flex justify-center my-8 px-4">
       <div

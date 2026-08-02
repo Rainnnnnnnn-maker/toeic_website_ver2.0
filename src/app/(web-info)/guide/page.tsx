@@ -1,26 +1,29 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { GUIDE_ARTICLES } from "@/data/guide-articles";
+import { getLatestGuideArticles } from "@/data/guide-articles";
 
 const SITE_URL = "https://www.toeic-words.com";
 
 export const metadata: Metadata = {
   title: "TOEIC 学習ガイド｜スコア別戦略・Part 別対策・語彙集",
   description:
-    "TOEIC のスコアアップに役立つ学習ガイド記事一覧。スコア別の必要語彙数、Part 5 攻略法、忘却曲線を活用した暗記法、ビジネス英語頻出語彙などを体系的に解説しています。",
+    "TOEIC 学習の計画づくりに使えるガイド記事一覧。目標別の学習順、Part 5 対策、間隔を空けた復習、ビジネス英語の語彙などを解説しています。",
   alternates: {
     canonical: `${SITE_URL}/guide`,
   },
   openGraph: {
     title: "TOEIC 学習ガイド｜スコア別戦略・Part 別対策・語彙集",
     description:
-      "TOEIC のスコアアップに役立つ学習ガイド記事を公開しています。語彙数の目安・派生語の覚え方・忘却曲線を踏まえた復習タイミングなど、現場で使えるノウハウをまとめています。",
+      "TOEIC 学習の計画づくりに使えるガイドを公開しています。目標別の優先順位、派生語の覚え方、間隔を空けた復習の始め方などをまとめています。",
     url: `${SITE_URL}/guide`,
     type: "website",
   },
 };
 
 export default function GuideIndexPage() {
+  // 更新日の新しい順（updatedAt desc → publishedAt desc）
+  const articles = getLatestGuideArticles();
+
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -43,7 +46,7 @@ export default function GuideIndexPage() {
   const itemListJsonLd = {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    itemListElement: GUIDE_ARTICLES.map((article, i) => ({
+    itemListElement: articles.map((article, i) => ({
       "@type": "ListItem",
       position: i + 1,
       url: `${SITE_URL}/guide/${article.slug}`,
@@ -72,11 +75,11 @@ export default function GuideIndexPage() {
 
       <h1 className="mb-4 text-2xl font-bold">TOEIC 学習ガイド</h1>
       <p className="mb-10 text-sm leading-relaxed text-black/70 dark:text-white/70">
-        TOEIC のスコアアップに直結する学習戦略・Part 別対策・語彙集をまとめた記事一覧です。当サイトの単語学習機能と組み合わせることで、効率的に目標スコアへ到達できる内容を順次公開していきます。
+        学習計画・Part 別対策・語彙の整理方法をまとめた記事一覧です。当サイトの単語学習機能と組み合わせ、現在の弱点に合う方法を選ぶための参考としてご利用ください。
       </p>
 
       <ul className="space-y-6">
-        {GUIDE_ARTICLES.map((article) => (
+        {articles.map((article) => (
           <li
             key={article.slug}
             className="rounded-lg border border-black/10 p-5 transition hover:border-black/30 dark:border-white/10 dark:hover:border-white/30"

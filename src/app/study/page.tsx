@@ -5,7 +5,7 @@ import Script from "next/script";
 
 export const metadata = {
 	title: "Webで使えるTOEIC単語帳 | 英単語学習モード",
-	description: "インストール不要、ブラウザで使える無料のTOEIC単語帳。ランダム出題される頻出単語を効率よく学習し、暗記チェックができます。",
+	description: "インストール不要、ブラウザで使える無料のTOEIC単語帳。収録語をランダムに出題し、意味を思い出せるか確認できます。",
 	alternates: {
 		canonical: "https://www.toeic-words.com/study",
 	},
@@ -56,10 +56,10 @@ export default async function StudyPage() {
           学習モードは、当サイトに収録された 1,300 語以上の TOEIC 重要単語からランダムに出題し、暗記の定着度をフラッシュカード形式でチェックできる機能です。レベル（important / mid / high）を絞って出題することもでき、目標スコア帯に最適化された学習が可能です。
         </p>
         <h2 className="mt-5 mb-2 text-base font-semibold text-slate-800">
-          なぜ「ランダム出題」が暗記に効くのか
+          ランダム出題を使う目的
         </h2>
         <p className="mb-3">
-          単語帳を a〜z 順に通読する学習法は、「順番」に依存して記憶が形成されるため、本番で順序がバラバラに出題された際に思い出しにくくなる弱点があります。心理学では、これを「ブロック練習の弊害」と呼びます。一方、ランダム出題（インターリーブ学習）では、毎回違う文脈で単語と出会うため、本番に近い形で記憶が定着します。研究でも、ランダム出題は通読より長期記憶への定着率が高いことが確認されています。
+          a〜z 順の一覧だけで学ぶと、単語そのものではなく前後の並びを手掛かりに答えていないか判断しにくくなります。ランダム出題は順番を崩し、意味を単独で思い出せるか確認するための機能です。間違えた語は詳細ページの例文へ戻り、もう一度確認してください。
         </p>
         <h2 className="mt-5 mb-2 text-base font-semibold text-slate-800">
           推奨利用シーン
@@ -73,11 +73,11 @@ export default async function StudyPage() {
         <p className="mb-1 text-xs text-slate-500">
           より詳しい学習戦略は、{" "}
           <Link href="/guide/forgetting-curve" className="text-blue-600 underline">
-            「忘却曲線を活用した暗記法」
+            「忘却曲線と間隔反復を取り入れる方法」
           </Link>{" "}
           や{" "}
           <Link href="/guide/toeic-vocab-by-score" className="text-blue-600 underline">
-            「スコア別必要語彙数と学習戦略」
+            「スコア別の単語学習戦略」
           </Link>{" "}
           をご参照ください。
         </p>

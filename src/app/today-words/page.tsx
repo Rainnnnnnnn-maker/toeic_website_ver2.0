@@ -77,16 +77,16 @@ export default async function TodayWordsPage() {
             なぜ「1 日 {TODAY_WORDS_COUNT} 単語」なのか
           </h3>
           <p className="mb-3">
-            認知心理学の研究では、新規情報は 1 セッションあたり 5〜9 個までが短期記憶の限界とされています（マジカルナンバー 7±2）。1 日 {TODAY_WORDS_COUNT} 単語であれば、忘却曲線に沿った復習サイクル（翌日・3 日後・1 週間後）を組み合わせても無理なく継続でき、長期記憶への定着率を最大化できます。
+            {TODAY_WORDS_COUNT} 語は、短時間でも一覧を見渡し、例文と音声まで確認しやすい量として当サイトが設定した日次目標です。記憶できる語数には個人差があるため、すべて覚えることをノルマにせず、難しかった語をお気に入りへ残して後日もう一度確認してください。
           </p>
           <p className="text-xs text-slate-500">
             復習タイミングの詳細は{" "}
             <Link href="/guide/forgetting-curve" prefetch={false} className="text-blue-600 underline">
-              「忘却曲線を活用した暗記法」
+              「忘却曲線と間隔反復を取り入れる方法」
             </Link>
             、毎日の学習習慣の組み立て方は{" "}
             <Link href="/guide/last-week-plan" prefetch={false} className="text-blue-600 underline">
-              「直前 1 週間で 50 点伸ばす単語復習プラン」
+              「直前 1 週間の単語復習プラン」
             </Link>{" "}
             をご参照ください。
           </p>

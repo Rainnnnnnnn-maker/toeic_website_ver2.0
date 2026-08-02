@@ -2,13 +2,13 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import { GoogleAnalytics } from "@next/third-parties/google";
 import { Suspense } from "react";
 import { AuthProvider } from "@/context/AuthContext";
 import { FavoritesProvider } from "@/context/FavoritesContext";
 import { Footer } from "@/components/common/Footer";
 import { CookieConsentGate } from "@/components/common/CookieConsentGate";
 import { A8AdBanner728x90 } from "@/components/common/A8AdBanner";
+import { GoogleAnalyticsGate } from "@/components/common/GoogleAnalyticsGate";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -28,7 +28,12 @@ export const metadata: Metadata = {
     default: "TOEIC重要単語",
     template: "%s | TOEIC重要単語",
   },
-  description: "【完全無料】TOEIC重要単語をAIが徹底解説！頻出単語を効率的に学習してスコアアップ。例文・類義語・発音も完備。",
+  description: "TOEIC学習向け英単語1,300語以上を3段階に整理。AI生成の解説・例文、類義語、発音、学習・復習機能を無料で利用できます。",
+  verification: {
+    other: {
+      "google-adsense-account": "ca-pub-3016015645741811",
+    },
+  },
   keywords: ["TOEIC", "重要単語", "頻出単語", "英単語", "学習", "アプリ", "無料", "600点", "730点", "800点", "AI解説"],
   icons: {
     icon: [
@@ -51,7 +56,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "TOEIC重要単語",
-    description: "【完全無料】TOEIC重要単語をAIが徹底解説！頻出単語を効率的に学習してスコアアップ。例文・類義語・発音も完備。",
+    description: "TOEIC学習向け英単語1,300語以上を3段階に整理。解説・例文、類義語、発音、学習・復習機能を無料で利用できます。",
     url: "https://www.toeic-words.com",
     siteName: "TOEIC語彙ラボ",
     locale: "ja_JP",
@@ -68,7 +73,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "TOEIC重要単語",
-    description: "【完全無料】TOEIC重要単語をAIが徹底解説！頻出単語を効率的に学習してスコアアップ。例文・類義語・発音も完備。",
+    description: "TOEIC学習向け英単語1,300語以上を3段階に整理。解説・例文、類義語、発音、学習・復習機能を無料で利用できます。",
     images: ["/opengraph-image"],
   },
 };
@@ -85,13 +90,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      <head>
-        <script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3016015645741811"
-          crossOrigin="anonymous"
-        ></script>
-      </head>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <AuthProvider>
           <FavoritesProvider>
@@ -107,9 +105,9 @@ export default function RootLayout({
         </AuthProvider>
         <Analytics />
         <SpeedInsights />
-        {process.env.NEXT_PUBLIC_GA_ID && (
-          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
-        )}
+        <Suspense fallback={null}>
+          <GoogleAnalyticsGate />
+        </Suspense>
       </body>
     </html>
   );

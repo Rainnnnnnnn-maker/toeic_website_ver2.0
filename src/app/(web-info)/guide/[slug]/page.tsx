@@ -7,6 +7,7 @@ import {
   getGuideArticleBySlug,
   type ArticleBlock,
   type GuideArticle,
+  type GuideSource,
 } from "@/data/guide-articles";
 
 const SITE_URL = "https://www.toeic-words.com";
@@ -28,6 +29,9 @@ export async function generateMetadata({
   return {
     title: article.title,
     description: article.description,
+    ...(article.indexable === false && {
+      robots: { index: false, follow: false },
+    }),
     alternates: { canonical: `${SITE_URL}/guide/${article.slug}` },
     openGraph: {
       title: article.title,
@@ -158,7 +162,9 @@ function RelatedArticles({ article }: { article: GuideArticle }) {
   const related =
     article.relatedSlugs
       ?.map((s) => GUIDE_ARTICLES.find((a) => a.slug === s))
-      .filter((a): a is GuideArticle => Boolean(a)) ?? [];
+      .filter(
+        (a): a is GuideArticle => a !== undefined && a.indexable !== false,
+      ) ?? [];
   if (related.length === 0) return null;
   return (
     <section className="mt-12 border-t border-black/10 pt-6 dark:border-white/10">
@@ -175,6 +181,32 @@ function RelatedArticles({ article }: { article: GuideArticle }) {
                 {r.description}
               </p>
             </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+function ArticleSources({ sources }: { sources: GuideSource[] }) {
+  return (
+    <section className="mt-12 border-t border-black/10 pt-6 dark:border-white/10">
+      <h2 className="mb-4 text-lg font-semibold">参考資料</h2>
+      <ul className="space-y-3 text-sm">
+        {sources.map((source) => (
+          <li key={source.url}>
+            <a
+              href={source.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-blue-600 underline hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+            >
+              {source.title}
+            </a>
+            <span className="text-black/60 dark:text-white/60">
+              {` — ${source.publisher}`}
+              {source.note ? `（${source.note}）` : ""}
+            </span>
           </li>
         ))}
       </ul>
@@ -220,14 +252,16 @@ export default async function GuideArticlePage({
     dateModified: article.updatedAt,
     inLanguage: "ja",
     mainEntityOfPage: `${SITE_URL}/guide/${article.slug}`,
+    citation: article.sources?.map((source) => source.url),
     publisher: {
       "@type": "Organization",
       name: "TOEIC重要単語",
       url: SITE_URL,
     },
     author: {
-      "@type": "Organization",
-      name: "TOEIC重要単語 編集チーム",
+      "@type": "Person",
+      name: "Rain",
+      url: `${SITE_URL}/about#operator`,
     },
   };
 
@@ -265,15 +299,30 @@ export default async function GuideArticlePage({
             {article.updatedAt !== article.publishedAt && (
               <span>更新日：{article.updatedAt}</span>
             )}
+            <Link
+              href="/about#operator"
+              className="text-blue-600 underline dark:text-blue-400"
+            >
+              編集・公開責任者：Rain
+            </Link>
           </div>
           <h1 className="text-2xl font-bold leading-snug">{article.title}</h1>
           <p className="mt-3 leading-relaxed text-black/70 dark:text-white/70">
             {article.description}
           </p>
+          {article.indexable === false && (
+            <p className="mt-4 rounded border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-100">
+              この記事は出典と内容を再確認中のため、現在は記事一覧と検索対象から外しています。
+            </p>
+          )}
         </header>
 
         <div>{article.blocks.map((b, i) => renderBlock(b, i))}</div>
       </article>
+
+      {article.sources && article.sources.length > 0 && (
+        <ArticleSources sources={article.sources} />
+      )}
 
       <RelatedArticles article={article} />
 

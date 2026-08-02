@@ -8,7 +8,7 @@ import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "今日の単語 聞き流し | TOEIC Words",
-  description: `通勤・通学や家事などのスキマ時間に。その日に選ばれたTOEIC頻出単語${TODAY_WORDS_COUNT}つの発音・英語例文・日本語訳を自動再生する「聞き流しモード」で、リスニング力と語彙力を同時に鍛えられます。`,
+  description: `その日に選ばれた英単語${TODAY_WORDS_COUNT}つの発音・AI生成の英語例文・日本語訳を順に自動再生する「聞き流しモード」です。`,
   alternates: {
     canonical: "https://www.toeic-words.com/today-words/listen",
   },
@@ -45,7 +45,7 @@ export default async function TodayWordsListenPage() {
             <strong>単語の発音</strong>：英単語をネイティブ音声で読み上げ
           </li>
           <li>
-            <strong>英語例文</strong>：TOEIC 形式の例文を英語で再生
+            <strong>英語例文</strong>：ビジネス場面を想定した AI 生成例文を英語で再生
           </li>
           <li>
             <strong>日本語訳</strong>：例文の意味を日本語で確認
@@ -75,13 +75,13 @@ export default async function TodayWordsListenPage() {
         </h3>
         <ul className="mb-3 list-inside list-disc space-y-1">
           <li>
-            英語例文の後に<strong>声に出してシャドーイング</strong>すると、発音とリズムが定着しやすくなります
+            周囲に配慮できる場所では、英語例文の後に<strong>声に出して復唱</strong>し、聞こえ方と発音を照合
           </li>
           <li>
             聞き取れなかった単語は通常モードに戻り、<strong>「お気に入り」に追加</strong>して翌日以降に復習
           </li>
           <li>
-            朝・昼・夜と<strong>1 日複数回流す</strong>ことで、忘却曲線に沿った間隔反復になります
+            後で<strong>意味を隠して思い出す</strong>確認も行い、聞いただけで覚えたと判断しない
           </li>
         </ul>
 
@@ -96,7 +96,7 @@ export default async function TodayWordsListenPage() {
           </Link>
           、復習タイミングの考え方は{" "}
           <Link href="/guide/forgetting-curve" prefetch={false} className="text-blue-600 underline">
-            「忘却曲線を活用した暗記法」
+            「忘却曲線と間隔反復を取り入れる方法」
           </Link>{" "}
           をご覧ください。
         </p>

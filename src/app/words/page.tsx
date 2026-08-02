@@ -25,10 +25,10 @@ import { TODAY_WORDS_COUNT } from "@/lib/word-select";
 
 export const metadata: Metadata = {
   title: {
-    absolute: "TOEIC重要単語 一覧【2026年最新】1,300語以上 | AI解説付き無料",
+    absolute: "TOEIC重要単語 一覧【2026年版】1,300語以上 | AI解説付き無料",
   },
   description:
-    "TOEIC頻出単語1,300語以上を、目標スコア・アルファベット・英単語検索から探せる無料単語リスト。600点・730〜800点・800点以上のレベル別に整理し、各単語のAI解説・例文・類義語・発音を確認できます。",
+    "TOEIC学習向け英単語1,300語以上を、目標スコアの目安・アルファベット・英単語検索から探せる無料リスト。AI解説・例文・類義語・発音を確認できます。",
   keywords: [
     "TOEIC 重要単語 一覧",
     "TOEIC 単語 リスト",

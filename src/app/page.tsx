@@ -8,16 +8,19 @@ import { SnsShareButtons } from "@/components/features/sns/SnsShareButtons";
 import { AuthStatus } from "@/components/features/auth/AuthStatus";
 import TodayRecommendedWordsClient from "@/components/features/words/TodayRecommendedWordsClient";
 import { SemanticSearchLauncher } from "@/components/features/words/SemanticSearchLauncher";
-import { getLatestGuideArticles } from "@/data/guide-articles";
+import {
+  getLatestGuideArticles,
+  PUBLISHED_GUIDE_ARTICLE_COUNT,
+} from "@/data/guide-articles";
 import { TODAY_WORDS_COUNT } from "@/lib/word-select";
+import { AdSenseScript } from "@/components/common/AdSenseScript";
 
 export const metadata: Metadata = {
   title: {
-    absolute: "TOEIC 重要単語【2026年最新】600点・730点・800点突破｜詳しい解説付き無料単語帳",
+    absolute: "TOEIC 重要単語【2026年版】600点・730点・800点向け｜詳しい解説付き無料単語帳",
   },
-  description:
-    "【完全無料】TOEIC重要単語をビジネス文脈に絞って徹底解説。2026年最新の出題傾向（リモートワーク・オンライン会議など）を反映した頻出英単語1,300語以上と、学習ガイド記事12本以上を収録。目標スコア（600点・730点・800点）のレベル別に厳選した単語、ビジネス例文、類義語の使い分け、音声発音チェック機能も完備。スマホでいつでも効率的に学習し、今のTOEICに通用する英語力を身につけましょう。",
-  keywords: ["TOEIC 重要単語", "TOEIC 単語帳", "TOEIC 頻出単語", "2026年", "最新", "無料", "アプリ", "600点", "730点", "800点"],
+  description: `【完全無料】TOEIC学習向け英単語1,300語以上を3段階に整理。ビジネス場面の例文、類義語、発音、学習・復習機能と学習ガイド${PUBLISHED_GUIDE_ARTICLE_COUNT}本を、登録不要で利用できます。`,
+  keywords: ["TOEIC 重要単語", "TOEIC 単語帳", "TOEIC 英単語", "2026年", "無料", "アプリ", "600点", "730点", "800点"],
   alternates: {
     canonical: "https://www.toeic-words.com/",
   },
@@ -47,8 +50,8 @@ function buildFaqEntries({
 }: Awaited<ReturnType<typeof getHomeWordData>>) {
   return [
     {
-      name: "2026年最新のTOEIC重要単語と出題傾向は？",
-      text: "近年のTOEIC L&Rテストでは、ビジネス環境の変化に伴い「リモートワーク」「オンライン会議」「チャットツール」に関連する語彙の出題頻度が増加しています。また、従来のオフィスワークだけでなく、ハイブリッドワークや柔軟な働き方を示唆する文脈も増えています。"
+      name: "このサイトの2026年版TOEIC単語リストとは？",
+      text: "TOEIC L&Rの学習で確認したい英単語を、当サイト独自の3段階に整理したリストです。IIBC・ETS公式の頻度表やスコア別語彙表ではないため、模試で見つけた弱点と組み合わせて利用してください。"
     },
     {
       name: "TOEIC重要単語の効率的な覚え方は？",
@@ -60,31 +63,31 @@ function buildFaqEntries({
     },
     {
       name: "TOEIC重要単語は全部で何語覚えればいいですか？",
-      text: `当サイトでは合計${totalCount}語のTOEIC頻出単語を収録しています。内訳は最重要単語${importantWords.length}語（600点レベル）、中級単語${mediumWords.length}語（730〜800点レベル）、高難易度単語${highWords.length}語（800点以上レベル）です。目標スコアに合わせて、まずは最重要単語から取り組みましょう。`
+      text: `当サイトでは合計${totalCount}語を、独自の学習目安として基礎${importantWords.length}語（600点）、中級${mediumWords.length}語（730〜800点）、上級${highWords.length}語（800点以上）に分類しています。公式のスコア別語彙基準ではないため、模試の弱点と組み合わせてください。`
     },
     {
       name: "TOEIC単語学習は毎日何語ずつ進めればいい？",
-      text: `1日10〜20語を目安にするのが効果的です。新しい単語を覚えるだけでなく、前日・3日前・1週間前に学習した単語の復習も組み合わせましょう。「今日のおすすめ${TODAY_WORDS_COUNT}単語」機能を活用すれば、スキマ時間にも無理なく毎日の学習習慣を続けられます。`
+      text: `学べる時間や既知語の割合に合わせ、無理なく翌日も復習できる数に調整してください。「今日のおすすめ${TODAY_WORDS_COUNT}単語」機能は、少量から学習習慣を作る入口として利用できます。`
     },
     {
-      name: "TOEICで最も頻出する品詞は何ですか？",
-      text: "TOEICでは特に動詞と名詞が重要です。Part 5（短文穴埋め）では品詞問題が頻出し、語形変化（例: implement / implementation / implemented）の理解が問われます。各単語ページでは語形変化も掲載しているので、動詞・名詞・形容詞・副詞の形をセットで覚えましょう。"
+      name: "Part 5の単語はどう覚えればいいですか？",
+      text: "Part 5では、意味だけでなく文中で必要な品詞を見分ける練習も役立ちます。各単語ページの語形変化を使い、動詞・名詞・形容詞・副詞を例文の中で確認してください。"
     },
     {
       name: "TOEICの単語学習はいつから始めるべき？",
-      text: "試験日の2〜3ヶ月前から本格的に取り組むのが理想です。ただし、日常的に英単語に触れる習慣をつけることが最も効果的です。通勤・通学時間などのスキマ時間を活用し、当サイトの「学習モード」や「今日のおすすめ単語」で毎日少しずつ進めましょう。"
+      text: "試験日までの期間と現在の語彙力によって必要な時間は異なります。まず模試で未知語を確認し、試験日から逆算して、復習日を含む無理のない量を設定してください。"
     },
     {
       name: "TOEIC単語帳アプリと当サイトの違いは？",
-      text: "当サイトはインストール不要でブラウザからすぐに使える完全無料のTOEIC単語学習サービスです。最大の特徴はビジネス文脈に絞った詳細な単語解説で、単なる日本語訳だけでなく、語源・ニュアンス・コロケーション・TOEIC実践例文まで網羅しており、深い理解に基づく暗記をサポートします。さらに、12本以上の学習ガイド記事でスコア別戦略・Part別対策まで体系的に学べます。"
+      text: `当サイトはインストール不要で、単語の意味・例文・音声、学習・復習機能をブラウザから無料で利用できます。さらに、${PUBLISHED_GUIDE_ARTICLE_COUNT}本の公開中ガイドで学習の進め方やサイト機能を確認できます。`
     },
     {
       name: "TOEIC 600点に必要な単語力は？",
-      text: `TOEIC 600点を目指すなら、まずは当サイトの最重要単語${importantWords.length}語を確実にマスターしましょう。これらはTOEIC全体で最も出現頻度が高い基礎単語です。リーディング・リスニング両方のパートで繰り返し登場するため、この層の単語を押さえるだけで大幅なスコアアップが期待できます。`
+      text: `IIBC・ETSは、600点に必要な語彙数を公式基準として公表していません。当サイトでは学習順の目安として基礎層${importantWords.length}語を用意していますが、模試で間違えた語と基本文法もあわせて確認してください。`
     },
     {
       name: "TOEIC 800点以上を目指すには？",
-      text: `800点以上を目指す場合、最重要単語に加えて中級単語${mediumWords.length}語と高難易度単語${highWords.length}語もカバーする必要があります。特にPart 7の長文読解では、文脈から意味を推測する力が問われるため、単語の複数の意味や使い分けを理解することが重要です。当サイトの解説で各単語のニュアンスを深く学びましょう。`
+      text: `中級${mediumWords.length}語・上級${highWords.length}語は学習範囲を広げる目安です。すべてを一律に暗記するのではなく、基礎語の取りこぼし、模試の未知語、複数語義や言い換えを優先してください。`
     },
   ];
 }
@@ -219,18 +222,10 @@ export default function Home() {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: "TOEIC語彙ラボ",
-    description: "【完全無料】TOEIC重要単語をビジネス文脈に絞って徹底解説。2026年最新の出題傾向（リモートワーク・オンライン会議など）を反映した頻出英単語1,300語以上と、学習ガイド記事12本以上を収録。目標スコア（600点・730点・800点）のレベル別に厳選した単語、ビジネス例文、類義語の使い分け、音声発音チェック機能も完備。スマホでいつでも効率的に学習し、今のTOEICに通用する英語力を身につけましょう。",
+    description: `TOEIC学習向け英単語1,300語以上と、公開中の学習ガイド${PUBLISHED_GUIDE_ARTICLE_COUNT}本を無料で利用できるオンライン学習サービス。`,
     alternateName: "toeic-words.com",
     url: "https://www.toeic-words.com/",
     inLanguage: "ja-JP",
-    potentialAction: {
-      "@type": "SearchAction",
-      target: {
-        "@type": "EntryPoint",
-        urlTemplate: "https://www.toeic-words.com/words/{search_term_string}",
-      },
-      "query-input": "required name=search_term_string",
-    },
   };
 
   // BreadcrumbList構造化データ
@@ -247,18 +242,9 @@ export default function Home() {
     ],
   };
 
-  // EducationalOrganization構造化データ
-  const educationalJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "EducationalOrganization",
-    name: "TOEIC重要単語",
-    description: "TOEIC L&Rテスト対策のための無料オンライン単語学習サービス",
-    url: "https://www.toeic-words.com/",
-    educationalCredentialAwarded: "TOEIC L&R スコアアップ",
-  };
-
   return (
     <div className="relative min-h-screen w-full flex justify-center py-8 px-4 bg-[radial-gradient(circle_at_top,#bae6fd_0,#eff6ff_45%,#f8fafc_100%)] sm:py-12 sm:px-6 lg:py-8 lg:px-8 lg:pb-16">
+      <AdSenseScript />
       <script
         id="ldjson-website"
         type="application/ld+json"
@@ -269,25 +255,20 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
-      <script
-        id="ldjson-educational"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(educationalJsonLd) }}
-      />
       <main className="w-full max-w-[960px] flex flex-col gap-5 relative">
         <div className="mb-[-8px] sm:mb-0 flex items-center justify-between gap-4">
           <AuthStatus />
           <SnsShareButtons
             url="https://www.toeic-words.com/"
-            title="【2026年最新】TOEIC 重要単語 | 頻出単語を効率よく学習"
+            title="【2026年版】TOEIC 重要単語 | 英単語を効率よく学習"
           />
         </div>
         <header className="flex flex-col gap-5 sm:flex-row sm:justify-between sm:items-start">
           <div className="flex flex-col gap-3 sm:max-w-[60%]">
             <p className="text-xs tracking-[0.12em] text-slate-500">TOEIC語彙ラボ · LEVEL UP YOUR SCORE</p>
-            <h1 className="text-[22px] leading-[1.3] text-slate-900 font-bold sm:text-[26px] lg:text-[28px]">【2026年最新】TOEIC 重要単語</h1>
+            <h1 className="text-[22px] leading-[1.3] text-slate-900 font-bold sm:text-[26px] lg:text-[28px]">【2026年版】TOEIC 重要単語</h1>
             <p className="text-sm leading-[1.6] text-gray-500">
-              頻出単語を効率よく学習して、スコアアップを目指しましょう。
+              目標と弱点に合わせて英単語を確認し、学習を続けましょう。
             </p>
           </div>
           <div className="flex gap-4 items-center mt-2 flex-wrap justify-end sm:justify-start">
@@ -319,7 +300,7 @@ export default function Home() {
         <section className="mt-12 pt-12 border-t border-slate-200 flex flex-col gap-12">
           {/* 選ばれる3つの理由 */}
           <div className="flex flex-col gap-6">
-            <h2 className="text-2xl font-bold text-slate-800 text-center">このサイトが選ばれる3つの理由</h2>
+            <h2 className="text-2xl font-bold text-slate-800 text-center">このサイトでできる3つのこと</h2>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col gap-3">
                 <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center text-xl font-bold mb-2">1</div>
@@ -332,14 +313,14 @@ export default function Home() {
                 <div className="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center text-xl font-bold mb-2">2</div>
                 <h3 className="text-lg font-bold text-slate-800">忘却曲線を意識した復習</h3>
                 <p className="text-sm text-slate-600 leading-relaxed">
-                  「学習モード」と「復習モード」を使い分けることで、記憶への定着率を最大化。さらに「今日のおすすめ{TODAY_WORDS_COUNT}単語」機能で、スキマ時間での毎日の継続をサポートします。
+                  「学習モード」と「復習モード」を使い分け、覚えにくい語へ繰り返し触れられます。さらに「今日のおすすめ{TODAY_WORDS_COUNT}単語」機能で、少量からの継続をサポートします。
                 </p>
               </div>
               <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col gap-3">
                 <div className="w-12 h-12 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center text-xl font-bold mb-2">3</div>
                 <h3 className="text-lg font-bold text-slate-800">完全無料・登録不要</h3>
                 <p className="text-sm text-slate-600 leading-relaxed">
-                  アプリのインストールや面倒な会員登録は一切不要。PCでもスマホでも、ブラウザを開くだけで1,300語以上のTOEIC頻出単語をすべて無料で学習できます。複数端末でお気に入りを同期したい方向けに、任意のログイン機能も用意しています。
+                  アプリのインストールや会員登録は不要。PCでもスマホでも、ブラウザから1,300語以上の収録語を無料で確認できます。複数端末でお気に入りを同期したい方向けに、任意のログイン機能も用意しています。
                 </p>
               </div>
             </div>
@@ -377,9 +358,9 @@ export default function Home() {
 
           {/* 開発者・運営からのメッセージ */}
           <div className="flex flex-col gap-4 border-l-4 border-blue-600 pl-5 py-2">
-            <h2 className="text-lg font-bold text-slate-800">開発チームからのメッセージ</h2>
+            <h2 className="text-lg font-bold text-slate-800">運営者からのメッセージ</h2>
             <p className="text-sm text-slate-600 leading-relaxed">
-              「市販の単語帳は持ち歩くのが重い」「アプリは有料のものが多い」——そんなTOEIC学習者の声から、このサイトは生まれました。誰もが質の高い英語学習環境に無料でアクセスできるべきだと考えています。従来の辞書にはない「生きたビジネス英語のニュアンス」を、運営者の手で確認しながら提供し、皆さまのスコアアップ、そしてその先のキャリアアップをサポートします。
+              運営者自身が TOEIC 学習を続ける中で、単語の意味・例文・音声をスマートフォンからまとめて確認したいと考え、このサイトを作りました。AI で生成した解説は自動チェックを行い、確認できた箇所や指摘を受けた箇所から改善しています。誤りや不自然な表現は、お問い合わせからお知らせください。
             </p>
           </div>
         </section>
@@ -397,7 +378,7 @@ export default function Home() {
             </Link>
           </div>
           <p className="text-sm text-slate-600 leading-relaxed">
-            TOEIC のスコアアップに直結する学習戦略・Part 別対策・語彙集を、運営者が体系的にまとめた長文記事を <strong>12 本以上</strong> 公開しています。スコア別の語彙数、忘却曲線を活用した暗記法、Part 5/7 の頻出語リストなど、単語帳だけでは補えない内容を扱います。
+            学習の進め方・Part 別対策・語彙集など、運営者がまとめたガイドを <strong>{PUBLISHED_GUIDE_ARTICLE_COUNT} 本</strong> 公開しています。サイト機能の使い方や、復習計画、語形・コロケーションなど、単語一覧だけでは扱いにくい内容を補います。
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {latestGuideArticles.map((article) => (
@@ -430,17 +411,15 @@ export default function Home() {
         {/* TOEIC最新単語 説明セクション */}
         <section className="mt-12 pt-12 border-t border-slate-200 flex flex-col gap-8">
           <article className="flex flex-col gap-4">
-            <h2 className="text-xl font-bold text-slate-800 mb-2">2026年のTOEIC頻出語を、今のビジネス英語で効率よく。</h2>
+            <h2 className="text-xl font-bold text-slate-800 mb-2">2026年版の収録語を、ビジネス場面の例文で確認。</h2>
             <p className="text-[15px] leading-[1.8] text-slate-600">
-              近年のTOEIC L&Rテストでは、リモートワーク、オンライン会議、チャットツール、AIなど、
-              現代のビジネス環境を反映した語彙や表現がますます重要になっています。
+              TOEIC L&amp;R では、オフィス、会議、契約、出張、顧客対応など、さまざまなビジネス場面の英文が扱われます。
+              当サイトでは、単語を日本語訳だけでなく、場面と結び付けて確認できるよう例文を掲載しています。
             </p>
             <p className="text-[15px] leading-[1.8] text-slate-600">
-              本サイトの「TOEIC重要単語」リストでは、そうした最新の出題傾向を踏まえた頻出語彙を厳選。
               例えば、<Link href="/words/accommodate" prefetch={false} className="text-blue-600 font-bold hover:underline">accommodate</Link>（対応する）や<Link href="/words/negotiate" prefetch={false} className="text-blue-600 font-bold hover:underline">negotiate</Link>（交渉する）、
-              <Link href="/words/implement" prefetch={false} className="text-blue-600 font-bold hover:underline">implement</Link>（実施する）など、スコアアップに直結する重要語を、
-              実践的な例文とともにわかりやすく学べます。
-              古い単語帳だけでは補いにくい、今のTOEICに合ったビジネス英語を、このサイトで効率よく身につけましょう。
+              <Link href="/words/implement" prefetch={false} className="text-blue-600 font-bold hover:underline">implement</Link>（実施する）などを、例文・類義語・音声とあわせて確認できます。
+              収録ランクは当サイト独自の学習目安なので、公式問題集や模試で見つけた弱点と組み合わせて利用してください。
             </p>
           </article>
 
