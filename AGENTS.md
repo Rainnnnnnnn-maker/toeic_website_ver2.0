@@ -57,7 +57,7 @@ Setting `BLOB_URL_IMPORTANT`, `BLOB_URL_MEDIUM`, `BLOB_URL_HIGH` skips the Blob 
 
 Never call Gemini directly. Always go through `getWordDetail`. For client-side access, use the Server Action `fetchWordDetail` from `src/actions/word.ts` (it wraps `getWordDetail` and swallows exceptions, returning `null` on failure).
 
-### Today's 5 Recommended Words
+### Today's 6 Recommended Words
 
 `getTodayRecommendedWords(limit)` in `src/data/words.ts` is a Cache Component (`'use cache'` + `cacheTag('today-recommended-words')` + `cacheLife('days')`). It picks words deterministically by UTC-based JST date key + FNV-1a hash of each slug. **The daily rotation is triggered by Vercel Cron** at UTC 22:05 (= JST 7:05) via `/api/revalidate/today-words`, which calls `revalidateTag('today-recommended-words')`. Client components that display these words are dumb — they receive the 5 words as props, never run selection logic themselves.
 
