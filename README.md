@@ -211,6 +211,7 @@ Generates audio for words or sentences.
 - **Body**: `{ "text": "word or sentence", "language": "en" | "ja", "wordSlug": "<slug>" }`
   - `wordSlug` is **required** for multi-word text or any Japanese text.
 - **Voices**: `en-US-Wavenet-C` (English), `ja-JP-Neural2-B` (Japanese).
+- **API key handling**: The server sends `TTS_API_KEY` to Google using the `x-goog-api-key` request header; it is never included in the request URL or returned to the browser.
 - **Allowlist**:
   - Single English words must exist in the curated vocabulary list.
   - Example sentences must exactly match (after whitespace normalization) one of the cached `WordDetails.toeicExamples` or `meanings[].detailedMeanings[].example` entries for the given `wordSlug`. This blocks Referer-spoofing attacks from synthesizing arbitrary text against the Google Cloud TTS quota.

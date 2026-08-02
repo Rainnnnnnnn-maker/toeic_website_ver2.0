@@ -76,6 +76,7 @@ The TTS endpoint has a strict allowlist to prevent quota abuse:
 - Example sentences must exactly match a `toeicExamples` or `meanings[].detailedMeanings[].example` entry for the given `wordSlug` (after whitespace normalization).
 - Rate limit: 30 req/min per IP via Upstash Ratelimit (sliding window); cached results bypass the counter.
 - TTS cache keys: `tts:en:word:<slug>` for single words; `tts:<lang>:<wordSlugTag>:<sha256_12>` for sentences (30-day TTL).
+- Send `TTS_API_KEY` to Google only through the `x-goog-api-key` request header. Never place it in the URL or response payload.
 
 ### Semantic Search（意味で探す）
 

@@ -153,10 +153,13 @@ async function callTtsApi(
 ): Promise<{ success: true; audioContent: string } | ValidationError> {
   try {
     const response = await fetch(
-      `https://texttospeech.googleapis.com/v1/text:synthesize?key=${apiKey}`,
+      "https://texttospeech.googleapis.com/v1/text:synthesize",
       {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-goog-api-key": apiKey,
+        },
         body: JSON.stringify({
           input: { text },
           voice: voiceConfig,
