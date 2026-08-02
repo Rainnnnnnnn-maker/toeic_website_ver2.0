@@ -1,96 +1,20 @@
 import "server-only";
 import { connection } from "next/server";
-import { list } from "@vercel/blob";
 import { cacheTag, cacheLife } from "next/cache";
 import { cache } from "react";
-import fs from "node:fs";
-import path from "node:path";
 import {
-  parseWords,
-  buildWordData,
   getTodayKey,
   selectTodayWords,
   TODAY_WORDS_COUNT,
   type WordData,
 } from "@/lib/word-select";
+import { loadWordData, resolveDefaultWordSource } from "@/lib/word-source";
 
 export type Word = {
   slug: string;
   term: string;
   level: 'important' | 'medium' | 'high';
 };
-
-async function getWordsLocal(): Promise<WordData> {
-  const loadWords = (filename: string, level: 'important' | 'medium' | 'high'): Word[] => {
-    const filePath = path.join(process.cwd(), "__words__", filename);
-    if (!fs.existsSync(filePath)) {
-      console.warn(`Local word file not found: ${filePath}`);
-      return [];
-    }
-    const text = fs.readFileSync(filePath, "utf-8");
-    return parseWords(text, level);
-  };
-
-  const important = loadWords("word.txt", "important");
-  const medium = loadWords("word_mid.txt", "medium");
-  const high = loadWords("word_high.txt", "high");
-
-  return buildWordData(important, medium, high);
-}
-
-async function getWordsBlob(): Promise<WordData> {
-  // Check for direct URLs in environment variables to avoid List operations
-  const importantUrl = process.env.BLOB_URL_IMPORTANT;
-  const mediumUrl = process.env.BLOB_URL_MEDIUM;
-  const highUrl = process.env.BLOB_URL_HIGH;
-
-  if (importantUrl && mediumUrl && highUrl) {
-    // 失敗時に [] を返すと "use cache"（max）で空リストが最大30日固定されるため throw する。
-    // throw ならキャッシュされず、バックグラウンド再検証の失敗時は直前の正常キャッシュが使われ続ける。
-    const loadWordsDirect = async (url: string, level: 'important' | 'medium' | 'high'): Promise<Word[]> => {
-      const res = await fetch(url);
-      if (!res.ok) {
-        throw new Error(`Failed to fetch blob from URL: ${url} (status: ${res.status})`);
-      }
-      const text = await res.text();
-      return parseWords(text, level);
-    };
-
-    const [important, medium, high] = await Promise.all([
-      loadWordsDirect(importantUrl, "important"),
-      loadWordsDirect(mediumUrl, "medium"),
-      loadWordsDirect(highUrl, "high")
-    ]);
-
-    return buildWordData(important, medium, high);
-  }
-
-  const { blobs } = await list({ token: process.env.BLOB_READ_WRITE_TOKEN });
-
-  const loadWords = async (filename: string, level: 'important' | 'medium' | 'high'): Promise<Word[]> => {
-    // Find blob ending with filename (to handle potential folders or prefixes)
-    const blob = blobs.find(b => b.pathname.endsWith(filename));
-    if (!blob) {
-      // 空リストのまま長期キャッシュされるのを防ぐため、欠損は例外として扱う
-      throw new Error(`Blob not found for: ${filename}`);
-    }
-
-    const res = await fetch(blob.url);
-    if (!res.ok) {
-      throw new Error(`Failed to fetch blob: ${blob.url} (status: ${res.status})`);
-    }
-    const text = await res.text();
-    return parseWords(text, level);
-  };
-
-  const [important, medium, high] = await Promise.all([
-    loadWords("words-file/word.txt", "important"),
-    loadWords("words-file/word_mid.txt", "medium"),
-    loadWords("words-file/word_high.txt", "high")
-  ]);
-
-  return buildWordData(important, medium, high);
-}
 
 // Cached function to fetch and parse words
 async function getWordsData(): Promise<WordData> {
@@ -100,10 +24,9 @@ async function getWordsData(): Promise<WordData> {
   // Vercel の ISR Writes を節約する。更新時は /api/revalidate/words でオンデマンドにパージする。
   cacheLife('max');
 
-  if (process.env.NODE_ENV === "development") {
-    return getWordsLocal();
-  }
-  return getWordsBlob();
+  // ローカル / Blob の分岐は src/lib/word-source.ts に集約している
+  // （`scripts/embed-words.ts` からも同じコーパスを読めるようにするため）。
+  return loadWordData(resolveDefaultWordSource());
 }
 
 // Memoize the data fetching within the same request lifecycle

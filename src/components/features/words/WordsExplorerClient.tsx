@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useEffectEvent, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState, useSyncExternalStore } from "react";
 import type { SubmitEvent } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -30,6 +30,9 @@ const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
 const levelStyles = WORD_LEVEL_CARD_STYLES;
 
+/** 起動クエリは同一タブ内で一度読むだけで変化しないため、購読は不要。 */
+const subscribeToLaunchStore = () => () => {};
+
 function matchesQuery(term: string, query: string): boolean {
   if (!query) return true;
 
@@ -49,8 +52,15 @@ export function WordsExplorerClient({ words }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const launchParams = parseSemanticLaunchParams(`?${searchParams.toString()}`);
-  const initialSemanticQuery = getSemanticLaunchQuery(launchParams.launchId);
   const searchMode = launchParams.mode;
+  const launchId = launchParams.launchId;
+  // sessionStorage はサーバー描画時に読めないため、サーバースナップショットとハイドレーション時は
+  // 必ず空文字を返し、ハイドレーション完了後に実際の検索語へ切り替える（不一致を起こさない）。
+  const launchQuery = useSyncExternalStore(
+    subscribeToLaunchStore,
+    () => getSemanticLaunchQuery(launchId),
+    () => ""
+  );
   const [query, setQuery] = useState("");
   const [level, setLevel] = useState<LevelFilter>("all");
   const [letter, setLetter] = useState("all");
@@ -347,9 +357,11 @@ export function WordsExplorerClient({ words }: Props) {
       </div>
 
       {searchMode === "meaning" ? (
+        // 起動クエリが読めるのはハイドレーション後なので、key を切り替えてパネルを
+        // 一度だけ再マウントし、初期クエリ・ローディング状態を確定させる。
         <SemanticSearchPanel
-          key={launchParams.launchId || "manual"}
-          initialQuery={initialSemanticQuery}
+          key={`${launchId || "manual"}:${launchQuery ? "launched" : "idle"}`}
+          initialQuery={launchQuery}
         />
       ) : (
       <div className="px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8">

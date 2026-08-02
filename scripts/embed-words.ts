@@ -6,6 +6,13 @@
  *   npm run embed:words -- --dry-run        # 投入せず、キャッシュ状況とサンプルテキストを表示
  *   npm run embed:words -- --limit=20       # 先頭20語のみ（動作確認用）
  *   npm run embed:words -- --only-cached    # Redis にある単語のみ（Gemini 生成をスキップ）
+ *   npm run embed:words -- --source=local   # 単語リストの取得元を明示（既定は blob）
+ *
+ * 単語リストは本番サイトと同じ `src/lib/word-source.ts` 経由で読み込む。
+ * 既定は本番と同じ Vercel Blob（NODE_ENV=development のときのみ __words__/*.txt）。
+ * ローカルの `__words__/*.txt` が Blob と食い違っていても、投入されるのは
+ * 実際に配信されているコーパスなので、本番限定の単語が検索不能になったり
+ * 削除済みの単語が 404 リンクとして残ったりしない。
  *
  * データフロー（1単語ごと）:
  *   Redis(L2) から WordDetails を取得 → 無ければ Gemini で生成して Redis に保存
@@ -14,14 +21,23 @@
  *
  * 必要な環境変数（--env-file=.env.local で読み込む）:
  *   GEMINI_API_KEY, UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN,
- *   UPSTASH_VECTOR_REST_URL, UPSTASH_VECTOR_REST_TOKEN
+ *   UPSTASH_VECTOR_REST_URL, UPSTASH_VECTOR_REST_TOKEN,
+ *   BLOB_URL_IMPORTANT / BLOB_URL_MEDIUM / BLOB_URL_HIGH もしくは BLOB_READ_WRITE_TOKEN
+ *   （--source=local のときは Blob 系は不要）
+ *
+ * `server-only` は Next.js の Client Component 誤 import を検出するマーカーであり、
+ * このファイルは `tsx` で直接動かす Node.js CLI なので import しない。
+ * 通常の Node.js 条件で import すると marker package 自体が例外を投げる。
  */
-import fs from "node:fs";
-import path from "node:path";
 import { GoogleGenAI } from "@google/genai";
 import { Redis } from "@upstash/redis";
-import { Index } from "@upstash/vector";
-import { parseWords, buildWordData } from "../src/lib/word-select";
+import { Index, type RangeResult } from "@upstash/vector";
+import {
+  hasDirectBlobUrls,
+  loadWordData,
+  resolveDefaultWordSource,
+  type WordSource,
+} from "../src/lib/word-source";
 import { parseStoredWordDetails } from "../src/lib/word-detail-parse";
 import { generateWordDetail } from "../src/lib/word-detail-gemini";
 import {
@@ -32,12 +48,18 @@ import {
   normalizeVector,
   type WordVectorMetadata,
 } from "../src/lib/semantic-search";
+import {
+  findStaleWordVectorIds,
+  shouldPruneStaleWordVectors,
+  type VectorInventoryItem,
+} from "../src/lib/semantic-index-sync";
 import type { Word } from "../src/data/words";
 import type { WordDetails } from "../src/types/word";
 
 const REDIS_MGET_BATCH = 100;
 const EMBED_BATCH = 16;
 const UPSERT_BATCH = 100;
+const VECTOR_RANGE_BATCH = 1000;
 const GEMINI_DELAY_MS = 300;
 const EMBED_DELAY_MS = 200;
 
@@ -45,16 +67,24 @@ type Args = {
   dryRun: boolean;
   onlyCached: boolean;
   limit: number | null;
+  source: WordSource | null;
 };
 
 function parseArgs(argv: string[]): Args {
-  const args: Args = { dryRun: false, onlyCached: false, limit: null };
+  const args: Args = { dryRun: false, onlyCached: false, limit: null, source: null };
   for (const arg of argv) {
     if (arg === "--dry-run") args.dryRun = true;
     else if (arg === "--only-cached") args.onlyCached = true;
     else if (arg.startsWith("--limit=")) {
       const n = Number(arg.slice("--limit=".length));
       if (Number.isFinite(n) && n > 0) args.limit = Math.floor(n);
+    } else if (arg.startsWith("--source=")) {
+      const value = arg.slice("--source=".length);
+      if (value !== "local" && value !== "blob") {
+        console.error(`Invalid --source: ${value} (expected "local" or "blob")`);
+        process.exit(1);
+      }
+      args.source = value;
     } else {
       console.warn(`Unknown argument ignored: ${arg}`);
     }
@@ -71,20 +101,15 @@ function requireEnv(name: string): string {
   return value;
 }
 
-function loadAllWords(): Word[] {
-  const load = (filename: string, level: Word["level"]): Word[] => {
-    const filePath = path.join(process.cwd(), "__words__", filename);
-    if (!fs.existsSync(filePath)) {
-      console.warn(`Local word file not found: ${filePath}`);
-      return [];
-    }
-    return parseWords(fs.readFileSync(filePath, "utf-8"), level);
-  };
-  const data = buildWordData(
-    load("word.txt", "important"),
-    load("word_mid.txt", "medium"),
-    load("word_high.txt", "high")
-  );
+/**
+ * 本番サイトと同じローダー（src/lib/word-source.ts）でコーパスを読み込む。
+ * Blob 取得元では認証情報が必須なので、失敗を後段まで引きずらないよう先に検証する。
+ */
+async function loadAllWords(source: WordSource): Promise<Word[]> {
+  if (source === "blob" && !hasDirectBlobUrls()) {
+    requireEnv("BLOB_READ_WRITE_TOKEN");
+  }
+  const data = await loadWordData(source);
   return data.allWords;
 }
 
@@ -148,6 +173,59 @@ async function embedTexts(genai: GoogleGenAI, texts: string[]): Promise<number[]
   return vectors;
 }
 
+async function readVectorInventory(
+  index: Index<WordVectorMetadata>
+): Promise<VectorInventoryItem[]> {
+  const inventory: VectorInventoryItem[] = [];
+  const visitedCursors = new Set<string>();
+  let cursor: string | number = 0;
+
+  while (true) {
+    const cursorKey = String(cursor);
+    if (visitedCursors.has(cursorKey)) {
+      throw new Error(`Vector range returned a repeated cursor: ${cursorKey}`);
+    }
+    visitedCursors.add(cursorKey);
+
+    const page: RangeResult<WordVectorMetadata> = await index.range({
+      cursor,
+      limit: VECTOR_RANGE_BATCH,
+      includeVectors: false,
+      includeMetadata: true,
+    });
+    inventory.push(...page.vectors);
+
+    if (page.nextCursor === "") break;
+    cursor = page.nextCursor;
+  }
+
+  return inventory;
+}
+
+async function pruneStaleWordVectors(
+  index: Index<WordVectorMetadata>,
+  corpusWords: readonly Word[]
+): Promise<{ scanned: number; stale: number; deleted: number }> {
+  const inventory = await readVectorInventory(index);
+  const staleIds = findStaleWordVectorIds(
+    inventory,
+    corpusWords.map((word) => word.slug)
+  );
+
+  if (staleIds.length === 0) {
+    return { scanned: inventory.length, stale: 0, deleted: 0 };
+  }
+
+  const { deleted } = await index.delete(staleIds);
+  if (deleted !== staleIds.length) {
+    throw new Error(
+      `Stale vector deletion mismatch: expected ${staleIds.length}, deleted ${deleted}`
+    );
+  }
+
+  return { scanned: inventory.length, stale: staleIds.length, deleted };
+}
+
 async function main(): Promise<void> {
   const args = parseArgs(process.argv.slice(2));
 
@@ -165,12 +243,18 @@ async function main(): Promise<void> {
     token: process.env.UPSTASH_REDIS_REST_TOKEN!,
   });
 
-  let words = loadAllWords();
-  if (words.length === 0) {
-    console.error("No words loaded from __words__/. Aborting.");
+  const source = args.source ?? resolveDefaultWordSource();
+  console.log(`Word source: ${source}${args.source ? "" : " (default)"}`);
+
+  const corpusWords = await loadAllWords(source);
+  if (corpusWords.length === 0) {
+    console.error(
+      `No words loaded from ${source === "local" ? "__words__/" : "Vercel Blob"}. Aborting.`
+    );
     process.exit(1);
   }
-  if (args.limit !== null) words = words.slice(0, args.limit);
+  const words =
+    args.limit === null ? corpusWords : corpusWords.slice(0, args.limit);
   console.log(`Target words: ${words.length}`);
 
   // Phase 1: WordDetails の収集（Redis 優先 → Gemini 生成）
@@ -249,12 +333,47 @@ async function main(): Promise<void> {
     console.log(`  upserted ${Math.min(i + UPSERT_BATCH, targets.length)}/${targets.length}`);
   }
 
-  // 全 upsert 完了後に世代を進め、部分インデックス時などの旧検索結果を参照不能にする。
+  // Phase 4: Blob の全件投入が成功した場合だけ、現行コーパス外の旧単語ベクトルを削除する。
+  // local / --limit / --only-cached / 生成失敗時は部分コーパスを正と誤認しないよう削除しない。
+  const canPruneStaleVectors = shouldPruneStaleWordVectors({
+    source,
+    limit: args.limit,
+    onlyCached: args.onlyCached,
+    corpusCount: corpusWords.length,
+    targetCount: targets.length,
+    failureCount: failures.length,
+  });
+  let pruneResult = { scanned: 0, stale: 0, deleted: 0 };
+  let pruneError: unknown = null;
+
+  if (canPruneStaleVectors) {
+    console.log("Phase 4: pruning stale word vectors...");
+    try {
+      pruneResult = await pruneStaleWordVectors(index, corpusWords);
+      console.log(
+        `  scanned: ${pruneResult.scanned}, stale: ${pruneResult.stale}, deleted: ${pruneResult.deleted}`
+      );
+    } catch (error) {
+      // upsert は既に完了しているため、結果キャッシュを旧世代へ固定しないよう
+      // 世代を進めてから失敗終了する。
+      pruneError = error;
+      console.error("  stale vector pruning failed");
+    }
+  } else {
+    console.log("Phase 4: stale vector pruning skipped (partial or non-Blob run).");
+  }
+
+  // 全 upsert（および可能なら削除同期）後に世代を進め、旧検索結果を参照不能にする。
   const semanticIndexVersion = await redis.incr(SEMANTIC_INDEX_VERSION_KEY);
+
+  if (pruneError) {
+    throw pruneError;
+  }
 
   const info = await index.info();
   console.log("\n=== Summary ===");
   console.log(`upserted: ${targets.length}`);
+  console.log(`stale vectors deleted: ${pruneResult.deleted}`);
   console.log(`semantic index version: ${semanticIndexVersion}`);
   console.log(`generation failures: ${failures.length}`);
   for (const f of failures) console.log(`  - ${f.slug}: ${f.error}`);
