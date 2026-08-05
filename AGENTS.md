@@ -37,6 +37,7 @@ Production builds switch the word-list loader to Vercel Blob, so a complete buil
 - **AI**: Google Gemini (`@google/genai`, models: `gemini-2.5-flash-lite` for word details, `gemini-embedding-001` for semantic-search embeddings)
 - **Cache L2**: Upstash Redis (`@upstash/redis`)
 - **Vector Search**: Upstash Vector (`@upstash/vector`) — 768-dim cosine index for semantic word search
+- **Auth / User Data**: Supabase (`@supabase/supabase-js` + `@supabase/ssr`) — optional Google sign-in and RLS-protected favorites sync in Postgres
 - **Storage**: Vercel Blob (word lists in production)
 - **TTS**: Google Cloud Text-to-Speech (HTTP API)
 - **Deploy**: Vercel (preview on all branches; production via manual `workflow_dispatch`)
@@ -68,6 +69,15 @@ Never call Gemini directly. Always go through `getWordDetail`. For client-side a
 - Only `NEXT_PUBLIC_*` env vars may be used client-side.
 - Navigation links use `prefetch={false}` site-wide to reduce Vercel Edge Requests. Use the existing `WordLinkPending` pattern (via `useLinkStatus`) for click-feedback on links that need a loading pulse.
   - Counterintuitive gotcha: on Suspense-streaming pages (e.g. `/words/[word]`, where `page.tsx` wraps the data fetcher in `<Suspense fallback={<Loading />}>`), `prefetch={false}` *disables* the instant `loading.tsx` skeleton — prefetch is what caches the loading shell so it can render on click. Without prefetch the router waits on the current page, so the skeleton never visibly fires. Enable prefetch only when you intentionally want that fallback to show.
+
+### Supabase Auth and Favorites Sync
+
+- Sign-in is optional. Guests keep full app access and store favorites in `localStorage`; signed-in users persist favorites in Supabase so they sync across devices.
+- Use `src/lib/supabase/client.ts` for browser access and `src/lib/supabase/server.ts` for Server Components, Server Actions, and Route Handlers. The server client is protected by `import "server-only"`; apart from the cookie-bridging client required directly inside `src/proxy.ts`, do not introduce another Supabase client initialization path.
+- `AuthContext` resolves auth state client-side with `onAuthStateChange` so the existing pages remain statically cacheable. `/auth/callback` exchanges the OAuth code for a session. `src/proxy.ts` exists only to refresh Supabase Auth sessions and intentionally matches `/login` and `/auth/*`; do not broaden the matcher merely to read auth state because that increases Vercel Proxy executions and can undermine the static-cache strategy.
+- `FavoritesContext` owns the guest/remote transition: first sign-in merges eligible local favorites into Supabase, successful merges clear the merged local copy, and sign-out writes the previous account's favorites back to local storage. The local owner marker plus `authEpoch` prevent favorites from leaking across account switches or reusing stale remote state. Keep merge/session decisions in the pure helpers under `src/lib/favorites-sync.ts` and storage mechanics in `src/lib/favorites-store.ts`.
+- The active Phase 1 schema is `profiles` plus `favorites`, with a unique `(user_id, word_slug)` constraint and RLS policies that restrict each user to their own rows. The baseline SQL and provider setup are documented in `__docs__/phase1-login-favorites-sync-setup.md`. There are currently no tracked files under `supabase/migrations/`; do not imply that a migration has been applied unless it is version-controlled and reconciled with the live project.
+- The publishable key is intentionally exposed to the browser; RLS is the authorization boundary. Never expose or add a Supabase secret/service-role key to client code, a `NEXT_PUBLIC_*` variable, logs, or committed files. The current feature does not require a service-role key.
 
 ### TTS API (`POST /api/tts`)
 
@@ -124,6 +134,7 @@ Any feature change must update **both** `README.md` and `.trae/documents/技術�
 - Pure, side-effect-free logic lives in `src/lib/*.ts` and is unit-tested in `src/lib/(tests)/*.test.ts` files (`environment: "node"`, no secrets required). Current suites: `word-select` (parsing/dedup, FNV-1a hash, JST day key, daily selection), `word-detail-parse` (Gemini JSON extraction + normalization), `tts-utils` (text normalization, slug sanitization, cache keys, example allowlist matching), `listen-utils` (`pickExample` fallback), `favorites-sync` (stored-favorites parsing, merge logic), `safe-compare` (constant-time token comparison), `study-utils` (study-mode pool selection/re-draw with injectable random, persisted-state parsing, sentence highlight splitting), `semantic-search` (query normalization, index-versioned cache keys, minimum-score filtering, vector normalization, embedding-document building, vector-match/cached-result parsing).
 - When extracting testable logic out of a `server-only` module, put the pure function in `src/lib/` (no `server-only`, type-only imports for server types) and have the server module import it — never duplicate.
 - Do **not** add tests that require Gemini/Redis/Blob/TTS or render React components; cover those by manual testing.
+- For auth/favorites changes, manually verify the guest flow, first-login local-to-Supabase merge, signed-in add/remove/clear sync, sign-out write-back, and same-browser account switching without cross-account favorite leakage.
 
 Before merging:
 1. `npm run lint` — must pass
@@ -149,5 +160,7 @@ Required in `.env.local` for local development:
 | `BLOB_READ_WRITE_TOKEN` | Vercel Blob (production word lists) |
 | `REVALIDATION_TOKEN` | Protects `/api/revalidate/*` endpoints |
 | `NEXT_PUBLIC_GA_ID` | Google Analytics 4 |
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL for optional sign-in and favorites sync |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Browser-safe Supabase publishable key; data access must remain protected by RLS |
 | `BLOB_URL_IMPORTANT` / `BLOB_URL_MEDIUM` / `BLOB_URL_HIGH` | Optional direct Blob URLs (skips `list` call) |
 | `WORD_CACHE_TTL_DAYS` | Redis TTL in days (default: 30) |
