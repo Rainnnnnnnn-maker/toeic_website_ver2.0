@@ -4,6 +4,10 @@ import {
   buildWordData,
   hashString,
   getTodayKey,
+  getWordListVersion,
+  parseTodayDateKey,
+  parseWordListVersion,
+  resolveTodayNavigationSelection,
   selectTodayWords,
   TODAY_WORDS_COUNT,
 } from "../word-select";
@@ -80,6 +84,70 @@ describe("getTodayKey", () => {
   });
 });
 
+describe("parseTodayDateKey", () => {
+  it("accepts a well-formed YYYY-MM-DD key", () => {
+    expect(parseTodayDateKey("2026-08-06")).toBe("2026-08-06");
+  });
+
+  it("accepts the output of getTodayKey", () => {
+    const key = getTodayKey(new Date("2026-06-04T22:00:00Z"));
+    expect(parseTodayDateKey(key)).toBe(key);
+  });
+
+  it("trims surrounding whitespace", () => {
+    expect(parseTodayDateKey("  2026-08-06 ")).toBe("2026-08-06");
+  });
+
+  it("rejects empty, null and undefined values", () => {
+    expect(parseTodayDateKey("")).toBeNull();
+    expect(parseTodayDateKey(null)).toBeNull();
+    expect(parseTodayDateKey(undefined)).toBeNull();
+  });
+
+  it("rejects the legacy comma-separated slug list so old links fall back", () => {
+    expect(parseTodayDateKey("abandon,accommodate,acquire")).toBeNull();
+  });
+
+  it("rejects malformed shapes", () => {
+    expect(parseTodayDateKey("2026-8-6")).toBeNull();
+    expect(parseTodayDateKey("26-08-06")).toBeNull();
+    expect(parseTodayDateKey("2026/08/06")).toBeNull();
+    expect(parseTodayDateKey("2026-08-06T00:00:00Z")).toBeNull();
+  });
+
+  it("rejects calendar dates that do not exist", () => {
+    expect(parseTodayDateKey("2026-02-31")).toBeNull();
+    expect(parseTodayDateKey("2026-13-01")).toBeNull();
+    expect(parseTodayDateKey("2026-00-10")).toBeNull();
+  });
+
+  it("keeps a valid leap day", () => {
+    expect(parseTodayDateKey("2028-02-29")).toBe("2028-02-29");
+    expect(parseTodayDateKey("2026-02-29")).toBeNull();
+  });
+});
+
+describe("word-list version", () => {
+  const words = parseWords("alpha\nbravo\ncharlie", "important");
+
+  it("is stable for the same slug set regardless of order", () => {
+    expect(getWordListVersion(words)).toBe(getWordListVersion([...words].reverse()));
+  });
+
+  it("changes when the slug set changes", () => {
+    const changedWords = parseWords("alpha\nbravo\ncharlie\ndelta", "important");
+    expect(getWordListVersion(changedWords)).not.toBe(getWordListVersion(words));
+  });
+
+  it("normalizes a valid version and rejects malformed values", () => {
+    const version = getWordListVersion(words);
+    expect(parseWordListVersion(`  ${version.toUpperCase()}  `)).toBe(version);
+    expect(parseWordListVersion("1234")).toBeNull();
+    expect(parseWordListVersion("not-a-version")).toBeNull();
+    expect(parseWordListVersion(null)).toBeNull();
+  });
+});
+
 describe("selectTodayWords", () => {
   const words = parseWords(
     ["alpha", "bravo", "charlie", "delta", "echo", "foxtrot"].join("\n"),
@@ -113,5 +181,66 @@ describe("selectTodayWords", () => {
     const day2 = selectTodayWords(words, "2026-07-15", 3).map((w) => w.slug);
     // Not a hard guarantee, but with this fixture the orderings differ.
     expect(day1).not.toEqual(day2);
+  });
+});
+
+describe("resolveTodayNavigationSelection", () => {
+  const words = parseWords(
+    ["alpha", "bravo", "charlie", "delta", "echo", "foxtrot", "golf", "hotel"].join("\n"),
+    "important"
+  );
+  const dateKey = "2026-08-07";
+  const version = getWordListVersion(words);
+  const selectedWords = selectTodayWords(words, dateKey, TODAY_WORDS_COUNT);
+
+  it("restores the same selection when date, corpus version and current slug match", () => {
+    const result = resolveTodayNavigationSelection(
+      words,
+      selectedWords[0].slug,
+      dateKey,
+      version
+    );
+
+    expect(result).toEqual({
+      dateKey,
+      wordListVersion: version,
+      words: selectedWords,
+    });
+  });
+
+  it("falls back when the word corpus changed after the link was generated", () => {
+    const changedWords = [
+      ...words,
+      { slug: "india", term: "india", level: "important" as const },
+    ];
+
+    expect(
+      resolveTodayNavigationSelection(
+        changedWords,
+        selectedWords[0].slug,
+        dateKey,
+        version
+      )
+    ).toBeNull();
+  });
+
+  it("falls back when the current word is not in the restored selection", () => {
+    const unselectedWord = words.find(
+      (word) => !selectedWords.some((selected) => selected.slug === word.slug)
+    );
+    expect(unselectedWord).toBeDefined();
+
+    expect(
+      resolveTodayNavigationSelection(words, unselectedWord!.slug, dateKey, version)
+    ).toBeNull();
+  });
+
+  it("falls back when date or corpus version is missing or malformed", () => {
+    expect(
+      resolveTodayNavigationSelection(words, selectedWords[0].slug, dateKey, null)
+    ).toBeNull();
+    expect(
+      resolveTodayNavigationSelection(words, selectedWords[0].slug, "invalid", version)
+    ).toBeNull();
   });
 });

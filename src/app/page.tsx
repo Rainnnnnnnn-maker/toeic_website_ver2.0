@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { Suspense, cache } from "react";
 import { BookOpen, Star, List } from "lucide-react";
-import { getImportantWords, getMediumWords, getHighWords, getTodayRecommendedWords } from "@/data/words";
+import { getImportantWords, getMediumWords, getHighWords, getTodayRecommendedSelection } from "@/data/words";
 import WordsListClient from "@/components/features/words/WordsListClient";
 import { SnsShareButtons } from "@/components/features/sns/SnsShareButtons";
 import { AuthStatus } from "@/components/features/auth/AuthStatus";
@@ -27,8 +27,15 @@ export const metadata: Metadata = {
 };
 
 async function TodayRecommendedWordsSection() {
-  const todayWords = await getTodayRecommendedWords();
-  return <TodayRecommendedWordsClient words={todayWords} variant="preview" />;
+  const { dateKey, wordListVersion, words } = await getTodayRecommendedSelection();
+  return (
+    <TodayRecommendedWordsClient
+      words={words}
+      dateKey={dateKey}
+      wordListVersion={wordListVersion}
+      variant="preview"
+    />
+  );
 }
 
 const getHomeWordData = cache(async () => {

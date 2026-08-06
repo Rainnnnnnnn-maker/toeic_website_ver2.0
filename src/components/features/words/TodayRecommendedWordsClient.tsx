@@ -7,6 +7,10 @@ import { Headphones } from "lucide-react";
 
 type Props = {
   words: Word[];
+  /** 選定に使われた日付キー。詳細ページの前後ナビが同じセットを再計算するために引き渡す。 */
+  dateKey: string;
+  /** 選定元の単語コーパス版。不一致時に誤った6語ナビを使わないために引き渡す。 */
+  wordListVersion: string;
   variant: "preview" | "full";
 };
 
@@ -22,10 +26,13 @@ const levelLabels = {
   high: "上級",
 } as const;
 
-export default function TodayRecommendedWordsClient({ words, variant }: Props) {
+export default function TodayRecommendedWordsClient({ words, dateKey, wordListVersion, variant }: Props) {
+  // 6語の slug ではなく日付キーと短いコーパス版を載せる。詳細ページ側は
+  // 同じ純粋ロジックでセットを再計算し、版が違えば全単語ナビへフォールバックする。
   const todayQuery = new URLSearchParams({
     from: "today",
-    today: words.map((word) => word.slug).join(","),
+    today: dateKey,
+    v: wordListVersion,
   }).toString();
 
   if (variant === "preview") {

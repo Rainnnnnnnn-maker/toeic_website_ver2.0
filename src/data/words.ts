@@ -4,6 +4,7 @@ import { cacheTag, cacheLife } from "next/cache";
 import { cache } from "react";
 import {
   getTodayKey,
+  getWordListVersion,
   selectTodayWords,
   TODAY_WORDS_COUNT,
   type WordData,
@@ -59,15 +60,46 @@ export async function getWordBySlug(slug: string): Promise<Word | undefined> {
   return data.allWords.find(w => w.slug === slug);
 }
 
-export async function getTodayRecommendedWords(limit: number = TODAY_WORDS_COUNT): Promise<Word[]> {
+export type TodayRecommendedSelection = {
+  /**
+   * 選定に使った日付キー（JST 7:00 切り替えの YYYY-MM-DD）。
+   * 単語詳細への `?from=today&today=<dateKey>&v=<wordListVersion>` クエリで受け渡し、
+   * クライアント側が同じコーパスから選定結果を再計算できるようにする。
+   */
+  dateKey: string;
+  wordListVersion: string;
+  words: Word[];
+};
+
+/**
+ * 「今日おすすめ」の選定結果を、選定に使った日付キーとコーパス版ごと返す。
+ * 両方を URL へ載せることで、クライアントが端末時計に依存せず
+ * サーバーと同一のセットを復元できる（JST 7:00 の日付境界と 7:05 の Cron の
+ * 5分間のずれを踏んでも食い違わない）。
+ */
+export async function getTodayRecommendedSelection(
+  limit: number = TODAY_WORDS_COUNT
+): Promise<TodayRecommendedSelection> {
   'use cache';
-  cacheTag('today-recommended-words');
+  cacheTag('today-recommended-words', 'word-list');
   // JST 7:05 の Vercel Cron で毎日明示的に再検証する。
   // 時間ベースの日次再検証を併用すると Cron と二重に stale 化するため、長期保持する。
   cacheLife('max');
 
   const data = await getWordsDataCached();
-  return selectTodayWords(data.allWords, getTodayKey(), limit);
+  const dateKey = getTodayKey();
+  return {
+    dateKey,
+    wordListVersion: getWordListVersion(data.allWords),
+    words: selectTodayWords(data.allWords, dateKey, limit),
+  };
+}
+
+// キャッシュ境界は getTodayRecommendedSelection 側に持たせ、ここでは包み直すだけにする
+// （'use cache' を二重に置くとキャッシュエントリが2つになるため）。
+export async function getTodayRecommendedWords(limit: number = TODAY_WORDS_COUNT): Promise<Word[]> {
+  const { words } = await getTodayRecommendedSelection(limit);
+  return words;
 }
 
 export async function getRelatedWords(currentSlug: string, count: number = 5): Promise<Word[]> {

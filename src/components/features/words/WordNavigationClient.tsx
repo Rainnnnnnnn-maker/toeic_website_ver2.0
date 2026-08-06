@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useFavorites } from "@/context/FavoritesContext";
 import { useState } from "react";
 import type { Word } from "@/data/words";
-import { TODAY_WORDS_COUNT } from "@/lib/word-select";
+import { resolveTodayNavigationSelection } from "@/lib/word-select";
 import { useShareTarget } from "@/context/ShareTargetContext";
 import { ChevronLeft } from "lucide-react";
 
@@ -26,18 +26,19 @@ export default function WordNavigationClient({
   const { setShareTarget } = useShareTarget();
 
   // 「今日おすすめ」コンテキストのときだけ today クエリを解釈する。
-  // 通常の単語一覧ナビでは allWords の Map 構築・クエリ解析を行わない。
-  const todayWords: Word[] = (() => {
-    if (!isFromToday) return [];
-    const slugs = Array.from(
-      new Set((searchParams.get("today") ?? "").split(",").filter(Boolean))
-    ).slice(0, TODAY_WORDS_COUNT);
-    if (slugs.length === 0) return [];
-    const wordMap = new Map(allWords.map((word) => [word.slug, word]));
-    return slugs
-      .map((slug) => wordMap.get(slug))
-      .filter((word): word is Word => word !== undefined);
-  })();
+  // 通常の単語一覧ナビでは日付の検証も選定計算も行わない。
+  //
+  // 日付キーと短いコーパス版から同じ6語を復元する。コーパス更新後の古いURLや
+  // 現在語が選定集合にないURLは null になり、誤った6語ナビを表示しない。
+  // 日次キャッシュ自体は参照しないため、SSG済みの全単語ページへタグが伝播しない。
+  const todaySelection = isFromToday
+    ? resolveTodayNavigationSelection(
+        allWords,
+        currentSlug,
+        searchParams.get("today"),
+        searchParams.get("v")
+      )
+    : null;
 
   const navigationList = (() => {
     if (isFromFavorites || isFromReview) {
@@ -49,8 +50,8 @@ export default function WordNavigationClient({
         .filter((w): w is Word => w !== undefined);
     }
     if (isFromToday) {
-      // today クエリが欠落／全て無効な場合（旧リンク等）は全単語ナビにフォールバックする
-      return todayWords.length > 0 ? todayWords : allWords;
+      // クエリ不正・旧形式・コーパス版不一致・現在語の集合外は全単語へフォールバック
+      return todaySelection?.words ?? allWords;
     }
     return allWords;
   })();
@@ -99,8 +100,9 @@ export default function WordNavigationClient({
   const querySuffix = (() => {
     if (isFromToday) {
       const params = new URLSearchParams({ from: "today" });
-      if (todayWords.length > 0) {
-        params.set("today", todayWords.map((word) => word.slug).join(","));
+      if (todaySelection) {
+        params.set("today", todaySelection.dateKey);
+        params.set("v", todaySelection.wordListVersion);
       }
       return `?${params.toString()}`;
     }

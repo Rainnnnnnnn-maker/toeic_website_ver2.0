@@ -69,11 +69,59 @@ export function getTodayKey(now: Date = new Date()): string {
   return new Date(targetTime).toISOString().slice(0, 10);
 }
 
+const TODAY_DATE_KEY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+const WORD_LIST_VERSION_PATTERN = /^[0-9a-f]{8}$/;
+
+/**
+ * 単語詳細への `?from=today&today=<日付キー>` クエリを検証する。
+ *
+ * 「今日おすすめ」からの前後ナビは、6語の slug を URL に並べる代わりに
+ * 選定に使われた日付キーだけを受け取り、`selectTodayWords` で再計算する
+ * （日次キャッシュタグを SSG 済みの単語詳細ページへ伝播させないため）。
+ * 値はハッシュ入力になるだけで結果は必ず全単語リストの部分集合になるが、
+ * 旧形式（slug のカンマ区切り）や壊れた値をそのまま選定へ流さないよう形式を固定する。
+ *
+ * @returns 妥当な `YYYY-MM-DD`、不正なら null（呼び出し側は全単語ナビへフォールバックする）
+ */
+export function parseTodayDateKey(value: string | null | undefined): string | null {
+  if (!value) return null;
+  const trimmed = value.trim();
+  if (!TODAY_DATE_KEY_PATTERN.test(trimmed)) return null;
+
+  // 2026-02-31 のような存在しない日付を弾く（往復して一致するかで判定）
+  const parsed = new Date(`${trimmed}T00:00:00Z`);
+  if (Number.isNaN(parsed.getTime())) return null;
+  if (parsed.toISOString().slice(0, 10) !== trimmed) return null;
+
+  return trimmed;
+}
+
+/**
+ * 今日おすすめの選定元コーパスを識別する短い版文字列を返す。
+ * 選定は slug の集合だけに依存するため、語順・term・level は fingerprint に含めない。
+ */
+export function getWordListVersion(words: readonly Pick<Word, "slug">[]): string {
+  const fingerprintSource = words
+    .map((word) => word.slug)
+    .sort()
+    .map((slug) => `${slug.length}:${slug}`)
+    .join("|");
+
+  return hashString(fingerprintSource).toString(16).padStart(8, "0");
+}
+
+/** URL の `v` クエリから8桁のコーパス版を検証・正規化する。 */
+export function parseWordListVersion(value: string | null | undefined): string | null {
+  if (!value) return null;
+  const normalized = value.trim().toLowerCase();
+  return WORD_LIST_VERSION_PATTERN.test(normalized) ? normalized : null;
+}
+
 /**
  * 日付キーに基づき単語を決定論的に並べ替え、先頭 limit 件を返す。
  * 同一ハッシュ時は slug の辞書順で安定化する。
  */
-export function selectTodayWords(words: Word[], todayKey: string, limit: number): Word[] {
+export function selectTodayWords(words: readonly Word[], todayKey: string, limit: number): Word[] {
   if (words.length === 0 || limit <= 0) return [];
 
   const ordered = [...words].sort((a, b) => {
@@ -84,4 +132,39 @@ export function selectTodayWords(words: Word[], todayKey: string, limit: number)
   });
 
   return ordered.slice(0, Math.min(limit, ordered.length));
+}
+
+export type TodayNavigationSelection = {
+  dateKey: string;
+  wordListVersion: string;
+  words: Word[];
+};
+
+/**
+ * URL の日付・コーパス版から、詳細ページ用の「今日おすすめ」ナビを安全に復元する。
+ * コーパスが更新済み、または現在語が復元した6語に含まれない場合は null を返し、
+ * 呼び出し側を全単語ナビへフォールバックさせる。
+ */
+export function resolveTodayNavigationSelection(
+  words: readonly Word[],
+  currentSlug: string,
+  dateKeyValue: string | null | undefined,
+  wordListVersionValue: string | null | undefined,
+  limit: number = TODAY_WORDS_COUNT
+): TodayNavigationSelection | null {
+  const dateKey = parseTodayDateKey(dateKeyValue);
+  const requestedWordListVersion = parseWordListVersion(wordListVersionValue);
+  if (!dateKey || !requestedWordListVersion) return null;
+
+  const currentWordListVersion = getWordListVersion(words);
+  if (requestedWordListVersion !== currentWordListVersion) return null;
+
+  const selectedWords = selectTodayWords(words, dateKey, limit);
+  if (!selectedWords.some((word) => word.slug === currentSlug)) return null;
+
+  return {
+    dateKey,
+    wordListVersion: currentWordListVersion,
+    words: selectedWords,
+  };
 }
