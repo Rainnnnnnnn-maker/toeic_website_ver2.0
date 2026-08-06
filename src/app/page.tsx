@@ -8,10 +8,7 @@ import { SnsShareButtons } from "@/components/features/sns/SnsShareButtons";
 import { AuthStatus } from "@/components/features/auth/AuthStatus";
 import TodayRecommendedWordsClient from "@/components/features/words/TodayRecommendedWordsClient";
 import { SemanticSearchLauncher } from "@/components/features/words/SemanticSearchLauncher";
-import {
-  getLatestGuideArticles,
-  PUBLISHED_GUIDE_ARTICLE_COUNT,
-} from "@/data/guide-articles";
+import { getLatestGuideArticles,PUBLISHED_GUIDE_ARTICLE_COUNT} from "@/data/guide-articles";
 import { TODAY_WORDS_COUNT } from "@/lib/word-select";
 import { AdSenseScript } from "@/components/common/AdSenseScript";
 
