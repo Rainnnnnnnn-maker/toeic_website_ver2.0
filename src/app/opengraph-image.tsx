@@ -1,8 +1,8 @@
 import { ImageResponse } from "next/og";
-import { loadGoogleFont } from "@/lib/og-utils";
+import { loadGoogleFont, OG_IMAGE_CACHE_CONTROL } from "@/lib/og-utils";
 
-export const revalidate = 86400;
-
+// `cacheComponents` 環境では `export const revalidate` が無効化されるため指定しない。
+// Active CPU の抑制は OG_IMAGE_CACHE_CONTROL による CDN キャッシュで行う（og-utils.ts 参照）。
 export const alt = "TOEIC重要単語";
 export const size = {
   width: 1200,
@@ -278,6 +278,7 @@ export default async function Image() {
     ),
     {
       ...size,
+      headers: { "Cache-Control": OG_IMAGE_CACHE_CONTROL },
       fonts: [
         {
           name: "Noto Sans JP",

@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 import { getWordBySlug, getAllWords } from "@/data/words";
 import { getWordDetail } from "@/data/word-detail";
-import { loadGoogleFont } from "@/lib/og-utils";
+import { loadGoogleFont, OG_IMAGE_CACHE_CONTROL } from "@/lib/og-utils";
 
 export const alt = "TOEIC重要単語";
 export const size = {
@@ -12,9 +12,9 @@ export const size = {
 export const contentType = "image/png";
 export const dynamicParams = false;
 
-// ビルド時に全単語のOG画像を静的生成する。
-// cacheComponents 環境では `export const revalidate` が無効化されるため、
-// SSG で生成して Function 実行（Active CPU）を発生させない方針に統一する。
+// `cacheComponents` 環境では metadata image route が実際にはプリレンダリングされず
+// 動的（ƒ）のままになるため、generateStaticParams だけでは Function 実行を防げない。
+// Active CPU の抑制は OG_IMAGE_CACHE_CONTROL による CDN キャッシュで行う（og-utils.ts 参照）。
 export async function generateStaticParams() {
   const words = await getAllWords();
   return words.map((w) => ({ word: w.slug }));
@@ -42,7 +42,7 @@ export default async function Image({ params }: { params: Promise<{ word: string
           Not Found
         </div>
       ),
-      { ...size }
+      { ...size, headers: { "Cache-Control": OG_IMAGE_CACHE_CONTROL } }
     );
   }
 
@@ -153,6 +153,7 @@ export default async function Image({ params }: { params: Promise<{ word: string
     ),
     {
       ...size,
+      headers: { "Cache-Control": OG_IMAGE_CACHE_CONTROL },
       fonts: [
         {
           name: "Noto Sans JP",
