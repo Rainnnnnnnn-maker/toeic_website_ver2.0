@@ -5,6 +5,7 @@ import { isSameHost } from "@/lib/tts-utils";
 import { embedText } from "@/lib/embeddings";
 import { getVectorIndex, isVectorConfigured } from "@/lib/vector";
 import { getSemanticIndexVersion } from "@/lib/semantic-index-version";
+import { classifyUpstreamFailure } from "@/lib/http-retry";
 import {
   SEMANTIC_CACHE_TTL_SECONDS,
   SEMANTIC_QUERY_MAX_LENGTH,
@@ -178,8 +179,11 @@ export async function POST(request: Request) {
 
     return Response.json({ results, cached: false });
   } catch (e) {
-    console.error("Semantic search failed:", e);
-    return Response.json({ error: "Semantic search failed" }, { status: 500 });
+    // 上流（Gemini embedding / Upstash Vector）の一時障害・レート超過・タイムアウトを
+    // 500 に丸めず切り分け可能にする
+    const { status, reason } = classifyUpstreamFailure(e);
+    console.error(`Semantic search failed (${reason}):`, e);
+    return Response.json({ error: "Semantic search failed" }, { status });
   }
 }
 

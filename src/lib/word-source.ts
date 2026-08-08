@@ -8,6 +8,7 @@ import {
   type WordLevel,
 } from "@/lib/word-select";
 import type { Word } from "@/data/words";
+import { HTTP_TIMEOUT_MS, fetchWithRetry } from "@/lib/http-retry";
 
 /**
  * 単語リストの取得元（ローカルファイル / Vercel Blob）を担う共有ローダー。
@@ -57,12 +58,14 @@ export async function loadWordDataFromBlob(): Promise<WordData> {
   if (hasDirectBlobUrls()) {
     // 失敗時に [] を返すと "use cache"（max）で空リストが最大30日固定されるため throw する。
     // throw ならキャッシュされず、バックグラウンド再検証の失敗時は直前の正常キャッシュが使われ続ける。
+    // GET は冪等なので再送して安全。ビルド時は全単語ページの生成がこの取得に依存するため、
+    // 一時的なネットワーク断で 2,700 ページ超の生成が丸ごと落ちないようリトライする。
     const loadWordsDirect = async (url: string, level: WordLevel): Promise<Word[]> => {
-      const res = await fetch(url);
-      if (!res.ok) {
-        throw new Error(`Failed to fetch blob from URL: ${url} (status: ${res.status})`);
-      }
-      const text = await res.text();
+      const text = await fetchWithRetry<string>(url, {
+        timeoutMs: HTTP_TIMEOUT_MS.blob,
+        label: `word list blob (${level})`,
+        consume: (response) => response.text(),
+      });
       return parseWords(text, level);
     };
 
@@ -75,7 +78,19 @@ export async function loadWordDataFromBlob(): Promise<WordData> {
     return buildWordData(important, medium, high);
   }
 
-  const { blobs } = await list({ token: process.env.BLOB_READ_WRITE_TOKEN });
+  // @vercel/blob は TimeoutError を network error として再送し得るため、
+  // reason なしの abort() で AbortError を発生させ、SDK の retry を即時終了させる。
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), HTTP_TIMEOUT_MS.blob);
+  let blobs: Awaited<ReturnType<typeof list>>["blobs"];
+  try {
+    ({ blobs } = await list({
+      token: process.env.BLOB_READ_WRITE_TOKEN,
+      abortSignal: controller.signal,
+    }));
+  } finally {
+    clearTimeout(timeout);
+  }
 
   const loadWords = async (filename: string, level: WordLevel): Promise<Word[]> => {
     // Find blob ending with filename (to handle potential folders or prefixes)
@@ -85,11 +100,11 @@ export async function loadWordDataFromBlob(): Promise<WordData> {
       throw new Error(`Blob not found for: ${filename}`);
     }
 
-    const res = await fetch(blob.url);
-    if (!res.ok) {
-      throw new Error(`Failed to fetch blob: ${blob.url} (status: ${res.status})`);
-    }
-    const text = await res.text();
+    const text = await fetchWithRetry<string>(blob.url, {
+      timeoutMs: HTTP_TIMEOUT_MS.blob,
+      label: `word list blob (${filename})`,
+      consume: (response) => response.text(),
+    });
     return parseWords(text, level);
   };
 
