@@ -104,13 +104,30 @@ function extractIp(request: Request): string {
   );
 }
 
-async function checkRateLimit(ip: string) {
-  const result = await getRatelimit().limit(ip);
+type RateLimitRejection = {
+  error: string;
+  status: number;
+  headers?: Record<string, string>;
+};
+
+async function checkRateLimit(ip: string): Promise<RateLimitRejection | null> {
+  let result: Awaited<ReturnType<Ratelimit["limit"]>>;
+  try {
+    result = await getRatelimit().limit(ip);
+  } catch (e) {
+    // この呼び出しは下の try/catch より前にあるため、素通しすると例外が
+    // Route Handler を抜けて一律 500 になる。TTS と同じく、埋め込み検索を
+    // 無防備に晒さないよう閉じたうえで status だけ正確にする。
+    const { status, reason } = classifyUpstreamFailure(e);
+    console.error(`Semantic search rate limit check failed (${reason}):`, e);
+    return { error: "Rate limit unavailable", status };
+  }
+
   if (result.success) return null;
 
   return {
     error: "Too Many Requests",
-    status: 429 as const,
+    status: 429,
     headers: {
       "X-RateLimit-Limit": String(result.limit),
       "X-RateLimit-Remaining": String(result.remaining),

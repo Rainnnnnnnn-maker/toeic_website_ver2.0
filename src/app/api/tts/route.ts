@@ -95,17 +95,27 @@ async function validateAllowlist(
 ): Promise<ValidationError | null> {
   const isSingleWord = language === "en" && !/\s/.test(text);
 
-  if (isSingleWord) {
-    const entry = await getWordBySlug(text.toLowerCase());
-    return entry ? null : { error: "Word not allowed", status: 400 };
-  }
+  try {
+    if (isSingleWord) {
+      const entry = await getWordBySlug(text.toLowerCase());
+      return entry ? null : { error: "Word not allowed", status: 400 };
+    }
 
-  if (!wordSlug) {
-    return { error: "wordSlug is required for example text", status: 400 };
-  }
+    if (!wordSlug) {
+      return { error: "wordSlug is required for example text", status: 400 };
+    }
 
-  const allowed = await isAllowedExampleText(text, language, wordSlug);
-  return allowed ? null : { error: "Example text not allowed", status: 400 };
+    const allowed = await isAllowedExampleText(text, language, wordSlug);
+    return allowed ? null : { error: "Example text not allowed", status: 400 };
+  } catch (e) {
+    // 例文の allowlist 検証は L1 → L2 → Gemini のキャッシュチェーンを辿るため、
+    // WordDetail 未生成の単語では Gemini の 429 / タイムアウトがここで送出される。
+    // 単語リスト取得（Vercel Blob）も同様。ここを素通しすると例外が Route Handler を
+    // 抜けて一律 500 になり、callTtsApi 側でせっかく分けた 429 / 502 / 504 と食い違う。
+    const { status, reason } = classifyUpstreamFailure(e);
+    console.error(`TTS allowlist validation failed (${reason}):`, e);
+    return { error: "Failed to validate text", status };
+  }
 }
 
 function getVoiceConfig(language: "en" | "ja") {
@@ -131,13 +141,30 @@ function extractIp(request: Request): string {
   );
 }
 
-async function checkRateLimit(ip: string) {
-  const result = await getRatelimit().limit(ip);
+type RateLimitRejection = {
+  error: string;
+  status: number;
+  headers?: Record<string, string>;
+};
+
+async function checkRateLimit(ip: string): Promise<RateLimitRejection | null> {
+  let result: Awaited<ReturnType<Ratelimit["limit"]>>;
+  try {
+    result = await getRatelimit().limit(ip);
+  } catch (e) {
+    // レートリミッタを引けない状態で通すと、従量課金の TTS を無防備に晒す。
+    // 可用性より濫用防止を優先して閉じる（従来の挙動どおり）が、
+    // 原因が Redis のタイムアウトか障害かを status で切り分けられるようにする。
+    const { status, reason } = classifyUpstreamFailure(e);
+    console.error(`TTS rate limit check failed (${reason}):`, e);
+    return { error: "Rate limit unavailable", status };
+  }
+
   if (result.success) return null;
 
   return {
     error: "Too Many Requests",
-    status: 429 as const,
+    status: 429,
     headers: {
       "X-RateLimit-Limit": String(result.limit),
       "X-RateLimit-Remaining": String(result.remaining),
