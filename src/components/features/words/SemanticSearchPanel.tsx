@@ -39,6 +39,9 @@ async function requestSemanticResults(query: string): Promise<SearchOutcome> {
       if (response.status === 503) {
         return { ok: false, message: "意味検索は現在準備中です。しばらくしてからお試しください。" };
       }
+      if (response.status === 504) {
+        return { ok: false, message: "検索に時間がかかりすぎました。もう一度お試しください。" };
+      }
       return { ok: false, message: "検索に失敗しました。時間をおいてお試しください。" };
     }
 

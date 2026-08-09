@@ -4,6 +4,7 @@ import { getRedis } from "@/lib/upstash";
 import { getWordBySlug } from "@/data/words";
 import { getWordDetail } from "@/data/word-detail";
 import { ttsCacheKey, matchesExample, isSameHost } from "@/lib/tts-utils";
+import { HTTP_TIMEOUT_MS, classifyUpstreamFailure, fetchWithRetry } from "@/lib/http-retry";
 
 async function isAllowedExampleText(
   text: string,
@@ -94,17 +95,27 @@ async function validateAllowlist(
 ): Promise<ValidationError | null> {
   const isSingleWord = language === "en" && !/\s/.test(text);
 
-  if (isSingleWord) {
-    const entry = await getWordBySlug(text.toLowerCase());
-    return entry ? null : { error: "Word not allowed", status: 400 };
-  }
+  try {
+    if (isSingleWord) {
+      const entry = await getWordBySlug(text.toLowerCase());
+      return entry ? null : { error: "Word not allowed", status: 400 };
+    }
 
-  if (!wordSlug) {
-    return { error: "wordSlug is required for example text", status: 400 };
-  }
+    if (!wordSlug) {
+      return { error: "wordSlug is required for example text", status: 400 };
+    }
 
-  const allowed = await isAllowedExampleText(text, language, wordSlug);
-  return allowed ? null : { error: "Example text not allowed", status: 400 };
+    const allowed = await isAllowedExampleText(text, language, wordSlug);
+    return allowed ? null : { error: "Example text not allowed", status: 400 };
+  } catch (e) {
+    // 例文の allowlist 検証は L1 → L2 → Gemini のキャッシュチェーンを辿るため、
+    // WordDetail 未生成の単語では Gemini の 429 / タイムアウトがここで送出される。
+    // 単語リスト取得（Vercel Blob）も同様。ここを素通しすると例外が Route Handler を
+    // 抜けて一律 500 になり、callTtsApi 側でせっかく分けた 429 / 502 / 504 と食い違う。
+    const { status, reason } = classifyUpstreamFailure(e);
+    console.error(`TTS allowlist validation failed (${reason}):`, e);
+    return { error: "Failed to validate text", status };
+  }
 }
 
 function getVoiceConfig(language: "en" | "ja") {
@@ -130,13 +141,30 @@ function extractIp(request: Request): string {
   );
 }
 
-async function checkRateLimit(ip: string) {
-  const result = await getRatelimit().limit(ip);
+type RateLimitRejection = {
+  error: string;
+  status: number;
+  headers?: Record<string, string>;
+};
+
+async function checkRateLimit(ip: string): Promise<RateLimitRejection | null> {
+  let result: Awaited<ReturnType<Ratelimit["limit"]>>;
+  try {
+    result = await getRatelimit().limit(ip);
+  } catch (e) {
+    // レートリミッタを引けない状態で通すと、従量課金の TTS を無防備に晒す。
+    // 可用性より濫用防止を優先して閉じる（従来の挙動どおり）が、
+    // 原因が Redis のタイムアウトか障害かを status で切り分けられるようにする。
+    const { status, reason } = classifyUpstreamFailure(e);
+    console.error(`TTS rate limit check failed (${reason}):`, e);
+    return { error: "Rate limit unavailable", status };
+  }
+
   if (result.success) return null;
 
   return {
     error: "Too Many Requests",
-    status: 429 as const,
+    status: 429,
     headers: {
       "X-RateLimit-Limit": String(result.limit),
       "X-RateLimit-Remaining": String(result.remaining),
@@ -152,34 +180,41 @@ async function callTtsApi(
   apiKey: string
 ): Promise<{ success: true; audioContent: string } | ValidationError> {
   try {
-    const response = await fetch(
+    const json = await fetchWithRetry<{ audioContent?: string }>(
       "https://texttospeech.googleapis.com/v1/text:synthesize",
       {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-goog-api-key": apiKey,
+        timeoutMs: HTTP_TIMEOUT_MS.tts,
+        // 同じ入力の再送は機能上安全だが、従量課金 API なので 1 回までに抑える。
+        // 429 は再送対象外にし、障害・クォータ枯渇時の費用増加を避ける。
+        retries: 1,
+        label: "google tts",
+        init: {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-goog-api-key": apiKey,
+          },
+          body: JSON.stringify({
+            input: { text },
+            voice: voiceConfig,
+            audioConfig: { audioEncoding: "MP3", speakingRate: 0.95 },
+          }),
         },
-        body: JSON.stringify({
-          input: { text },
-          voice: voiceConfig,
-          audioConfig: { audioEncoding: "MP3", speakingRate: 0.95 },
-        }),
+        consume: async (response) =>
+          (await response.json()) as { audioContent?: string },
       }
     );
 
-    if (!response.ok) {
-      return { error: "Failed to synthesize speech", status: 500 };
-    }
-
-    const json = (await response.json()) as { audioContent?: string };
     if (!json.audioContent) {
       return { error: "TTS response did not include audio content", status: 500 };
     }
 
     return { success: true, audioContent: json.audioContent };
-  } catch {
-    return { error: "Unexpected error while calling TTS API", status: 500 };
+  } catch (e) {
+    // 上流の一時障害・レート超過・タイムアウトを 500 に丸めず切り分け可能にする
+    const { status, reason } = classifyUpstreamFailure(e);
+    console.error(`TTS upstream failure (${reason}):`, e);
+    return { error: "Failed to synthesize speech", status };
   }
 }
 

@@ -41,6 +41,12 @@ import {
 import { parseStoredWordDetails } from "../src/lib/word-detail-parse";
 import { generateWordDetail } from "../src/lib/word-detail-gemini";
 import {
+  GEMINI_RETRY_POLICY,
+  HTTP_TIMEOUT_MS,
+  retryWithTimeout,
+} from "../src/lib/http-retry";
+import { createVectorRequester } from "../src/lib/vector-requester";
+import {
   EMBEDDING_DIMENSION,
   EMBEDDING_MODEL,
   SEMANTIC_INDEX_VERSION_KEY,
@@ -149,11 +155,19 @@ async function embedTexts(genai: GoogleGenAI, texts: string[]): Promise<number[]
   const vectors: number[][] = [];
   for (let i = 0; i < texts.length; i += EMBED_BATCH) {
     const batch = texts.slice(i, i + EMBED_BATCH);
-    const response = await genai.models.embedContent({
-      model: EMBEDDING_MODEL,
-      contents: batch,
-      config: { taskType: "RETRIEVAL_DOCUMENT", outputDimensionality: EMBEDDING_DIMENSION },
-    });
+    const response = await retryWithTimeout(
+      (signal) =>
+        genai.models.embedContent({
+          model: EMBEDDING_MODEL,
+          contents: batch,
+          config: {
+            taskType: "RETRIEVAL_DOCUMENT",
+            outputDimensionality: EMBEDDING_DIMENSION,
+            abortSignal: signal,
+          },
+        }),
+      { ...GEMINI_RETRY_POLICY.embedding, label: "gemini embedding batch" }
+    );
     const embeddings = response.embeddings ?? [];
     if (embeddings.length !== batch.length) {
       throw new Error(
@@ -241,6 +255,8 @@ async function main(): Promise<void> {
   const redis = new Redis({
     url: process.env.UPSTASH_REDIS_REST_URL!,
     token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+    retry: { retries: 1, backoff: () => 200 },
+    signal: () => AbortSignal.timeout(HTTP_TIMEOUT_MS.redis),
   });
 
   const source = args.source ?? resolveDefaultWordSource();
@@ -282,6 +298,8 @@ async function main(): Promise<void> {
 
   if (!args.onlyCached && missing.length > 0) {
     console.log(`Generating ${missing.length} missing WordDetails with Gemini...`);
+    // タイムアウトを切っておかないと、1 単語の応答待ちでバッチ全体が止まりうる。
+    // 失敗した単語は failures に記録して次へ進む。
     const genai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
     let processed = 0;
     for (const word of missing) {
@@ -314,10 +332,14 @@ async function main(): Promise<void> {
 
   // Phase 3: Upstash Vector へ upsert
   console.log("Phase 3: upserting into Upstash Vector...");
-  const index = new Index<WordVectorMetadata>({
-    url: process.env.UPSTASH_VECTOR_REST_URL!,
-    token: process.env.UPSTASH_VECTOR_REST_TOKEN!,
-  });
+  const index = new Index<WordVectorMetadata>(
+    createVectorRequester({
+      url: process.env.UPSTASH_VECTOR_REST_URL!,
+      token: process.env.UPSTASH_VECTOR_REST_TOKEN!,
+      timeoutMs: HTTP_TIMEOUT_MS.vector,
+      retries: 2,
+    })
+  );
   for (let i = 0; i < targets.length; i += UPSERT_BATCH) {
     const batch = targets.slice(i, i + UPSERT_BATCH).map((word, offset) => ({
       id: word.slug,

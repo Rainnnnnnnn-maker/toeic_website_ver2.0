@@ -12,6 +12,8 @@ async function fetchWordDetailFromGemini(term: string): Promise<WordDetails> {
     throw new Error("GEMINI_API_KEY is not configured");
   }
 
+  // retryOptions を指定すると SDK が 429 も再送して status を失わせる。
+  // timeout / retry は generateWordDetail 内の共通ラッパーで適用する。
   const client = new GoogleGenAI({ apiKey });
   return generateWordDetail(client, term);
 }

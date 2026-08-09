@@ -1,6 +1,7 @@
 import type { GoogleGenAI } from "@google/genai";
 import type { WordDetails } from "@/types/word";
 import { parseJsonFromText, normalizePayload } from "./word-detail-parse";
+import { GEMINI_RETRY_POLICY, retryWithTimeout } from "./http-retry";
 
 /**
  * Gemini による単語詳細生成ロジック。
@@ -73,37 +74,40 @@ export async function generateWordDetail(client: GoogleGenAI, term: string): Pro
     },
   ];
 
-  let data: WordDetails | null = null;
   let lastError: unknown;
 
   for (const attempt of prompts) {
+    // transport / HTTP エラーはプロンプトを変えても直らないため、ここでは捕捉しない。
+    // 429 は retryWithTimeout が即時終了し、第2プロンプトも送られない。
+    const response = await retryWithTimeout(
+      (signal) =>
+        client.models.generateContent({
+          model: "gemini-2.5-flash-lite",
+          contents: attempt.prompt,
+          config: {
+            temperature: 0.2,
+            maxOutputTokens: attempt.maxOutputTokens,
+            responseMimeType: "application/json",
+            abortSignal: signal,
+          },
+        }),
+      { ...GEMINI_RETRY_POLICY.wordDetail, label: "gemini word detail" }
+    );
+
+    // 第2プロンプトは、応答自体は成功したが JSON が空・不正だった場合だけ使う。
     try {
-      const response = await client.models.generateContent({
-        model: "gemini-2.5-flash-lite",
-        contents: attempt.prompt,
-        config: {
-          temperature: 0.2,
-          maxOutputTokens: attempt.maxOutputTokens,
-          responseMimeType: "application/json",
-        },
-      });
       const text = response.text;
       if (!text) {
         throw new Error("Empty response from Gemini");
       }
       const raw = parseJsonFromText(text);
-      data = normalizePayload(term, raw);
-      break;
+      return normalizePayload(term, raw);
     } catch (e) {
       lastError = e;
     }
   }
 
-  if (!data) {
-    throw lastError instanceof Error
-      ? lastError
-      : new Error("Failed to generate a valid JSON response from Gemini");
-  }
-
-  return data;
+  throw lastError instanceof Error
+    ? lastError
+    : new Error("Failed to generate a valid JSON response from Gemini");
 }
