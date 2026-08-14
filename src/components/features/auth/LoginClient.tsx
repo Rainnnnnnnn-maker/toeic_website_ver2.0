@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { LogOut, UserRound } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { createClient } from "@/lib/supabase/client";
+import { LoginCardFallback } from "@/components/features/auth/LoginFallback";
 
 function GoogleLogo() {
   return (
@@ -58,11 +59,7 @@ export default function LoginClient() {
   };
 
   if (isAuthLoading) {
-    return (
-      <div className="mx-auto max-w-md rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-        <div className="h-24 animate-pulse rounded-lg bg-slate-100" />
-      </div>
-    );
+    return <LoginCardFallback />;
   }
 
   if (user) {

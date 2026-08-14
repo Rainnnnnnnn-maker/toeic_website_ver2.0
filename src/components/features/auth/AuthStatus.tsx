@@ -1,8 +1,35 @@
 "use client";
 
-import Link from "next/link";
-import { CircleUserRound, LogOut, UserRound } from "lucide-react";
+import Link, { useLinkStatus } from "next/link";
+import {
+  CircleUserRound,
+  LoaderCircle,
+  LogOut,
+  UserRound,
+} from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+
+function LoginLinkContent() {
+  const { pending } = useLinkStatus();
+
+  return (
+    <span className="inline-flex items-center gap-1.5" aria-live="polite">
+      {pending ? (
+        <>
+          <span className="animate-spin text-emerald-600 motion-reduce:animate-none" aria-hidden>
+            <LoaderCircle size={16} />
+          </span>
+          <span>移動中…</span>
+        </>
+      ) : (
+        <>
+          <CircleUserRound size={16} className="text-emerald-600" aria-hidden />
+          <span>ログイン</span>
+        </>
+      )}
+    </span>
+  );
+}
 
 // ホーム上部などに置くコンパクトなログイン状態表示。
 // 隣に並ぶ SNS シェアボタン（32px 丸アイコン）と高さを揃えたピル型 UI。
@@ -19,10 +46,9 @@ export function AuthStatus() {
       <Link
         href="/login"
         prefetch={false}
-        className="inline-flex h-8 items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3.5 text-xs font-bold text-slate-600 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700 hover:shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1"
+        className="inline-flex h-8 w-24 items-center justify-center rounded-full border border-slate-200 bg-white px-3 text-xs font-bold text-slate-600 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700 hover:shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1"
       >
-        <CircleUserRound size={16} className="text-emerald-600" />
-        ログイン
+        <LoginLinkContent />
       </Link>
     );
   }

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import LoginClient from "@/components/features/auth/LoginClient";
+import { LoginCardFallback } from "@/components/features/auth/LoginFallback";
 
 export const metadata: Metadata = {
   title: "ログイン",
@@ -15,7 +16,7 @@ export const metadata: Metadata = {
 export default function LoginPage() {
   return (
     <main className="min-h-screen w-full bg-[radial-gradient(circle_at_top,#bae6fd_0,#eff6ff_45%,#f8fafc_100%)] px-4 py-12">
-      <Suspense fallback={null}>
+      <Suspense fallback={<LoginCardFallback />}>
         <LoginClient />
       </Suspense>
     </main>
