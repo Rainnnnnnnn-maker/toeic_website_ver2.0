@@ -242,7 +242,7 @@ export function WordDetailClient({ initialData, linkedWords = {}, relatedWords =
         {data.toeicExamples.length > 0 && (
           <WordDetailSection
             id="word-toeic-examples"
-            title={`${data.word}のTOEIC例文(AI)`}
+            title="TOEIC例文(AI)"
             accentClassName="bg-purple-500"
             collapsible={shouldCollapseExamples(data.toeicExamples)}
             meta={`${data.toeicExamples.length}例文`}

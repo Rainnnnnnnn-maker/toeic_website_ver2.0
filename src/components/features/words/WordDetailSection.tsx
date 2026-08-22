@@ -1,4 +1,6 @@
-import type { ReactNode } from "react";
+"use client";
+
+import { useState, type ReactNode } from "react";
 import { ChevronDown } from "lucide-react";
 
 type DisclosureProps = {
@@ -21,8 +23,14 @@ export function WordDetailDisclosure({
   meta,
   preview,
 }: DisclosureProps) {
+  const [isOpen, setIsOpen] = useState(true);
+
   return (
-    <details className="group/disclosure overflow-hidden rounded-xl border border-slate-200 bg-white transition-colors open:border-blue-200 open:bg-blue-50/20">
+    <details
+      open={isOpen}
+      onToggle={(event) => setIsOpen(event.currentTarget.open)}
+      className="group/disclosure overflow-hidden rounded-xl border border-slate-200 bg-white transition-colors open:border-blue-200 open:bg-blue-50/20"
+    >
       <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-3 py-2.5 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500 [&::-webkit-details-marker]:hidden sm:px-4">
         <span className="min-w-0">
           <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-600">
@@ -31,7 +39,7 @@ export function WordDetailDisclosure({
           </span>
           {preview && (
             <span
-              className="mt-1 block truncate text-xs font-normal normal-case tracking-normal text-slate-500"
+              className="mt-1 block truncate text-xs font-normal normal-case tracking-normal text-slate-500 group-open/disclosure:hidden"
               aria-hidden="true"
             >
               {preview}
