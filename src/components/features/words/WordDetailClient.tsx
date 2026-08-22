@@ -9,7 +9,14 @@ import type { Word } from "@/data/words";
 import { SnsShareButtons } from "@/components/features/sns/SnsShareButtons";
 import { useTTS } from "@/hooks/useTTS";
 import { useShareTarget } from "@/context/ShareTargetContext";
+import {
+  shouldCollapseExamples,
+  shouldCollapseItems,
+  shouldCollapseMeaningDetails,
+  shouldCollapseText,
+} from "@/lib/word-detail-disclosure";
 import { StudyAdvice } from "./StudyAdvice";
+import { WordDetailDisclosure, WordDetailSection } from "./WordDetailSection";
 
 type Props = {
   initialData: WordDetails;
@@ -29,6 +36,11 @@ export function WordDetailClient({ initialData, linkedWords = {}, relatedWords =
   const { shareTarget } = useShareTarget();
 
   const data = initialData;
+  const detailedMeaningCount = data.meanings.reduce(
+    (count, meaning) => count + meaning.detailedMeanings.length,
+    0,
+  );
+  const meaningDetailsAreLong = shouldCollapseMeaningDetails(data.meanings);
 
   return (
     <>
@@ -96,109 +108,71 @@ export function WordDetailClient({ initialData, linkedWords = {}, relatedWords =
             </p>
           </div>
 
-          <div className="flex flex-col gap-3">
-            {data.meanings.map((m, idx) => (
-              <div key={idx} className="flex flex-col gap-1.5">
-                <div className="flex items-center gap-1.5">
-                  <span className="px-1.5 py-0.5 rounded-md bg-indigo-50 text-indigo-700 text-xs font-bold border border-indigo-100">
-                    {m.partOfSpeech}
-                  </span>
-                  <span className="text-sm text-slate-900 font-medium">{m.meaning}</span>
-                </div>
-                
-                {m.detailedMeanings.length > 0 && (
-                  <div className="pl-1.5 border-l-2 border-slate-100 ml-0.5 flex flex-col gap-3">
-                    {m.detailedMeanings.map((d) => (
-                      <div key={d.number} className="pl-2.5 flex flex-col gap-1.5">
-                        <div className="flex flex-col gap-0.5">
-                          <p className="text-sm text-slate-600 font-medium">
-                            <span className="text-slate-400 mr-1.5">#{d.number}</span>
-                            {d.definition}
-                          </p>
-                          {d.grammarPattern && (
-                            <p className="text-xs text-slate-400">文型: {d.grammarPattern}</p>
-                          )}
-                        </div>
-
-                        <div className="bg-white rounded-lg border border-slate-200 p-2.5 shadow-sm">
-                          <div className="flex items-start gap-2 mb-2">
-                            <button
-                              type="button"
-                              className="shrink-0 inline-flex items-center justify-center p-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-md transition-colors border border-blue-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-                              onClick={() => handlePlaySentenceAudio(d.example, `meaning-${idx}-detail-${d.number}`, "en", data.word)}
-                              disabled={sentenceAudioLoading === `meaning-${idx}-detail-${d.number}`}
-                              aria-label="例文を再生"
-                            >
-                              {sentenceAudioLoading === `meaning-${idx}-detail-${d.number}` ? (
-                                <Loader2 className="animate-spin" size={14} />
-                              ) : (
-                                <Volume2 size={14} />
-                              )}
-                            </button>
-                            <p className="text-sm text-slate-900 leading-relaxed font-medium mt-0.5">{d.example}</p>
-                          </div>
-                          <div className="flex items-start gap-2 border-t border-slate-100 pt-2">
-                             <button
-                              type="button"
-                              className="shrink-0 inline-flex items-center justify-center p-1.5 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-md transition-colors border border-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500"
-                              onClick={() => handlePlaySentenceAudio(d.exampleJapanese, `meaning-${idx}-detail-${d.number}-ja`, "ja", data.word)}
-                              disabled={sentenceAudioLoading === `meaning-${idx}-detail-${d.number}-ja`}
-                              aria-label="日本語訳を再生"
-                            >
-                              {sentenceAudioLoading === `meaning-${idx}-detail-${d.number}-ja` ? (
-                                <Loader2 className="animate-spin" size={14} />
-                              ) : (
-                                <Volume2 size={14} />
-                              )}
-                            </button>
-                            <p className="text-xs text-slate-600 leading-relaxed mt-0.5">{d.exampleJapanese}</p>
-                          </div>
-                        </div>
-
-                        <div className="flex flex-wrap gap-1.5 text-xs">
-                          <span className="text-slate-400">場面: {d.context}</span>
-                          <span className="text-slate-300">|</span>
-                          <span className="text-slate-400">頻度: {d.frequency}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
+          {meaningDetailsAreLong ? (
+            <WordDetailDisclosure
+              title="品詞別の詳しい意味・例文"
+              accentClassName="bg-indigo-500"
+              meta={
+                detailedMeaningCount > 0
+                  ? `${detailedMeaningCount}例`
+                  : `${data.meanings.length}品詞`
+              }
+              preview={data.meanings
+                .map((meaning) => `${meaning.partOfSpeech}: ${meaning.meaning}`)
+                .join(" / ")}
+            >
+              <MeaningDetails
+                data={data}
+                sentenceAudioLoading={sentenceAudioLoading}
+                onPlaySentence={handlePlaySentenceAudio}
+              />
+            </WordDetailDisclosure>
+          ) : (
+            <MeaningDetails
+              data={data}
+              sentenceAudioLoading={sentenceAudioLoading}
+              onPlaySentence={handlePlaySentenceAudio}
+            />
+          )}
         </section>
 
         {data.nuance && (
-          <section className="flex flex-col gap-2">
-            <h2 className="text-xs font-bold tracking-wider uppercase text-slate-500 flex items-center gap-1.5">
-              <span className="w-0.5 h-2.5 bg-amber-500 rounded-full"></span>
-              ニュアンス
-            </h2>
+          <WordDetailSection
+            id="word-nuance"
+            title="ニュアンス"
+            accentClassName="bg-amber-500"
+            collapsible={shouldCollapseText(data.nuance)}
+            preview={data.nuance}
+          >
             <div className="bg-amber-50/50 rounded-lg p-3 border border-amber-100/50">
               <p className="text-sm text-slate-700 leading-relaxed">{data.nuance}</p>
             </div>
-          </section>
+          </WordDetailSection>
         )}
 
         {data.etymology && (
-          <section className="flex flex-col gap-2">
-            <h2 className="text-xs font-bold tracking-wider uppercase text-slate-500 flex items-center gap-1.5">
-              <span className="w-0.5 h-2.5 bg-orange-500 rounded-full"></span>
-              語源・成り立ち
-            </h2>
+          <WordDetailSection
+            id="word-etymology"
+            title="語源・成り立ち"
+            accentClassName="bg-orange-500"
+            collapsible={shouldCollapseText(data.etymology)}
+            preview={data.etymology}
+          >
             <div className="bg-orange-50/50 rounded-lg p-3 border border-orange-100/50">
               <p className="text-sm text-slate-700 leading-relaxed">{data.etymology}</p>
             </div>
-          </section>
+          </WordDetailSection>
         )}
 
         {data.collocations && data.collocations.length > 0 && (
-          <section className="flex flex-col gap-2">
-            <h2 className="text-xs font-bold tracking-wider uppercase text-slate-500 flex items-center gap-1.5">
-              <span className="w-0.5 h-2.5 bg-pink-500 rounded-full"></span>
-              よく使われる表現・コロケーション
-            </h2>
+          <WordDetailSection
+            id="word-collocations"
+            title="よく使われる表現・コロケーション"
+            accentClassName="bg-pink-500"
+            collapsible={shouldCollapseItems(data.collocations)}
+            meta={`${data.collocations.length}表現`}
+            preview={data.collocations.join(" ・ ")}
+          >
             <ul className="flex flex-wrap gap-1.5 list-none m-0 p-0">
               {data.collocations.map((col, i) => (
                 <li key={`col-${i}`} className="px-2 py-1 rounded bg-pink-50 text-pink-700 text-sm border border-pink-200 font-medium">
@@ -206,15 +180,20 @@ export function WordDetailClient({ initialData, linkedWords = {}, relatedWords =
                 </li>
               ))}
             </ul>
-          </section>
+          </WordDetailSection>
         )}
 
         {data.wordForms.length > 0 && (
-          <section className="flex flex-col gap-2">
-            <h2 className="text-xs font-bold tracking-wider uppercase text-slate-500 flex items-center gap-1.5">
-              <span className="w-0.5 h-2.5 bg-blue-500 rounded-full"></span>
-              語形変化
-            </h2>
+          <WordDetailSection
+            id="word-forms"
+            title="語形変化"
+            accentClassName="bg-blue-500"
+            collapsible={shouldCollapseItems(
+              data.wordForms.map((wordForm) => `${wordForm.form}${wordForm.type}`),
+            )}
+            meta={`${data.wordForms.length}語`}
+            preview={data.wordForms.map((wordForm) => wordForm.form).join(" ・ ")}
+          >
             <ul className="flex flex-wrap gap-1.5 list-none m-0 p-0">
               {data.wordForms.map((wf, i) => (
                 <li key={`${wf.form}-${i}`} className="px-2 py-1 rounded bg-slate-50 text-slate-700 text-sm border border-slate-200 flex items-center gap-1.5">
@@ -225,15 +204,18 @@ export function WordDetailClient({ initialData, linkedWords = {}, relatedWords =
                 </li>
               ))}
             </ul>
-          </section>
+          </WordDetailSection>
         )}
 
         {data.synonyms.length > 0 && (
-          <section className="flex flex-col gap-2">
-            <h2 className="text-xs font-bold tracking-wider uppercase text-slate-500 flex items-center gap-1.5">
-              <span className="w-0.5 h-2.5 bg-green-500 rounded-full"></span>
-              類義語
-            </h2>
+          <WordDetailSection
+            id="word-synonyms"
+            title="類義語"
+            accentClassName="bg-green-500"
+            collapsible={shouldCollapseItems(data.synonyms)}
+            meta={`${data.synonyms.length}語`}
+            preview={data.synonyms.join(" ・ ")}
+          >
             <ul className="flex flex-wrap gap-1.5 list-none m-0 p-0">
               {data.synonyms.map((s, i) => (
                 <li key={i} className="text-sm">
@@ -254,15 +236,18 @@ export function WordDetailClient({ initialData, linkedWords = {}, relatedWords =
                 </li>
               ))}
             </ul>
-          </section>
+          </WordDetailSection>
         )}
 
         {data.toeicExamples.length > 0 && (
-          <section className="flex flex-col gap-2">
-            <h2 className="text-xs font-bold tracking-wider uppercase text-slate-500 flex items-center gap-1.5">
-              <span className="w-0.5 h-2.5 bg-purple-500 rounded-full"></span>
-              {data.word}のTOEIC例文(AI)
-            </h2>
+          <WordDetailSection
+            id="word-toeic-examples"
+            title={`${data.word}のTOEIC例文(AI)`}
+            accentClassName="bg-purple-500"
+            collapsible={shouldCollapseExamples(data.toeicExamples)}
+            meta={`${data.toeicExamples.length}例文`}
+            preview={data.toeicExamples[0]?.english}
+          >
             <div className="flex flex-col gap-2">
               {data.toeicExamples.map((ex, i) => (
                 <div key={i} className="bg-slate-50 rounded-lg p-2.5 border border-slate-100">
@@ -301,17 +286,20 @@ export function WordDetailClient({ initialData, linkedWords = {}, relatedWords =
                 </div>
               ))}
             </div>
-          </section>
+          </WordDetailSection>
         )}
 
         <StudyAdvice level={level} />
 
         {relatedWords && relatedWords.length > 0 && (
-          <section className="flex flex-col gap-2">
-            <h2 className="text-xs font-bold tracking-wider uppercase text-slate-500 flex items-center gap-1.5">
-              <span className="w-0.5 h-2.5 bg-teal-500 rounded-full"></span>
-              同レベル単語（以下単語の意味覚えていますか）
-            </h2>
+          <WordDetailSection
+            id="related-words"
+            title="同レベル単語（以下単語の意味覚えていますか）"
+            accentClassName="bg-teal-500"
+            collapsible={shouldCollapseItems(relatedWords.map((word) => word.term))}
+            meta={`${relatedWords.length}語`}
+            preview={relatedWords.map((word) => word.term).join(" ・ ")}
+          >
             <ul className="flex flex-wrap gap-1.5 list-none m-0 p-0">
               {relatedWords.map((w) => (
                 <li key={w.slug}>
@@ -322,9 +310,124 @@ export function WordDetailClient({ initialData, linkedWords = {}, relatedWords =
                 </li>
               ))}
             </ul>
-          </section>
+          </WordDetailSection>
         )}
       </div>
     </>
+  );
+}
+
+type MeaningDetailsProps = {
+  data: WordDetails;
+  sentenceAudioLoading: string | null;
+  onPlaySentence: (
+    text: string,
+    id: string,
+    language?: string,
+    wordSlug?: string,
+  ) => Promise<void>;
+};
+
+function MeaningDetails({
+  data,
+  sentenceAudioLoading,
+  onPlaySentence,
+}: MeaningDetailsProps) {
+  return (
+    <div className="flex flex-col gap-3">
+      {data.meanings.map((m, idx) => (
+        <div key={idx} className="flex flex-col gap-1.5">
+          <div className="flex items-center gap-1.5">
+            <span className="px-1.5 py-0.5 rounded-md bg-indigo-50 text-indigo-700 text-xs font-bold border border-indigo-100">
+              {m.partOfSpeech}
+            </span>
+            <span className="text-sm text-slate-900 font-medium">{m.meaning}</span>
+          </div>
+
+          {m.detailedMeanings.length > 0 && (
+            <div className="pl-1.5 border-l-2 border-slate-100 ml-0.5 flex flex-col gap-3">
+              {m.detailedMeanings.map((d) => (
+                <div key={d.number} className="pl-2.5 flex flex-col gap-1.5">
+                  <div className="flex flex-col gap-0.5">
+                    <p className="text-sm text-slate-600 font-medium">
+                      <span className="text-slate-400 mr-1.5">#{d.number}</span>
+                      {d.definition}
+                    </p>
+                    {d.grammarPattern && (
+                      <p className="text-xs text-slate-400">文型: {d.grammarPattern}</p>
+                    )}
+                  </div>
+
+                  <div className="bg-white rounded-lg border border-slate-200 p-2.5 shadow-sm">
+                    <div className="flex items-start gap-2 mb-2">
+                      <button
+                        type="button"
+                        className="shrink-0 inline-flex items-center justify-center p-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-md transition-colors border border-blue-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                        onClick={() =>
+                          onPlaySentence(
+                            d.example,
+                            `meaning-${idx}-detail-${d.number}`,
+                            "en",
+                            data.word,
+                          )
+                        }
+                        disabled={
+                          sentenceAudioLoading === `meaning-${idx}-detail-${d.number}`
+                        }
+                        aria-label="例文を再生"
+                      >
+                        {sentenceAudioLoading === `meaning-${idx}-detail-${d.number}` ? (
+                          <Loader2 className="animate-spin" size={14} />
+                        ) : (
+                          <Volume2 size={14} />
+                        )}
+                      </button>
+                      <p className="text-sm text-slate-900 leading-relaxed font-medium mt-0.5">
+                        {d.example}
+                      </p>
+                    </div>
+                    <div className="flex items-start gap-2 border-t border-slate-100 pt-2">
+                      <button
+                        type="button"
+                        className="shrink-0 inline-flex items-center justify-center p-1.5 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-md transition-colors border border-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500"
+                        onClick={() =>
+                          onPlaySentence(
+                            d.exampleJapanese,
+                            `meaning-${idx}-detail-${d.number}-ja`,
+                            "ja",
+                            data.word,
+                          )
+                        }
+                        disabled={
+                          sentenceAudioLoading ===
+                          `meaning-${idx}-detail-${d.number}-ja`
+                        }
+                        aria-label="日本語訳を再生"
+                      >
+                        {sentenceAudioLoading ===
+                        `meaning-${idx}-detail-${d.number}-ja` ? (
+                          <Loader2 className="animate-spin" size={14} />
+                        ) : (
+                          <Volume2 size={14} />
+                        )}
+                      </button>
+                      <p className="text-xs text-slate-600 leading-relaxed mt-0.5">
+                        {d.exampleJapanese}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap gap-1.5 text-xs">
+                    <span className="text-slate-400">場面: {d.context}</span>
+                    <span className="text-slate-300">|</span>
+                    <span className="text-slate-400">頻度: {d.frequency}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
   );
 }

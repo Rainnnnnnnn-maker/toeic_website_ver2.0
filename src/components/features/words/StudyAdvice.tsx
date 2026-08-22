@@ -1,4 +1,6 @@
 import { BookOpen } from "lucide-react";
+import { shouldCollapseText } from "@/lib/word-detail-disclosure";
+import { WordDetailSection } from "./WordDetailSection";
 
 type Props = {
   level?: 'important' | 'medium' | 'high';
@@ -25,17 +27,19 @@ export function StudyAdvice({ level }: Props) {
   const { title, content } = advice[level];
 
   return (
-    <section className="flex flex-col gap-2 mt-2">
-      <h2 className="text-xs font-bold tracking-wider uppercase text-slate-500 flex items-center gap-1.5">
-        <span className="w-0.5 h-2.5 bg-pink-500 rounded-full"></span>
-        学習アドバイス（{title}）
-      </h2>
+    <WordDetailSection
+      id="study-advice"
+      title={`学習アドバイス（${title}）`}
+      accentClassName="bg-pink-500"
+      collapsible={shouldCollapseText(content)}
+      preview={content}
+    >
       <div className="bg-pink-50/50 rounded-lg p-4 border border-pink-100 flex gap-3 items-start">
         <BookOpen className="w-5 h-5 text-pink-500 shrink-0 mt-0.5" />
         <p className="text-sm text-slate-700 leading-relaxed">
           {content}
         </p>
       </div>
-    </section>
+    </WordDetailSection>
   );
 }
