@@ -5,11 +5,13 @@ on:
   pull_request:
     paths-ignore:
       - '**.md'
+      - '**.sql'
       - '.gitignore'
   push:
     # branches: [main]
     paths-ignore:
       - '**.md'
+      - '**.sql'
       - '.gitignore'
 
 jobs:

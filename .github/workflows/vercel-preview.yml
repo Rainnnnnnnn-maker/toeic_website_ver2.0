@@ -8,6 +8,8 @@ on:
   push:
     branches-ignore:
       - main
+    paths-ignore:
+      - '**.sql'
 
 jobs:
   Deploy-Preview:
