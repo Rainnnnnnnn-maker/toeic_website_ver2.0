@@ -30,8 +30,14 @@ import {
   clearMergedLocalFavorites,
 } from "@/lib/favorites-store";
 
+// お気に入りの読み込み状態。ログイン必須機能（マイページ / 復習キュー）は
+// "ready"（＝Supabase から取得済み）でのみ描画し、localStorage の値を混ぜない。
+export type FavoritesStatus = "guest" | "loading" | "ready" | "error";
+
 type FavoritesContextType = {
   favorites: string[];
+  favoritesStatus: FavoritesStatus;
+  retryFavoritesSync: () => void;
   addFavorite: (slug: string) => void;
   removeFavorite: (slug: string) => void;
   toggleFavorite: (slug: string) => void;
@@ -51,7 +57,7 @@ const useIsomorphicLayoutEffect =
   typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 export function FavoritesProvider({ children }: { children: ReactNode }) {
-  const { user, authEpoch } = useAuth();
+  const { user, isAuthLoading, authEpoch } = useAuth();
   const userId = user?.id ?? null;
   // localStorage を外部ストアとして直接購読する。これによりマウント時に
   // effect から setState する必要がなくなる（react-hooks/set-state-in-effect）。
@@ -69,6 +75,14 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
     authEpoch: number;
     favorites: string[];
   } | null>(null);
+
+  // Supabase からの取得に失敗した認証セッション。マイページなど
+  // 「Supabase のお気に入りだけを見せる」画面がエラーを検知するために持つ。
+  const [failedSession, setFailedSession] = useState<{
+    userId: string;
+    authEpoch: number;
+  } | null>(null);
+  const [reloadToken, setReloadToken] = useState(0);
 
   // 同じユーザーでもログアウトを挟んだ古いremoteは再利用せず、
   // 現在の認証世代でSupabaseから取得済みの場合だけremoteを正とする。
@@ -120,8 +134,11 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
 
       if (cancelled) return;
       if (error) {
-        // 取得失敗時は localStorage の内容のまま動作継続（次回ログイン時に再同期）
+        // 取得失敗時も localStorage の内容で動作継続（ゲスト相当の体験は維持）。
+        // ただし favoritesStatus は "error" になり、ログイン必須画面は
+        // ローカル値を表示せず再試行 UI を出す。
         console.error("Failed to load favorites from Supabase", error);
+        setFailedSession({ userId, authEpoch });
         return;
       }
 
@@ -165,7 +182,7 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true;
     };
-  }, [userId, authEpoch]);
+  }, [userId, authEpoch, reloadToken]);
 
   // 未ログイン時の更新は localStorage を直接書き換える（ストアが再購読を通知する）。
   // 変更のたびに保存用 effect を回す必要がなくなるため、書き込み漏れも起きない。
@@ -270,10 +287,27 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
     return favorites.includes(slug);
   };
 
+  const favoritesStatus: FavoritesStatus = (() => {
+    if (isAuthLoading) return "loading";
+    if (!userId) return "guest";
+    if (isRemote) return "ready";
+    if (isCurrentFavoriteSession(failedSession, userId, authEpoch)) {
+      return "error";
+    }
+    return "loading";
+  })();
+
+  const retryFavoritesSync = () => {
+    setFailedSession(null);
+    setReloadToken((token) => token + 1);
+  };
+
   return (
     <FavoritesContext
       value={{
         favorites,
+        favoritesStatus,
+        retryFavoritesSync,
         addFavorite,
         removeFavorite,
         toggleFavorite,

@@ -10,6 +10,7 @@ import { fetchWordDetail } from '@/actions/word';
 import { useTTS } from '@/hooks/useTTS';
 import { useStudyCountdown } from '@/hooks/useStudyCountdown';
 import { useStudyProgress, readPersistedState, clearPersistedState } from '@/hooks/useStudyProgress';
+import type { ReviewGrade } from '@/lib/review-schedule';
 import {
   buildWordMap,
   getNavigationType,
@@ -28,6 +29,13 @@ type Props = {
   backLink?: string;
   backLinkText?: string;
   order?: 'random' | 'sequential';
+  /**
+   * 採点結果の記録先。復習モード（ログイン中）からのみ渡される。
+   * 学習モードでは undefined なので、既存の挙動は変わらない。
+   */
+  onGrade?: (slug: string, grade: ReviewGrade) => void;
+  /** 「覚えていない」で単語詳細へ遷移する際の from パラメータ */
+  wordDetailFrom?: 'review' | 'study';
 };
 
 const DEFAULT_STORAGE_KEY = 'toeic-study-state-v1';
@@ -41,7 +49,9 @@ export default function StudyClient({
   pageTitle = DEFAULT_PAGE_TITLE,
   backLink = DEFAULT_BACK_LINK,
   backLinkText = DEFAULT_BACK_LINK_TEXT,
-  order = 'random'
+  order = 'random',
+  onGrade,
+  wordDetailFrom,
 }: Props) {
   const router = useRouter();
   const { isFavorite, toggleFavorite } = useFavorites();
@@ -138,19 +148,24 @@ export default function StudyClient({
 
   const handleRemembered = () => {
     if (!currentWord) return;
+    onGrade?.(currentWord.slug, 'remembered');
     const newCount = markRemembered(currentWord.slug);
     advanceToNextWord(newCount);
   };
 
   const handleForgot = () => {
     if (!currentWord) return;
+    // 直後の router.push でアンマウントされるため、記録は同期的に呼び出す
+    onGrade?.(currentWord.slug, 'forgot');
     markForgot(currentWord.slug);
-    const query = backLink === '/favorites' ? '?from=review' : '?from=study';
-    router.push(`/words/${currentWord.slug}${query}`);
+    const fromParam =
+      wordDetailFrom ?? (backLink === '/favorites' ? 'review' : 'study');
+    router.push(`/words/${currentWord.slug}?from=${fromParam}`);
   };
 
   const handleLater = () => {
     if (!currentWord) return;
+    onGrade?.(currentWord.slug, 'later');
     markLater(currentWord.slug);
     advanceToNextWord();
   };

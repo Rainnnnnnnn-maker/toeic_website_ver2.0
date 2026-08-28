@@ -4,6 +4,7 @@ import FavoritesListClient from "@/components/features/favorites/FavoritesListCl
 import ListenModeButton from "@/components/features/favorites/ListenModeButton";
 import type { Metadata } from "next";
 import ReviewModeButton from "@/components/features/review/ReviewModeButton";
+import MyPageLinkButton from "@/components/features/mypage/MyPageLinkButton";
 import Script from "next/script";
 import { ArrowLeft } from "lucide-react";
 
@@ -59,6 +60,7 @@ export default async function FavoritesPage() {
           <div className="flex gap-4 items-center mt-2 flex-wrap justify-end sm:justify-start">
             <ListenModeButton />
             <ReviewModeButton />
+            <MyPageLinkButton variant="solid" />
             <Link href="/" prefetch={false} className="group relative inline-flex items-center justify-center gap-1.5 px-4 py-2 min-h-[36px] bg-white text-slate-700 border border-slate-200 rounded-lg font-bold text-sm shadow-sm transition-all duration-300 hover:border-slate-300 hover:bg-slate-50 hover:shadow-md hover:-translate-y-1 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-slate-500">
               <ArrowLeft size={16} className="transition-transform group-hover:-translate-x-1" />
               <span>単語一覧</span>

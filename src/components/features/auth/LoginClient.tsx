@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { LogOut, UserRound } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { createClient } from "@/lib/supabase/client";
+import { sanitizeNextPath } from "@/lib/auth-redirect";
 import { LoginCardFallback } from "@/components/features/auth/LoginFallback";
 
 function GoogleLogo() {
@@ -37,6 +38,8 @@ export default function LoginClient() {
   const [clientError, setClientError] = useState<string | null>(null);
   const searchParams = useSearchParams();
   const callbackError = searchParams.get("error");
+  // マイページのログインゲートなど、戻り先を指定された場合に引き継ぐ
+  const nextPath = sanitizeNextPath(searchParams.get("next"));
 
   const handleGoogleLogin = async () => {
     setIsSigningIn(true);
@@ -45,7 +48,7 @@ export default function LoginClient() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`,
       },
     });
     if (error) {
@@ -79,11 +82,15 @@ export default function LoginClient() {
         </p>
         <div className="flex flex-wrap items-center gap-3">
           <Link
-            href="/"
+            href={nextPath}
             prefetch={false}
             className="inline-flex items-center justify-center rounded-lg bg-emerald-600 px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
           >
-            トップへ戻る
+            {nextPath === "/"
+              ? "トップへ戻る"
+              : nextPath === "/mypage"
+                ? "マイページへ"
+                : "元のページへ戻る"}
           </Link>
           <button
             type="button"
