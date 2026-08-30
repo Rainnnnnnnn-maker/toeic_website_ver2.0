@@ -414,3 +414,43 @@ export function buildRecordMap(
 ): Map<string, ReviewRecord> {
   return new Map(records.map((record) => [record.slug, record]));
 }
+
+/**
+ * Supabase の値と未送信アウトボックスの値を統合する。
+ * 最終採点日時が新しい方を優先し、同時刻なら回数が進んでいる方を採用する。
+ */
+export function mergePendingReviewRecord(
+  server: ReviewRecord | undefined,
+  pending: ReviewRecord
+): ReviewRecord {
+  if (!server) return pending;
+
+  const serverTime = server.lastReviewedAt ?? Number.NEGATIVE_INFINITY;
+  const pendingTime = pending.lastReviewedAt ?? Number.NEGATIVE_INFINITY;
+  if (pendingTime > serverTime) return pending;
+  if (serverTime > pendingTime) return server;
+
+  if (pending.reviewCount > server.reviewCount) return pending;
+  if (server.reviewCount > pending.reviewCount) return server;
+  if (pending.forgotCount > server.forgotCount) return pending;
+  return server;
+}
+
+/** 連続日数は新しい学習日を優先し、自己ベストは両方の最大値を残す。 */
+export function mergePendingStreak(
+  server: StreakState,
+  pending: StreakState
+): StreakState {
+  const serverDate = server.lastStudyDateKey ?? "";
+  const pendingDate = pending.lastStudyDateKey ?? "";
+  const latest = pendingDate > serverDate ? pending : server;
+
+  return {
+    lastStudyDateKey: latest.lastStudyDateKey,
+    currentStreak:
+      pendingDate === serverDate
+        ? Math.max(server.currentStreak, pending.currentStreak)
+        : latest.currentStreak,
+    bestStreak: Math.max(server.bestStreak, pending.bestStreak),
+  };
+}

@@ -6,6 +6,7 @@ import { useFavorites } from "@/context/FavoritesContext";
 import { useState } from "react";
 import type { Word } from "@/data/words";
 import { resolveTodayNavigationSelection } from "@/lib/word-select";
+import { parseReviewQueue } from "@/lib/review-schedule";
 import { useShareTarget } from "@/context/ShareTargetContext";
 import { ChevronLeft } from "lucide-react";
 
@@ -22,6 +23,9 @@ export default function WordNavigationClient({
   const isFromToday = from === "today";
   const isFromStudy = from === "study";
   const isFromReview = from === "review";
+  const isFromMyPage = from === "mypage";
+  const rawReviewQueue = searchParams.get("queue");
+  const reviewQueue = parseReviewQueue(rawReviewQueue);
   const { favorites } = useFavorites();
   const { setShareTarget } = useShareTarget();
 
@@ -41,7 +45,7 @@ export default function WordNavigationClient({
     : null;
 
   const navigationList = (() => {
-    if (isFromFavorites || isFromReview) {
+    if (isFromFavorites || isFromReview || isFromMyPage) {
       // お気に入り一覧と同じ順序（最新が先頭）にする
       const wordMap = new Map(allWords.map((w) => [w.slug, w]));
       return [...favorites]
@@ -108,9 +112,17 @@ export default function WordNavigationClient({
     }
     if (isFromFavorites) return "?from=favorites";
     if (isFromStudy) return "?from=study";
-    if (isFromReview) return "?from=review";
+    if (isFromReview) {
+      const params = new URLSearchParams({ from: "review" });
+      if (rawReviewQueue !== null) params.set("queue", reviewQueue);
+      return `?${params.toString()}`;
+    }
+    if (isFromMyPage) return "?from=mypage";
     return "";
   })();
+
+  const reviewBackLink =
+    rawReviewQueue === null ? "/review" : `/review?queue=${reviewQueue}`;
 
   return (
     <>
@@ -136,12 +148,21 @@ export default function WordNavigationClient({
             </Link>
           ) : isFromReview ? (
             <Link 
-              href="/review" 
+              href={reviewBackLink}
               prefetch={false}
               className="group inline-flex items-center justify-center gap-1.5 h-10 px-4 bg-white border border-gray-200 rounded-full text-slate-600 text-[15px] font-semibold no-underline transition-all duration-200 shadow-sm select-none hover:bg-gray-50 hover:border-gray-300 hover:text-slate-900 hover:-translate-y-px hover:shadow-md active:translate-y-0 active:shadow-sm"
             >
               <ChevronLeft size={18} className="transition-transform group-hover:-translate-x-0.5 text-slate-400 group-hover:text-slate-600" />
               復習モード
+            </Link>
+          ) : isFromMyPage ? (
+            <Link
+              href="/mypage"
+              prefetch={false}
+              className="group inline-flex items-center justify-center gap-1.5 h-10 px-4 bg-white border border-gray-200 rounded-full text-slate-600 text-[15px] font-semibold no-underline transition-all duration-200 shadow-sm select-none hover:bg-gray-50 hover:border-gray-300 hover:text-slate-900 hover:-translate-y-px hover:shadow-md active:translate-y-0 active:shadow-sm"
+            >
+              <ChevronLeft size={18} className="transition-transform group-hover:-translate-x-0.5 text-slate-400 group-hover:text-slate-600" />
+              マイページ
             </Link>
           ) : (
             <Link 

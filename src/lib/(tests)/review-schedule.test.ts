@@ -16,6 +16,8 @@ import {
   gradeRecord,
   isDue,
   MAX_REVIEW_BOX,
+  mergePendingReviewRecord,
+  mergePendingStreak,
   nextStreak,
   parseReviewProgressRow,
   parseReviewQueue,
@@ -499,6 +501,56 @@ describe("parseStreakRow / buildStreakRow", () => {
       last_study_date: TODAY_KEY,
       current_streak: 1,
       best_streak: 1,
+    });
+  });
+});
+
+describe("mergePendingReviewRecord", () => {
+  it("未送信側の採点日時が新しければ未送信値を採用する", () => {
+    const server = record({
+      slug: "apple",
+      reviewCount: 2,
+      lastReviewedAt: NOW.getTime() - DAY_MS,
+    });
+    const pending = record({
+      slug: "apple",
+      reviewCount: 3,
+      lastReviewedAt: NOW.getTime(),
+    });
+
+    expect(mergePendingReviewRecord(server, pending)).toBe(pending);
+  });
+
+  it("Supabase側が新しければSupabase値を採用する", () => {
+    const server = record({ slug: "apple", lastReviewedAt: NOW.getTime() });
+    const pending = record({
+      slug: "apple",
+      lastReviewedAt: NOW.getTime() - DAY_MS,
+    });
+
+    expect(mergePendingReviewRecord(server, pending)).toBe(server);
+  });
+});
+
+describe("mergePendingStreak", () => {
+  it("新しい学習日の連続日数と両方の自己ベストを保持する", () => {
+    expect(
+      mergePendingStreak(
+        {
+          lastStudyDateKey: "2026-08-28",
+          currentStreak: 4,
+          bestStreak: 8,
+        },
+        {
+          lastStudyDateKey: "2026-08-29",
+          currentStreak: 5,
+          bestStreak: 7,
+        }
+      )
+    ).toEqual({
+      lastStudyDateKey: "2026-08-29",
+      currentStreak: 5,
+      bestStreak: 8,
     });
   });
 });

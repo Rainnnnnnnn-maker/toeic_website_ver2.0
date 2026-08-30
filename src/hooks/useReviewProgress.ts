@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { createClient } from "@/lib/supabase/client";
 import {
@@ -8,6 +8,8 @@ import {
   createReviewRecord,
   EMPTY_STREAK,
   gradeRecord,
+  mergePendingReviewRecord,
+  mergePendingStreak,
   nextStreak,
   type ReviewGrade,
   type ReviewRecord,
@@ -17,9 +19,16 @@ import { getTodayKey } from "@/lib/word-select";
 import {
   fetchReviewRecords,
   fetchStreak,
-  upsertReviewRecord,
-  upsertStreak,
+  flushReviewProgressOutbox,
 } from "@/lib/review-progress-repo";
+import {
+  acknowledgeReviewRecord,
+  acknowledgeReviewStreak,
+  enqueueReviewRecord,
+  enqueueReviewStreak,
+  hasPendingReviewProgress,
+  readReviewProgressOutbox,
+} from "@/lib/review-progress-outbox";
 
 export type ReviewProgressStatus = "guest" | "loading" | "ready" | "error";
 
@@ -51,23 +60,28 @@ function isCurrentSession(
  *
  * - 復習導線はログイン必須の機能なので、未ログイン時は "guest" を返すだけで
  *   localStorage へのフォールバックはしない。
- * - 採点は楽観的更新 + 投げっぱなしの upsert（FavoritesContext と同じ流儀）。
- *   失敗しても次回採点時に最新値で上書きされるため、恒久的な破損はしない。
+ * - 採点は楽観的更新し、ユーザー別アウトボックスへ同期保存してから upsert する。
+ *   失敗分は次回マウントまたは次回採点で再送する。
  */
 export function useReviewProgress() {
   const { user, isAuthLoading, authEpoch } = useAuth();
   const userId = user?.id ?? null;
 
   const [loaded, setLoaded] = useState<LoadedProgress | null>(null);
+  const loadedRef = useRef<LoadedProgress | null>(null);
   const [failedSession, setFailedSession] = useState<{
     userId: string;
     authEpoch: number;
   } | null>(null);
   const [reloadToken, setReloadToken] = useState(0);
-  const [hasSyncError, setHasSyncError] = useState(false);
+  const [syncErrorSession, setSyncErrorSession] = useState<{
+    userId: string;
+    authEpoch: number;
+  } | null>(null);
 
   const isReady = isCurrentSession(loaded, userId, authEpoch);
   const hasFailed = isCurrentSession(failedSession, userId, authEpoch);
+  const hasSyncError = isCurrentSession(syncErrorSession, userId, authEpoch);
 
   useEffect(() => {
     if (!userId) return;
@@ -82,12 +96,48 @@ export function useReviewProgress() {
           fetchStreak(supabase, userId),
         ]);
         if (cancelled) return;
-        setLoaded({
+        const recordMap = buildRecordMap(records);
+        const outbox = readReviewProgressOutbox(userId);
+        for (const pending of outbox.records) {
+          const server = recordMap.get(pending.slug);
+          const merged = mergePendingReviewRecord(server, pending);
+          recordMap.set(pending.slug, merged);
+          if (merged === server) acknowledgeReviewRecord(userId, pending);
+          else if (merged !== pending) enqueueReviewRecord(userId, merged);
+        }
+
+        const mergedStreak = outbox.streak
+          ? mergePendingStreak(streak, outbox.streak)
+          : streak;
+        if (outbox.streak) {
+          const serverAlreadyNewer =
+            mergedStreak.lastStudyDateKey === streak.lastStudyDateKey &&
+            mergedStreak.currentStreak === streak.currentStreak &&
+            mergedStreak.bestStreak === streak.bestStreak;
+          if (serverAlreadyNewer) acknowledgeReviewStreak(userId, outbox.streak);
+          else enqueueReviewStreak(userId, mergedStreak);
+        }
+
+        const nextLoaded = {
           userId,
           authEpoch,
-          records: buildRecordMap(records),
-          streak,
-        });
+          records: recordMap,
+          streak: mergedStreak,
+        };
+        loadedRef.current = nextLoaded;
+        setLoaded(nextLoaded);
+        flushReviewProgressOutbox(supabase, userId)
+          .then(() => {
+            if (cancelled || hasPendingReviewProgress(userId)) return;
+            setSyncErrorSession((current) =>
+              isCurrentSession(current, userId, authEpoch) ? null : current
+            );
+          })
+          .catch((error) => {
+            if (cancelled) return;
+            console.error("Failed to save review progress to Supabase", error);
+            setSyncErrorSession({ userId, authEpoch });
+          });
       } catch (error) {
         if (cancelled) return;
         console.error("Failed to load review progress from Supabase", error);
@@ -112,35 +162,43 @@ export function useReviewProgress() {
 
   /** 採点を 1 件記録する。ログイン中かつ読み込み完了時のみ有効。 */
   const recordGrade = (slug: string, grade: ReviewGrade) => {
-    if (!userId || !isReady || loaded === null) return;
+    const currentLoaded = loadedRef.current;
+    if (
+      !userId ||
+      currentLoaded === null ||
+      !isCurrentSession(currentLoaded, userId, authEpoch)
+    ) {
+      return;
+    }
 
     const now = new Date();
-    const current = loaded.records.get(slug) ?? createReviewRecord(slug);
+    const current = currentLoaded.records.get(slug) ?? createReviewRecord(slug);
     const graded = gradeRecord(current, grade, now);
-    const updatedStreak = nextStreak(loaded.streak, getTodayKey(now));
-    const streakChanged = updatedStreak !== loaded.streak;
+    const updatedStreak = nextStreak(currentLoaded.streak, getTodayKey(now));
+    const streakChanged = updatedStreak !== currentLoaded.streak;
+    const records = new Map(currentLoaded.records);
+    records.set(slug, graded);
+    const nextLoaded = { ...currentLoaded, records, streak: updatedStreak };
+    loadedRef.current = nextLoaded;
+    setLoaded(nextLoaded);
 
-    setLoaded((previous) => {
-      if (previous === null) return previous;
-      const records = new Map(previous.records);
-      records.set(slug, graded);
-      return { ...previous, records, streak: updatedStreak };
-    });
-
-    // 「覚えていない」の直後は単語詳細へ遷移してアンマウントされるため、
-    // ここで同期的にリクエストを投げておく（完了は待たない）。
-    const supabase = createClient();
-    upsertReviewRecord(supabase, userId, graded).catch((error) => {
-      console.error("Failed to save review progress to Supabase", error);
-      setHasSyncError(true);
-    });
+    // 遷移・アンマウントより前にアウトボックスへ同期保存してから送信を開始する。
+    enqueueReviewRecord(userId, graded);
 
     if (streakChanged) {
-      upsertStreak(supabase, userId, updatedStreak).catch((error) => {
-        console.error("Failed to save learning streak to Supabase", error);
-        setHasSyncError(true);
-      });
+      enqueueReviewStreak(userId, updatedStreak);
     }
+    flushReviewProgressOutbox(createClient(), userId)
+      .then(() => {
+        if (hasPendingReviewProgress(userId)) return;
+        setSyncErrorSession((current) =>
+          isCurrentSession(current, userId, authEpoch) ? null : current
+        );
+      })
+      .catch((error) => {
+        console.error("Failed to save review progress to Supabase", error);
+        setSyncErrorSession({ userId, authEpoch });
+      });
   };
 
   const retry = () => {

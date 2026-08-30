@@ -78,7 +78,7 @@ export default function LoginClient() {
           </div>
         </div>
         <p className="text-sm leading-relaxed text-slate-600">
-          お気に入りはアカウントに保存され、他の端末でも同じお気に入りを利用できます。
+          お気に入りと復習の記録はアカウントに保存され、他の端末でも続きから学習できます。
         </p>
         <div className="flex flex-wrap items-center gap-3">
           <Link
@@ -110,7 +110,7 @@ export default function LoginClient() {
       <div className="flex flex-col gap-2">
         <h1 className="text-xl font-bold text-slate-900">ログイン</h1>
         <p className="text-sm leading-relaxed text-slate-600">
-          ログインは<strong>任意</strong>です。複数の端末でお気に入りを同期したい方向けの機能で、ログインしなくてもすべての学習機能を今まで通り無料で利用できます。
+          ログインは<strong>任意</strong>です。単語閲覧・検索・お気に入り・通常の学習と復習は、ログインなしでも今まで通り無料で利用できます。ログインすると、複数端末でのお気に入り同期とマイページの復習スケジュールが使えます。
         </p>
       </div>
 
@@ -137,7 +137,7 @@ export default function LoginClient() {
       <ul className="flex list-inside list-disc flex-col gap-1 text-xs leading-relaxed text-slate-500">
         <li>初回ログイン時に、この端末のお気に入りがアカウントへ引き継がれます。</li>
         <li>
-          保存されるのはお気に入りの単語とメールアドレス等のアカウント情報のみです。詳しくは
+          メールアドレス等のアカウント情報、お気に入りの単語、復習回数・回答結果・復習日時・連続学習日数が保存されます。詳しくは
           <Link
             href="/privacy"
             prefetch={false}

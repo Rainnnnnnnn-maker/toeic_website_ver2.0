@@ -7,6 +7,11 @@ import {
   type ReviewRecord,
   type StreakState,
 } from "@/lib/review-schedule";
+import {
+  acknowledgeReviewRecord,
+  acknowledgeReviewStreak,
+  readReviewProgressOutbox,
+} from "@/lib/review-progress-outbox";
 
 /**
  * 復習進捗（word_review_progress / learning_streaks）への薄いアクセス層。
@@ -24,6 +29,10 @@ const STREAK_TABLE = "learning_streaks";
 
 const PROGRESS_COLUMNS =
   "word_slug, box, review_count, forgot_count, last_reviewed_at, next_review_at";
+
+// 同じユーザーへの送信が逆順に完了して古い採点で上書きされないよう、
+// アウトボックスの flush はユーザー単位で直列化する。
+const flushQueues = new Map<string, Promise<void>>();
 
 /** ログイン中ユーザーの復習進捗をすべて取得する（RLS により自分の行のみ）。 */
 export async function fetchReviewRecords(
@@ -81,4 +90,69 @@ export async function upsertStreak(
     .upsert(buildStreakRow(userId, streak), { onConflict: "user_id" });
 
   if (error) throw error;
+}
+
+/**
+ * ユーザー別アウトボックスに残っている書き込みをまとめて再送する。
+ * レコードとストリークは独立して成功扱いにし、成功した側だけを削除する。
+ */
+async function flushReviewProgressOutboxOnce(
+  supabase: SupabaseClient,
+  userId: string
+): Promise<void> {
+  const outbox = readReviewProgressOutbox(userId);
+  const failures: unknown[] = [];
+
+  await Promise.all([
+    (async () => {
+      if (outbox.records.length === 0) return;
+      const { error } = await supabase
+        .from(PROGRESS_TABLE)
+        .upsert(
+          outbox.records.map((record) => buildReviewProgressRow(userId, record)),
+          { onConflict: "user_id,word_slug" }
+        );
+
+      if (error) {
+        failures.push(error);
+        return;
+      }
+      for (const record of outbox.records) {
+        acknowledgeReviewRecord(userId, record);
+      }
+    })(),
+    (async () => {
+      if (outbox.streak === null) return;
+      const { error } = await supabase
+        .from(STREAK_TABLE)
+        .upsert(buildStreakRow(userId, outbox.streak), {
+          onConflict: "user_id",
+        });
+
+      if (error) {
+        failures.push(error);
+        return;
+      }
+      acknowledgeReviewStreak(userId, outbox.streak);
+    })(),
+  ]);
+
+  if (failures.length > 0) {
+    throw new AggregateError(failures, "Failed to flush review progress outbox");
+  }
+}
+
+export function flushReviewProgressOutbox(
+  supabase: SupabaseClient,
+  userId: string
+): Promise<void> {
+  const previous = flushQueues.get(userId) ?? Promise.resolve();
+  const queued = previous
+    .catch(() => undefined)
+    .then(() => flushReviewProgressOutboxOnce(supabase, userId));
+  flushQueues.set(userId, queued);
+
+  return queued.finally(() => {
+    if (flushQueues.get(userId) === queued) flushQueues.delete(userId);
+  });
 }

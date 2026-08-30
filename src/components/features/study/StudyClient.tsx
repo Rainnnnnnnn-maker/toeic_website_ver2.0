@@ -10,7 +10,7 @@ import { fetchWordDetail } from '@/actions/word';
 import { useTTS } from '@/hooks/useTTS';
 import { useStudyCountdown } from '@/hooks/useStudyCountdown';
 import { useStudyProgress, readPersistedState, clearPersistedState } from '@/hooks/useStudyProgress';
-import type { ReviewGrade } from '@/lib/review-schedule';
+import type { ReviewGrade, ReviewQueue } from '@/lib/review-schedule';
 import {
   buildWordMap,
   getNavigationType,
@@ -36,6 +36,8 @@ type Props = {
   onGrade?: (slug: string, grade: ReviewGrade) => void;
   /** 「覚えていない」で単語詳細へ遷移する際の from パラメータ */
   wordDetailFrom?: 'review' | 'study';
+  /** 復習詳細から戻る際に復元するキュー */
+  reviewQueue?: ReviewQueue;
 };
 
 const DEFAULT_STORAGE_KEY = 'toeic-study-state-v1';
@@ -52,6 +54,7 @@ export default function StudyClient({
   order = 'random',
   onGrade,
   wordDetailFrom,
+  reviewQueue,
 }: Props) {
   const router = useRouter();
   const { isFavorite, toggleFavorite } = useFavorites();
@@ -160,7 +163,11 @@ export default function StudyClient({
     markForgot(currentWord.slug);
     const fromParam =
       wordDetailFrom ?? (backLink === '/favorites' ? 'review' : 'study');
-    router.push(`/words/${currentWord.slug}?from=${fromParam}`);
+    const params = new URLSearchParams({ from: fromParam });
+    if (fromParam === 'review' && reviewQueue) {
+      params.set('queue', reviewQueue);
+    }
+    router.push(`/words/${currentWord.slug}?${params.toString()}`);
   };
 
   const handleLater = () => {
