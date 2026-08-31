@@ -5,7 +5,7 @@ import { LayoutDashboard } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 type Props = {
-  /** pill: AuthStatus の隣に置く小さめのボタン / solid: 各ページのヘッダー CTA */
+  /** pill: AuthStatus 内の小さめのボタン / solid: 各ページのヘッダー CTA */
   variant?: "pill" | "solid";
 };
 

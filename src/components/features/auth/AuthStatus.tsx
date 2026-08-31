@@ -1,13 +1,9 @@
 "use client";
 
 import Link, { useLinkStatus } from "next/link";
-import {
-  CircleUserRound,
-  LoaderCircle,
-  LogOut,
-  UserRound,
-} from "lucide-react";
+import { CircleUserRound, LoaderCircle, LogOut } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import MyPageLinkButton from "@/components/features/mypage/MyPageLinkButton";
 
 function LoginLinkContent() {
   const { pending } = useLinkStatus();
@@ -31,8 +27,8 @@ function LoginLinkContent() {
   );
 }
 
-// ホーム上部などに置くコンパクトなログイン状態表示。
-// 隣に並ぶ SNS シェアボタン（32px 丸アイコン）と高さを揃えたピル型 UI。
+// ホーム上部の認証導線。未ログイン時はログイン、ログイン済みなら
+// 同じ位置をマイページ導線へ切り替え、ログアウト操作を隣に置く。
 export function AuthStatus() {
   const { user, isAuthLoading, signOut } = useAuth();
 
@@ -53,40 +49,9 @@ export function AuthStatus() {
     );
   }
 
-  const avatarUrl =
-    typeof user.user_metadata?.avatar_url === "string"
-      ? user.user_metadata.avatar_url
-      : null;
-  const displayName =
-    typeof user.user_metadata?.full_name === "string"
-      ? user.user_metadata.full_name
-      : (user.email ?? undefined);
-
   return (
     <div className="flex items-center gap-2">
-      <span
-        className="inline-flex h-8 items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 py-0 pl-1 pr-3 shadow-sm"
-        title={displayName}
-      >
-        <span className="relative">
-          {avatarUrl ? (
-            // Vercel の画像最適化コストを避けるため next/image は使わない（外部アバターの小画像のみ）
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={avatarUrl}
-              alt=""
-              referrerPolicy="no-referrer"
-              className="h-6 w-6 rounded-full border border-white"
-            />
-          ) : (
-            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
-              <UserRound size={14} />
-            </span>
-          )}
-          <span className="absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full border border-white bg-emerald-500" />
-        </span>
-        <span className="text-xs font-bold text-emerald-700">ログイン中</span>
-      </span>
+      <MyPageLinkButton />
       <button
         type="button"
         onClick={signOut}

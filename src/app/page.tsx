@@ -6,7 +6,6 @@ import { getImportantWords, getMediumWords, getHighWords, getTodayRecommendedSel
 import WordsListClient from "@/components/features/words/WordsListClient";
 import { SnsShareButtons } from "@/components/features/sns/SnsShareButtons";
 import { AuthStatus } from "@/components/features/auth/AuthStatus";
-import MyPageLinkButton from "@/components/features/mypage/MyPageLinkButton";
 import TodayRecommendedWordsClient from "@/components/features/words/TodayRecommendedWordsClient";
 import { SemanticSearchLauncher } from "@/components/features/words/SemanticSearchLauncher";
 import { getLatestGuideArticles,PUBLISHED_GUIDE_ARTICLE_COUNT} from "@/data/guide-articles";
@@ -262,10 +261,7 @@ export default function Home() {
       />
       <main className="w-full max-w-[960px] flex flex-col gap-5 relative">
         <div className="mb-[-8px] sm:mb-0 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <AuthStatus />
-            <MyPageLinkButton />
-          </div>
+          <AuthStatus />
           <SnsShareButtons
             url="https://www.toeic-words.com/"
             title="【2026年版】TOEIC 重要単語 | 英単語を効率よく学習"
