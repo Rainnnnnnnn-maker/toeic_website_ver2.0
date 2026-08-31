@@ -12,10 +12,7 @@ export const size = {
 export const contentType = "image/png";
 
 export default async function Image() {
-  const textToLoad =
-    "TOEIC重要単語集LEVEL UP YOUR SCORE2026年版AI解説付き完全無料最重要単語中級単語上級単語www.toeic-words.com点 ";
-
-  const fontData = await loadGoogleFont("Noto+Sans+JP", textToLoad);
+  const fontData = await loadGoogleFont("Noto+Sans+JP");
 
   return new ImageResponse(
     (

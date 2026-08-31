@@ -63,10 +63,8 @@ export default async function Image({ params }: { params: Promise<{ word: string
       translation = "TOEIC重要単語"; 
   }
 
-  // Load fonts
-  // We need to load characters for the word and translation
-  const textToLoad = word + translation + "TOEIC重要単語" + " ";
-  const fontData = await loadGoogleFont("Noto+Sans+JP", textToLoad);
+  // 全 OGP で同じフルフォントのキャッシュを共有する。
+  const fontData = await loadGoogleFont("Noto+Sans+JP");
 
   return new ImageResponse(
     (
