@@ -79,9 +79,9 @@ export function useStudyProgress(storageKey: string, currentSlug: string | null)
     /**
      * 「覚えていない」: 連続カウントをリセットする。
      * 直後の router.push でアンマウントされ useEffect が走らない可能性があるため、
-     * ここで同期的に永続化する。
+     * ここで同期的に永続化する。resumeSlug は詳細確認後の復帰位置。
      */
-    const markForgot = (slug: string): void => {
+    const markForgot = (slug: string, resumeSlug: string = slug): void => {
         const newForgot = addUnique(forgottenSlugs, slug);
         const newRemembered = removeValue(rememberedSlugs, slug);
         const newLater = removeValue(laterSlugs, slug);
@@ -91,7 +91,7 @@ export function useStudyProgress(storageKey: string, currentSlug: string | null)
         setLaterSlugs(newLater);
         setConsecutiveRememberCount(0);
 
-        writePersistedState(storageKey, slug, newRemembered, newForgot, newLater, 0);
+        writePersistedState(storageKey, resumeSlug, newRemembered, newForgot, newLater, 0);
     };
 
     /** 「あとで」: 判断保留なので連続カウントはリセットしない */

@@ -160,7 +160,15 @@ export default function StudyClient({
     if (!currentWord) return;
     // 直後の router.push でアンマウントされるため、記録は同期的に呼び出す
     onGrade?.(currentWord.slug, 'forgot');
-    markForgot(currentWord.slug);
+    const resumeWord =
+      wordDetailFrom === 'review'
+        ? pickSequentialStudyWord(words, currentWord.slug)
+        : currentWord;
+    markForgot(currentWord.slug, resumeWord?.slug ?? currentWord.slug);
+    if (wordDetailFrom === 'review' && resumeWord) {
+      // Next Router が戻り先の画面状態を保持しても、同じ単語を再表示しない。
+      setCurrentWord(resumeWord);
+    }
     const fromParam =
       wordDetailFrom ?? (backLink === '/favorites' ? 'review' : 'study');
     const params = new URLSearchParams({ from: fromParam });
