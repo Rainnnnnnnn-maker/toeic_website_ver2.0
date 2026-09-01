@@ -18,6 +18,21 @@ export const OG_IMAGE_CACHE_CONTROL =
   "public, max-age=86400, s-maxage=2592000, stale-while-revalidate=86400";
 
 /**
+ * 単語リストに無いスラッグへの OG リクエストに付ける Cache-Control。
+ *
+ * このルートは `generateStaticParams` / `dynamicParams = false` を持てない
+ * （プリレンダリングされないため許可リストをルーティング層に置けない）ので、
+ * 未知スラッグの排除は Function 内の `getWordBySlug` チェックで行う。
+ * 画像を描かず 404 を返すので Satori / resvg のコストは発生しないが、
+ * 短めに CDN へ載せて Invocation の連打も抑える。
+ *
+ * 単語が後から追加されたときに 404 を長く抱えないよう、
+ * `s-maxage` は OG_IMAGE_CACHE_CONTROL より大幅に短くする。
+ */
+export const OG_IMAGE_NOT_FOUND_CACHE_CONTROL =
+  "public, max-age=0, s-maxage=3600, stale-while-revalidate=86400";
+
+/**
  * Google Fonts から Satori が読める TTF を1件だけ取得し、全 OGP で共有する。
  *
  * Google Fonts の `text=` URL は指定文字列ごとに異なる一方、このサーバー向け

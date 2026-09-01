@@ -1,7 +1,11 @@
 import { ImageResponse } from "next/og";
-import { getWordBySlug, getAllWords } from "@/data/words";
+import { getWordBySlug } from "@/data/words";
 import { getWordDetail } from "@/data/word-detail";
-import { loadGoogleFont, OG_IMAGE_CACHE_CONTROL } from "@/lib/og-utils";
+import {
+  loadGoogleFont,
+  OG_IMAGE_CACHE_CONTROL,
+  OG_IMAGE_NOT_FOUND_CACHE_CONTROL,
+} from "@/lib/og-utils";
 
 export const alt = "TOEIC重要単語";
 export const size = {
@@ -10,40 +14,32 @@ export const size = {
 };
 
 export const contentType = "image/png";
-export const dynamicParams = false;
 
-// `cacheComponents` 環境では metadata image route が実際にはプリレンダリングされず
-// 動的（ƒ）のままになるため、generateStaticParams だけでは Function 実行を防げない。
-// Active CPU の抑制は OG_IMAGE_CACHE_CONTROL による CDN キャッシュで行う（og-utils.ts 参照）。
-export async function generateStaticParams() {
-  const words = await getAllWords();
-  return words.map((w) => ({ word: w.slug }));
-}
+// `generateStaticParams` / `dynamicParams = false` は意図的に持たない。
+//
+// `cacheComponents` 環境では metadata image route がプリレンダリングされず、動的（ƒ）のまま
+// になる（prerender-manifest 上の OG ルートは 0 件）。それでも `generateStaticParams` を置くと
+// ビルドの静的生成対象だけが単語数ぶん増え、1枚も出力されないプリレンダー試行が全単語で走る。
+// 実測では静的生成対象が 1,422 → 2,798 ページに倍増し、静的生成 9.1s → 28.2s、
+// ビルド全体 17s → 35s、macOS の圧縮メモリ 4.7GB → 11.4GB、swapin 1.4万 → 20万回まで悪化した。
+// 各試行が Satori のレイアウト計算 + resvg のラスタライズ + フォントバッファを
+// ワーカー数ぶん並列に抱えるためで、得られる成果物は無い。
+//
+// `dynamicParams = false` は `generateStaticParams` とセットでしか成立しないため、
+// 未知スラッグの排除は下の `getWordBySlug` チェック（画像を描かず 404）で代替する。
+// 実行時の Active CPU 抑制は OG_IMAGE_CACHE_CONTROL による CDN キャッシュで行う（og-utils.ts 参照）。
 
 export default async function Image({ params }: { params: Promise<{ word: string }> }) {
   const { word } = await params;
   const wordEntry = await getWordBySlug(word);
   
-  // If word doesn't exist, return default image (or handle error)
+  // 単語リストに無いスラッグはここで弾く（`dynamicParams = false` の代替ガード）。
+  // 画像を生成せず 404 を返すので、Satori / resvg のコストは発生しない。
   if (!wordEntry) {
-    return new ImageResponse(
-      (
-        <div
-          style={{
-            width: "100%",
-            height: "100%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            background: "#fff",
-            fontSize: 48,
-          }}
-        >
-          Not Found
-        </div>
-      ),
-      { ...size, headers: { "Cache-Control": OG_IMAGE_CACHE_CONTROL } }
-    );
+    return new Response(null, {
+      status: 404,
+      headers: { "Cache-Control": OG_IMAGE_NOT_FOUND_CACHE_CONTROL },
+    });
   }
 
   // Try to fetch details for translation
