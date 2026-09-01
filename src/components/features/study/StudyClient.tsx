@@ -167,7 +167,10 @@ export default function StudyClient({
     markForgot(currentWord.slug, resumeWord?.slug ?? currentWord.slug);
     if (wordDetailFrom === 'review' && resumeWord) {
       // Next Router が戻り先の画面状態を保持しても、同じ単語を再表示しない。
+      // ヒント（例文）とカウントダウンも next カードの初期状態へ戻す。
+      // これがないと、戻ったときに次の単語へ前の単語の例文が残って見える。
       setCurrentWord(resumeWord);
+      startCardCountdown();
     }
     const fromParam =
       wordDetailFrom ?? (backLink === '/favorites' ? 'review' : 'study');
