@@ -317,14 +317,14 @@ export default function Home() {
                 <div className="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center text-xl font-bold mb-2">2</div>
                 <h3 className="text-lg font-bold text-slate-800">忘却曲線を意識した復習</h3>
                 <p className="text-sm text-slate-600 leading-relaxed">
-                  「学習モード」と「復習モード」を使い分け、覚えにくい語へ繰り返し触れられます。さらに「今日のおすすめ{TODAY_WORDS_COUNT}単語」機能で、少量からの継続をサポートします。
+                  「学習モード」と「復習モード」を使い分け、覚えにくい語へ繰り返し触れられます（お気に入り単語の復習モードはログインが必要）。さらに「今日のおすすめ{TODAY_WORDS_COUNT}単語」機能で、少量からの継続をサポートします。
                 </p>
               </div>
               <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col gap-3">
                 <div className="w-12 h-12 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center text-xl font-bold mb-2">3</div>
                 <h3 className="text-lg font-bold text-slate-800">完全無料・登録不要</h3>
                 <p className="text-sm text-slate-600 leading-relaxed">
-                  アプリのインストールや会員登録は不要。PCでもスマホでも、ブラウザから1,300語以上の収録語を無料で確認できます。複数端末でお気に入りを同期したい方向けに、任意のログイン機能も用意しています。
+                  アプリのインストールや会員登録は不要。PCでもスマホでも、ブラウザから1,300語以上の収録語を無料で確認できます。複数端末でのお気に入り同期や、お気に入り単語の復習モード・聞き流しを使いたい方向けに、無料のログイン機能も用意しています。
                 </p>
               </div>
             </div>
@@ -354,7 +354,7 @@ export default function Home() {
                 <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold mt-0.5">3</span>
                 <div>
                   <p className="font-bold text-slate-800">週末や夜：お気に入り＆復習モードで知識を定着</p>
-                  <p className="text-sm text-slate-600 mt-1">覚えにくい単語は「お気に入り」に登録し、週末に「復習モード」で一気に振り返ります。</p>
+                  <p className="text-sm text-slate-600 mt-1">覚えにくい単語は「お気に入り」に登録し、週末に「復習モード」で一気に振り返ります（復習モードはログインが必要）。</p>
                 </div>
               </li>
             </ol>

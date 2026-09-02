@@ -6,7 +6,7 @@ import { A8AdBanner468x60 } from "@/components/common/A8AdBanner";
 
 export const metadata: Metadata = {
   title: "お気に入り単語 聞き流し | TOEIC Words",
-  description: "お気に入りに登録した単語の発音・英語例文・日本語訳を自動再生する「聞き流しモード」です。",
+  description: "お気に入りに登録した単語の発音・英語例文・日本語訳を自動再生する「聞き流しモード」です。ご利用にはログインが必要です。",
   // ユーザー固有のお気に入りに依存するページなので noindex（self-canonical は付けない）
   robots: {
     index: false,
@@ -28,7 +28,7 @@ export default async function FavoritesListenPage() {
             お気に入り単語 聞き流しモードとは
           </h2>
           <p className="mb-3">
-            「聞き流しモード」は、お気に入りに登録した TOEIC 単語を、画面を見続けなくても耳だけで学習できる自動再生機能です。単語の発音・英語例文・日本語訳が自然な間隔で連続再生されるため、通勤・通学・家事などの「ながら時間」を活かして、自分が苦手な単語を集中的に語彙とリスニング力の両面から鍛えられます。
+            「聞き流しモード」は、お気に入りに登録した TOEIC 単語を、画面を見続けなくても耳だけで学習できる自動再生機能です。お気に入り単語の聞き流しはログインが必要で、ログインすると復習記録とあわせて複数の端末から同じお気に入りを再生できます。単語の発音・英語例文・日本語訳が自然な間隔で連続再生されるため、通勤・通学・家事などの「ながら時間」を活かして、自分が苦手な単語を集中的に語彙とリスニング力の両面から鍛えられます。
           </p>
 
           <h3 className="mt-4 mb-2 text-sm font-semibold text-slate-800">
@@ -84,7 +84,7 @@ export default async function FavoritesListenPage() {
 
           <p className="text-xs text-slate-500">
             文字でじっくり確認したい場合は{" "}
-            <Link href="/review" prefetch={false} className="text-blue-600 underline">
+            <Link href="/favorites" prefetch={false} className="text-blue-600 underline">
               「お気に入り一覧」
             </Link>
             、テスト形式で覚えたい場合は{" "}

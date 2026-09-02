@@ -4,7 +4,7 @@ import ReviewWrapper from "@/components/features/review/ReviewWrapper";
 
 export const metadata = {
   title: "復習モード",
-  description: "お気に入り登録した単語を重点的に復習します。",
+  description: "お気に入り登録した単語を重点的に復習します。ご利用にはログインが必要です。",
   alternates: {
     canonical: "https://www.toeic-words.com/review",
   },

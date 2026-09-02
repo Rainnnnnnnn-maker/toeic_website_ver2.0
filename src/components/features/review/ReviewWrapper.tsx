@@ -8,6 +8,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useFavorites } from "@/context/FavoritesContext";
 import { useReviewProgress } from "@/hooks/useReviewProgress";
 import StudyClient from "@/components/features/study/StudyClient";
+import FavoritePracticeLoginGate from "@/components/features/auth/FavoritePracticeLoginGate";
 import type { Word } from "@/data/words";
 import { buildWordMap } from "@/lib/study-utils";
 import { getTodayKey } from "@/lib/word-select";
@@ -66,7 +67,7 @@ type ReviewSessionProps = {
   favoriteSlugs: string[];
   wordBySlug: Map<string, Word>;
   records: ReadonlyMap<string, ReviewRecord>;
-  userId: string | null;
+  userId: string;
   authEpoch: number;
   backLink: string;
   backLinkText: string;
@@ -100,9 +101,8 @@ function ReviewSession({
   onGrade,
 }: ReviewSessionProps) {
   const requestedConfig = QUEUE_CONFIG[requestedQueue];
-  const requestedStorageKey = userId
-    ? `${requestedConfig.storageKey}:${userId}:e${authEpoch}`
-    : requestedConfig.storageKey;
+  // 復習はログイン必須になったため、キーは常にユーザー＋認証エポックで分離する。
+  const requestedStorageKey = `${requestedConfig.storageKey}:${userId}:e${authEpoch}`;
   const fixedSessionStorageKey = `${requestedStorageKey}:fixed-v1`;
 
   // フィルター済みの出題集合はマウント時に一度だけ固定する。
@@ -216,9 +216,7 @@ function ReviewSession({
   };
 
   const config = QUEUE_CONFIG[session.actualQueue];
-  const storageKey = userId
-    ? `${config.storageKey}:${userId}:e${authEpoch}`
-    : config.storageKey;
+  const storageKey = `${config.storageKey}:${userId}:e${authEpoch}`;
 
   if (session.completed) {
     return (
@@ -345,11 +343,25 @@ export default function ReviewWrapper({ allWords }: Props) {
   const needsProgress = requestedQueue !== "all";
 
   // ゲスト判定前や、ログイン中のリモートデータ取得途中にはセッションを始めない。
-  if (
-    isAuthLoading ||
-    favoritesStatus === "loading" ||
-    progressStatus === "loading"
-  ) {
+  if (isAuthLoading) {
+    return (
+      <CenteredMessage>
+        <p className="text-sm leading-[1.6] text-gray-500">読み込み中...</p>
+      </CenteredMessage>
+    );
+  }
+
+  // お気に入りを使った復習はログイン必須。ブックマーク等からの直接アクセスでも
+  // セッションを開始せず、共通のログイン案内を出す。
+  if (!user) {
+    return (
+      <CenteredMessage>
+        <FavoritePracticeLoginGate feature="review" />
+      </CenteredMessage>
+    );
+  }
+
+  if (favoritesStatus === "loading" || progressStatus === "loading") {
     return (
       <CenteredMessage>
         <p className="text-sm leading-[1.6] text-gray-500">読み込み中...</p>
@@ -359,7 +371,7 @@ export default function ReviewWrapper({ allWords }: Props) {
 
   // ログイン中にお気に入り取得が失敗した場合、別アカウント由来の
   // localStorage 値をログイン向けキューへ流さず、明示的に再試行させる。
-  if (user && favoritesStatus === "error") {
+  if (favoritesStatus === "error") {
     return (
       <CenteredMessage>
         <div className="flex flex-col items-center gap-4 text-center">
@@ -383,43 +395,23 @@ export default function ReviewWrapper({ allWords }: Props) {
   }
 
   const canFilter =
-    needsProgress &&
-    user !== null &&
-    favoritesStatus === "ready" &&
-    progressStatus === "ready";
-  const canRecord =
-    user !== null &&
-    favoritesStatus === "ready" &&
-    progressStatus === "ready";
+    needsProgress && favoritesStatus === "ready" && progressStatus === "ready";
+  const canRecord = favoritesStatus === "ready" && progressStatus === "ready";
 
-  const cameFromMyPage = user !== null && rawQueue !== null;
+  const cameFromMyPage = rawQueue !== null;
   const backLink = cameFromMyPage ? "/mypage" : "/favorites";
   const backLinkText = cameFromMyPage
     ? "マイページへ戻る"
     : "お気に入りへ戻る";
 
   const baseNotice = (() => {
-    if (needsProgress && progressStatus === "guest") {
-      return (
-        <>
-          ログインすると、忘れかけた単語だけを出題する復習スケジュールが使えます。今回はお気に入り全件で復習します。
-          <Link
-            href="/login?next=/mypage"
-            prefetch={false}
-            className="ml-1 font-bold text-emerald-700 underline underline-offset-2"
-          >
-            ログイン
-          </Link>
-        </>
-      );
-    }
     if (progressStatus === "error") {
       return "学習データを読み込めなかったため、今回は記録せずお気に入り全件で復習します。";
     }
     return null;
   })();
 
-  const sessionKey = `${user?.id ?? "guest"}:${authEpoch}:${requestedQueue}:${canFilter}`;
+  const sessionKey = `${user.id}:${authEpoch}:${requestedQueue}:${canFilter}`;
 
   return (
     <ReviewSession
@@ -429,7 +421,7 @@ export default function ReviewWrapper({ allWords }: Props) {
       favoriteSlugs={favoriteSlugs}
       wordBySlug={wordBySlug}
       records={records}
-      userId={user?.id ?? null}
+      userId={user.id}
       authEpoch={authEpoch}
       backLink={backLink}
       backLinkText={backLinkText}

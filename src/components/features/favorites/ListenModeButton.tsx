@@ -5,9 +5,11 @@ import { useFavorites } from "@/context/FavoritesContext";
 import { Headphones } from "lucide-react";
 
 export default function ListenModeButton() {
-  const { favorites } = useFavorites();
-  
-  if (favorites.length === 0) return null;
+  // 聞き流しはログイン必須。Supabase 由来のお気に入りが揃うまでは出さない
+  // （未ログイン時は FavoritePracticeLoginCard がログイン導線を出す）。
+  const { favorites, favoritesStatus } = useFavorites();
+
+  if (favoritesStatus !== "ready" || favorites.length === 0) return null;
 
   return (
     <Link href="/favorites/listen" prefetch={false} className="group relative inline-flex items-center justify-center gap-1.5 px-4 py-2 min-h-[36px] bg-gradient-to-r from-blue-600 to-cyan-500 text-white rounded-lg font-bold text-sm shadow-[0_4px_14px_0_rgba(37,99,235,0.39)] overflow-hidden transition-all duration-300 hover:shadow-[0_6px_20px_rgba(37,99,235,0.23)] hover:-translate-y-1 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500">

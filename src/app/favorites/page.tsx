@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getAllWords } from "@/data/words";
 import FavoritesListClient from "@/components/features/favorites/FavoritesListClient";
 import ListenModeButton from "@/components/features/favorites/ListenModeButton";
+import FavoritePracticeLoginCard from "@/components/features/favorites/FavoritePracticeLoginCard";
 import type { Metadata } from "next";
 import ReviewModeButton from "@/components/features/review/ReviewModeButton";
 import MyPageLinkButton from "@/components/features/mypage/MyPageLinkButton";
@@ -67,6 +68,7 @@ export default async function FavoritesPage() {
             </Link>
           </div>
         </header>
+        <FavoritePracticeLoginCard />
         <FavoritesListClient allWords={allWords} />
       </main>
     </div>

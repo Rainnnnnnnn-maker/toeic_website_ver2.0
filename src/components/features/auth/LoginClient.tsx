@@ -110,7 +110,7 @@ export default function LoginClient() {
       <div className="flex flex-col gap-2">
         <h1 className="text-xl font-bold text-slate-900">ログイン</h1>
         <p className="text-sm leading-relaxed text-slate-600">
-          ログインは<strong>任意</strong>です。単語閲覧・検索・お気に入り・通常の学習と復習は、ログインなしでも今まで通り無料で利用できます。ログインすると、複数端末でのお気に入り同期とマイページの復習スケジュールが使えます。
+          単語閲覧・検索・お気に入りの登録と一覧・学習モード・今日の6単語は、<strong>ログインなしでも</strong>今まで通り無料で利用できます。ログインすると、複数端末でのお気に入り同期に加えて、お気に入り単語の復習モード・聞き流しと、マイページの復習スケジュールが使えます。
         </p>
       </div>
 

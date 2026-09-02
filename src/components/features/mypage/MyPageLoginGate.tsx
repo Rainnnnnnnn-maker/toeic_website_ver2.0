@@ -78,7 +78,7 @@ export default function MyPageLoginGate() {
           ログインしなくても使える機能
         </p>
         <p className="mt-1 text-[13px] leading-[1.6] text-slate-500">
-          お気に入りの登録・一覧・復習モード・聞き流しは、これまでどおりログインなしでご利用いただけます。
+          お気に入りの登録・一覧、学習モード、今日の6単語は、ログインなしでご利用いただけます。お気に入り単語の復習モードと聞き流しは、ログイン後にこのページから利用できます。
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
           <Link
