@@ -54,11 +54,10 @@ debug.log
 #word doc
 __words__/*
 
-#trae doc
-.trae/documents/*
-!.trae/documents/技術ドキュメント.md
-
 #skill script
 sync-blob.mjs
 
 __BLOB__/
+
+#internal plans
+docs/archive/plans/
