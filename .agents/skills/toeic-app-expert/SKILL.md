@@ -57,4 +57,4 @@ TOEIC頻出重要単語を学習するWebアプリケーションです。
 - **コンポーネント追加**: `src/components/features` 配下に機能単位で配置する。
 - **キャッシュ確認**: Redisのキーは `word:<lowercased>`。
 
-このスキルは `.trae/documents/技術ドキュメント.md` の内容に基づいています。
+このスキルは `docs/architecture.md` の内容に基づいています。

@@ -236,7 +236,7 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...   # 3-1 で控えた Pub
 - [X] `src/app/(web-info)/privacy/page.tsx` — 収集情報にアカウント情報を追記し、任意ログイン時の Supabase 保存を明記（最終更新日も更新）
 - [X] `src/app/(web-info)/about/page.tsx` — 任意 Google ログインの説明を追記
 - [X] `src/app/page.tsx` / `src/app/(web-info)/donate/page.tsx` — 「会員登録不要（ログインは任意）」等に調整
-- [X] `README.md` と `.trae/documents/技術ドキュメント.md`（最終更新日・更新履歴 4.5）を更新
+- [X] `README.md` と `docs/architecture.md`（最終更新日・更新履歴 4.5）を更新
 
 ### 5-5. 検証
 
@@ -291,7 +291,7 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...   # 3-1 で控えた Pub
 3. §3 / §5 のチェックボックスで進捗を確認し、§6 の未決事項に未回答があればまず決める
 4. `.env.local` に §3-6 の 2 変数があるか確認
 5. Claude Code に依頼する場合の指示例:
-   > `__docs__/phase1-login-favorites-sync-setup.md` を読んで、§5 の未完了タスクを続きから実装して。§6 の方針・注意点に従うこと。
+   > `docs/operations/phase1-login-favorites-sync-setup.md` を読んで、§5 の未完了タスクを続きから実装して。§6 の方針・注意点に従うこと。
    >
 6. 完了したタスクはこのファイルのチェックボックスを `[x]` に更新してコミットする
 

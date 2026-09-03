@@ -80,7 +80,7 @@ Carry the server's `dateKey` through the URL rather than calling `getTodayKey()`
 - Use `src/lib/supabase/client.ts` for browser access and `src/lib/supabase/server.ts` for Server Components, Server Actions, and Route Handlers. The server client is protected by `import "server-only"`; apart from the cookie-bridging client required directly inside `src/proxy.ts`, do not introduce another Supabase client initialization path.
 - `AuthContext` resolves auth state client-side with `onAuthStateChange` so the existing pages remain statically cacheable. `/auth/callback` exchanges the OAuth code for a session. `src/proxy.ts` exists only to refresh Supabase Auth sessions and intentionally matches `/login` and `/auth/*`; do not broaden the matcher merely to read auth state because that increases Vercel Proxy executions and can undermine the static-cache strategy.
 - `FavoritesContext` owns the guest/remote transition: first sign-in merges eligible local favorites into Supabase, successful merges clear the merged local copy, and sign-out writes the previous account's favorites back to local storage. The local owner marker plus `authEpoch` prevent favorites from leaking across account switches or reusing stale remote state. Keep merge/session decisions in the pure helpers under `src/lib/favorites-sync.ts` and storage mechanics in `src/lib/favorites-store.ts`.
-- The active Phase 1 schema is `profiles` plus `favorites`, with a unique `(user_id, word_slug)` constraint and RLS policies that restrict each user to their own rows. The baseline SQL and provider setup are documented in `__docs__/phase1-login-favorites-sync-setup.md`. There are currently no tracked files under `supabase/migrations/`; do not imply that a migration has been applied unless it is version-controlled and reconciled with the live project.
+- The active Phase 1 schema is `profiles` plus `favorites`, with a unique `(user_id, word_slug)` constraint and RLS policies that restrict each user to their own rows. The baseline SQL and provider setup are documented in `docs/operations/phase1-login-favorites-sync-setup.md`. There is currently no tracked baseline migration for those Phase 1 tables under `supabase/migrations/`; do not imply that a migration has been applied unless it is version-controlled and reconciled with the live project.
 - The publishable key is intentionally exposed to the browser; RLS is the authorization boundary. Never expose or add a Supabase secret/service-role key to client code, a `NEXT_PUBLIC_*` variable, logs, or committed files. The current feature does not require a service-role key.
 
 ### Review Flow and My Page (Sign-In Required)
@@ -94,7 +94,7 @@ Carry the server's `dateKey` through the URL rather than calling `getTodayKey()`
 - **Keep `new Date()` out of the prerendered path.** Under `cacheComponents`, calling it while a Client Component is prerendered fails the build. Time-dependent aggregation lives in `MyPageDashboard`, which only mounts after data loads; `ReviewWrapper` creates the date inside the branch that needs it.
 - `/review` accepts `?queue=due|weak|all`. `all` (and no parameter) keeps the same full-list behavior. Signed-in review sessions wait for both remote favorites and progress; never build a signed-in queue from the transient localStorage favorites snapshot. A signed-in favorites fetch error is a retry state, while guests, progress fetch errors, and empty filtered results fall back to the full safe favorites list with an inline notice. `due`/`weak` snapshot at most `REVIEW_SESSION_LIMIT` slugs once at session start, remove graded slugs without replenishing from the backlog, and show completion when the fixed set is exhausted. Storage keys include queue, user id, and auth epoch so accounts and queues never share session state.
 - `StudyClient` takes optional `onGrade` / `wordDetailFrom` / `reviewQueue`. `/study` passes none of them, so learning mode is unchanged. `onGrade` must be called synchronously in the "覚えていない" handler, before the `router.push` unmounts the component. When a review queue is present, carry it through `/words/[word]` and back so due/weak context is not lost; `from=mypage` must return directly to `/mypage`.
-- The schema lives in `supabase/migrations/` (version-controlled) and must be applied manually — the Supabase SQL Editor is the reliable path, `npx supabase db push` also works, but never point `supabase db reset` / `db diff` at the remote because the Phase 1 tables have no baseline migration. The SQL is self-contained (it creates `handle_updated_at()` itself) and idempotent, so a failed run can simply be re-run after fixing the cause. It must also `grant` to `authenticated`: newer Supabase projects do not auto-expose new public tables to the Data API, and RLS alone then yields `42501`. Setup steps and a troubleshooting table are in `__docs__/mypage-review-flow-setup.md`.
+- The schema lives in `supabase/migrations/` (version-controlled) and must be applied manually — the Supabase SQL Editor is the reliable path, `npx supabase db push` also works, but never point `supabase db reset` / `db diff` at the remote because the Phase 1 tables have no baseline migration. The SQL is self-contained (it creates `handle_updated_at()` itself) and idempotent, so a failed run can simply be re-run after fixing the cause. It must also `grant` to `authenticated`: newer Supabase projects do not auto-expose new public tables to the Data API, and RLS alone then yields `42501`. Setup steps and a troubleshooting table are in `docs/operations/mypage-review-flow-setup.md`.
 
 ### Outbound Timeouts and Retries
 
@@ -151,12 +151,19 @@ All revalidation endpoints require `?token=<REVALIDATION_TOKEN>`:
 - `src/app/api/` — Route Handlers only; no UI logic here
 
 ### Project Skills
-Repository-specific skills live in `.trae/skills/`, symlinked into `.claude/skills/` and `~/.codex/skills/` so every agent resolves the same `SKILL.md`. Edit the files under `.trae/skills/` only — never the symlinks.
+Repository-specific skills live in `.agents/skills/`, symlinked into `.claude/skills/` and `~/.codex/skills/` so every agent resolves the same `SKILL.md`. Edit the files under `.agents/skills/` only — never the symlinks.
 
 Word-list operations (syncing from Vercel Blob, alphabetical sorting, deduplication) each have a dedicated skill. Read the relevant `SKILL.md` before editing `__words__/*.txt` by hand. Do not maintain a list of skill names here; each skill's `description` frontmatter is the single source of truth and agents load it automatically.
 
 ### Document Update Rule
-Any feature change must update **both** `README.md` and `.trae/documents/技術ドキュメント.md` (including the "最終更新日") in the same commit or PR.
+Project documentation lives under `docs/`; use `docs/README.md` as the index. Any feature change must update **both** `README.md` and `docs/architecture.md` (including the "最終更新日") in the same commit or PR, plus any affected specification or operations guide.
+
+### Working Agreements
+These carry over from the retired `.trae/rules/project_rules.md`; `AGENTS.md` is now their only home.
+
+- **Destructive Git operations require an explicit instruction.** Never run `git reset --hard`, `git push --force`, or delete a branch unless the user asked for that specific action.
+- **Confirm instead of guessing.** When a requirement or specification is ambiguous, ask the user rather than picking an interpretation and building on it.
+- **Never log environment variable values.** Keys and tokens live only in `.env.local`; they must not appear in code, documentation, commits, or log output.
 
 ### Testing
 **Unit tests (Vitest) cover pure logic only**; integration/UI is still verified by manual smoke test.
@@ -174,7 +181,7 @@ Before merging:
 4. Manual smoke test of the affected feature in `npm run dev`
 
 ### OGP Font Loading (Known Fragility)
-`src/lib/og-utils.ts:loadGoogleFont` uses a regex to parse Google Fonts CSS. The current parser only matches `opentype`/`truetype` formats and may fail if Google serves `woff2` only. A fix is documented in `.trae/TODO_Refactoring1.md`.
+`src/lib/og-utils.ts:loadGoogleFont` uses a regex to parse Google Fonts CSS. The current parser only matches `opentype`/`truetype` formats and may fail if Google serves `woff2` only. Treat this as a known limitation when changing OGP font loading.
 
 ### Environment Variables
 Required in `.env.local` for local development:

@@ -11,8 +11,9 @@
 git diff --quiet "$VERCEL_GIT_PREVIOUS_SHA" "$VERCEL_GIT_COMMIT_SHA" -- \
   . \
   ':(exclude)*.md' \
+  ':(exclude)docs/**' \
+  ':(exclude).agents/**' \
   ':(exclude).claude/**' \
-  ':(exclude).trae/**' \
   ':(exclude).github/**' \
   ':(exclude).gitignore' \
   || exit 1

@@ -4,7 +4,7 @@ import { NextResponse, type NextRequest } from "next/server";
 // Supabase Auth のセッションリフレッシュ専用 proxy。
 // Vercel の Proxy 実行量を抑えるため、matcher は認証関連ページに最小化している
 // （認証状態の表示はクライアント側 onAuthStateChange で解決する方針。
-//   __docs__/phase1-login-favorites-sync-setup.md §6 N-1 / N-2 参照）。
+//   docs/operations/phase1-login-favorites-sync-setup.md §6 N-1 / N-2 参照）。
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
 

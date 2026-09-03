@@ -267,5 +267,7 @@ Returns `sitemap.xml` containing all static pages and all word detail URLs.
 - `src/data`: Data fetching logic — `words.ts` (Local vs Blob switching, `getAllWords` / `getTodayRecommendedWords` / `getRelatedWords`) and `word-detail.ts` (multi-layer cached `getWordDetail`, Gemini generation).
 - `src/hooks`: Custom React hooks (e.g., `useTTS`, `useReviewProgress`).
 - `src/context`: React Contexts (`AuthContext`, `FavoritesContext`, `ShareTargetContext`).
-- `supabase/migrations`: Version-controlled SQL applied through the Supabase SQL Editor (currently `word_review_progress` / `learning_streaks` for the review flow). Manual setup steps live in `__docs__/mypage-review-flow-setup.md`.
+- `docs`: Project documentation, with the current architecture in `docs/architecture.md`, operational runbooks in `docs/operations/`, specifications in `docs/specs/`, and completed plans in `docs/archive/`.
+- `.agents/skills`: Canonical repository-specific agent skills. `.claude/skills` and `~/.codex/skills` point here through symlinks.
+- `supabase/migrations`: Version-controlled SQL applied through the Supabase SQL Editor (currently `word_review_progress` / `learning_streaks` for the review flow). Manual setup steps live in `docs/operations/mypage-review-flow-setup.md`.
 - `__words__`: Local storage for word lists during development.
