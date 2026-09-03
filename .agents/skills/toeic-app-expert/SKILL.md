@@ -10,7 +10,7 @@ description: "TOEIC単語アプリ開発のエキスパート。技術ドキュ�
 
 TOEIC頻出重要単語を学習するWebアプリケーションです。
 
-- **フレームワーク**: Next.js 16.1.0 (App Router)
+- **フレームワーク**: Next.js 16.2.0 (App Router)
 - **UI**: React 19, TypeScript
 - **AI生成**: Google Gemini (詳細解説生成)
 - **キャッシュ**: Upstash Redis (L2), Next.js Data Cache (L1)
