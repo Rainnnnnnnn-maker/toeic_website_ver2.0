@@ -12,10 +12,11 @@ type WeakItem = {
 
 type Props = {
   items: WeakItem[];
+  sessionCount: number;
 };
 
 /** 「覚えていない」と答えた回数が多い単語。苦手だけをまとめて復習できる。 */
-export default function WeakWordsPanel({ items }: Props) {
+export default function WeakWordsPanel({ items, sessionCount }: Props) {
   if (items.length === 0) return null;
 
   return (
@@ -27,6 +28,7 @@ export default function WeakWordsPanel({ items }: Props) {
         <h3 className="text-sm font-bold text-slate-800">苦手な単語</h3>
       </div>
 
+      <p className="text-xs text-slate-600">「×」は「覚えていない」と答えた累計回数です。回数が多い順に表示しています。</p>
       <ul className="flex flex-wrap gap-2">
         {items.map(({ word, forgotCount }) => (
           <li key={word.slug}>
@@ -50,7 +52,7 @@ export default function WeakWordsPanel({ items }: Props) {
         onClick={() => trackMyPageCta("review_weak")}
         className="group inline-flex items-center gap-1.5 self-start text-sm font-bold text-rose-600 transition-colors hover:text-rose-700"
       >
-        苦手な単語だけ復習する
+        苦手な単語を {sessionCount} 語復習する
         <ArrowRight
           size={15}
           className="transition-transform group-hover:translate-x-1"

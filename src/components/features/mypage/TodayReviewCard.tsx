@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { REVIEW_SESSION_LIMIT } from "@/lib/review-schedule";
 import { CalendarClock, PlayCircle, Search, Sparkles, Star } from "lucide-react";
 import { trackMyPageCta } from "@/components/features/mypage/analytics";
 
@@ -116,7 +117,9 @@ export default function TodayReviewCard({
   }
 
   const finished = reviewedToday + dueCount;
-  const ratio = finished === 0 ? 1 : reviewedToday / finished;
+  const dailyTarget = Math.min(REVIEW_SESSION_LIMIT, finished);
+  const ratio = dailyTarget === 0 ? 1 : reviewedToday / dailyTarget;
+  const targetReached = reviewedToday >= dailyTarget;
 
   // 今日の分は消化済み
   if (dueCount === 0) {
@@ -153,7 +156,7 @@ export default function TodayReviewCard({
             先取りで復習する
           </Link>
         </div>
-        <ProgressRing ratio={ratio} label="今日の進捗" />
+        <ProgressRing ratio={ratio} label="今日の目安" />
       </section>
     );
   }
@@ -164,7 +167,9 @@ export default function TodayReviewCard({
         <p className="text-xs font-bold uppercase tracking-[0.12em] text-emerald-600">
           TODAY&apos;S REVIEW
         </p>
-        <h2 className="flex items-baseline gap-2 text-slate-900">
+        {targetReached ? (
+          <h2 className="text-2xl font-bold text-emerald-700">今日の目安 {dailyTarget} 語を達成！</h2>
+        ) : <h2 className="flex items-baseline gap-2 text-slate-900">
           <span className="text-[40px] font-bold leading-none sm:text-[48px]">
             {sessionCount}
           </span>
@@ -172,12 +177,13 @@ export default function TodayReviewCard({
           <span className="text-sm font-medium text-slate-500">
             を復習しましょう
           </span>
-        </h2>
-        <p className="text-sm leading-[1.7] text-slate-500">
-          {dueCount > sessionCount
+        </h2>}
+        <p className="text-sm leading-[1.7] text-slate-600">
+          {targetReached ? `今日は ${reviewedToday} 語を復習しました。おつかれさまでした。余裕があれば、もう ${sessionCount} 語進められます。` : dueCount > sessionCount
             ? `復習の期限が来ているのは ${dueCount} 語です。まずは ${sessionCount} 語だけ進めれば十分です。`
             : "忘れかけたタイミングの単語をまとめました。"}
-          {reviewedToday > 0 && `（今日はここまで ${reviewedToday} 語）`}
+          {!targetReached && reviewedToday > 0 && `（今日はここまで ${reviewedToday} 語）`}
+          {targetReached && <span className="mt-1 block text-xs text-slate-500">期限が来ている単語：残り {dueCount} 語</span>}
         </p>
         <Link
           href="/review?queue=due"
@@ -189,10 +195,10 @@ export default function TodayReviewCard({
             <div className="relative h-full w-8 bg-white/20" />
           </div>
           <PlayCircle size={18} className="relative z-10" />
-          <span className="relative z-10">復習をはじめる</span>
+          <span className="relative z-10">{targetReached ? `もう ${sessionCount} 語復習する` : "復習をはじめる"}</span>
         </Link>
       </div>
-      <ProgressRing ratio={ratio} label="今日の進捗" />
+      <ProgressRing ratio={ratio} label="今日の目安" />
     </section>
   );
 }

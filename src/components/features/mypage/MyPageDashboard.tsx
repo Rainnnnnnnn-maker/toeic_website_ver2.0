@@ -11,6 +11,7 @@ import {
   countReviewedOnDay,
   countReviewedSince,
   getDueSlugs,
+  getRetentionLevel,
   getLastWeekStart,
   getNextDueAt,
   getWeakSlugs,
@@ -71,6 +72,12 @@ export default function MyPageDashboard({
   const nextDueAt = getNextDueAt(favoriteSlugs, records, now);
   const currentStreak = resolveDisplayStreak(streak, todayKey);
 
+  const retentionWords = favoriteSlugs.map((slug) => ({
+    word: wordBySlug.get(slug)!,
+    level: getRetentionLevel(records.get(slug)),
+  }));
+  const weakSessionCount = getWeakSlugs(favoriteSlugs, records, REVIEW_SESSION_LIMIT).length;
+
   const weakItems = getWeakSlugs(favoriteSlugs, records)
     .map((slug) => {
       const word = wordBySlug.get(slug);
@@ -118,9 +125,9 @@ export default function MyPageDashboard({
         weeklyReviewedCount={weeklyReviewedCount}
       />
 
-      {favoriteSlugs.length > 0 && <RetentionBreakdown summary={summary} />}
+      {favoriteSlugs.length > 0 && <RetentionBreakdown summary={summary} words={retentionWords} />}
 
-      <WeakWordsPanel items={weakItems} />
+      <WeakWordsPanel items={weakItems} sessionCount={weakSessionCount} />
 
       <ReviewMenu />
     </>

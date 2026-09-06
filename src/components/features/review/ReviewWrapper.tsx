@@ -317,6 +317,7 @@ function ReviewSession({
       )}
       <StudyClient
         words={reviewWords}
+        sessionProgress={session.actualQueue !== "all" ? { total: session.initialCount, remaining: session.remainingSlugs.length } : undefined}
         storageKey={storageKey}
         pageTitle={config.pageTitle}
         backLink={backLink}

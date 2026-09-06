@@ -38,6 +38,7 @@ type Props = {
   wordDetailFrom?: 'review' | 'study';
   /** 復習詳細から戻る際に復元するキュー */
   reviewQueue?: ReviewQueue;
+  sessionProgress?: { total: number; remaining: number };
 };
 
 const DEFAULT_STORAGE_KEY = 'toeic-study-state-v1';
@@ -55,6 +56,7 @@ export default function StudyClient({
   onGrade,
   wordDetailFrom,
   reviewQueue,
+  sessionProgress,
 }: Props) {
   const router = useRouter();
   const { isFavorite, toggleFavorite } = useFavorites();
@@ -250,6 +252,12 @@ export default function StudyClient({
               {backLinkText}
             </Link>
             <h1 className="text-[28px] leading-[1.3] text-slate-900 font-bold mt-12 sm:text-[32px]">{pageTitle}</h1>
+            {sessionProgress && (
+              <div className="w-full max-w-xs text-sm text-slate-600" role="status">
+                <p>今回の復習：{sessionProgress.total - sessionProgress.remaining} / {sessionProgress.total} 語完了・残り {sessionProgress.remaining} 語</p>
+                <progress aria-label="今回の復習の進捗" className="mt-2 h-2 w-full accent-emerald-600" max={sessionProgress.total} value={sessionProgress.total - sessionProgress.remaining} />
+              </div>
+            )}
             <p className="text-sm leading-[1.6] text-gray-500">
               表示された単語を知っていますか？
             </p>
