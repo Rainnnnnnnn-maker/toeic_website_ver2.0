@@ -1,6 +1,6 @@
 # TOEIC重要単語（toeic_website_ver2.0）技術ドキュメント
 
-最終更新日: 2026-09-03（プロジェクト文書を `docs/`、リポジトリ固有スキルを `.agents/skills/` に集約）
+最終更新日: 2026-09-06（マイページの達成表示・復習進捗・定着度別一覧）
 
 ## 1. プロジェクト概要
 
@@ -1185,3 +1185,12 @@ RLS は `favorites` と同じく「自分の行のみ全操作可」（`auth.uid
 | 2026-09-02 | 5.33 | -   | お気に入りを使った復習モード（`/review`）と聞き流し（`/favorites/listen`）を**ログイン必須**に変更。お気に入りの登録・一覧・学習モード・今日の6単語・その聞き流しは従来どおりログイン不要のまま残し、「制限」ではなく「同期と復習管理のため」の導線として提示する。(1) 共通の `FavoritePracticeLoginGate`（`src/components/features/auth/`）を新設し、`/review` と `/favorites/listen` の両方で再利用。ブックマーク等からの直接アクセスでも機能を開始せず、`?queue=` を保持したまま `/login?next=<元のパス>` へ送り、ログイン後は元のページへ戻す。(2) `/favorites` は未ログイン時のみ復習・聞き流しボタンを `FavoritePracticeLoginCard` に差し替え、`/login?next=/mypage` へ直接遷移させる（`/mypage` を挟まずタップ数を増やさない）。お気に入り0件のときは非表示。ログイン済みの3ボタン表示は維持し、`ReviewModeButton` / `ListenModeButton` は `favoritesStatus === "ready"` を条件に追加。(3) `FavoritesListenClient` をラッパー（状態分岐）と `FavoritesListenPlayer`（再生本体）に分割。従来は認証状態を見ずローカルのお気に入りを再生していたため、未ログインで従量課金の `/api/tts` を呼ばない構造にした。(4) `ReviewWrapper` のゲスト向け「お気に入り全件フォールバック」を廃止（進捗取得失敗時のフォールバックは維持）。ゲスト用 `sessionStorage` 共有キーも廃止し、キーは常にユーザーID＋`authEpoch` で分離。(5) GA4 に `favorite_practice_gate_view` / `favorite_practice_gate_cta`（`feature`＝`review`/`listen`/`card`）を追加。(6) 「ログインなしで復習・聞き流しが使える」と読める文言を更新：`MyPageLoginGate` / `LoginClient` / ログインページ metadata / About / プライバシーポリシー / TOP / 学習モードページ / ガイド記事（忘却曲線・レベル別・3日間プラン・聞き流し活用）/ `/review` metadata / `/favorites/listen` の解説。あわせて `/favorites/listen` 下部で「お気に入り一覧」と表示しつつ `/review` を指していたリンクを `/favorites` に修正。認証判定はクライアント側のままで `src/proxy.ts` の matcher は広げない。 |
 | 2026-09-02 | 5.34 | -   | ログイン必須化の導線を修正。`/review` または `/favorites/listen` のログイン案内から認証した場合も、`?queue=` を含むアクセス元には戻さず、`/login?next=/mypage` 経由で必ずマイページへ誘導する。`FavoritePracticeLoginGate` から可変 `nextPath` を廃止し、案内文言と実際の着地を統一した。 |
 | 2026-09-03 | 5.35 | -   | `.trae/` を廃止し、プロジェクト文書を標準的な `docs/` に集約。現行仕様の正本を `docs/architecture.md`、運用手順を `docs/operations/`、仕様書を `docs/specs/`、進行中の計画を `docs/plans/`、完了済み資料を `docs/archive/` に分類した。リポジトリ固有スキルはベンダー非依存の `.agents/skills/` へ移し、`.claude/skills/` と `~/.codex/skills/` のシンボリックリンク、`AGENTS.md`、README、ソースコメント、運用資料の参照先を更新。旧 `.trae/rules/` は `AGENTS.md` を単一の正本として廃止した。 |
+
+
+### マイページの達成表示・定着度別一覧（2026-09-06）
+
+- 今日の目安は `REVIEW_SESSION_LIMIT`（現在10語、対象が少なければ対象数）とし、到達後は達成メッセージと「もう N 語復習する」を表示する。期限到来の残件数は別に表示する。
+- due / weak の固定セッションでは、完了語数・初期語数・残り語数を復習画面に表示する。全件モードと学習モードには表示しない。
+- 苦手単語の × は「覚えていない」の累計回数と明記し、開始時の上限を適用した対象語数をボタンに表示する（途中再開時は保存済みセッションが優先）。
+- 定着度は成果を中心に表示する。区分ボタンを押すとマイページ内で該当単語一覧を展開し、0件時は空状態を表示する。分類は `getRetentionLevel` を集計と共用し、詳細へのリンクは `from=mypage` を付ける。
+- 確認項目：10語達成表示、due/weak の進捗と詳細からの復帰、4区分の件数と一覧、空区分、スマートフォン幅とキーボード操作。

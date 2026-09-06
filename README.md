@@ -271,3 +271,12 @@ Returns `sitemap.xml` containing all static pages and all word detail URLs.
 - `.agents/skills`: Canonical repository-specific agent skills. `.claude/skills` and `~/.codex/skills` point here through symlinks.
 - `supabase/migrations`: Version-controlled SQL applied through the Supabase SQL Editor (currently `word_review_progress` / `learning_streaks` for the review flow). Manual setup steps live in `docs/operations/mypage-review-flow-setup.md`.
 - `__words__`: Local storage for word lists during development.
+
+
+### マイページの達成表示・定着度別一覧（2026-09-06）
+
+- 今日の目安は `REVIEW_SESSION_LIMIT`（現在10語、対象が少なければ対象数）とし、到達後は達成メッセージと「もう N 語復習する」を表示する。期限到来の残件数は別に表示する。
+- due / weak の固定セッションでは、完了語数・初期語数・残り語数を復習画面に表示する。全件モードと学習モードには表示しない。
+- 苦手単語の × は「覚えていない」の累計回数と明記し、開始時の上限を適用した対象語数をボタンに表示する（途中再開時は保存済みセッションが優先）。
+- 定着度は成果を中心に表示する。区分ボタンを押すとマイページ内で該当単語一覧を展開し、0件時は空状態を表示する。分類は `getRetentionLevel` を集計と共用し、詳細へのリンクは `from=mypage` を付ける。
+- 確認項目：10語達成表示、due/weak の進捗と詳細からの復帰、4区分の件数と一覧、空区分、スマートフォン幅とキーボード操作。
