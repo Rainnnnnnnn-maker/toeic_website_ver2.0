@@ -9,6 +9,7 @@ import {
   createReviewRecord,
   EMPTY_STREAK,
   getDueSlugs,
+  getRetentionLevel,
   getLastWeekStart,
   getNextDueAt,
   getReviewDayStart,
@@ -552,5 +553,17 @@ describe("mergePendingStreak", () => {
       currentStreak: 5,
       bestStreak: 8,
     });
+  });
+});
+
+
+describe("getRetentionLevel", () => {
+  it("未登録と各ボックスの境界を集計と同じ区分にする", () => {
+    expect(getRetentionLevel(undefined)).toBe("untouched");
+    const levels = ["untouched", "learning", "learning", "familiar", "familiar", "mastered"];
+    for (let box = 0; box <= 5; box++) {
+      const record = { ...createReviewRecord("test"), box } as ReviewRecord;
+      expect(getRetentionLevel(record)).toBe(levels[box]);
+    }
   });
 });

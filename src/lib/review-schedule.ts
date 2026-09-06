@@ -209,6 +209,17 @@ export type ReviewSummary = {
   mastered: number;
 };
 
+export type RetentionLevel = "untouched" | "learning" | "familiar" | "mastered";
+
+/** 集計と単語一覧で共用する定着度の分類。 */
+export function getRetentionLevel(record: ReviewRecord | undefined): RetentionLevel {
+  const box = record?.box ?? 0;
+  if (box === 0) return "untouched";
+  if (box <= 2) return "learning";
+  if (box <= 4) return "familiar";
+  return "mastered";
+}
+
 export function summarizeReview(
   favoriteSlugs: readonly string[],
   records: ReadonlyMap<string, ReviewRecord>,
@@ -228,11 +239,7 @@ export function summarizeReview(
     const record = records.get(slug);
     if (isDue(record, nowMs)) summary.due += 1;
 
-    const box = record?.box ?? 0;
-    if (box === 0) summary.untouched += 1;
-    else if (box <= 2) summary.learning += 1;
-    else if (box <= 4) summary.familiar += 1;
-    else summary.mastered += 1;
+    summary[getRetentionLevel(record)] += 1;
   }
 
   return summary;
