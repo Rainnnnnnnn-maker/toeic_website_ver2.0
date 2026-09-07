@@ -18,6 +18,7 @@ export const A8AdBanner468x60 = () => {
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
+            loading="lazy"
             style={{ border: 0 }}
             width="468"
             height="60"
@@ -28,6 +29,7 @@ export const A8AdBanner468x60 = () => {
         </a>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
+          loading="lazy"
           style={{ border: 0, position: "absolute", width: 1, height: 1 }}
           width="1"
           height="1"
@@ -56,6 +58,7 @@ export const A8AdBanner728x90 = () => {
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
+            loading="lazy"
             style={{ border: 0 }}
             width="728"
             height="90"
@@ -66,6 +69,7 @@ export const A8AdBanner728x90 = () => {
         </a>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
+          loading="lazy"
           style={{ border: 0, position: "absolute", width: 1, height: 1 }}
           width="1"
           height="1"

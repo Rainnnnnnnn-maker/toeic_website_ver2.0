@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Suspense } from "react";
@@ -10,16 +9,6 @@ import { CookieConsentGate } from "@/components/common/CookieConsentGate";
 import { A8AdBanner728x90 } from "@/components/common/A8AdBanner";
 import { GoogleAnalyticsGate } from "@/components/common/GoogleAnalyticsGate";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.toeic-words.com"),
@@ -90,7 +79,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body>
         <AuthProvider>
           <FavoritesProvider>
             <div className="flex min-h-screen flex-col">
