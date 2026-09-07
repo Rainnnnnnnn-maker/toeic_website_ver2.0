@@ -4,6 +4,8 @@ TOEIC語彙ラボ is a comprehensive web application for learning essential TOEI
 
 ## 🚀 Features
 
+- **Initial-load resources**: The UI uses system fonts without Geist downloads/preloads. A8 banners and their tracking pixels use native lazy loading, retaining their dimensions to reserve layout space.
+
 - **Curated Word Lists**: Access 1,300+ important TOEIC vocabulary words classified into three levels (Important / Medium / High), sourced from Vercel Blob in production. Blob fetch failures throw (instead of returning an empty list) so a transient outage never gets cached as an empty word list — the last good cache keeps serving.
 - **SEO-Optimized Learning Hub**: `/words` combines a score/letter/prefix search explorer with a server-rendered complete index. The complete index keeps every word available through a crawlable `<a href>` while nesting level → initial-letter groups in native `<details>` disclosure panels, so the mobile page is scannable without sacrificing the internal-link graph.
 - **Google Search Site Name**: Google-facing site-name signals use `TOEIC語彙ラボ` (`WebSite.name`, `og:site_name`, and `application-name`), while page titles keep the established `TOEIC重要単語` product name. The homepage uses the factual `2026年版` label rather than claiming unverified “latest test trends.”
