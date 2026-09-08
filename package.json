@@ -14,7 +14,11 @@
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "embed:words": "tsx --env-file=.env.local scripts/embed-words.ts",
-    "audit:ci": "node scripts/check-audit.mjs"
+    "audit:ci": "node scripts/check-audit.mjs",
+    "test:e2e": "cypress run --e2e",
+    "test:e2e:open": "cypress open --e2e",
+    "typecheck:e2e": "tsc --project cypress/tsconfig.json",
+    "test:e2e:ci": "node cypress/scripts/run-ci.mjs"
   },
   "dependencies": {
     "@google/genai": "^1.50.1",
@@ -42,6 +46,7 @@
     "@vitest/coverage-v8": "^4.1.8",
     "autoprefixer": "^10.4.27",
     "babel-plugin-react-compiler": "1.0.0",
+    "cypress": "^16.0.0",
     "eslint": "^9",
     "eslint-config-next": "^16.2.12",
     "postcss": "^8.5.18",
