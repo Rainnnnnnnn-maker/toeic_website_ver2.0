@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useFavorites } from "@/context/FavoritesContext";
 import { useState } from "react";
 import type { Word } from "@/data/words";
-import { resolveTodayNavigationSelection } from "@/lib/word-select";
+import { resolveTodayNavigation } from "@/lib/today-navigation";
 import { parseReviewQueue } from "@/lib/review-schedule";
 import { useShareTarget } from "@/context/ShareTargetContext";
 import { ChevronLeft } from "lucide-react";
@@ -29,19 +29,9 @@ export default function WordNavigationClient({
   const { favorites } = useFavorites();
   const { setShareTarget } = useShareTarget();
 
-  // 「今日おすすめ」コンテキストのときだけ today クエリを解釈する。
-  // 通常の単語一覧ナビでは日付の検証も選定計算も行わない。
-  //
-  // 日付キーと短いコーパス版から同じ6語を復元する。コーパス更新後の古いURLや
-  // 現在語が選定集合にないURLは null になり、誤った6語ナビを表示しない。
-  // 日次キャッシュ自体は参照しないため、SSG済みの全単語ページへタグが伝播しない。
+  // Restore the displayed order without reading the daily cache or device clock.
   const todaySelection = isFromToday
-    ? resolveTodayNavigationSelection(
-        allWords,
-        currentSlug,
-        searchParams.get("today"),
-        searchParams.get("v")
-      )
+    ? resolveTodayNavigation(allWords, currentSlug, new URLSearchParams(searchParams.toString()))
     : null;
 
   const navigationList = (() => {
@@ -54,8 +44,8 @@ export default function WordNavigationClient({
         .filter((w): w is Word => w !== undefined);
     }
     if (isFromToday) {
-      // クエリ不正・旧形式・コーパス版不一致・現在語の集合外は全単語へフォールバック
-      return todaySelection?.words ?? allWords;
+      // Never leave the daily selection, even when a cached link cannot be restored.
+      return todaySelection?.words ?? [];
     }
     return allWords;
   })();
@@ -86,7 +76,7 @@ export default function WordNavigationClient({
   let prevWord = computedPrevWord;
   let nextWord = computedNextWord;
 
-  if (currentIndex === -1) {
+  if (currentIndex === -1 && !isFromToday) {
     if (fallbackNav.slug === currentSlug) {
       // リストから外れた等で currentIndex が -1 になった場合、直前の有効な値を使用
       prevWord = fallbackNav.prev;
@@ -103,12 +93,7 @@ export default function WordNavigationClient({
 
   const querySuffix = (() => {
     if (isFromToday) {
-      const params = new URLSearchParams({ from: "today" });
-      if (todaySelection) {
-        params.set("today", todaySelection.dateKey);
-        params.set("v", todaySelection.wordListVersion);
-      }
-      return `?${params.toString()}`;
+      return todaySelection ? `?${todaySelection.query}` : "?from=today";
     }
     if (isFromFavorites) return "?from=favorites";
     if (isFromStudy) return "?from=study";
@@ -191,6 +176,15 @@ export default function WordNavigationClient({
           />
         </div>
       </header>
+
+      {isFromToday && !todaySelection && (
+        <p role="status" className="text-sm text-slate-600">
+          おすすめ単語の情報が更新されました。
+          <Link href="/today-words" prefetch={false} className="underline">
+            今日のおすすめを開き直す
+          </Link>
+        </p>
+      )}
 
       <nav className="flex justify-between items-center -mt-2 pb-0 -mb-2" aria-label="単語ナビゲーション">
         {prevWord ? (

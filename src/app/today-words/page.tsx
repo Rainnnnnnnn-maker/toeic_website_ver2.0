@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 };
 
 export default async function TodayWordsPage() {
-  const { dateKey, wordListVersion, words: todayWords } = await getTodayRecommendedSelection();
+  const { words: todayWords } = await getTodayRecommendedSelection();
 
   return (
     <div className="relative min-h-screen w-full flex justify-center py-8 px-4 bg-[radial-gradient(circle_at_top,#bae6fd_0,#eff6ff_45%,#f8fafc_100%)] sm:py-12 sm:px-6 lg:py-8 lg:px-8 lg:pb-16">
@@ -48,8 +48,6 @@ export default async function TodayWordsPage() {
         <Suspense fallback={<section className="bg-white/90 border border-slate-200 rounded-2xl p-4 sm:p-6 shadow-[0_1px_2px_rgba(0,0,0,0.05)] animate-pulse h-[220px]" />}>
           <TodayRecommendedWordsClient
             words={todayWords}
-            dateKey={dateKey}
-            wordListVersion={wordListVersion}
             variant="full"
           />
         </Suspense>
