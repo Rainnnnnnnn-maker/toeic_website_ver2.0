@@ -1,6 +1,6 @@
 # TOEIC重要単語（toeic_website_ver2.0）技術ドキュメント
 
-最終更新日: 2026-09-08（今日おすすめ単語の前後ナビ修正）
+最終更新日: 2026-09-08（今日おすすめ単語の前後ナビ修正・Cypress E2E CI追加・自動デプロイ記述修正）
 
 ## 1. プロジェクト概要
 
@@ -42,7 +42,7 @@
 | 区分      | 技術                          |       バージョン | 用途                           |
 | ------- | --------------------------- | ----------: | ---------------------------- |
 | Lint    | ESLint / eslint-config-next | ^9 / 16.2.0 | Next.js推奨ルールに準拠              |
-| テスト       | Vitest                      |     ^4.0.15 | 純粋ロジックのユニットテスト（CIで実行）。結合/UIは手動テスト |
+| テスト       | Vitest                      |     ^4.0.15 | 純粋ロジックのユニットテスト（CIで実行）。主要2フローはCypress E2E、その他の結合/UIは手動テスト |
 | SNSシェア | react-share | ^5.2.2 | Twitter/Facebook/LINEへのシェアボタン機能 |
 | ユーティリティ | server-only | ^0.0.1 | サーバー専用コードの誤import防止 |
 
@@ -316,14 +316,14 @@
 
 * 定義: `.github/workflows/ci.yml`
 
-* 実行: PRおよび `main` へのpushで `npm ci` → `npm run lint` → `npm run test`
+* 実行: PR・全ブランチへのpush・手動実行。lint、アプリ型チェック、Vitest／coverage、依存監査と、Chromeの `nodejs-e2e` を各ジョブで実行する
 
 * 変更ファイルがすべて `*.sql` の push／PR 更新は `paths-ignore` でワークフロー自体を起動しない。SQL とソースコードが混在する変更は通常どおり実行する
 
   * `npm run test`（Vitest）は純粋ロジックのユニットテストのみを対象とし、外部シークレット（Gemini/Redis/Blob/TTS）を必要としない
-  * `npm run build` は現在コメントアウトされており、必要に応じて有効化する（ローカルでの実行を推奨）
+  * `nodejs-e2e` は `npm run typecheck:e2e` と `npm run test:e2e:ci` を実行する。固定データで一時コピーを本番ビルドし、Chromeで2フローを検証する。実Blobコーパスを使う通常の `npm run build` は引き続きローカルで確認する。
 
-#### Vercelデプロイ（GitHub Actions）
+#### Vercelデプロイ（Git連携＋GitHub Actions）
 
 * Preview: `.github/workflows/vercel-preview.yml`
 
@@ -333,7 +333,8 @@
 
   * `workflow_dispatch`（手動実行）で Production へデプロイ
 
-* `vercel.json` の `git.deploymentEnabled` は `false` とし、Vercel Git Integration による push 起点の重複デプロイは無効化する。Preview／Production とも上記 GitHub Actions を唯一のデプロイ経路とする
+* `vercel.json` の `git.deploymentEnabled` は `true`。Vercel Git連携が有効で、Vercel側のProduction Branchへのpushで本番を自動デプロイする。上記ActionsのPreview／手動Production経路も併存する。ActionsのSQL等の除外条件はGit連携には適用されない。
+* CI追加だけではVercel自動デプロイの待機条件にならない。必要なPRチェックやVercel Deployment Checksは別途設定する。本変更ではデプロイ設定・ブランチ保護を変更しない。
 
 ## 4. コンポーネント仕様
 
@@ -993,9 +994,19 @@ RLS は `favorites` と同じく「自分の行のみ全操作可」（`auth.uid
 
 * React 18以降でのレンダリング中のRef更新（Ref mutation during render）によるエラー（`react-hooks/refs`）を防ぐため、レンダリング中に直前の値を保持して条件付き更新を行う場合は、`useState` を用いた派生ステートのアプローチを採用する
 
-### 5.2 テスト方針（ユニット＋手動）
+### 5.2 テスト方針（ユニット＋E2E＋手動）
 
-**純粋ロジックは Vitest のユニットテストで自動検証し、結合・UI は手動テストで確認する**という二段構えを採る。
+純粋ロジックは Vitest、ゲストのお気に入り永続化と今日おすすめの前後移動は Cypress E2E、その他の結合・UI は手動スモークテストで確認する。
+
+#### E2Eテスト（ローカル・CI）
+
+* `cypress/e2e/*.cy.ts` を `npm run test:e2e` で実行する。ブラウザ上の操作と再読み込みで検証し、保存値やナビゲーションをモックしない。
+* 今日おすすめの表示順を実際のリンクから取得し、全件の往復・両端のリンク非表示・再読み込み後の `picks` 維持を確認する。日付から選定を再計算しない。
+* Cypressの型は `cypress/tsconfig.json` に分離し、`npm run typecheck:e2e` で検証する。アプリのTypeScriptとVitestの収集対象からは除外する。
+* `npm run test:e2e:ci` はOS一時ディレクトリにsrc・public・設定だけをコピーし、`.env*`・本物の単語ファイル・`.next` はコピーしない。プロセス環境も許可したOS変数だけを引き継ぐ。
+* 固定9語をローカルHTTPから既存の `BLOB_URL_*` ローダーに渡し、Redis SDKのGETには固定解説を返す。9語から選ぶ6語の表示順を検証することで、全単語への誤フォールバックも検知する。データ取得・日次選定・保存・ナビのアプリコードは置き換えない。
+* 一時コピーの共有node_modulesシンボリックリンクを扱えるWebpackでproduction buildし、production server起動後にCypressを実行する。終了時はサーバーと一時コピーを削除。失敗時にログ・画像・動画を7日保存する。追加のサービスシークレットは不要。
+* 通常の `test:e2e` は実際の開発サーバー向けで、Redis／Geminiとローカル単語ファイルが必要。詳細は [Cypress実行手順](operations/cypress-e2e.md)。
 
 #### ユニットテスト（自動・CI）
 
@@ -1091,13 +1102,13 @@ RLS は `favorites` と同じく「自分の行のみ全操作可」（`auth.uid
 
 * `main` は保護ブランチ扱いを想定し、変更はPR経由で取り込む
 
-* CI（lint/test）が通過することをマージ条件とする（build はローカルで確認）
+* CI（lint/typecheck/test/E2E）が通過することをマージ条件とする方針。GitHubのrequired checksは別途設定が必要で、workflowファイルだけでは強制されない（実Blobコーパスのbuildはローカルで確認）
 
 * Previewデプロイは `main` 以外のブランチpushで実行される
 
-  * ただし、変更ファイルがすべて `*.sql` の push は CI と Previewデプロイの両方を起動しない。SQL とソースコードが混在する場合は通常どおり実行する
+  * ただし、変更ファイルがすべて `*.sql` の push は CI と Previewデプロイの両方を起動しない。SQL とソースコードが混在する場合は通常どおり実行する。この除外はGitHub Actionsのみに適用され、Vercel Git連携には適用されない
 
-* Productionデプロイは手動（`workflow_dispatch`）で実行する
+* ProductionはVercel Git連携で自動デプロイする。追加の手動経路として `workflow_dispatch` も残っている
 
 ### 5.4 ドキュメント更新手順
 

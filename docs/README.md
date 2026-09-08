@@ -11,6 +11,10 @@
 - `reviews/` — コード・UI・設計レビューの記録
 - `archive/` — 実装済み計画や完了した移行計画
 
+## テスト実行
+
+- [Cypress E2E実行手順](operations/cypress-e2e.md) — お気に入り保存と今日おすすめの前後移動
+
 ## 管理ルール
 
 1. 現行仕様は `architecture.md` に書き、操作手順は `operations/` に分離します。

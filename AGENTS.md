@@ -11,9 +11,13 @@ npm run build           # Production build (also validates TypeScript)
 npm run lint            # Run ESLint (must pass before merging)
 npm run start           # Start production server after build
 npm run test            # Run Vitest unit tests (pure-logic only — see Testing below)
+npm run test:e2e        # Run Cypress E2E tests against a running local server
+npm run test:e2e:ci     # Build/run isolated production E2E with local HTTP fixtures (no secrets)
+npm run test:e2e:open   # Open the interactive Cypress runner
+npm run typecheck:e2e   # Type-check the isolated Cypress project
 ```
 
-**CI runs `npm run lint` and `npm run test`.** The `npm run build` step in `.github/workflows/ci.yml` is commented out and should be run locally before pushing.
+**CI runs lint, typecheck, Vitest/coverage, dependency audit, and Cypress E2E.** The E2E job builds an isolated production app with fixed local HTTP fixtures. Run the normal `npm run build` locally before pushing to also validate the real Blob corpus.
 
 ### Build Troubleshooting (Repository-Specific)
 
@@ -40,7 +44,7 @@ Production builds switch the word-list loader to Vercel Blob, so a complete buil
 - **Auth / User Data**: Supabase (`@supabase/supabase-js` + `@supabase/ssr`) — optional Google sign-in and RLS-protected favorites sync in Postgres
 - **Storage**: Vercel Blob (word lists in production)
 - **TTS**: Google Cloud Text-to-Speech (HTTP API)
-- **Deploy**: Vercel (preview on all branches; production via manual `workflow_dispatch`)
+- **Deploy**: Vercel (preview on all branches; production automatically via Vercel Git integration (`git.deploymentEnabled: true`); the manual `workflow_dispatch` workflow also remains)
 
 ### Word List Data Flow
 
@@ -166,7 +170,7 @@ These carry over from the retired `.trae/rules/project_rules.md`; `AGENTS.md` is
 - **Never log environment variable values.** Keys and tokens live only in `.env.local`; they must not appear in code, documentation, commits, or log output.
 
 ### Testing
-**Unit tests (Vitest) cover pure logic only**; integration/UI is still verified by manual smoke test.
+**Unit tests (Vitest) cover pure logic only**. Cypress E2E tests in `cypress/e2e/` cover guest favorites persistence and today-word navigation; other integration/UI flows still require manual smoke tests. CI uses `test:e2e:ci` with local HTTP fixtures and no app secrets; regular `test:e2e` targets a running local server. See `docs/operations/cypress-e2e.md` for prerequisites. Cypress types are isolated in `cypress/tsconfig.json`; keep them out of the application TypeScript project.
 
 - Pure, side-effect-free logic lives in `src/lib/*.ts` and is unit-tested in `src/lib/(tests)/*.test.ts` files (`environment: "node"`, no secrets required). Current suites: `word-select` (parsing/dedup, FNV-1a hash, JST day key, daily selection), `word-detail-parse` (Gemini JSON extraction + normalization), `word-detail-gemini` (fake-client prompt fallback and 429 stop behavior), `tts-utils` (text normalization, slug sanitization, cache keys, example allowlist matching), `listen-utils` (`pickExample` fallback), `favorites-sync` (stored-favorites parsing, merge logic), `safe-compare` (constant-time token comparison), `study-utils` (study-mode pool selection/re-draw with injectable random, persisted-state parsing, sentence highlight splitting), `review-schedule` (Leitner box transitions, JST day-boundary math, due ordering, streaks, summaries, queue parsing, Supabase row conversion), `auth-redirect` (post-login `?next=` open-redirect guard), `semantic-search` (query normalization, index-versioned cache keys, minimum-score filtering, vector normalization, embedding-document building, vector-match/cached-result parsing), `http-retry` (retryable-status policy, timeout/error classification, response-body retry, and stubbed SDK operations), and `vector-requester` (status-selective retries and request preservation against a stubbed `fetchImpl` — no real network).
 - When extracting testable logic out of a `server-only` module, put the pure function in `src/lib/` (no `server-only`, type-only imports for server types) and have the server module import it — never duplicate.
