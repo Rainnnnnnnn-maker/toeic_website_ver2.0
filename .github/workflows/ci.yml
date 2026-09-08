@@ -14,7 +14,42 @@ on:
       - '**.sql'
       - '.gitignore'
 
+# Other jobs need the npm package for type resolution, but not the browser binary.
+env:
+  CYPRESS_INSTALL_BINARY: '0'
+
 jobs:
+
+  nodejs-e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    env:
+      E2E_BROWSER: chrome
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/Cypress
+          key: cypress-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+      - run: npm ci
+      - run: env -u CYPRESS_INSTALL_BINARY npx cypress install
+      - run: npm run typecheck:e2e
+      - name: Build isolated app and run Cypress on Chrome
+        run: npm run test:e2e:ci
+      - name: Upload E2E failure evidence
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-failure-evidence
+          path: cypress/results/
+          if-no-files-found: ignore
+          retention-days: 7
 
   #--------------------------------------------------------------------------------------------#
   # nodejs-audit
