@@ -81,7 +81,7 @@ const WORD_LIST_VERSION_PATTERN = /^[0-9a-f]{8}$/;
  * 値はハッシュ入力になるだけで結果は必ず全単語リストの部分集合になるが、
  * 旧形式（slug のカンマ区切り）や壊れた値をそのまま選定へ流さないよう形式を固定する。
  *
- * @returns 妥当な `YYYY-MM-DD`、不正なら null（呼び出し側は全単語ナビへフォールバックする）
+ * @returns 妥当な `YYYY-MM-DD`、不正なら null（呼び出し側で復元不能として扱う）
  */
 export function parseTodayDateKey(value: string | null | undefined): string | null {
   if (!value) return null;
@@ -143,7 +143,7 @@ export type TodayNavigationSelection = {
 /**
  * URL の日付・コーパス版から、詳細ページ用の「今日おすすめ」ナビを安全に復元する。
  * コーパスが更新済み、または現在語が復元した6語に含まれない場合は null を返し、
- * 呼び出し側を全単語ナビへフォールバックさせる。
+ * 呼び出し側で一覧を開き直す案内を表示する。
  */
 export function resolveTodayNavigationSelection(
   words: readonly Word[],

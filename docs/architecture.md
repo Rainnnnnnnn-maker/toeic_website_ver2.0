@@ -1,6 +1,6 @@
 # TOEIC重要単語（toeic_website_ver2.0）技術ドキュメント
 
-最終更新日: 2026-09-07（未使用フォント削除・A8画像の遅延読み込み）
+最終更新日: 2026-09-08（今日おすすめ単語の前後ナビ修正）
 
 ## 1. プロジェクト概要
 
@@ -371,7 +371,7 @@
 
 * 今日おすすめ6単語UI `src/components/features/words/TodayRecommendedWordsClient.tsx`（Client Component）
 
-  * Server側の `getTodayRecommendedSelection()` が選定した6語・日付キー・8桁のコーパス版を props で受け取る dumb component。詳細リンクには `today=<日付>&v=<コーパス版>` のみを載せる
+  * Server側で選定した6語を props で受け取る dumb component。詳細リンクへ表示順のslug配列をJSONの `picks` クエリとして載せる。
   * 「聞き流し」リンクを併設し、`/today-words/listen` へ遷移できる
   * TOPのプレビューエリア・`/today-words` フルビューの両方で同一実装を使い、選定ロジックの単一ソース化を達成
   * 過去はクライアント側で全単語を再ソートしていたが、bundle 削減と「ホーム/聞き流しで選ばれる6単語の整合性」を担保するためサーバー側選定に統一済み
@@ -453,9 +453,9 @@
 
 * 単語詳細ヘッダ/前後ナビ `src/components/features/words/WordNavigation.tsx`（Server Component） / `WordNavigationClient.tsx`
   * Server Component は長期キャッシュ対象の `getAllWords()` のみ取得し、日次キャッシュの `getTodayRecommendedSelection()` には依存しない
-  * 「今日おすすめ」からの遷移時は、選定日と短いコーパス版を載せる（`?from=today&today=2026-08-07&v=1a2b3c4d`）。Client Component が props で受け取り済みの全単語リストに対し、サーバーと同じ純粋関数で6語を再計算する（語数は `TODAY_WORDS_COUNT` で共有）
-  * サーバーの日付キーを渡すのは、クライアントが自前で `getTodayKey()` を呼ぶと端末時計のずれに依存するうえ、日付境界 JST 7:00 と Cron 実行 7:05 の**5分間**でクリック元の一覧と前後ナビの集合が食い違うため。日付キーを持ち回れば原理的に一致する
-  * `resolveTodayNavigationSelection()` は日付・コーパス版を検証し、現在の `allWords` から計算した版との一致と、現在語が復元した6語に含まれることまで確認する。不一致、パラメータ欠落、旧形式（slug列）、日付だけの旧リンクは全単語一覧へフォールバックする。`today` 文脈以外では検証も選定計算も行わない
+  * 「今日おすすめ」からは `from=today&picks=<JSON slug配列>` を渡す。`buildTodayNavigationQuery()` を入口と前後リンクで共有し、表示した順序を維持する。
+  * 表示したslugの順序をそのまま持ち回るため、端末時計・日付境界・Cron時刻・単語リスト版のずれでナビ対象が変わらない。
+  * `resolveTodayNavigation()` は最大 `TODAY_WORDS_COUNT` 語、重複なし、全slugの存在、現在語の所属を検証する。日付・版から再選定しない。不正・対象語欠落時は前後リンクを隠し `/today-words` への案内を表示する。旧日付・版URLは従来の厳密検証に成功した場合だけ復元し、次のリンクをsnapshot形式にする。
   * これにより `today-recommended-words` タグが約1,350件の `/words/[word]` プリレンダリングへ伝播することを防ぐ
 
   * 現在単語のパンくずと、前/次単語への遷移を提供する
@@ -669,8 +669,8 @@
 
 1. Server Component（TOP `/`、`/today-words`）が `getTodayRecommendedSelection()` を、`/today-words/listen` が薄いラッパー `getTodayRecommendedWords()` を呼び出す
 2. `getTodayRecommendedSelection` は `'use cache'` Cache Component。UTC日付キー + `slug` の FNV-1a ハッシュで安定ソートし、先頭6語を日付キー・コーパス版と一緒に返却する。キャッシュは `cacheLife('max')` で長期保持し、毎日 JST 7:05 の Cronまたは `word-list` タグで再検証する
-3. `TodayRecommendedWordsClient` は詳細リンクへ `from=today&today=<日付キー>&v=<8桁版>` を付与する（6語のslug列は載せない）
-4. 単語詳細の `WordNavigation` は日次キャッシュを取得せず、`WordNavigationClient` が純粋関数 `resolveTodayNavigationSelection()` で日付・版・現在語の所属を検証して6語を再計算する。コーパス更新、欠落、不正、旧形式では全単語ナビにフォールバックする
+3. `TodayRecommendedWordsClient` は表示した順序を `from=today&picks=<JSON slug配列>` に載せる。
+4. 単語詳細は日次キャッシュを取得せず、`resolveTodayNavigation()` で表示順を復元する。単語リストの版の違いでは全単語ナビへ切り替えない。復元できない場合は前後リンクを隠しておすすめ一覧への案内を表示する。
 5. `TodayWordsListenClient` は選定済みの6語を props で受け取るのみで、選定ロジックを持たない（単一ソース化）
 6. 同一日内は同一セットになり、日付が変わるとセットが切り替わる
 
@@ -1185,6 +1185,7 @@ RLS は `favorites` と同じく「自分の行のみ全操作可」（`auth.uid
 | 2026-09-02 | 5.33 | -   | お気に入りを使った復習モード（`/review`）と聞き流し（`/favorites/listen`）を**ログイン必須**に変更。お気に入りの登録・一覧・学習モード・今日の6単語・その聞き流しは従来どおりログイン不要のまま残し、「制限」ではなく「同期と復習管理のため」の導線として提示する。(1) 共通の `FavoritePracticeLoginGate`（`src/components/features/auth/`）を新設し、`/review` と `/favorites/listen` の両方で再利用。ブックマーク等からの直接アクセスでも機能を開始せず、`?queue=` を保持したまま `/login?next=<元のパス>` へ送り、ログイン後は元のページへ戻す。(2) `/favorites` は未ログイン時のみ復習・聞き流しボタンを `FavoritePracticeLoginCard` に差し替え、`/login?next=/mypage` へ直接遷移させる（`/mypage` を挟まずタップ数を増やさない）。お気に入り0件のときは非表示。ログイン済みの3ボタン表示は維持し、`ReviewModeButton` / `ListenModeButton` は `favoritesStatus === "ready"` を条件に追加。(3) `FavoritesListenClient` をラッパー（状態分岐）と `FavoritesListenPlayer`（再生本体）に分割。従来は認証状態を見ずローカルのお気に入りを再生していたため、未ログインで従量課金の `/api/tts` を呼ばない構造にした。(4) `ReviewWrapper` のゲスト向け「お気に入り全件フォールバック」を廃止（進捗取得失敗時のフォールバックは維持）。ゲスト用 `sessionStorage` 共有キーも廃止し、キーは常にユーザーID＋`authEpoch` で分離。(5) GA4 に `favorite_practice_gate_view` / `favorite_practice_gate_cta`（`feature`＝`review`/`listen`/`card`）を追加。(6) 「ログインなしで復習・聞き流しが使える」と読める文言を更新：`MyPageLoginGate` / `LoginClient` / ログインページ metadata / About / プライバシーポリシー / TOP / 学習モードページ / ガイド記事（忘却曲線・レベル別・3日間プラン・聞き流し活用）/ `/review` metadata / `/favorites/listen` の解説。あわせて `/favorites/listen` 下部で「お気に入り一覧」と表示しつつ `/review` を指していたリンクを `/favorites` に修正。認証判定はクライアント側のままで `src/proxy.ts` の matcher は広げない。 |
 | 2026-09-02 | 5.34 | -   | ログイン必須化の導線を修正。`/review` または `/favorites/listen` のログイン案内から認証した場合も、`?queue=` を含むアクセス元には戻さず、`/login?next=/mypage` 経由で必ずマイページへ誘導する。`FavoritePracticeLoginGate` から可変 `nextPath` を廃止し、案内文言と実際の着地を統一した。 |
 | 2026-09-03 | 5.35 | -   | `.trae/` を廃止し、プロジェクト文書を標準的な `docs/` に集約。現行仕様の正本を `docs/architecture.md`、運用手順を `docs/operations/`、仕様書を `docs/specs/`、進行中の計画を `docs/plans/`、完了済み資料を `docs/archive/` に分類した。リポジトリ固有スキルはベンダー非依存の `.agents/skills/` へ移し、`.claude/skills/` と `~/.codex/skills/` のシンボリックリンク、`AGENTS.md`、README、ソースコメント、運用資料の参照先を更新。旧 `.trae/rules/` は `AGENTS.md` を単一の正本として廃止した。 |
+| 2026-09-08 | 5.36 | - | 今日おすすめの前後ナビを表示slugのsnapshot方式へ修正。キャッシュ版不一致による全単語への逸脱を防止し、復元不能時は一覧への案内を表示。日次キャッシュのSSG依存は追加しない。 |
 
 
 ### マイページの達成表示・定着度別一覧（2026-09-06）

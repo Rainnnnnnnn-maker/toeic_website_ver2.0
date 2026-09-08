@@ -24,12 +24,10 @@ export const metadata: Metadata = {
 };
 
 async function TodayRecommendedWordsSection() {
-  const { dateKey, wordListVersion, words } = await getTodayRecommendedSelection();
+  const { words } = await getTodayRecommendedSelection();
   return (
     <TodayRecommendedWordsClient
       words={words}
-      dateKey={dateKey}
-      wordListVersion={wordListVersion}
       variant="preview"
     />
   );
