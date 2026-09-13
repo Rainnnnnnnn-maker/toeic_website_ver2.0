@@ -52,7 +52,8 @@ try {
   await mkdir(output, { recursive: true });
   workspace = await mkdtemp(path.join(tmpdir(), "toeic-e2e-"));
   // Explicit allowlist: never copy .env*, .vercel, __words__, or the real .next cache.
-  for (const file of ["src", "public", "next.config.ts", "tsconfig.json", "postcss.config.js", "tailwind.config.ts", "package.json", "package-lock.json"]) {
+  // `scripts` is required because the build type-checks src/lib/(tests)/audit-report.test.ts, which imports scripts/audit-report.mjs.
+  for (const file of ["src", "scripts", "public", "next.config.ts", "tsconfig.json", "postcss.config.js", "tailwind.config.ts", "package.json", "package-lock.json"]) {
     await cp(path.join(root, file), path.join(workspace, file), { recursive: true });
   }
   await symlink(path.join(root, "node_modules"), path.join(workspace, "node_modules"), "dir");

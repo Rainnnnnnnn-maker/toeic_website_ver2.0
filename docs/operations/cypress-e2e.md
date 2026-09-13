@@ -40,10 +40,11 @@ npm run test:e2e
 画面を見ながらデバッグする場合は `npm run test:e2e:open`。
 ポートが違う場合は `CYPRESS_BASE_URL=http://127.0.0.1:3001 npm run test:e2e`。
 サーバーの起動・停止は実行者が行う。本番ビルドの確認には `npm run build` → `npm run start` でも同じテストを実行できる（単語一覧はBlobになる）。
+Next.jsのdevサーバーは `localhost` と `--hostname` で指定したホスト以外のOriginからの `/_next` 開発リソースを既定で403にする。上記の `--hostname 127.0.0.1` を付けずに起動した `npm run dev`（エディタのプレビュー等）が3000番を使っていても動くよう、`next.config.ts` の `allowedDevOrigins` に `127.0.0.1` を登録している。これが無いとSSRだけで済む `today-navigation.cy.ts` は通るが、ハイドレーションが必要な `favorites.cy.ts` が失敗する。
 
 ## 検証範囲
 
-- `favorites.cy.ts`: 未ログインの空状態から画面の星ボタンで追加し、再読み込み後も登録済みであることと一覧掲載を確認。一覧から詳細へ戻って削除し、詳細・一覧の再読み込み後も削除が維持されることを確認。
+- `favorites.cy.ts`: 未ログインの空状態から画面の星ボタンで追加し、再読み込み後も登録済みであることと一覧掲載を確認。一覧から詳細へ戻って削除し、詳細・一覧の再読み込み後も削除が維持されることを確認。別テストで、フィクスチャの3語を未ログインのお気に入りとしてlocalStorageに用意し、一覧の前方一致検索（大文字入力・完全一致・部分一致しないこと・0件時の空状態と検索クリア）を確認。
 - `today-navigation.cy.ts`: `/today-words` に表示された順序を取得し、先頭から末尾、末尾から先頭へリンクで移動。各ページの見出し・URL・`from=today`・`picks` を確認し、先頭に前リンク、末尾に次リンクが存在しないこと、末尾で再読み込みしても順序が保持されることを確認。
 
 Cypress標準のtest isolationで各テストのCookie・localStorage・sessionStorageを初期化する。テスト中のreloadでは保存を消さない。Cookie同意のみ「同意しない」を設定する。ログイン操作は行わず、Supabaseアカウントの同期・別端末確認は対象外。
