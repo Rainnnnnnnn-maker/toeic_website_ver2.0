@@ -40,6 +40,7 @@ npm run test:e2e
 画面を見ながらデバッグする場合は `npm run test:e2e:open`。
 ポートが違う場合は `CYPRESS_BASE_URL=http://127.0.0.1:3001 npm run test:e2e`。
 サーバーの起動・停止は実行者が行う。本番ビルドの確認には `npm run build` → `npm run start` でも同じテストを実行できる（単語一覧はBlobになる）。
+Next.jsのdevサーバーは `localhost` と `--hostname` で指定したホスト以外のOriginからの `/_next` 開発リソースを既定で403にする。上記の `--hostname 127.0.0.1` を付けずに起動した `npm run dev`（エディタのプレビュー等）が3000番を使っていても動くよう、`next.config.ts` の `allowedDevOrigins` に `127.0.0.1` を登録している。これが無いとSSRだけで済む `today-navigation.cy.ts` は通るが、ハイドレーションが必要な `favorites.cy.ts` が失敗する。
 
 ## 検証範囲
 
