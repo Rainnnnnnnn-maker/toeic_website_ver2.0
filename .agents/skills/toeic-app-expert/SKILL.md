@@ -9,7 +9,7 @@ description: "toeic_website_ver2.0 固有の設計・実装・デバッグを、
 
 ## 現行アーキテクチャ
 
-- Next.js 16.2 App Router、React 19、TypeScript strict、Tailwind CSS 3.4。React Compiler が有効なため、手動の `useMemo` / `useCallback` は原則追加しません。
+- Next.js 16.3 App Router、React 19、TypeScript strict、Tailwind CSS 3.4。React Compiler が有効なため、手動の `useMemo` / `useCallback` は原則追加しません。
 - 単語一覧は `src/lib/word-source.ts` に集約されています。開発時は `__words__/word*.txt`、本番は Vercel Blob を読み、`src/data/words.ts` が `cacheTag('word-list')` と `cacheLife('max')` でキャッシュします。
 - 単語詳細の入口は `src/data/word-detail.ts:getWordDetail()` のみです。L1 Next.js Data Cache → L2 Upstash Redis → Gemini 生成の順で、L1 は `cacheLife('max')`、L2 は `WORD_CACHE_TTL_DAYS` を使います。Client Component からは `src/actions/word.ts:fetchWordDetail()` を利用します。
 - 今日の6単語は `getTodayRecommendedSelection()` が JST 日付キーとコーパス版を含めて決定し、Vercel Cron が更新します。静的生成される `/words/[word]` の到達経路から日次選定関数を呼んではいけません。
