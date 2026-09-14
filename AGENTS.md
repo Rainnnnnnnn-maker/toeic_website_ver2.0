@@ -34,7 +34,7 @@ Production builds switch the word-list loader to Vercel Blob, so a complete buil
 ## Architecture
 
 ### Tech Stack
-- **Next.js 16.2** — App Router with `reactCompiler: true` and `cacheComponents: true`
+- **Next.js 16.3** — App Router with `reactCompiler: true` and `cacheComponents: true`
 - **React 19** with React Compiler (automatic memoization via `babel-plugin-react-compiler`) — do not add `useMemo`/`useCallback` manually
 - **Tailwind CSS 3.4** — utility-first only; minimize arbitrary CSS
 - **TypeScript 5** strict mode — import alias `@/` maps to `src/`
