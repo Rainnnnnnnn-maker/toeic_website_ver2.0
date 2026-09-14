@@ -57,7 +57,7 @@ TOEIC語彙ラボ is a comprehensive web application for learning essential TOEI
 
 ## 🛠️ Tech Stack
 
-- **Framework**: [Next.js 16.2](https://nextjs.org/) (App Router, `reactCompiler: true`, `cacheComponents: true`)
+- **Framework**: [Next.js 16.3](https://nextjs.org/) (App Router, `reactCompiler: true`, `cacheComponents: true`)
 - **Language**: [TypeScript](https://www.typescriptlang.org/)
 - **UI**: React 19, [Tailwind CSS v3.4](https://tailwindcss.com/) (Utility-first CSS), Lucide React
 - **Compiler**: React Compiler (`babel-plugin-react-compiler`) for automatic memoization
