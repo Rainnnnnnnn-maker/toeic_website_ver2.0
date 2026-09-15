@@ -46,6 +46,7 @@ Next.jsのdevサーバーは `localhost` と `--hostname` で指定したホス�
 
 - `favorites.cy.ts`: 未ログインの空状態から画面の星ボタンで追加し、再読み込み後も登録済みであることと一覧掲載を確認。一覧から詳細へ戻って削除し、詳細・一覧の再読み込み後も削除が維持されることを確認。別テストで、フィクスチャの3語を未ログインのお気に入りとしてlocalStorageに用意し、一覧の前方一致検索（大文字入力・完全一致・部分一致しないこと・0件時の空状態と検索クリア）を確認。
 - `today-navigation.cy.ts`: `/today-words` に表示された順序を取得し、先頭から末尾、末尾から先頭へリンクで移動。各ページの見出し・URL・`from=today`・`picks` を確認し、先頭に前リンク、末尾に次リンクが存在しないこと、末尾で再読み込みしても順序が保持されることを確認。
+- `word-detail-navigation.cy.ts`: フィクスチャの3語を未ログインのお気に入りとしてlocalStorageに用意し、中間の単語の詳細を開く。`from=review` では `queue=due|weak|all` と指定なしのいずれでも前後ナビが存在せず、「次の単語へ」が元キューの `/review` を指すことを確認。対照として `from=favorites` ではお気に入り順の前後リンクが表示されることを確認。
 
 Cypress標準のtest isolationで各テストのCookie・localStorage・sessionStorageを初期化する。テスト中のreloadでは保存を消さない。Cookie同意のみ「同意しない」を設定する。ログイン操作は行わず、Supabaseアカウントの同期・別端末確認は対象外。
 

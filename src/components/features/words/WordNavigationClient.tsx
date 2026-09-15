@@ -35,7 +35,7 @@ export default function WordNavigationClient({
     : null;
 
   const navigationList = (() => {
-    if (isFromFavorites || isFromReview || isFromMyPage) {
+    if (isFromFavorites || isFromMyPage) {
       // お気に入り一覧と同じ順序（最新が先頭）にする
       const wordMap = new Map(allWords.map((w) => [w.slug, w]));
       return [...favorites]
@@ -97,11 +97,6 @@ export default function WordNavigationClient({
     }
     if (isFromFavorites) return "?from=favorites";
     if (isFromStudy) return "?from=study";
-    if (isFromReview) {
-      const params = new URLSearchParams({ from: "review" });
-      if (rawReviewQueue !== null) params.set("queue", reviewQueue);
-      return `?${params.toString()}`;
-    }
     if (isFromMyPage) return "?from=mypage";
     return "";
   })();
@@ -186,37 +181,41 @@ export default function WordNavigationClient({
         </p>
       )}
 
-      <nav className="flex justify-between items-center -mt-2 pb-0 -mb-2" aria-label="単語ナビゲーション">
-        {prevWord ? (
-          <Link
-            href={`/words/${prevWord.slug}${querySuffix}`}
-            // 次/前は高意図リンク（リンク2本のみ）なので、あえて prefetch を有効化。
-            // loading.tsx の殻が先読みされ、クリック時にスケルトンが即出る（一覧の大量リンクとは扱いを分ける）。
-            className="inline-flex items-center justify-center gap-1.5 h-9 px-4 bg-white border border-gray-200 rounded-full text-gray-600 text-[13px] font-medium no-underline transition-all duration-200 shadow-sm select-none hover:bg-gray-50 hover:border-gray-300 hover:text-gray-900 hover:-translate-y-px hover:shadow-md active:translate-y-0 active:shadow-sm"
-          >
-            <span aria-hidden="true">←</span> 前単語
-          </Link>
-        ) : (
-          <span className="inline-flex items-center justify-center gap-1.5 h-9 px-4 bg-white border border-gray-200 rounded-full text-gray-600 text-[13px] font-medium no-underline transition-all duration-200 shadow-sm select-none invisible pointer-events-none">
-            <span aria-hidden="true">←</span> 前単語
-          </span>
-        )}
+      {/* 復習モードからの詳細は「次の単語へ」でセッションへ戻る一本道にする。
+          前後ナビがあると同じセッションの未採点カードを先に見られ、採点が実力より甘くなる。 */}
+      {!isFromReview && (
+        <nav className="flex justify-between items-center -mt-2 pb-0 -mb-2" aria-label="単語ナビゲーション">
+          {prevWord ? (
+            <Link
+              href={`/words/${prevWord.slug}${querySuffix}`}
+              // 次/前は高意図リンク（リンク2本のみ）なので、あえて prefetch を有効化。
+              // loading.tsx の殻が先読みされ、クリック時にスケルトンが即出る（一覧の大量リンクとは扱いを分ける）。
+              className="inline-flex items-center justify-center gap-1.5 h-9 px-4 bg-white border border-gray-200 rounded-full text-gray-600 text-[13px] font-medium no-underline transition-all duration-200 shadow-sm select-none hover:bg-gray-50 hover:border-gray-300 hover:text-gray-900 hover:-translate-y-px hover:shadow-md active:translate-y-0 active:shadow-sm"
+            >
+              <span aria-hidden="true">←</span> 前単語
+            </Link>
+          ) : (
+            <span className="inline-flex items-center justify-center gap-1.5 h-9 px-4 bg-white border border-gray-200 rounded-full text-gray-600 text-[13px] font-medium no-underline transition-all duration-200 shadow-sm select-none invisible pointer-events-none">
+              <span aria-hidden="true">←</span> 前単語
+            </span>
+          )}
 
-        {nextWord ? (
-          <Link
-            href={`/words/${nextWord.slug}${querySuffix}`}
-            // 次/前は高意図リンク（リンク2本のみ）なので、あえて prefetch を有効化。
-            // loading.tsx の殻が先読みされ、クリック時にスケルトンが即出る（一覧の大量リンクとは扱いを分ける）。
-            className="inline-flex items-center justify-center gap-1.5 h-9 px-4 bg-white border border-gray-200 rounded-full text-gray-600 text-[13px] font-medium no-underline transition-all duration-200 shadow-sm select-none hover:bg-gray-50 hover:border-gray-300 hover:text-gray-900 hover:-translate-y-px hover:shadow-md active:translate-y-0 active:shadow-sm"
-          >
-            次単語 <span aria-hidden="true">→</span>
-          </Link>
-        ) : (
-          <span className="inline-flex items-center justify-center gap-1.5 h-9 px-4 bg-white border border-gray-200 rounded-full text-gray-600 text-[13px] font-medium no-underline transition-all duration-200 shadow-sm select-none invisible pointer-events-none">
-            次単語 <span aria-hidden="true">→</span>
-          </span>
-        )}
-      </nav>
+          {nextWord ? (
+            <Link
+              href={`/words/${nextWord.slug}${querySuffix}`}
+              // 次/前は高意図リンク（リンク2本のみ）なので、あえて prefetch を有効化。
+              // loading.tsx の殻が先読みされ、クリック時にスケルトンが即出る（一覧の大量リンクとは扱いを分ける）。
+              className="inline-flex items-center justify-center gap-1.5 h-9 px-4 bg-white border border-gray-200 rounded-full text-gray-600 text-[13px] font-medium no-underline transition-all duration-200 shadow-sm select-none hover:bg-gray-50 hover:border-gray-300 hover:text-gray-900 hover:-translate-y-px hover:shadow-md active:translate-y-0 active:shadow-sm"
+            >
+              次単語 <span aria-hidden="true">→</span>
+            </Link>
+          ) : (
+            <span className="inline-flex items-center justify-center gap-1.5 h-9 px-4 bg-white border border-gray-200 rounded-full text-gray-600 text-[13px] font-medium no-underline transition-all duration-200 shadow-sm select-none invisible pointer-events-none">
+              次単語 <span aria-hidden="true">→</span>
+            </span>
+          )}
+        </nav>
+      )}
     </>
   );
 }
