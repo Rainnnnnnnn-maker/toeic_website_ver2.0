@@ -1,6 +1,6 @@
 # TOEIC重要単語（toeic_website_ver2.0）技術ドキュメント
 
-最終更新日: 2026-09-15（復習モードから開いた単語詳細の前後ナビを非表示化）
+最終更新日: 2026-09-18（再申請準備：教材改訂・公開制御・永続修正・確認記録）
 
 ## 1. プロジェクト概要
 
@@ -140,7 +140,7 @@
 
 * `NEXT_PUBLIC_GA_ID`: Google Analytics 4 測定ID（G-XXXXXXXXXX）
 
-* `NEXT_PUBLIC_ADSENSE_REVIEW`: （任意）`1` または `true` で AdSense 審査モードを有効化。単語詳細ページ（`/words/[word]`）への `robots: noindex` 付与・`sitemap.xml` からの単語URL除外・A8アフィリエイトバナー非表示・TOP／学習ガイドに限定したAdSenseスクリプトの停止をまとめて切り替える（判定は `src/lib/adsense-review.ts` の `isAdsenseReviewMode()` に集約）。値はビルド時にインライン化されるため、変更にはVercelでの再デプロイが必要。審査承認後はこの変数を削除（または `0`）にして再デプロイすれば単語ページのindexと対象ページの広告読み込みが戻る
+* `NEXT_PUBLIC_AFFILIATE_ADS_ENABLED`: `true` の場合だけA8バナーを表示。既定は非表示。検索公開とは独立し、旧 `NEXT_PUBLIC_ADSENSE_REVIEW` は廃止。
 
 * `NEXT_PUBLIC_SUPABASE_URL`: Supabase プロジェクト URL（任意ログイン + お気に入り同期）
 
@@ -640,9 +640,9 @@
   * `src/components/common/CookieConsent.tsx`：初回訪問時のクッキー同意バナー（クライアント。同意/拒否で Cookie を書き込み、ローカル状態で即時非表示）
   * `src/components/common/CookieConsentGate.tsx`：Server Component。`next/headers` の `cookies()` で同意 Cookie を読み、未決定の場合のみバナーを描画する。`app/layout.tsx` で `<Suspense>` に包んで使用し、レイアウト全体の動的化を防ぐ
   * `src/components/common/GoogleAnalyticsGate.tsx`：Server Component。同意Cookieが `true` の場合だけ `<GoogleAnalytics>` を描画し、同意前・拒否時はGA4を読み込まない
-  * `src/components/common/AdSenseScript.tsx`：審査モード無効時にだけAdSenseスクリプトを読み込む。root layoutには置かず、TOPと `/guide` 配下の編集コンテンツに限定する。所有確認用 `google-adsense-account` メタタグはroot metadataへ常設
+  * Google広告スクリプトは撤去。所有確認用 `google-adsense-account` メタタグと `ads.txt` は常設。承認後の広告配置は別途検証する。
   * `src/components/common/TabNavigation.tsx`：単語一覧のレベル切り替えタブ
-  * `src/components/common/A8AdBanner.tsx`：A8.net アフィリエイトバナー（レスポンシブ対応。AdSense審査モード `NEXT_PUBLIC_ADSENSE_REVIEW` 有効時は非表示）
+  * `src/components/common/A8AdBanner.tsx`：A8バナー。`NEXT_PUBLIC_AFFILIATE_ADS_ENABLED=true` でのみ表示。
 
 * SEO
 
@@ -1217,3 +1217,13 @@ RLS は `favorites` と同じく「自分の行のみ全操作可」（`auth.uid
 ### 初期表示のフォントと広告画像（2026-09-07）
 
 本文は `globals.css` のシステムフォントを使用し、未使用の Geist / Geist Mono の初期化と preload を行わない。A8 の両サイズのバナー画像と計測ピクセルは `loading="lazy"` でブラウザーの表示領域への近接判定に応じて読み込む。幅・高さ・aspect-ratio は維持して表示領域を確保する。計測ピクセルも遅延するため、ページアクセス直後にはリクエストされない場合がある。審査モード中の非表示条件は従来どおり。
+
+## 編集コンテンツの公開・修正（2026-09-18）
+
+- ガイドは `status: published | draft` で公開を判定。公開検索・関連記事・static params・sitemapが同じ公開フィルタを使う。下書きは直接URLでもnotFound。`guide-lessons.ts` の自作演習を本文に合成し、ネイティブdetailsで解答を表示する。
+- 単語取得は既存 `getWordDetail` のL1を維持し、内部取得で収録語確認→`word-editorial.json`→Redis→Geminiの順。編集データは型検証された版管理JSONで、Redisの期限や再生成に左右されない。埋め込みCLIも同じ編集データを優先する。
+- 編集後は対象slugのL1とVectorを既存revalidation APIで更新する。全件再生成・削除は不要。
+- `npm run audit:content` はBlobとRedisを読み取り、3レベル各10語をローカル `.artifacts` に保存。`npm run review:content` はガイド15本と標本30語のハッシュ・確認状態を出力する。AI照合を人の承認に変換しない。手順は `docs/reviews/README.md`。
+- 全語の人手確認は未完了。語義内の根拠のない頻度表示は撤去。修正語には修正点・参考資料を表示する。
+
+過去の更新履歴に記載された審査モードの「審査対象を絞る」という説明は当時の設計意図であり、現在の運用根拠ではない。noindexはAdSenseの審査除外を保証しない。

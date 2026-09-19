@@ -51,7 +51,7 @@ TOEIC語彙ラボ is a comprehensive web application for learning essential TOEI
 - **Static Pages**: Includes About, Privacy, Terms, and Contact pages for better user trust and SEO. The Privacy Policy explicitly discloses Google AdSense / third-party ad vendors' Cookie usage and Google Analytics tracking, with opt-out links, in line with AdSense program policy requirements.
 - **Learning Guide Articles** (`/guide`): 16 article records, of which 15 are currently published. The May 2026 public-test retrospective is retained for source review but excluded from the guide index, static params, sitemap, related links, and search indexing. Published guides use visible `Rain` bylines, optional linked references, and `Article` + `BreadcrumbList` JSON-LD; unsupported score guarantees, fixed forgetting percentages, and unverifiable frequency claims have been removed or qualified. The index lists articles newest-first.
 - **Cookie Consent**: First-visit consent banner aligned with GA4 tracking. Consent is stored in a cookie and read server-side via `CookieConsentGate`; `GoogleAnalyticsGate` loads GA4 only after explicit acceptance. Both gates are wrapped in `<Suspense>` so the rest of the root layout remains cacheable.
-- **AdSense Review Controls**: Ownership is declared with the official `google-adsense-account` meta tag. The AdSense script is no longer global: outside review mode it is placed only on the TOP and learning-guide routes. Review mode disables the script, hides A8 banners, marks word-detail pages `noindex`, and removes those URLs from the sitemap.
+- **AdSense Preparation**: Ownership meta tag and ads.txt are retained; Google ad scripts are disabled. Affiliate banners are independently opt-in via `NEXT_PUBLIC_AFFILIATE_ADS_ENABLED=true`. Search indexing does not depend on advertising. Draft guides return not-found. Fifteen guides include revised explanations and nine original exercises. Editorial word corrections take precedence over Redis and generation; review hashes distinguish AI checks from human approval. See [reapplication plan](docs/plans/adsense-reapplication-plan.md) and [review procedure](docs/reviews/README.md).
 - **Responsive Design**: Optimized for desktop and mobile devices.
 - **Stronger Page Backgrounds**: The TOP, word index, sign-in, favorites, daily picks, listening, study, and review screens share a more visible blue radial background, while word-detail pages retain their distinct teal hue with increased saturation.
 
@@ -115,7 +115,7 @@ TOEIC語彙ラボ is a comprehensive web application for learning essential TOEI
     | `REVALIDATION_TOKEN` | Secret token for validating ISR revalidation requests. |
     | `WORD_CACHE_TTL_DAYS` | (Optional) Cache duration in days (default: 30). |
     | `NEXT_PUBLIC_GA_ID` | Google Analytics 4 Measurement ID (G-XXXXXXXXXX). |
-    | `NEXT_PUBLIC_ADSENSE_REVIEW` | (Optional) Set to `1` to enable AdSense review mode: adds `noindex` to word detail pages, removes them from `sitemap.xml`, hides A8 affiliate banners, and disables the route-scoped AdSense script. Inlined at build time — redeploy to toggle. Remove the variable after approval to restore word indexing and eligible-page ad loading. |
+    | `NEXT_PUBLIC_AFFILIATE_ADS_ENABLED` | Optional: `true` enables A8 banners; default off. Independent of indexing; changes require redeployment. |
     | `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL (optional sign-in / favorites sync). |
     | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Supabase publishable key (safe for client exposure; data access is protected by RLS). |
 

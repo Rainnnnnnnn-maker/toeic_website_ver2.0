@@ -57,8 +57,9 @@ Setting `BLOB_URL_IMPORTANT`, `BLOB_URL_MEDIUM`, `BLOB_URL_HIGH` skips the Blob 
 `src/data/word-detail.ts:getWordDetail(slug)` is the single entry point for word detail data:
 
 1. **L1** — Next.js Data Cache (`"use cache"` + `cacheLife("max")` + `cacheTag("word-detail-${slug}", "word-detail")`)
-2. **L2** — Upstash Redis (`src/lib/wordCache.ts`, key: `word:<slug>`, TTL: `WORD_CACHE_TTL_DAYS` days)
-3. **L3** — Google Gemini generation → normalize → write to Redis
+2. **Editorial** — `src/data/word-editorial.json` corrections, checked inside `getWordDetailFresh` after corpus membership and before Redis; shared with the embedding CLI. Keep corrections version-controlled and revalidate the affected L1 / Vector entries after deployment.
+3. **L2** — Upstash Redis (`src/lib/wordCache.ts`, key: `word:<slug>`, TTL: `WORD_CACHE_TTL_DAYS` days)
+4. **L3** — Google Gemini generation → normalize → write to Redis
 
 Never call Gemini directly. Always go through `getWordDetail`. For client-side access, use the Server Action `fetchWordDetail` from `src/actions/word.ts` (it wraps `getWordDetail` and swallows exceptions, returning `null` on failure).
 

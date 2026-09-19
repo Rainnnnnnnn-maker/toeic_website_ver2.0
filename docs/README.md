@@ -11,6 +11,11 @@
 - `reviews/` — コード・UI・設計レビューの記録
 - `archive/` — 実装済み計画や完了した移行計画
 
+## AdSense 再申請
+
+- [改善計画](plans/adsense-reapplication-plan.md) — 有用性の低いコンテンツへの対応、優先順位、再申請の完了条件
+- [再申請・導入手順](operations/google-adsense-guide.md) — 所有確認と広告掲載の運用
+
 ## テスト実行
 
 - [Cypress E2E実行手順](operations/cypress-e2e.md) — お気に入り保存と今日おすすめの前後移動
@@ -21,3 +26,5 @@
 2. 完了した計画は削除せず `archive/` へ移します。
 3. 機能変更時は `README.md` と `architecture.md` の「最終更新日」を同じ変更で更新します。
 4. リポジトリ固有のエージェントスキルは `.agents/skills/` を正本とします。
+
+- [コンテンツ確認記録と承認の手順](reviews/README.md)
