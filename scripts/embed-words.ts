@@ -29,6 +29,7 @@
  * このファイルは `tsx` で直接動かす Node.js CLI なので import しない。
  * 通常の Node.js 条件で import すると marker package 自体が例外を投げる。
  */
+import { getEditorialWord } from "../src/data/word-editorial";
 import { GoogleGenAI } from "@google/genai";
 import { Redis } from "@upstash/redis";
 import { Index, type RangeResult } from "@upstash/vector";
@@ -276,6 +277,11 @@ async function main(): Promise<void> {
   // Phase 1: WordDetails の収集（Redis 優先 → Gemini 生成）
   console.log("Phase 1: collecting WordDetails from Redis...");
   const detailsBySlug = await fetchCachedDetails(redis, words);
+  // Match getWordDetailFresh: editorial corrections take priority over Redis.
+  for (const word of words) {
+    const editorial = getEditorialWord(word.slug);
+    if (editorial) detailsBySlug.set(word.slug, editorial.detail);
+  }
   const missing = words.filter((w) => !detailsBySlug.has(w.slug));
   console.log(`  cached: ${detailsBySlug.size}, missing: ${missing.length}`);
 

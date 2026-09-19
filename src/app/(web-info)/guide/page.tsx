@@ -66,7 +66,7 @@ export default function GuideIndexPage() {
       />
 
       <nav className="mb-8 text-sm text-black/50 dark:text-white/50">
-        <Link href="/" className="hover:underline">
+        <Link prefetch={false} href="/" className="hover:underline">
           TOP
         </Link>
         <span className="mx-2">/</span>
@@ -84,7 +84,7 @@ export default function GuideIndexPage() {
             key={article.slug}
             className="rounded-lg border border-black/10 p-5 transition hover:border-black/30 dark:border-white/10 dark:hover:border-white/30"
           >
-            <Link href={`/guide/${article.slug}`} className="block">
+            <Link prefetch={false} href={`/guide/${article.slug}`} className="block">
               <div className="mb-2 flex flex-wrap items-center gap-2 text-xs text-black/50 dark:text-white/50">
                 <span className="rounded bg-black/5 px-2 py-0.5 dark:bg-white/10">
                   {article.category}
@@ -106,6 +106,7 @@ export default function GuideIndexPage() {
       <p className="mt-10 text-xs text-black/40 dark:text-white/40">
         記事は順次追加・更新しています。リクエストがあれば
         <Link
+          prefetch={false}
           href="/contact"
           className="ml-1 text-blue-600 underline hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
         >

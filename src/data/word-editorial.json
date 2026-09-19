@@ -1,0 +1,1453 @@
+{
+  "approve": {
+    "updatedAt": "2026-09-18",
+    "method": "ai-assisted",
+    "note": "正式承認の他動詞approveと、賛成を表すapprove ofの文型を区別。",
+    "sources": [
+      "https://dictionary.cambridge.org/dictionary/english/approve"
+    ],
+    "detail": {
+      "word": "approve",
+      "pronunciation": "/əˈpruːv/",
+      "meanings": [
+        {
+          "partOfSpeech": "動詞",
+          "meaning": "公式に承認する、賛成する。",
+          "detailedMeanings": [
+            {
+              "number": 1,
+              "definition": "正式に承認・許可する。",
+              "example": "The committee approved the proposal.",
+              "exampleJapanese": "委員会はその提案を承認した。",
+              "context": "ビジネス、公的機関での決定",
+              "frequency": "",
+              "synonyms": [
+                "authorize",
+                "sanction",
+                "endorse"
+              ],
+              "grammarPattern": "approve + 計画・申請など（正式に承認する）"
+            },
+            {
+              "number": 2,
+              "definition": "～に賛成する、～を良いと認める。",
+              "example": "I don't approve of his behavior.",
+              "exampleJapanese": "私は彼の行動を良いとは思わない。",
+              "context": "個人的な意見や評価",
+              "frequency": "",
+              "synonyms": [
+                "endorse",
+                "support",
+                "favor"
+              ],
+              "grammarPattern": "approve of A"
+            }
+          ]
+        }
+      ],
+      "wordForms": [
+        {
+          "form": "approves",
+          "type": "三人称単数現在形"
+        },
+        {
+          "form": "approved",
+          "type": "過去形・過去分詞形"
+        },
+        {
+          "form": "approving",
+          "type": "現在分詞形・動名詞"
+        },
+        {
+          "form": "approval",
+          "type": "名詞形"
+        }
+      ],
+      "synonyms": [
+        "endorse",
+        "sanction",
+        "authorize",
+        "ratify",
+        "confirm"
+      ],
+      "nuance": "公式な場での承認や、個人的な賛同・支持を表す。",
+      "toeicExamples": [
+        {
+          "english": "The board of directors will approve the budget at the next meeting.",
+          "japanese": "取締役会は次回の会議で予算を承認するだろう。"
+        },
+        {
+          "english": "We are seeking approval from the regulatory authorities.",
+          "japanese": "私たちは規制当局からの承認を求めている。"
+        },
+        {
+          "english": "The manager approved the employee's request for leave.",
+          "japanese": "マネージャーは従業員の休暇申請を承認した。"
+        },
+        {
+          "english": "Do you approve of this new policy?",
+          "japanese": "この新しい方針に賛成ですか？"
+        }
+      ],
+      "englishDefinition": "To officially agree to or accept as satisfactory.",
+      "japaneseTranslation": "承認する、賛成する",
+      "etymology": "ラテン語の ad（～へ）+ probare（良いと証明する、試す）が語源。良いと認める、という意味合いから「承認する」となった。",
+      "collocations": [
+        "officially approve",
+        "seek approval",
+        "gain approval"
+      ]
+    }
+  },
+  "economic": {
+    "updatedAt": "2026-09-18",
+    "method": "ai-assisted",
+    "note": "economical on fuelとの混同を除き、経済に関する自作例文へ置換。",
+    "sources": [
+      "https://dictionary.cambridge.org/us/grammar/british-grammar/economic-or-economical"
+    ],
+    "detail": {
+      "word": "economic",
+      "pronunciation": "/ˌiːkəˈnɒmɪk/, /ˌɛkəˈnɒmɪk/",
+      "meanings": [
+        {
+          "partOfSpeech": "形容詞",
+          "meaning": "経済や産業、商業に関する。",
+          "detailedMeanings": [
+            {
+              "number": 1,
+              "definition": "経済（学）に関する",
+              "example": "The government is implementing new economic policies.",
+              "exampleJapanese": "政府は新しい経済政策を実施している。",
+              "context": "政治・社会",
+              "frequency": "",
+              "synonyms": [
+                "financial",
+                "monetary",
+                "fiscal"
+              ],
+              "grammarPattern": "economic + 名詞"
+            }
+          ]
+        }
+      ],
+      "wordForms": [
+        {
+          "form": "economical",
+          "type": "形容詞"
+        },
+        {
+          "form": "economically",
+          "type": "副詞"
+        },
+        {
+          "form": "economy",
+          "type": "名詞"
+        }
+      ],
+      "synonyms": [
+        "financial",
+        "monetary",
+        "fiscal",
+        "commercial",
+        "business"
+      ],
+      "nuance": "economic policyは経済政策。燃料やお金を節約できることは通常economicalで表す。economicには採算が合うという用法もあるが、economic on fuelという形を基本例として覚えない。",
+      "toeicExamples": [
+        {
+          "english": "The report examines economic growth in several regions.",
+          "japanese": "その報告書は複数地域の経済成長を分析している。"
+        },
+        {
+          "english": "We need to consider the economic impact of the new regulations.",
+          "japanese": "私たちは新しい規制の経済的影響を考慮する必要がある。"
+        },
+        {
+          "english": "Economic conditions have affected demand for office space.",
+          "japanese": "経済状況はオフィススペースの需要に影響を与えている。"
+        },
+        {
+          "english": "The economic downturn has affected sales significantly.",
+          "japanese": "景気後退は売上に著しい影響を与えた。"
+        }
+      ],
+      "englishDefinition": "Relating to trade, industry, and the management of money; relating to the economy of a country or region.",
+      "japaneseTranslation": "経済の、経済に関する"
+    }
+  },
+  "ensure": {
+    "updatedAt": "2026-09-18",
+    "method": "ai-assisted",
+    "note": "ensure O Vと保険の語義・例文を除去し、ensure thatの文型を明確化。",
+    "sources": [
+      "https://dictionary.cambridge.org/dictionary/english/ensure"
+    ],
+    "detail": {
+      "word": "ensure",
+      "pronunciation": "/ɪnˈʃʊər/",
+      "meanings": [
+        {
+          "partOfSpeech": "動詞",
+          "meaning": "何かを確実にする、保証する。特に、望ましい結果が起こることを保証したり、問題が発生しないようにしたりするために行動を起こす。",
+          "detailedMeanings": [
+            {
+              "number": 1,
+              "definition": "確実にする、保証する",
+              "example": "We must ensure that all safety regulations are followed.",
+              "exampleJapanese": "私たちは全ての安全規則が守られていることを確実にする必要がある。",
+              "context": "安全管理、品質管理、計画の実行など、結果の確実性を重視する場合。",
+              "frequency": "",
+              "synonyms": [
+                "assure",
+                "guarantee",
+                "secure"
+              ],
+              "grammarPattern": "ensure + 名詞 / ensure (that) + 主語 + 動詞"
+            }
+          ]
+        }
+      ],
+      "wordForms": [
+        {
+          "form": "ensures",
+          "type": "三人称単数現在形"
+        },
+        {
+          "form": "ensured",
+          "type": "過去形"
+        },
+        {
+          "form": "ensured",
+          "type": "過去分詞"
+        },
+        {
+          "form": "ensuring",
+          "type": "現在分詞"
+        }
+      ],
+      "synonyms": [
+        "assure",
+        "guarantee",
+        "secure",
+        "make certain",
+        "confirm"
+      ],
+      "nuance": "望ましい結果を確実にする意味で、ensure safetyやensure that ...の形で使う。保険をかける場合はinsureを使い、人を安心させるassureとは文型も比較する。",
+      "toeicExamples": [
+        {
+          "english": "Please ensure that all documents are submitted by the deadline.",
+          "japanese": "全ての書類が締め切りまでに提出されることを確実にしてください。"
+        },
+        {
+          "english": "The company implemented new procedures to ensure customer satisfaction.",
+          "japanese": "その会社は顧客満足を保証するために新しい手順を導入した。"
+        },
+        {
+          "english": "We need to ensure the quality of our products before shipping.",
+          "japanese": "出荷前に製品の品質を保証する必要がある。"
+        },
+        {
+          "english": "The manager will ensure that the project stays within budget.",
+          "japanese": "マネージャーはプロジェクトが予算内に収まることを確実にするだろう。"
+        }
+      ],
+      "englishDefinition": "to make sure that something will happen or be the case",
+      "japaneseTranslation": "確実にする、保証する"
+    }
+  },
+  "facilitate": {
+    "updatedAt": "2026-09-18",
+    "method": "ai-assisted",
+    "note": "人を直接目的語にする一般化をやめ、活動・過程を目的語にする例に合わせた。",
+    "sources": [
+      "https://dictionary.cambridge.org/dictionary/english/facilitate"
+    ],
+    "detail": {
+      "word": "facilitate",
+      "pronunciation": "/fəˈsɪlɪteɪt/",
+      "meanings": [
+        {
+          "partOfSpeech": "動詞",
+          "meaning": "物事を容易にする、促進する。特に、プロセスや活動がよりスムーズに進むように支援する。",
+          "detailedMeanings": [
+            {
+              "number": 1,
+              "definition": "（プロセス、活動、進歩などを）容易にする、促進する。",
+              "example": "The new software will facilitate communication between departments.",
+              "exampleJapanese": "新しいソフトウェアは、部署間のコミュニケーションを円滑にするだろう。",
+              "context": "ビジネス、技術、組織運営など、物事がスムーズに進むことを期待する場面。",
+              "frequency": "",
+              "synonyms": [
+                "ease",
+                "assist",
+                "promote",
+                "expedite"
+              ],
+              "grammarPattern": "facilitate [something]"
+            },
+            {
+              "number": 2,
+              "definition": "（人やグループの活動を）手助けする、支援する。",
+              "example": "The mediator helped to facilitate the negotiations.",
+              "exampleJapanese": "調停者は交渉を円滑に進めるのを手助けした。",
+              "context": "交渉、会議、議論など、関係者が協力して何かを進める場面。",
+              "frequency": "",
+              "synonyms": [
+                "help",
+                "aid",
+                "support"
+              ],
+              "grammarPattern": "facilitate + 活動・過程（negotiations / discussionなど）"
+            }
+          ]
+        }
+      ],
+      "wordForms": [
+        {
+          "form": "facilitates",
+          "type": "三人称単数現在形"
+        },
+        {
+          "form": "facilitated",
+          "type": "過去形・過去分詞形"
+        },
+        {
+          "form": "facilitating",
+          "type": "現在分詞・動名詞"
+        },
+        {
+          "form": "facilitation",
+          "type": "名詞"
+        },
+        {
+          "form": "facilitator",
+          "type": "名詞"
+        }
+      ],
+      "synonyms": [
+        "ease",
+        "assist",
+        "promote",
+        "expedite",
+        "help"
+      ],
+      "nuance": "単に助けるだけでなく、プロセスや状況をよりスムーズに、効率的に進むように「働きかける」ニュアンスが強い。",
+      "toeicExamples": [
+        {
+          "english": "The new system is designed to facilitate the booking process.",
+          "japanese": "新しいシステムは予約プロセスを円滑にするように設計されています。"
+        },
+        {
+          "english": "We need to facilitate cooperation among the team members.",
+          "japanese": "チームメンバー間の協力を促進する必要があります。"
+        },
+        {
+          "english": "The government introduced measures to facilitate economic growth.",
+          "japanese": "政府は経済成長を促進するための措置を導入しました。"
+        },
+        {
+          "english": "The conference aims to facilitate discussion on future strategies.",
+          "japanese": "この会議は将来の戦略に関する議論を促進することを目的としています。"
+        }
+      ],
+      "englishDefinition": "To make an action or process easy or easier.",
+      "japaneseTranslation": "容易にする、促進する、円滑に進める"
+    }
+  },
+  "refund": {
+    "updatedAt": "2026-09-18",
+    "method": "ai-assisted",
+    "note": "re + fund（資金）という未裏付けの語源説明を除去。文型を例文の目的語と一致させた。",
+    "sources": [
+      "https://dictionary.cambridge.org/dictionary/english/refund"
+    ],
+    "detail": {
+      "word": "refund",
+      "pronunciation": "/rɪˈfʌnd/",
+      "meanings": [
+        {
+          "partOfSpeech": "名詞",
+          "meaning": "支払った金額の払い戻し。特に、商品が不良品であったり、購入者の意図に合わなかったりした場合に受け取る。",
+          "detailedMeanings": [
+            {
+              "number": 1,
+              "definition": "払い戻し金",
+              "example": "I received a full refund for the faulty product.",
+              "exampleJapanese": "不良品の全額払い戻しを受け取りました。",
+              "context": "商品購入・返品",
+              "frequency": "",
+              "synonyms": [
+                "reimbursement",
+                "repayment"
+              ],
+              "grammarPattern": "get/receive a refund"
+            },
+            {
+              "number": 2,
+              "definition": "返金",
+              "example": "The store offers a money-back refund within 30 days.",
+              "exampleJapanese": "その店では30日以内の返金保証があります。",
+              "context": "販売・カスタマーサービス",
+              "frequency": "",
+              "synonyms": [
+                "reimbursement"
+              ],
+              "grammarPattern": "offer a refund"
+            }
+          ]
+        },
+        {
+          "partOfSpeech": "動詞",
+          "meaning": "代金を払い戻すこと。特に、購入者からの要求に応じて。",
+          "detailedMeanings": [
+            {
+              "number": 1,
+              "definition": "返金する",
+              "example": "The company will refund your money if you are not satisfied.",
+              "exampleJapanese": "満足いただけない場合、会社は返金いたします。",
+              "context": "カスタマーサービス",
+              "frequency": "",
+              "synonyms": [
+                "reimburse",
+                "repay"
+              ],
+              "grammarPattern": "refund + 金額・代金（例：refund your money）"
+            },
+            {
+              "number": 2,
+              "definition": "払い戻す",
+              "example": "Please refund the amount paid for the damaged goods.",
+              "exampleJapanese": "破損した商品の支払い額を払い戻してください。",
+              "context": "取引・請求",
+              "frequency": "",
+              "synonyms": [
+                "reimburse"
+              ],
+              "grammarPattern": "refund the cost/price"
+            }
+          ]
+        }
+      ],
+      "wordForms": [
+        {
+          "form": "refunded",
+          "type": "過去形・過去分詞形"
+        },
+        {
+          "form": "refunding",
+          "type": "現在分詞形"
+        }
+      ],
+      "synonyms": [
+        "reimbursement",
+        "repayment",
+        "restitution"
+      ],
+      "nuance": "「refund」は、商品やサービスに対する支払いを返してもらうことを指し、特に購入者が不満や問題を感じた場合に用いられます。",
+      "toeicExamples": [
+        {
+          "english": "Customers can request a full refund if the product is defective.",
+          "japanese": "製品に欠陥がある場合、顧客は全額返金を要求できます。"
+        },
+        {
+          "english": "The airline will refund the ticket price for any cancelled flights.",
+          "japanese": "航空会社は、欠航したフライトのチケット代金を払い戻します。"
+        },
+        {
+          "english": "Please allow 5-7 business days for the refund to appear on your statement.",
+          "japanese": "返金が明細に反映されるまで、5〜7営業日かかりますのでご了承ください。"
+        },
+        {
+          "english": "We offer a no-questions-asked refund policy.",
+          "japanese": "当社は、理由を問わない返金ポリシーを提供しています。"
+        }
+      ],
+      "englishDefinition": "To give back money to someone, especially because they are unhappy with a product or service.",
+      "japaneseTranslation": "返金する、払い戻す",
+      "collocations": [
+        "full refund",
+        "partial refund",
+        "request a refund"
+      ]
+    }
+  },
+  "complement": {
+    "updatedAt": "2026-09-18",
+    "method": "ai-assisted",
+    "note": "名詞欄に動詞の例文を置いていた重複語義を除去。動詞の説明は動詞欄に維持。",
+    "sources": [
+      "https://dictionary.cambridge.org/dictionary/english/complement"
+    ],
+    "detail": {
+      "word": "complement",
+      "pronunciation": "/ˈkɒmplɪmənt/",
+      "meanings": [
+        {
+          "partOfSpeech": "名詞",
+          "meaning": "補完するもの、補うもの。また、補完関係。",
+          "detailedMeanings": [
+            {
+              "number": 1,
+              "definition": "補完するもの、補うもの。",
+              "example": "The scarf is a perfect complement to her outfit.",
+              "exampleJapanese": "そのスカーフは彼女の服装を完璧に引き立てている。",
+              "context": "服装や装飾品が全体を引き立てる場合",
+              "frequency": "",
+              "synonyms": [
+                "addition",
+                "enhancement",
+                "accompaniment"
+              ],
+              "grammarPattern": "A is a complement to B."
+            }
+          ]
+        },
+        {
+          "partOfSpeech": "動詞",
+          "meaning": "補完する、補う。",
+          "detailedMeanings": [
+            {
+              "number": 1,
+              "definition": "不足しているものを補う。",
+              "example": "This new feature will complement our existing services.",
+              "exampleJapanese": "この新機能は既存のサービスを補完するものとなるだろう。",
+              "context": "製品やサービスが既存のものを補強する場合",
+              "frequency": "",
+              "synonyms": [
+                "complete",
+                "enhance",
+                "supplement"
+              ],
+              "grammarPattern": "A complements B."
+            },
+            {
+              "number": 2,
+              "definition": "引き立てる。",
+              "example": "The wine complements the meal perfectly.",
+              "exampleJapanese": "そのワインは食事を完璧に引き立てる。",
+              "context": "食べ物や飲み物が料理の味を良くする場合",
+              "frequency": "",
+              "synonyms": [
+                "enhance",
+                "accentuate"
+              ],
+              "grammarPattern": "A complements B."
+            }
+          ]
+        }
+      ],
+      "wordForms": [
+        {
+          "form": "complements",
+          "type": "三人称単数現在形"
+        },
+        {
+          "form": "complementing",
+          "type": "現在分詞"
+        },
+        {
+          "form": "complemented",
+          "type": "過去形・過去分詞"
+        }
+      ],
+      "synonyms": [
+        "complete",
+        "enhance",
+        "supplement",
+        "accompany",
+        "fulfill"
+      ],
+      "nuance": "「補完する」という意味合いが強く、単に付け加えるだけでなく、全体をより良くしたり、不足を埋めたりするニュアンスを持つ。",
+      "toeicExamples": [
+        {
+          "english": "The new software is designed to complement our existing product line.",
+          "japanese": "その新しいソフトウェアは、既存の製品ラインを補完するように設計されています。"
+        },
+        {
+          "english": "Her artistic skills complement his technical expertise, making them a strong team.",
+          "japanese": "彼女の芸術的なスキルは彼の技術的な専門知識を補完し、彼らを強力なチームにしています。"
+        },
+        {
+          "english": "We are looking for a candidate whose experience will complement the current team's skill set.",
+          "japanese": "現在のチームのスキルセットを補完する経験を持つ候補者を探しています。"
+        },
+        {
+          "english": "The marketing strategy aims to complement the product's features and benefits.",
+          "japanese": "マーケティング戦略は、製品の機能と利点を補完することを目的としています。"
+        }
+      ],
+      "englishDefinition": "To add to something in a way that enhances or improves it; make complete.",
+      "japaneseTranslation": "補完する、補う"
+    }
+  },
+  "intensive": {
+    "updatedAt": "2026-09-18",
+    "method": "ai-assisted",
+    "note": "intense painとの混同を除き、集中的な活動・集約農業の語義を維持。",
+    "sources": [
+      "https://dictionary.cambridge.org/dictionary/english/intensive"
+    ],
+    "detail": {
+      "word": "intensive",
+      "pronunciation": "/ɪnˈtɛnsɪv/",
+      "meanings": [
+        {
+          "partOfSpeech": "形容詞",
+          "meaning": "集中的な、徹底的な、集約的な。",
+          "detailedMeanings": [
+            {
+              "number": 1,
+              "definition": "多くのエネルギー、労力、または注意を必要とするさま。",
+              "example": "The company is undertaking an intensive marketing campaign.",
+              "exampleJapanese": "その会社は集中的なマーケティングキャンペーンを実施している。",
+              "context": "ビジネス、広告",
+              "frequency": "",
+              "synonyms": [
+                "concentrated",
+                "thorough",
+                "vigorous"
+              ],
+              "grammarPattern": "intensive [noun]"
+            },
+            {
+              "number": 2,
+              "definition": "（農業などで）集約的な栽培や飼育を行うさま。",
+              "example": "Intensive farming has led to increased food production.",
+              "exampleJapanese": "集約農業は食料生産の増加につながった。",
+              "context": "農業、経済",
+              "frequency": "",
+              "synonyms": [
+                "concentrated",
+                "high-yield"
+              ],
+              "grammarPattern": "intensive [noun]"
+            }
+          ]
+        }
+      ],
+      "wordForms": [
+        {
+          "form": "intensively",
+          "type": "副詞"
+        },
+        {
+          "form": "intensiveness",
+          "type": "名詞"
+        }
+      ],
+      "synonyms": [
+        "concentrated",
+        "thorough",
+        "vigorous",
+        "intense",
+        "severe"
+      ],
+      "nuance": "intensive trainingは多くの労力を集中する研修。痛みなどの強さを表すintenseとは区別する。",
+      "toeicExamples": [
+        {
+          "english": "The training program requires intensive study over a period of six months.",
+          "japanese": "その研修プログラムは、6ヶ月間にわたる集中的な学習を必要とします。"
+        },
+        {
+          "english": "We need to conduct an intensive review of the project's financial status.",
+          "japanese": "私たちはプロジェクトの財務状況を徹底的に見直す必要があります。"
+        },
+        {
+          "english": "The company is investing in intensive research and development.",
+          "japanese": "その会社は集中的な研究開発に投資しています。"
+        },
+        {
+          "english": "An intensive care unit (ICU) provides critical care for patients.",
+          "japanese": "集中治療室（ICU）は、重症患者に高度な治療を提供します。"
+        }
+      ],
+      "englishDefinition": "requiring a lot of effort or attention; thorough and detailed.",
+      "japaneseTranslation": "集中的な、徹底的な"
+    }
+  },
+  "simultaneously": {
+    "updatedAt": "2026-09-18",
+    "method": "ai-assisted",
+    "note": "simul + tenereという未裏付けの語源を除去。同時に起きる対象が明確な例文へ変更。",
+    "sources": [
+      "https://dictionary.cambridge.org/dictionary/english/simultaneously"
+    ],
+    "detail": {
+      "word": "simultaneously",
+      "pronunciation": "/ˌsɪməlˈteɪniəsli/",
+      "meanings": [
+        {
+          "partOfSpeech": "副詞",
+          "meaning": "同時に、一斉に。複数の物事が同じ時間に行われる様子を表します。",
+          "detailedMeanings": [
+            {
+              "number": 1,
+              "definition": "同じ時間に行われる",
+              "example": "The two events happened simultaneously.",
+              "exampleJapanese": "その二つの出来事は同時に起こった。",
+              "context": "出来事や行動が同時に発生する状況",
+              "frequency": "",
+              "synonyms": [
+                "concurrently",
+                "at the same time",
+                "together"
+              ],
+              "grammarPattern": "simultaneously with A"
+            },
+            {
+              "number": 2,
+              "definition": "並行して行われる",
+              "example": "The software can perform several tasks simultaneously.",
+              "exampleJapanese": "そのソフトウェアは複数のタスクを同時に実行できる。",
+              "context": "機能や処理が同時に進行する状況",
+              "frequency": "",
+              "synonyms": [
+                "at once",
+                "in parallel"
+              ],
+              "grammarPattern": "simultaneously"
+            }
+          ]
+        }
+      ],
+      "wordForms": [
+        {
+          "form": "simultaneous",
+          "type": "形容詞"
+        },
+        {
+          "form": "simultaneity",
+          "type": "名詞"
+        }
+      ],
+      "synonyms": [
+        "concurrently",
+        "at the same time",
+        "together",
+        "at once",
+        "in parallel"
+      ],
+      "nuance": "複数の行動や出来事が同じ時間に起こることを表す。",
+      "toeicExamples": [
+        {
+          "english": "The announcement was made simultaneously in Tokyo and London.",
+          "japanese": "その発表は東京とロンドンで同時に行われた。"
+        },
+        {
+          "english": "Two teams are testing the software simultaneously.",
+          "japanese": "二つのチームが同時にそのソフトウェアをテストしている。"
+        },
+        {
+          "english": "The system allows users to access data simultaneously from multiple locations.",
+          "japanese": "そのシステムは、ユーザーが複数の場所から同時にデータにアクセスすることを可能にする。"
+        },
+        {
+          "english": "The two stores will open simultaneously on Monday.",
+          "japanese": "その二店舗は月曜日に同時に開店する予定だ。"
+        }
+      ],
+      "englishDefinition": "Happening, existing, or done at the same time.",
+      "japaneseTranslation": "同時に",
+      "collocations": [
+        "at the same time",
+        "happened simultaneously",
+        "perform simultaneously"
+      ]
+    }
+  },
+  "absent": {
+    "updatedAt": "2026-09-18",
+    "method": "ai-assisted",
+    "note": "the absent ofという誤文を修正。形容詞と動詞の発音、名詞absenceを区別。",
+    "sources": [
+      "https://dictionary.cambridge.org/dictionary/english/absent"
+    ],
+    "detail": {
+      "word": "absent",
+      "pronunciation": "形容詞 /ˈæbsənt/、動詞 /æbˈsent/",
+      "meanings": [
+        {
+          "partOfSpeech": "形容詞",
+          "meaning": "欠席している、不在である。存在しない、欠けている。",
+          "detailedMeanings": [
+            {
+              "number": 1,
+              "definition": "学校や仕事などを休んでいる。",
+              "example": "He was absent from school yesterday.",
+              "exampleJapanese": "彼は昨日学校を欠席しました。",
+              "context": "学校や職場での出欠確認",
+              "frequency": "",
+              "synonyms": [
+                "away",
+                "missing",
+                "out"
+              ],
+              "grammarPattern": "absent from ~"
+            },
+            {
+              "number": 2,
+              "definition": "あるべき場所や状況にない。",
+              "example": "The necessary ingredient was absent from the recipe.",
+              "exampleJapanese": "そのレシピには必要な材料がありませんでした。",
+              "context": "物事の構成要素や状態の説明",
+              "frequency": "",
+              "synonyms": [
+                "lacking",
+                "missing",
+                "wanting"
+              ],
+              "grammarPattern": "absent from ~"
+            }
+          ]
+        },
+        {
+          "partOfSpeech": "動詞",
+          "meaning": "（公の場から）身を引く、欠席する。",
+          "detailedMeanings": [
+            {
+              "number": 1,
+              "definition": "会議や集会などに意図的に出席しない。",
+              "example": "She decided to absent herself from the meeting.",
+              "exampleJapanese": "彼女はその会議を欠席することにしました。",
+              "context": "フォーマルな場での欠席表明",
+              "frequency": "",
+              "synonyms": [
+                "avoid",
+                "shun"
+              ],
+              "grammarPattern": "absent oneself from ~"
+            }
+          ]
+        }
+      ],
+      "wordForms": [
+        {
+          "form": "absently",
+          "type": "副詞"
+        },
+        {
+          "form": "absentee",
+          "type": "名詞"
+        },
+        {
+          "form": "absence",
+          "type": "名詞（不在・欠如）"
+        }
+      ],
+      "synonyms": [
+        "missing",
+        "lacking",
+        "away",
+        "out",
+        "wanting"
+      ],
+      "nuance": "「欠席」は物理的にいないことを、「欠如」は本来あるべきものが存在しないことを指します。",
+      "toeicExamples": [
+        {
+          "english": "All employees are required to attend the mandatory training session; no one will be permitted to be absent.",
+          "japanese": "全従業員は必須のトレーニングセッションに参加する必要があります。誰も欠席することは許可されません。"
+        },
+        {
+          "english": "Please notify the office if you will be absent due to illness.",
+          "japanese": "病気のため欠席する場合は、事務所にご連絡ください。"
+        },
+        {
+          "english": "Clear guidelines were absent from the project plan.",
+          "japanese": "そのプロジェクト計画には明確な指針が欠けていた。"
+        },
+        {
+          "english": "He was absent from work for three days last week.",
+          "japanese": "彼は先週、仕事を3日間休みました。"
+        }
+      ],
+      "englishDefinition": "not present in a place, at an occasion, or as part of something.",
+      "japaneseTranslation": "欠席の、不在の、欠けている",
+      "etymology": "ラテン語のab（離れて）とesse（いる）が語源で、「離れている」状態から「不在の」「欠けている」という意味になりました。",
+      "collocations": [
+        "be absent from",
+        "absent without leave"
+      ]
+    }
+  },
+  "absorption": {
+    "updatedAt": "2026-09-18",
+    "method": "ai-assisted",
+    "note": "吸収と吸着adsorptionを区別し、発音のp脱落を修正。不明確なmarket absorption例文を置換。",
+    "sources": [
+      "https://dictionary.cambridge.org/dictionary/english/absorption"
+    ],
+    "detail": {
+      "word": "absorption",
+      "pronunciation": "/əbˈzɔːrpʃən/",
+      "meanings": [
+        {
+          "partOfSpeech": "名詞",
+          "meaning": "吸収、没頭、組織への統合。",
+          "detailedMeanings": [
+            {
+              "number": 1,
+              "definition": "液体や気体が他の物質に吸い込まれること。",
+              "example": "The sponge's absorption of water was remarkable.",
+              "exampleJapanese": "そのスポンジの吸水性は目覚ましかった。",
+              "context": "物理現象、化学現象",
+              "frequency": "",
+              "synonyms": [
+                "soaking up"
+              ],
+              "grammarPattern": "absorption of A"
+            },
+            {
+              "number": 2,
+              "definition": "ある物事に深く関心を持ち、集中している状態。",
+              "example": "His absorption in his work was complete.",
+              "exampleJapanese": "彼は仕事に完全に没頭していた。",
+              "context": "精神状態、活動",
+              "frequency": "",
+              "synonyms": [
+                "immersion",
+                "engrossment",
+                "preoccupation"
+              ],
+              "grammarPattern": "absorption in A"
+            },
+            {
+              "number": 3,
+              "definition": "組織が別の組織に取り込まれ、一体になること。",
+              "example": "The absorption of the smaller company by the larger one was finalized.",
+              "exampleJapanese": "その小規模企業の吸収合併は最終決定された。",
+              "context": "ビジネス、経済",
+              "frequency": "",
+              "synonyms": [
+                "acquisition",
+                "takeover"
+              ],
+              "grammarPattern": "absorption of A by B"
+            }
+          ]
+        }
+      ],
+      "wordForms": [
+        {
+          "form": "absorb",
+          "type": "動詞"
+        },
+        {
+          "form": "absorbent",
+          "type": "形容詞"
+        },
+        {
+          "form": "absorbingly",
+          "type": "副詞"
+        }
+      ],
+      "synonyms": [
+        "immersion",
+        "engrossment",
+        "integration"
+      ],
+      "nuance": "液体や気体が吸い込まれる物理的な意味合いと、精神的に深く入り込む意味合い、そしてビジネスでの買収の意味合いがある。",
+      "toeicExamples": [
+        {
+          "english": "The material has excellent absorption properties for liquids.",
+          "japanese": "その素材は液体に対する優れた吸収性を持っている。"
+        },
+        {
+          "english": "The new coating reduces the absorption of water.",
+          "japanese": "新しいコーティングは水の吸収を抑える。"
+        },
+        {
+          "english": "His absorption in the complex problem prevented him from noticing the time.",
+          "japanese": "複雑な問題への彼の没頭は、彼が時間経過に気づかないようにさせた。"
+        },
+        {
+          "english": "The absorption of new technology is crucial for our growth.",
+          "japanese": "新技術の吸収は私たちの成長にとって極めて重要である。"
+        }
+      ],
+      "englishDefinition": "The process or action of absorbing something, or the state of being absorbed.",
+      "japaneseTranslation": "吸収、没頭、統合",
+      "etymology": "ラテン語の 'absorbere'（吸い込む）に由来し、'ab-'（離れて）と 'sorbere'（吸う）が組み合わさってできた言葉です。",
+      "collocations": [
+        "high absorption",
+        "water absorption",
+        "complete absorption"
+      ]
+    }
+  },
+  "acclimate": {
+    "updatedAt": "2026-09-18",
+    "method": "ai-assisted",
+    "note": "動詞の発音を修正。acclivis（上り坂）由来という裏付けのない語源を除去。",
+    "sources": [
+      "https://assets.cambridge.org/97805211/52532/excerpt/9780521152532_excerpt.pdf"
+    ],
+    "detail": {
+      "word": "acclimate",
+      "pronunciation": "/ˈækləmeɪt/",
+      "meanings": [
+        {
+          "partOfSpeech": "動詞",
+          "meaning": "新しい環境や状況に慣れる、順応させる。",
+          "detailedMeanings": [
+            {
+              "number": 1,
+              "definition": "（人や動植物が）新しい環境に慣れる。",
+              "example": "The plants will need time to acclimate to the new climate.",
+              "exampleJapanese": "その植物は新しい気候に慣れるのに時間がかかるでしょう。",
+              "context": "自然環境や気候への適応",
+              "frequency": "",
+              "synonyms": [
+                "adapt",
+                "adjust",
+                "get used to"
+              ],
+              "grammarPattern": "acclimate to something"
+            },
+            {
+              "number": 2,
+              "definition": "（人や動植物を）新しい環境に慣れさせる。",
+              "example": "We need to acclimate the new puppy to its surroundings.",
+              "exampleJapanese": "新しい子犬をその環境に慣れさせる必要があります。",
+              "context": "人為的な環境への適応",
+              "frequency": "",
+              "synonyms": [
+                "habituate",
+                "familiarize"
+              ],
+              "grammarPattern": "acclimate someone/something to something"
+            }
+          ]
+        }
+      ],
+      "wordForms": [
+        {
+          "form": "acclimated",
+          "type": "過去形・過去分詞形"
+        },
+        {
+          "form": "acclimating",
+          "type": "現在分詞形"
+        },
+        {
+          "form": "acclimation",
+          "type": "名詞形"
+        }
+      ],
+      "synonyms": [
+        "adapt",
+        "adjust",
+        "accustom",
+        "habituate",
+        "orient"
+      ],
+      "nuance": "主に、身体的または心理的に、新しい環境や状況に徐々に適応していく過程を指します。",
+      "toeicExamples": [
+        {
+          "english": "Employees are given a week to acclimate to the new office environment.",
+          "japanese": "従業員は新しいオフィス環境に慣れるために1週間を与えられます。"
+        },
+        {
+          "english": "The expedition team had to acclimate to the high altitude before starting the climb.",
+          "japanese": "遠征隊は登攀を開始する前に高地順応しなければなりませんでした。"
+        },
+        {
+          "english": "It takes time for visitors to acclimate to the local customs and culture.",
+          "japanese": "訪問者が地元の習慣や文化に慣れるには時間がかかります。"
+        }
+      ],
+      "englishDefinition": "to get used to a new place or situation, or to make someone or something used to it",
+      "japaneseTranslation": "慣れる、順応する",
+      "collocations": [
+        "acclimate to the environment",
+        "acclimate to the climate",
+        "acclimate quickly"
+      ]
+    }
+  },
+  "aerial": {
+    "updatedAt": "2026-09-18",
+    "method": "ai-assisted",
+    "note": "aerial altitude／空中高度という不自然な表現を航空測量の例文へ置換。",
+    "sources": [
+      "https://dictionary.cambridge.org/dictionary/english/aerial"
+    ],
+    "detail": {
+      "word": "aerial",
+      "pronunciation": "/ˈeə.ri.əl/",
+      "meanings": [
+        {
+          "partOfSpeech": "形容詞",
+          "meaning": "空気中や空中に存在するさま。また、空中を移動するさま。",
+          "detailedMeanings": [
+            {
+              "number": 1,
+              "definition": "空中に、または空気中に存在する",
+              "example": "The engineers conducted an aerial survey of the site.",
+              "exampleJapanese": "技術者たちはその敷地の航空測量を行った。",
+              "context": "航空、気象",
+              "frequency": "",
+              "synonyms": [
+                "airborne"
+              ],
+              "grammarPattern": "aerial [noun]"
+            },
+            {
+              "number": 2,
+              "definition": "空中からの",
+              "example": "Aerial photography is used for mapping.",
+              "exampleJapanese": "空中写真は地図作成に使われる。",
+              "context": "地理、調査",
+              "frequency": "",
+              "synonyms": [
+                "from the air",
+                "overhead"
+              ],
+              "grammarPattern": "aerial [noun]"
+            }
+          ]
+        },
+        {
+          "partOfSpeech": "名詞",
+          "meaning": "アンテナ。",
+          "detailedMeanings": [
+            {
+              "number": 1,
+              "definition": "テレビやラジオなどの受信アンテナ",
+              "example": "We need to install a new aerial for better reception.",
+              "exampleJapanese": "より良い受信のために新しいアンテナを取り付ける必要がある。",
+              "context": "通信、家電",
+              "frequency": "",
+              "synonyms": [
+                "antenna"
+              ],
+              "grammarPattern": "an aerial"
+            }
+          ]
+        }
+      ],
+      "wordForms": [
+        {
+          "form": "aerials",
+          "type": "複数形"
+        }
+      ],
+      "synonyms": [
+        "airborne",
+        "overhead",
+        "antenna"
+      ],
+      "nuance": "空中や空気中に関連する事柄を表す形容詞、またはアンテナを指す名詞。",
+      "toeicExamples": [
+        {
+          "english": "The company specializes in aerial surveys of remote areas.",
+          "japanese": "その会社は遠隔地の空中測量に特化している。"
+        },
+        {
+          "english": "An aerial view of the city revealed its intricate layout.",
+          "japanese": "その都市の空中からの眺めは、その複雑な配置を明らかにした。"
+        },
+        {
+          "english": "The technician adjusted the aerial to improve the signal strength.",
+          "japanese": "技術者は信号強度を改善するためにアンテナを調整した。"
+        },
+        {
+          "english": "Aerial firefighting techniques are crucial in combating wildfires.",
+          "japanese": "空中消火技術は山火事の鎮圧において極めて重要である。"
+        }
+      ],
+      "englishDefinition": "Relating to, existing in, or carried through the air.",
+      "japaneseTranslation": "空中（の）、空気（の）、アンテナ"
+    }
+  },
+  "ambiance": {
+    "updatedAt": "2026-09-18",
+    "method": "ai-assisted",
+    "note": "ambianceとambienceの綴り・複数形の対応を明示。",
+    "sources": [
+      "https://dictionary.cambridge.org/dictionary/english/ambiance"
+    ],
+    "detail": {
+      "word": "ambiance",
+      "pronunciation": "/ˈæmbiəns/",
+      "meanings": [
+        {
+          "partOfSpeech": "名詞",
+          "meaning": "ある場所の雰囲気や、その場所が醸し出す独特の気分や感じのこと。特に、快適で心地よい雰囲気を指すことが多い。",
+          "detailedMeanings": [
+            {
+              "number": 1,
+              "definition": "雰囲気、気分",
+              "example": "The restaurant had a wonderful ambiance, with soft music and candlelight.",
+              "exampleJapanese": "そのレストランは、静かな音楽とキャンドルライトで、素晴らしい雰囲気だった。",
+              "context": "レストラン、ホテル、イベント会場などの場所の雰囲気について説明する際。",
+              "frequency": "",
+              "synonyms": [
+                "atmosphere",
+                "mood",
+                "vibe",
+                "feeling",
+                "aura"
+              ],
+              "grammarPattern": "the ambiance of [場所]"
+            }
+          ]
+        }
+      ],
+      "wordForms": [
+        {
+          "form": "ambiances",
+          "type": "複数形"
+        },
+        {
+          "form": "ambience",
+          "type": "別の綴り"
+        },
+        {
+          "form": "ambiences",
+          "type": "ambienceの複数形"
+        }
+      ],
+      "synonyms": [
+        "atmosphere",
+        "mood",
+        "vibe",
+        "feeling",
+        "aura"
+      ],
+      "nuance": "主に場所や状況が作り出す、心地よく、あるいは特徴的な雰囲気や気分を指す。単なる「雰囲気」よりも、その場の「空気感」や「感じ」に重点が置かれる。",
+      "toeicExamples": [
+        {
+          "english": "The hotel lobby is designed to create a relaxing ambiance for guests.",
+          "japanese": "そのホテルのロビーは、ゲストにリラックスできる雰囲気を作り出すようにデザインされている。"
+        },
+        {
+          "english": "We enjoyed the lively ambiance of the street market.",
+          "japanese": "私たちは、そのストリートマーケットの活気ある雰囲気を楽しんだ。"
+        },
+        {
+          "english": "The new cafe has a cozy ambiance that makes you want to stay for hours.",
+          "japanese": "新しいカフェは、何時間でもいたくなるような居心地の良い雰囲気を持っている。"
+        },
+        {
+          "english": "The ambiance of the concert hall contributed to the overall enjoyment of the performance.",
+          "japanese": "コンサートホールの雰囲気が、公演全体の楽しみを増幅させた。"
+        }
+      ],
+      "englishDefinition": "The character and atmosphere of a place.",
+      "japaneseTranslation": "雰囲気、気分",
+      "etymology": "フランス語のambiance（雰囲気、周囲）に由来し、ラテン語のambire（囲む、回る）が語源。その場所を取り巻く空気感を表す。",
+      "collocations": [
+        "cozy ambiance",
+        "relaxing ambiance",
+        "lively ambiance"
+      ]
+    }
+  },
+  "expenditure": {
+    "updatedAt": "2026-09-18",
+    "method": "ai-assisted",
+    "note": "浪費・大きな金額が必須という誤解を避け、支出・消費として説明。",
+    "sources": [
+      "https://dictionary.cambridge.org/dictionary/english/expenditure"
+    ],
+    "detail": {
+      "word": "expenditure",
+      "pronunciation": "/ɪkˈspendɪtʃər/",
+      "meanings": [
+        {
+          "partOfSpeech": "名詞",
+          "meaning": "支出とは、商品やサービスを購入するために使われたお金のことです。特に、事業や政府機関などの大きな組織における費用を指すことが多いです。",
+          "detailedMeanings": [
+            {
+              "number": 1,
+              "definition": "支出、出費",
+              "example": "The company's annual expenditure on research and development has increased significantly.",
+              "exampleJapanese": "その会社の研究開発への年間支出は大幅に増加した。",
+              "context": "ビジネス、経済",
+              "frequency": "",
+              "synonyms": [
+                "spending",
+                "outlay",
+                "expense",
+                "cost"
+              ],
+              "grammarPattern": "expenditure on something"
+            },
+            {
+              "number": 2,
+              "definition": "時間や労力などを費やすこと。",
+              "example": "Excessive expenditure of energy can lead to exhaustion.",
+              "exampleJapanese": "過度のエネルギー消費は疲労につながる可能性がある。",
+              "context": "一般的な消費",
+              "frequency": "",
+              "synonyms": [
+                "use",
+                "consumption"
+              ],
+              "grammarPattern": "expenditure of something"
+            }
+          ]
+        }
+      ],
+      "wordForms": [
+        {
+          "form": "expend",
+          "type": "動詞"
+        },
+        {
+          "form": "expended",
+          "type": "動詞（過去形・過去分詞）"
+        },
+        {
+          "form": "expending",
+          "type": "動詞（現在分詞）"
+        },
+        {
+          "form": "expendable",
+          "type": "形容詞"
+        }
+      ],
+      "synonyms": [
+        "spending",
+        "outlay",
+        "expense",
+        "cost",
+        "disbursement"
+      ],
+      "nuance": "支出・出費を表す比較的フォーマルな語。金額が大きいことや無駄遣いであることを、それだけで意味するわけではない。",
+      "toeicExamples": [
+        {
+          "english": "Please submit a detailed report of all travel expenditures.",
+          "japanese": "すべての出張経費の詳細な報告書を提出してください。"
+        },
+        {
+          "english": "The government announced new measures to control public expenditure.",
+          "japanese": "政府は公共支出を抑制するための新たな措置を発表した。"
+        },
+        {
+          "english": "We need to review our marketing expenditure to ensure it is effective.",
+          "japanese": "マーケティング支出が効果的であることを確認するために、見直しが必要です。"
+        },
+        {
+          "english": "The expenditure on infrastructure projects is expected to boost the economy.",
+          "japanese": "インフラプロジェクトへの支出は経済を活性化すると予想される。"
+        }
+      ],
+      "englishDefinition": "The action of spending funds, or the amount of money spent.",
+      "japaneseTranslation": "支出、出費、消費",
+      "etymology": "ラテン語の 'expendere'（重さを量る、支払う）に由来し、「外へ（ex-）重さを量る（pendere）」というイメージから、お金を支払う、支出するという意味になりました。",
+      "collocations": [
+        "total expenditure",
+        "annual expenditure",
+        "reduce expenditure"
+      ]
+    }
+  },
+  "preliminary": {
+    "updatedAt": "2026-09-18",
+    "method": "ai-assisted",
+    "note": "文型を掲載例文に対応させ、類義語欄の自身の語を除去。",
+    "sources": [
+      "https://dictionary.cambridge.org/dictionary/english/preliminary"
+    ],
+    "detail": {
+      "word": "preliminary",
+      "pronunciation": "/prɪˈlɪmɪnəri/",
+      "meanings": [
+        {
+          "partOfSpeech": "形容詞",
+          "meaning": "事前の、予備の、準備の。",
+          "detailedMeanings": [
+            {
+              "number": 1,
+              "definition": "正式なものや主要なものの前に行われる。",
+              "example": "We had a preliminary discussion before the main meeting.",
+              "exampleJapanese": "本会議の前に予備的な話し合いをした。",
+              "context": "会議やイベントの前の段階",
+              "frequency": "",
+              "synonyms": [
+                "preparatory",
+                "initial",
+                "introductory"
+              ],
+              "grammarPattern": "preliminary + 名詞（discussion / reportなど）"
+            },
+            {
+              "number": 2,
+              "definition": "ある行動や出来事の前に、準備として行われる。",
+              "example": "The preliminary results of the study were promising.",
+              "exampleJapanese": "その研究の予備的な結果は有望だった。",
+              "context": "調査や研究の初期段階",
+              "frequency": "",
+              "synonyms": [
+                "initial",
+                "early"
+              ],
+              "grammarPattern": "preliminary findings/results/steps"
+            }
+          ]
+        },
+        {
+          "partOfSpeech": "名詞",
+          "meaning": "予備的なもの、前置き。",
+          "detailedMeanings": [
+            {
+              "number": 1,
+              "definition": "正式なものや主要なものの前に行われる事柄。",
+              "example": "The meeting served as a preliminary to the main negotiations.",
+              "exampleJapanese": "その会議は主要な交渉への前置きとなった。",
+              "context": "イベントや交渉の導入部分",
+              "frequency": "",
+              "synonyms": [
+                "prelude",
+                "opening",
+                "introduction"
+              ],
+              "grammarPattern": "a preliminary to something"
+            }
+          ]
+        }
+      ],
+      "wordForms": [
+        {
+          "form": "preliminaries",
+          "type": "複数形"
+        }
+      ],
+      "synonyms": [
+        "preparatory",
+        "initial",
+        "introductory",
+        "first",
+        "early"
+      ],
+      "nuance": "「preliminary」は、本格的なものや主要なものの前に、準備段階として行われることを示します。単なる「最初の」というよりは、その後の展開への「足がかり」や「下準備」といったニュアンスがあります。",
+      "toeicExamples": [
+        {
+          "english": "Please submit your preliminary report by Friday.",
+          "japanese": "予備報告書を金曜日までに提出してください。"
+        },
+        {
+          "english": "The company conducted a preliminary survey of the market.",
+          "japanese": "その会社は市場の予備調査を実施した。"
+        },
+        {
+          "english": "The preliminary rounds of the competition will begin next week.",
+          "japanese": "大会の予選は来週始まる。"
+        },
+        {
+          "english": "We need to make some preliminary arrangements before the guests arrive.",
+          "japanese": "ゲストが到着する前に、いくつかの準備を整える必要がある。"
+        }
+      ],
+      "englishDefinition": "Happening or done before the main or important event.",
+      "japaneseTranslation": "予備的な、事前の、準備の",
+      "etymology": "ラテン語の「prae」（前に）と「limen」（敷居、入り口）が語源です。文字通り「入り口の前」という意味から、物事の始まりや準備段階を指すようになりました。",
+      "collocations": [
+        "preliminary discussion",
+        "preliminary results",
+        "preliminary stage"
+      ]
+    }
+  }
+}

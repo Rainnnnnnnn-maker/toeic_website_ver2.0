@@ -1,6 +1,5 @@
 import { getAllWords } from "@/data/words";
 import { getPublishedGuideArticles } from "@/data/guide-articles";
-import { isAdsenseReviewMode } from "@/lib/adsense-review";
 
 const BASE_URL = "https://www.toeic-words.com";
 const WORD_LIST_LASTMOD = "2026-04-26";
@@ -21,8 +20,7 @@ const guideLastmod = formatLastmod(
 );
 
 export async function GET() {
-  // AdSense審査モード中は単語詳細ページ(noindex対象)をsitemapに載せない
-  const allWords = isAdsenseReviewMode() ? [] : await getAllWords();
+  const allWords = await getAllWords();
 
   let xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

@@ -419,8 +419,7 @@ function MeaningDetails({
 
                   <div className="flex flex-wrap gap-1.5 text-xs">
                     <span className="text-slate-400">場面: {d.context}</span>
-                    <span className="text-slate-300">|</span>
-                    <span className="text-slate-400">頻度: {d.frequency}</span>
+                    {/* AI-generated frequency labels have no corpus evidence. */}
                   </div>
                 </div>
               ))}

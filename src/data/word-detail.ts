@@ -1,4 +1,5 @@
 import "server-only";
+import { getEditorialWord } from "@/data/word-editorial";
 import { GoogleGenAI } from "@google/genai";
 import { getWordBySlug } from "@/data/words";
 import { getWordDetails as getRedisWordDetails, setWordDetails as setRedisWordDetails } from "@/lib/wordCache";
@@ -24,6 +25,10 @@ async function fetchWordDetailFromGemini(term: string): Promise<WordDetails> {
 export async function getWordDetailFresh(slug: string): Promise<WordDetails | null> {
   const entry = await getWordBySlug(slug);
   if (!entry) return null;
+
+  // Version-controlled corrections survive Redis expiry and Gemini regeneration.
+  const editorial = getEditorialWord(entry.slug);
+  if (editorial) return structuredClone(editorial.detail);
 
   // 1. Try Upstash Redis first (L2 Cache)
   try {

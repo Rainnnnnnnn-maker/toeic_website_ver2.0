@@ -67,3 +67,6 @@ docs/archive/plans/
 /cypress/videos/
 /cypress/downloads/
 /cypress/results/
+
+# Local content-audit snapshots and browser evidence
+/.artifacts/

@@ -10,7 +10,6 @@ import TodayRecommendedWordsClient from "@/components/features/words/TodayRecomm
 import { SemanticSearchLauncher } from "@/components/features/words/SemanticSearchLauncher";
 import { getLatestGuideArticles,PUBLISHED_GUIDE_ARTICLE_COUNT} from "@/data/guide-articles";
 import { TODAY_WORDS_COUNT } from "@/lib/word-select";
-import { AdSenseScript } from "@/components/common/AdSenseScript";
 
 export const metadata: Metadata = {
   title: {
@@ -246,7 +245,6 @@ export default function Home() {
 
   return (
     <div className="relative min-h-screen w-full flex justify-center py-8 px-4 bg-[radial-gradient(circle_at_top,#bae6fd_0,#eff6ff_45%,#f8fafc_100%)] sm:py-12 sm:px-6 lg:py-8 lg:px-8 lg:pb-16">
-      <AdSenseScript />
       <script
         id="ldjson-website"
         type="application/ld+json"
@@ -290,6 +288,15 @@ export default function Home() {
             </Link>
           </div>
         </header>
+        <section aria-labelledby="first-study-heading" className="rounded-2xl border border-blue-100 bg-blue-50/60 p-5">
+          <h2 id="first-study-heading" className="text-base font-bold text-slate-900">はじめての方へ：まず1問、理由まで確認</h2>
+          <p className="mt-2 text-sm leading-relaxed text-slate-700">単語の意味は分かるのに、文の中で選べない方へ。自作問題で迷った理由を確認し、単語・例文・復習へ進めます。ガイドと単語の閲覧、お気に入り保存は登録不要です。</p>
+          <div className="mt-3 flex flex-wrap gap-3 text-sm font-semibold">
+            <Link href="/guide/part5-frequent-words" prefetch={false} className="rounded-lg bg-blue-700 px-4 py-3 text-white hover:bg-blue-800 focus-visible:ring-2 focus-visible:ring-blue-500">Part 5の5問に挑戦</Link>
+            <Link href="/guide/confusing-word-pairs" prefetch={false} className="rounded-lg border border-blue-200 bg-white px-4 py-3 text-blue-800 hover:bg-blue-50 focus-visible:ring-2 focus-visible:ring-blue-500">紛らわしい語を比較</Link>
+            <Link href="/guide/forgetting-curve" prefetch={false} className="rounded-lg border border-blue-200 bg-white px-4 py-3 text-blue-800 hover:bg-blue-50 focus-visible:ring-2 focus-visible:ring-blue-500">7日間の復習例を見る</Link>
+          </div>
+        </section>
         <SemanticSearchLauncher />
         <Suspense fallback={<TodayRecommendedWordsFallback />}>
           <TodayRecommendedWordsSection />
@@ -308,7 +315,7 @@ export default function Home() {
                 <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center text-xl font-bold mb-2">1</div>
                 <h3 className="text-lg font-bold text-slate-800">ビジネス文脈に絞った詳しい解説</h3>
                 <p className="text-sm text-slate-600 leading-relaxed">
-                  単なる日本語訳だけでなく、語源、微妙なニュアンスの違い、ビジネスシーンでの具体的な使われ方まで踏み込んで解説。丸暗記に頼らない「生きた英語」が身につきます。
+                  単なる日本語訳だけでなく、語源、微妙なニュアンスの違い、ビジネスシーンでの具体的な使われ方まで踏み込んで解説。単語を文の中でどう使うかを確認できます。
                 </p>
               </div>
               <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col gap-3">

@@ -395,7 +395,7 @@ export default async function WordsListPage() {
               </h2>
             </div>
             <p className="max-w-md text-sm leading-relaxed text-slate-500 sm:text-right">
-              SEOと探しやすさを両立するため、すべての単語をレベル別・アルファベット順で掲載しています。
+              一覧から探したいときは、レベルを開くとアルファベット順で収録語を確認できます。
             </p>
           </div>
 

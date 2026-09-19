@@ -1,3 +1,4 @@
+import { getEditorialWord } from "@/data/word-editorial";
 import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -7,7 +8,6 @@ import { Metadata } from "next";
 import { getWordBySlug, getAllWords, getRelatedWords } from "@/data/words";
 import { getWordDetail } from "@/data/word-detail";
 import { generateWordDetailJsonLd } from "@/lib/json-ld";
-import { isAdsenseReviewMode } from "@/lib/adsense-review";
 import Loading from "./loading";
 
 // Vercel Hobbyプランの制限対策 (60秒)
@@ -97,10 +97,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       absolute: title,
     },
     description,
-    // AdSense審査モード中は単語詳細ページを検索インデックスから外す
-    ...(isAdsenseReviewMode() && {
-      robots: { index: false, follow: true },
-    }),
     openGraph: {
       title,
       description,
@@ -145,6 +141,7 @@ async function WordDetailFetcher({ word }: { word: string }) {
   // Server Component内でデータを取得（L1 Cache: Next.js Data Cache）
   // データがない場合は生成処理が走る（L2: Redis -> L3: Gemini）
   const detailData = await getWordDetail(word);
+  const editorial = getEditorialWord(word);
   const wordEntry = await getWordBySlug(word);
 
   // データ取得後にJSON-LDを生成（ストリーミングの一部として送信）
@@ -215,6 +212,17 @@ async function WordDetailFetcher({ word }: { word: string }) {
         relatedWords={relatedWords} 
         level={wordEntry?.level}
       />
+      {editorial && (
+        <aside className="mt-4 rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-700">
+          <h2 className="font-semibold">解説の更新について</h2>
+          <p className="mt-2">{editorial.updatedAt}：{editorial.note}</p>
+          <p className="mt-2 text-xs">AIを利用して修正した解説です。専門家の監修済みを意味するものではありません。</p>
+          <ul className="mt-2 list-inside list-disc">
+            {editorial.sources.map((url) => <li key={url}><a href={url} target="_blank" rel="noopener noreferrer" className="text-blue-700 underline">語義・用法の参考資料</a></li>)}
+          </ul>
+          <Link href="/contact" prefetch={false} className="mt-2 inline-block text-blue-700 underline">内容の誤りを報告</Link>
+        </aside>
+      )}
     </>
   );
 }

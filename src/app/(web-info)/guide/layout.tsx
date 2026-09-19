@@ -1,14 +1,4 @@
-import { AdSenseScript } from "@/components/common/AdSenseScript";
-
-export default function GuideLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return (
-    <>
-      <AdSenseScript />
-      {children}
-    </>
-  );
+/** Shared shell only. Advertising must never be inherited by draft/error pages. */
+export default function GuideLayout({ children }: { children: React.ReactNode }) {
+  return <>{children}</>;
 }

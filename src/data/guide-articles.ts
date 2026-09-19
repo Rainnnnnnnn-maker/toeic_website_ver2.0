@@ -1,6 +1,8 @@
+import { GUIDE_LESSONS } from "./guide-lessons";
 import { TODAY_WORDS_COUNT } from "@/lib/word-select";
 
 export type ArticleBlock =
+  | { type: "exercise"; question: string; options: string[]; answer: number; explanation: string }
   | { type: "p"; text: string }
   | { type: "h2"; text: string }
   | { type: "h3"; text: string }
@@ -28,19 +30,20 @@ export type GuideArticle = {
   blocks: ArticleBlock[];
   relatedSlugs?: string[];
   sources?: GuideSource[];
-  /** false の記事は内容確認が終わるまで一覧・sitemap・検索対象から外す。 */
-  indexable?: boolean;
+  /** 下書きは詳細URL・一覧・関連記事・sitemapのすべてから除外する。 */
+  status: "published" | "draft";
 };
 
-export const GUIDE_ARTICLES: GuideArticle[] = [
+const BASE_GUIDE_ARTICLES: GuideArticle[] = [
   {
     slug: "toeic-vocab-by-score",
     title: "TOEIC スコア別 単語学習戦略｜600・730・860 点の優先順位",
     description:
       "TOEIC の目標スコアごとに、どの層の単語を優先するか、派生語やコロケーションをどこまで学ぶかを整理しました。600 点・730 点・860 点それぞれの学習順序を解説します。",
+    status: "published",
     category: "学習戦略",
     publishedAt: "2026-04-26",
-    updatedAt: "2026-08-02",
+    updatedAt: "2026-09-18",
     estimatedReadingMin: 7,
     blocks: [
       {
@@ -122,7 +125,7 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
           "未知語を「全パート共通の基礎語」「Part 別頻出語」「専門語」に分類する",
           "基礎語から順に、当サイトの「学習モード」でランダム出題により暗記を進める",
           "覚えにくい単語は「お気に入り」に登録し、間隔を空けて数日後・1 週間後に復習する",
-          "1 ヶ月ごとに模試を再受験して、語彙の伸びをスコアで確認する",
+          "一定期間ごとに未使用の模試で確認し、得点と語彙が原因の誤答数を記録する。得点の変化だけを語彙学習の効果とは判断しない",
         ],
       },
       {
@@ -151,9 +154,10 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     title: "TOEIC Part 5 の語彙・語形変化を解くための確認手順",
     description:
       "TOEIC Part 5（短文穴埋め問題）に向けて、品詞・語彙・文法を見分ける手順、派生語の覚え方、練習時の時間配分例をまとめました。",
+    status: "published",
     category: "Part 別対策",
     publishedAt: "2026-04-26",
-    updatedAt: "2026-08-02",
+    updatedAt: "2026-09-18",
     estimatedReadingMin: 6,
     blocks: [
       {
@@ -178,10 +182,10 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
       {
         type: "ul",
         items: [
-          "空所の直後が名詞 → 形容詞 or 名詞（複合名詞）",
-          "空所の直後が動詞 → 副詞",
-          "be 動詞・冠詞の直後 → 名詞 or 形容詞",
-          "完全な文の前後 → 副詞（修飾要素）",
+          "the ___ report のように冠詞と名詞の間なら、形容詞や名詞の修飾語を検討する。構造によっては分詞なども入る",
+          "___ increases productivity. では空所が主語なので名詞等を検討する。The team ___ reviews reports. なら reviews を修飾する副詞が候補になる",
+          "be 動詞の後は補語の形容詞・名詞だけでなく、進行形や受動態を作る分詞の場合もある",
+          "文の前後に空所がある場合は、修飾語か、節をつなぐ語かを句読点と構造から確認する",
         ],
       },
       {
@@ -239,7 +243,7 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
         type: "ol",
         items: [
           "まず時間を測り、30 問を解くのにかかる現在の時間を把握する",
-          "選択肢を見て品詞問題と判断したら、文の意味は読まず構造のみで判断",
+          "品詞問題では空所前後の構造から候補を絞り、文全体の意味と一致するか確認する",
           "語彙問題で 30 秒以上悩んだら印をつけて次へ進む",
           "Part 6・7 に時間を残すことを最優先",
         ],
@@ -264,9 +268,10 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     title: "忘却曲線と間隔反復を TOEIC 単語復習に取り入れる方法",
     description:
       "忘却曲線を固定の忘却率として扱わず、間隔を空けて思い出す練習を TOEIC 単語復習へ取り入れる方法を解説します。お気に入り・復習モードの使い方も紹介します。",
+    status: "published",
     category: "学習法",
     publishedAt: "2026-04-26",
-    updatedAt: "2026-08-02",
+    updatedAt: "2026-09-18",
     estimatedReadingMin: 6,
     blocks: [
       {
@@ -318,7 +323,7 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
         type: "ul",
         items: [
           "10 分：当日の新出単語 10 語をインプット（意味・例文・音声をセットで）",
-          "10 分：前日に覚えた単語の復習（学習モードでランダム出題）",
+          "10 分：前日に覚えた単語を、お気に入り一覧や手元の記録から選んで復習",
           "5 分：3 日前・1 週間前・2 週間前の単語をフラッシュチェック",
           "5 分：覚えにくい単語を「お気に入り」に追加し、後日重点復習",
         ],
@@ -328,16 +333,16 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
         type: "ol",
         items: [
           `「今日のおすすめ ${TODAY_WORDS_COUNT} 単語」で毎日 ${TODAY_WORDS_COUNT} 語を確認（同じ日には同じ語が表示される）`,
-          "詰まった単語は「お気に入り」に追加（ローカル保存）",
+          "詰まった単語は「お気に入り」に追加（ゲストは端末内、ログイン中はアカウントに保存）",
           "「学習モード」でランダム出題し、覚えていない単語にチェック",
           "「復習モード」でお気に入り単語のみを集中学習（ログインが必要）",
-          "1 週間後に同じ単語を再度「学習モード」で確認し、定着度をチェック",
+          "1 週間後にお気に入り一覧や学習記録から同じ語を開き、答えを見る前に意味を確認する（学習モードのランダム出題では同じ語は保証されない）",
         ],
       },
       { type: "h2", text: "覚えにくい単語の例" },
       {
         type: "wordLinks",
-        intro: "発音と意味のギャップが大きく、定着しにくい代表例：",
+        intro: "綴り・発音・意味を組み合わせて練習する収録語の例：",
         words: [
           "thorough",
           "subsequent",
@@ -383,9 +388,10 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     title: "TOEIC 学習で確認したいビジネス語彙｜契約・会議・メール表現",
     description:
       "契約・会議・メール・経理の 4 領域に分け、ビジネス文書や会話を読むときに確認したい語と基本的な組み合わせを整理しました。",
+    status: "published",
     category: "語彙集",
     publishedAt: "2026-04-26",
-    updatedAt: "2026-08-02",
+    updatedAt: "2026-09-18",
     estimatedReadingMin: 7,
     blocks: [
       {
@@ -503,9 +509,10 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     title: "当サイトの単語選定基準と推奨学習フロー",
     description:
       "TOEIC 重要単語で使う「important / mid / high」の 3 段階が当サイト独自の学習目安であること、AI 解説の生成・確認方法、ランクの使い方を説明します。",
+    status: "published",
     category: "サイト紹介",
     publishedAt: "2026-04-26",
-    updatedAt: "2026-08-02",
+    updatedAt: "2026-09-18",
     estimatedReadingMin: 5,
     blocks: [
       {
@@ -551,20 +558,20 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
       {
         type: "callout",
         tone: "info",
-        text: "重複や誤分類が見つかった場合は、随時メンテナンスを行っています。最新の更新内容は README および技術ドキュメントの「更新履歴」で確認できます。",
+        text: "ランクは学習の優先順位を決める補助です。分類への疑問や解説の誤りは、お問い合わせから単語名と該当箇所をお知らせください。",
       },
       { type: "h2", text: "AI 解説の生成と検証" },
       {
         type: "p",
-        text: "各単語の詳細ページに表示される意味・ニュアンス・例文は、Google Gemini（gemini-2.5-flash-lite）で生成し、Next.js の Data Cache と Upstash Redis を利用して配信しています。全ページの人手確認が完了しているわけではなく、次の手順で形式確認と段階的な修正を行っています。",
+        text: "各単語の意味・ニュアンス・例文にはAI生成を利用しています。形式の自動確認と内容の確認は別であり、全ページを人が確認したものではありません。誤りが見つかった場合は修正内容と対象を記録し、再生成で修正が失われないよう管理します。",
       },
       {
         type: "ol",
         items: [
-          "TOEIC のビジネス文脈に限定したプロンプト設計（一般会話例文を排除）",
-          "出力後の自動検証（必須フィールド・例文数・形式の整合性チェック）",
+          "仕事や日常の場面を想定して解説・例文を生成",
+          "出力後にデータ形式を自動確認（語義・英文の正しさを保証するものではありません）",
           "優先度の高いページや指摘を受けたページを運営者が目視確認",
-          "誤りを確認した場合、対象キャッシュを更新して再生成内容を確認",
+          "誤りを確認した場合、修正内容を保存し、対象ページの表示を確認",
         ],
       },
       { type: "h2", text: "推奨学習フロー（レベル別）" },
@@ -595,7 +602,7 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
           "模試で間違えた語を優先し、必要に応じて high ランクまで範囲を広げる",
           "聞き流しモード（/today-words/listen）で耳からのインプットを強化",
           "ニュアンスや類義語の使い分けを詳細ページで確認",
-          "Part 7 模試で未知語が出た際は、ランダム検索（/words）から該当語を引き、その場で詳細を確認",
+          "Part 7 の練習で未知語が出たら、単語一覧の「英単語で探す」で検索し、文中の意味に合うか確認",
         ],
       },
       { type: "h2", text: "更新方針" },
@@ -628,9 +635,10 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     title: "TOEIC 試験当日の持ち物・流れ・時間配分まとめ",
     description:
       "TOEIC L&R 公開テスト当日の持ち物、午前／午後の公式スケジュール、Reading 75 分の時間配分例、会場での注意事項を公式案内に沿って整理しました。",
+    status: "published",
     category: "試験対策",
     publishedAt: "2026-04-26",
-    updatedAt: "2026-08-02",
+    updatedAt: "2026-09-18",
     estimatedReadingMin: 6,
     blocks: [
       {
@@ -757,35 +765,36 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     title: "TOEIC Part 7 の読み方とディスコースマーカーの確認",
     description:
       "TOEIC Part 7（読解）の文書と設問を読む手順、therefore、moreover、nevertheless など、文章の関係を示す表現の確認方法を解説します。",
+    status: "published",
     category: "Part 別対策",
     publishedAt: "2026-04-26",
-    updatedAt: "2026-08-02",
+    updatedAt: "2026-09-18",
     estimatedReadingMin: 7,
     blocks: [
       {
         type: "p",
         text: "TOEIC Part 7 は 54 問です。Reading 75 分にパート別の公式制限時間はないため、Part 5・6 を含む模試で自分の配分を決めます。本記事では、文書と設問を行き来する読み方と、文章の関係を示す表現を整理します。",
       },
-      { type: "h2", text: "Part 7 の構成と難度" },
+      { type: "h2", text: "Part 7 の構成と確認点" },
       {
         type: "table",
-        headers: ["セクション", "問題数", "文書数", "難度"],
+        headers: ["セクション", "問題数", "文書数", "確認点"],
         rows: [
-          ["Single Passage（単一文書）", "29 問", "10 文書", "★★☆"],
-          ["Double Passage（2 文書）", "10 問", "2 セット", "★★★"],
-          ["Triple Passage（3 文書）", "15 問", "3 セット", "★★★★"],
+          ["Single Passage（単一文書）", "29 問", "10 文書", "一つの文書内の根拠を探す"],
+          ["Double Passage（2 文書）", "10 問", "2 セット", "二つの文書の情報を照合"],
+          ["Triple Passage（3 文書）", "15 問", "3 セット", "三つの文書の情報を照合"],
         ],
       },
       { type: "h2", text: "速読の 3 原則" },
       { type: "h3", text: "原則 1：設問を先に読む" },
       {
         type: "p",
-        text: "本文を読み始める前に必ず設問に目を通し、何を問われるかを把握してから本文に入ります。設問のキーワード（人名、固有名詞、日付、金額など）を頭に入れると、本文中で該当箇所を見つけた瞬間に解答できます。",
+        text: "設問を先に確認する方法を試す場合は、誰・いつ・何を聞かれているかを整理してから本文を読みます。同じ単語があるだけでは正解とは限りません。依頼と決定、過去と予定、否定表現を区別して根拠を探します。",
       },
       { type: "h3", text: "原則 2：トピックセンテンスを優先" },
       {
         type: "p",
-        text: "英語の論理構造では、各段落の最初の 1〜2 文に主題が置かれることが多く、これを読むだけで段落全体の趣旨がつかめます。詳細部分は設問で問われた箇所だけを精読する戦略が効率的です。",
+        text: "冒頭は話題をつかむ手掛かりですが、目的や結論が後ろに書かれる文書もあります。最初の文だけで判断せず、変更・条件・例外を含む箇所まで確認します。複数文書では差出人と日付も対応させます。",
       },
       { type: "h3", text: "原則 3：ディスコースマーカーで論理を追う" },
       {
@@ -830,9 +839,9 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
       {
         type: "ul",
         items: [
-          "What is the purpose of ...?（目的） → 第 1 段落の冒頭",
+          "What is the purpose of ...?（目的） → 冒頭と依頼・告知の内容を照合",
           "What is mentioned about ...?（言及） → 該当キーワードを本文検索",
-          "What is implied / suggested?（示唆） → 文末や逆接の直後",
+          "What is implied / suggested?（示唆） → 文書内の事実をつなぎ、書かれていない推測を足さない",
           "In paragraph X, the word \"Y\" is closest in meaning to ...（語義） → 文脈から類義語選択",
         ],
       },
@@ -840,9 +849,9 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
       {
         type: "ol",
         items: [
-          "Single Passage: 1 文書 5〜6 分（設問 2〜4 問）",
-          "Double Passage: 1 セット 8〜10 分（設問 5 問）",
-          "Triple Passage: 1 セット 10〜12 分（設問 5 問）",
+          "単一文書29問：合計約28分を練習開始時の目安にする",
+          "複数文書25問：合計約27分を目安にし、単一文書と合わせて55分に収める",
+          "Part 5・6に各10分を使う例なら、10＋10＋55＝75分。各設問の難しさに応じて調整し、解き直し時間もこの枠内で確保する",
         ],
       },
       {
@@ -865,9 +874,10 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     title: "TOEIC リスニング Part 3・4｜設問を先に確認する練習手順",
     description:
       "TOEIC Part 3（会話問題）・Part 4（説明文問題）で、設問を先に確認する練習手順、5W1Hの見方、設問例をまとめました。",
+    status: "published",
     category: "Part 別対策",
     publishedAt: "2026-04-26",
-    updatedAt: "2026-08-02",
+    updatedAt: "2026-09-18",
     estimatedReadingMin: 6,
     blocks: [
       {
@@ -893,16 +903,16 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
         type: "table",
         headers: ["タイミング", "やること"],
         rows: [
-          ["Part 3 開始のディレクション中（約 30 秒）", "最初の 1 セット（3 問）の設問を読む"],
-          ["1 セット目の本文音声中", "音声に集中（先読みは禁止）"],
-          ["1 セット目の設問読み上げ中（各 8 秒×3 問＝24 秒）", "解答→次セットの先読み"],
-          ["以降、各セット間の 24 秒で次の先読みを繰り返す", "リズムが命"],
+          ["Part 3 の説明音声中、指示に従って使える時間", "最初の 1 セット（3 問）の設問を読む"],
+          ["1 セット目の本文音声中", "現在の会話に集中する（学習上の提案）"],
+          ["現在のセットを解き終えた後、次の会話が始まるまで", "解答→次セットの先読み"],
+          ["以降も、次の会話が始まったら読む作業を止める", "読み切ることより音声を聞き逃さないことを優先"],
         ],
       },
       {
         type: "callout",
         tone: "warning",
-        text: "本文音声中に先読みすると、本文の重要部分を聞き逃します。先読みは「次のセットの設問読み上げ中」に行うのが鉄則です。",
+        text: "次の設問に気を取られて会話を聞き逃す場合は、読む量を減らしてください。前のセットを解き終え、次の会話が始まるまでの時間を使います。固定の秒数を前提にせず、試験中は係員と問題音声の指示に従います。",
       },
       { type: "h2", text: "先読み時に注目すべき 5W1H" },
       {
@@ -976,9 +986,10 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     title: "ビジネス英語の類義語 15 ペア｜用法と組み合わせを比較",
     description:
       "accept/admit、improve/enhance など、意味が近い英単語 15 ペアについて、通常の用法とコロケーションを比較します。",
+    status: "published",
     category: "語彙集",
     publishedAt: "2026-04-26",
-    updatedAt: "2026-08-02",
+    updatedAt: "2026-09-18",
     estimatedReadingMin: 8,
     blocks: [
       {
@@ -999,7 +1010,7 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
       { type: "h2", text: "2. improve / enhance（改善する）" },
       {
         type: "p",
-        text: "improve は「悪い・不十分なものをより良くする」、enhance は「すでに良いものをさらに高める」。改善の出発点が違います。「improve customer service」「enhance brand value」が典型です。",
+        text: "improve は状態や能力をより良くする・良くなる、enhance は質・価値・魅力などを高めるという意味で使います。すでに良いか悪いかだけでは区別できません。improve customer service、enhance brand value のように目的語まで確認します。",
       },
       { type: "wordLinks", words: ["improve", "enhance"] },
       { type: "h2", text: "3. expand / extend（広げる・延長する）" },
@@ -1047,7 +1058,7 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
       { type: "h2", text: "10. replace / substitute（置き換える）" },
       {
         type: "p",
-        text: "replace は「古いもの／壊れたものを新しいものに交換」、substitute は「一時的に代わりとして使う」。「replace the broken machine」「substitute butter for oil」が典型です。",
+        text: "replace は別のものに置き換える、substitute は代わりに使うことを表し、一時的かどうかだけでは区別できません。replace A with B はAをBに置き換える、substitute B for A はAの代わりにBを使う、という語順を例文で確認します。",
       },
       { type: "wordLinks", words: ["replace", "substitute"] },
       { type: "h2", text: "11. exceed / surpass（上回る）" },
@@ -1071,7 +1082,7 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
       { type: "h2", text: "14. encourage / motivate（励ます・動機付ける）" },
       {
         type: "p",
-        text: "encourage は「行動を促す・後押しする」、motivate は「内発的なやる気を引き出す」。「encourage employees to participate」「motivate the team」が典型です。",
+        text: "encourage は行動を後押しする、motivate は行動の動機を与えることを表します。motivate の動機は内発的なものに限らず、報酬など外的なものでも構いません。encourage employees to participate、motivate the team のように使います。",
       },
       { type: "wordLinks", words: ["encourage", "motivate"] },
       { type: "h2", text: "15. reject / decline（断る）" },
@@ -1098,9 +1109,10 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     title: "TOEIC 直前 1 週間の単語復習プラン｜既習語を中心に総点検",
     description:
       "TOEIC 試験の 7 日前から当日までに、模試で迷った語や既習語を再確認する日次プランです。得点幅を保証せず、弱点整理と当日の準備に焦点を当てます。",
+    status: "published",
     category: "学習法",
     publishedAt: "2026-04-26",
-    updatedAt: "2026-08-02",
+    updatedAt: "2026-09-18",
     estimatedReadingMin: 6,
     blocks: [
       {
@@ -1187,7 +1199,7 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
         items: [
           "起床後すぐに英語音源を 5 分聴く（耳のウォームアップ）",
           "朝食はしっかり食べる（脳のエネルギー源）",
-          "会場到着後、お気に入り単語の上位 30 語だけ確認",
+          "受付前に余裕があれば、事前に選んだ少数の弱点語を確認。受付後は教材をしまい、係員の指示に従う",
           "試験開始 5 分前は深呼吸でリラックス",
         ],
       },
@@ -1222,11 +1234,12 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     title: "第424回・第425回TOEIC公開テスト（2026年5月17日実施）難易度・感想まとめ",
     description:
       "2026年5月17日(日)に実施された第424回（午前）・第425回（午後）TOEIC L&R 公開テストについて、講師ブログ・YouTube・SNS など複数ソースから集めた難易度評価と受験者の感想を整理。Part 別の傾向と次回受験に向けた対策ポイントを解説します。",
+    status: "draft",
     category: "公開テスト振り返り",
     publishedAt: "2026-05-21",
     updatedAt: "2026-05-21",
     estimatedReadingMin: 8,
-    indexable: false,
+    // 出典確認が完了するまで公開しない。
     blocks: [
       {
         type: "p",
@@ -1391,9 +1404,10 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     title: "「意味で探す」AI 検索の使い方｜日本語のイメージから TOEIC 単語にたどり着く",
     description:
       "単語一覧ページの「意味で探す」タブでは、「延期する」のような和訳や「感謝を伝えるメールで使う単語」のような場面の説明から、意味の近い収録単語を AI が探し出します。使い方と検索のコツ、利用時の注意点をまとめました。",
+    status: "published",
     category: "サイト紹介",
     publishedAt: "2026-08-02",
-    updatedAt: "2026-08-02",
+    updatedAt: "2026-09-18",
     estimatedReadingMin: 6,
     blocks: [
       {
@@ -1407,7 +1421,7 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
       },
       {
         type: "table",
-        headers: ["入力の仕方", "入力例", "ヒットする単語の例"],
+        headers: ["入力の仕方", "入力例", "意味を比較する語の例（検索結果を保証しません）"],
         rows: [
           ["和訳から探す", "「延期する」", "postpone など"],
           [
@@ -1488,9 +1502,10 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     slug: "listen-mode-guide",
     title: "聞き流しモード活用ガイド｜移動時間に TOEIC 単語を音声で確認",
     description: `「今日の ${TODAY_WORDS_COUNT} 単語」とお気に入りページの聞き流しモードは、単語→英語例文→日本語訳の順に音声を自動再生します。操作方法と復唱練習への取り入れ方を紹介します。`,
+    status: "published",
     category: "学習法",
     publishedAt: "2026-08-02",
-    updatedAt: "2026-08-02",
+    updatedAt: "2026-09-18",
     estimatedReadingMin: 6,
     blocks: [
       {
@@ -1525,7 +1540,7 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
       },
       {
         type: "wordLinks",
-        intro: "音と綴りのギャップが大きく、耳から覚える価値が特に高い単語の例：",
+        intro: "音と綴りを照合して練習する収録語の例：",
         words: [
           "itinerary",
           "warranty",
@@ -1535,14 +1550,14 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
           "laboratory",
         ],
       },
-      { type: "h2", text: "シャドーイングに発展させる" },
+      { type: "h2", text: "例文の復唱に発展させる" },
       {
         type: "ol",
         items: [
           "1 周目はただ聞く。知らない単語があっても止めない",
-          "2 周目は英語例文の直後に、聞こえたままを小声で復唱する（テキストは見ない）",
+          "2 周目は一時停止して、聞いた例文を復唱する。聞き取れなければ先にテキストを確認する",
           "口が回らなかった単語は詳細ページを開き、再生ボタンで単語と例文を個別に繰り返す",
-          "数日後に同じリストをもう一度流して、口が覚えているか確かめる",
+          "数日後に同じ語をお気に入りや記録から選び、意味と発音を確認する。今日の単語は日々変わるため、同じリストは保証されない",
         ],
       },
       {
@@ -1567,9 +1582,10 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     title: "紛らわしい英単語 12 グループ｜adapt と adopt、assure と ensure",
     description:
       "綴りが似ている、意味が重なるなど、当サイトの収録語から混同しやすい 12 グループを取り上げ、通常の用法と見分ける手掛かりを整理しました。",
+    status: "published",
     category: "語彙集",
     publishedAt: "2026-08-02",
-    updatedAt: "2026-08-02",
+    updatedAt: "2026-09-18",
     estimatedReadingMin: 8,
     blocks: [
       {
@@ -1677,9 +1693,10 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     title: "接頭辞・接尾辞で TOEIC 語彙を増やす｜初見の単語を「推測できる」武器にする",
     description:
       "pre- は「前もって」、sub- は「下に」——パーツの意味を知っていると、初見の単語でも意味の見当がつきます。当サイトの収録語から例を挙げながら、語彙を点ではなく面で増やす方法をまとめました。",
+    status: "published",
     category: "語彙集",
     publishedAt: "2026-08-02",
-    updatedAt: "2026-08-02",
+    updatedAt: "2026-09-18",
     estimatedReadingMin: 7,
     blocks: [
       {
@@ -1689,7 +1706,7 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
       { type: "h2", text: "まず押さえたい接頭辞 8 つ" },
       {
         type: "table",
-        headers: ["接頭辞", "核のイメージ", "収録語の例"],
+        headers: ["接頭辞", "意味を推測する手掛かり", "語の例（未収録語も含む）"],
         rows: [
           [
             "pre-",
@@ -1709,7 +1726,7 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
           [
             "sub-",
             "下に",
-            "submit（提出する）、subsequent（その後の）、subsidiary（子会社）",
+            "subcommittee（小委員会）、subheading（小見出し）",
           ],
           [
             "trans-",
@@ -1744,7 +1761,7 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
       },
       {
         type: "table",
-        headers: ["接尾辞", "品詞", "収録語の例"],
+        headers: ["接尾辞", "品詞", "語の例（未収録語も含む）"],
         rows: [
           [
             "-tion / -sion",
@@ -1813,9 +1830,10 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     title: "コロケーションで覚えるビジネス英語｜単語を組み合わせで確認",
     description:
       "submit a proposal、issue a refund、extend the deadline など、ビジネス場面で使われる動詞と名詞の組み合わせを、当サイトの収録語をもとに整理しました。",
+    status: "published",
     category: "語彙集",
     publishedAt: "2026-08-02",
-    updatedAt: "2026-08-02",
+    updatedAt: "2026-09-18",
     estimatedReadingMin: 7,
     blocks: [
       {
@@ -1923,8 +1941,13 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
   },
 ];
 
+export const GUIDE_ARTICLES: GuideArticle[] = BASE_GUIDE_ARTICLES.map((article) => ({
+  ...article,
+  blocks: [...article.blocks, ...(GUIDE_LESSONS[article.slug] ?? [])],
+}));
+
 export function getGuideArticleBySlug(slug: string): GuideArticle | undefined {
-  return GUIDE_ARTICLES.find((a) => a.slug === slug);
+  return getPublishedGuideArticles().find((a) => a.slug === slug);
 }
 
 export function getAllGuideSlugs(): string[] {
@@ -1932,7 +1955,7 @@ export function getAllGuideSlugs(): string[] {
 }
 
 export function getPublishedGuideArticles(): GuideArticle[] {
-  return GUIDE_ARTICLES.filter((article) => article.indexable !== false);
+  return GUIDE_ARTICLES.filter((article) => article.status === "published");
 }
 
 export const PUBLISHED_GUIDE_ARTICLE_COUNT =

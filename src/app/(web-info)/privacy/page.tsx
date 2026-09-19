@@ -14,7 +14,7 @@ export default function PrivacyPage() {
   return (
     <>
       <nav className="mb-8 text-sm text-black/50 dark:text-white/50">
-        <Link href="/" className="hover:underline">
+        <Link prefetch={false} href="/" className="hover:underline">
           TOP
         </Link>
         <span className="mx-2">/</span>
@@ -89,7 +89,7 @@ export default function PrivacyPage() {
           </p>
           <ul className="mt-2 list-inside list-disc space-y-1">
             <li>サイト利用状況の把握・改善</li>
-            <li>広告の配信・最適化</li>
+            <li>広告を掲載する場合の配信・効果測定（現在Google広告は配信していません）</li>
             <li>サイトのパフォーマンス測定</li>
           </ul>
           <p className="mt-2">
@@ -102,16 +102,14 @@ export default function PrivacyPage() {
             3. 広告配信について
           </h2>
           <p>
-            当サイトでは、第三者配信の広告サービスである
-            <strong>Google AdSense</strong>
-            を利用しています。
+            当サイトは Google AdSense の利用を準備中です。現在、Googleの広告配信スクリプトは読み込んでいません。広告を開始する際は掲載範囲・同意方法と本ポリシーを見直します。以下は配信開始後の情報の取り扱いに関する案内です。
           </p>
           <ul className="mt-2 list-inside list-disc space-y-1">
             <li>
               Googleなどの第三者配信事業者は、Cookieを使用して、ユーザーが当サイトや他のサイトに過去にアクセスした際の情報に基づいて、適切な広告を表示します。
             </li>
             <li>
-              Cookieによって取得される情報には、氏名、住所、メールアドレス、電話番号など個人を特定する情報は含まれません。
+              広告配信では、Cookie等の識別子や閲覧に関する情報が扱われる場合があります。提供される情報とその利用方法は、配信事業者のポリシーをご確認ください。
             </li>
             <li>
               ユーザーは、
@@ -154,7 +152,7 @@ export default function PrivacyPage() {
               Google Analyticsは、トラフィックデータの収集のためにCookieを使用しています。
             </li>
             <li>
-              トラフィックデータは匿名で収集されており、個人を特定するものではありません。
+              当サイトでは解析への同意後にGoogle Analyticsを読み込みます。アクセス解析ではCookie等の識別子、閲覧ページ、端末・ブラウザに関する情報が扱われます。
             </li>
             <li>
               この機能はブラウザのCookieを無効にすることで収集を拒否することができます。詳細は
@@ -195,7 +193,7 @@ export default function PrivacyPage() {
         <section>
           <h2 className="mb-3 text-lg font-semibold">5. 第三者への情報提供</h2>
           <p>
-            当サイトでは、法令に基づく場合を除き、ユーザーの情報を第三者に提供することはありません。なお、上記「広告配信について」「アクセス解析ツールについて」に記載のとおり、Googleおよびその提携事業者にCookieを通じた情報が送信される場合がありますが、これらは個人を特定するものではありません。また、ログイン機能を利用した場合のアカウント情報、お気に入りデータおよび復習・連続学習の記録は、認証・データベースサービス「Supabase」のサーバーに保管されます。
+            当サイトは、本ポリシーに記載した機能の提供・解析のために外部サービスを利用します。「意味で探す」の入力はGoogle Gemini APIへ、同意後のアクセス解析情報はGoogle Analyticsへ送信されます。また、ログイン機能を利用した場合のアカウント情報、お気に入りデータおよび復習・連続学習の記録は、認証・データベースサービス「Supabase」のサーバーに保管されます。
           </p>
         </section>
 
@@ -213,6 +211,7 @@ export default function PrivacyPage() {
           <p>
             本ポリシーに関するお問い合わせは、
             <Link
+              prefetch={false}
               href="/contact"
               className="text-blue-600 underline hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
             >
@@ -223,7 +222,7 @@ export default function PrivacyPage() {
         </section>
 
         <p className="pt-4 text-xs text-black/40 dark:text-white/40">
-          最終更新日：2026年8月29日
+          最終更新日：2026年9月18日
         </p>
       </div>
     </>

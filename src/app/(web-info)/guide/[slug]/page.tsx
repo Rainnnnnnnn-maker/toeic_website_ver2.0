@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
-  GUIDE_ARTICLES,
   getAllGuideSlugs,
   getGuideArticleBySlug,
   type ArticleBlock,
@@ -24,14 +23,11 @@ export async function generateMetadata({
   const { slug } = await params;
   const article = getGuideArticleBySlug(slug);
   if (!article) {
-    return { title: "記事が見つかりません" };
+    notFound();
   }
   return {
     title: article.title,
     description: article.description,
-    ...(article.indexable === false && {
-      robots: { index: false, follow: false },
-    }),
     alternates: { canonical: `${SITE_URL}/guide/${article.slug}` },
     openGraph: {
       title: article.title,
@@ -46,6 +42,23 @@ export async function generateMetadata({
 
 function renderBlock(block: ArticleBlock, idx: number) {
   switch (block.type) {
+    case "exercise":
+      return (
+        <section key={idx} className="my-5 rounded-xl border border-blue-200 bg-blue-50/40 p-4 dark:border-blue-800 dark:bg-blue-950/20" aria-label="練習問題">
+          <h3 className="font-semibold leading-relaxed">{block.question}</h3>
+          <ol className="my-3 grid list-none gap-2 sm:grid-cols-2">
+            {block.options.map((option, optionIndex) => (
+              <li key={optionIndex} className="rounded border border-black/10 bg-white p-2 dark:border-white/20 dark:bg-slate-900">
+                <span className="mr-2 font-semibold">{String.fromCharCode(65 + optionIndex)}.</span>{option}
+              </li>
+            ))}
+          </ol>
+          <details className="rounded border border-blue-200 bg-white p-3 dark:border-blue-800 dark:bg-slate-900">
+            <summary className="cursor-pointer font-semibold text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:text-blue-300">答えと理由を確認</summary>
+            <p className="mt-3 leading-relaxed">{block.explanation}</p>
+          </details>
+        </section>
+      );
     case "h2":
       return (
         <h2
@@ -101,7 +114,7 @@ function renderBlock(block: ArticleBlock, idx: number) {
     }
     case "table":
       return (
-        <div key={idx} className="my-4 overflow-x-auto">
+        <div key={idx} className="my-4 overflow-x-auto" tabIndex={0} role="region" aria-label="比較表（横にスクロールできます）">
           <table className="min-w-full border-collapse text-sm">
             <thead>
               <tr className="border-b border-black/20 dark:border-white/20">
@@ -143,6 +156,7 @@ function renderBlock(block: ArticleBlock, idx: number) {
           <div className="flex flex-wrap gap-2">
             {block.words.map((w) => (
               <Link
+              prefetch={false}
                 key={w}
                 href={`/words/${w}`}
                 className="rounded border border-black/15 px-2 py-1 font-mono text-xs hover:border-blue-500 hover:text-blue-600 dark:border-white/20 dark:hover:border-blue-400 dark:hover:text-blue-400"
@@ -161,9 +175,9 @@ function renderBlock(block: ArticleBlock, idx: number) {
 function RelatedArticles({ article }: { article: GuideArticle }) {
   const related =
     article.relatedSlugs
-      ?.map((s) => GUIDE_ARTICLES.find((a) => a.slug === s))
+      ?.map((s) => getGuideArticleBySlug(s))
       .filter(
-        (a): a is GuideArticle => a !== undefined && a.indexable !== false,
+        (a): a is GuideArticle => a !== undefined,
       ) ?? [];
   if (related.length === 0) return null;
   return (
@@ -173,6 +187,7 @@ function RelatedArticles({ article }: { article: GuideArticle }) {
         {related.map((r) => (
           <li key={r.slug}>
             <Link
+              prefetch={false}
               href={`/guide/${r.slug}`}
               className="block rounded border border-black/10 p-3 hover:border-blue-500 dark:border-white/10 dark:hover:border-blue-400"
             >
@@ -277,11 +292,11 @@ export default async function GuideArticlePage({
       />
 
       <nav className="mb-8 text-sm text-black/50 dark:text-white/50">
-        <Link href="/" className="hover:underline">
+        <Link prefetch={false} href="/" className="hover:underline">
           TOP
         </Link>
         <span className="mx-2">/</span>
-        <Link href="/guide" className="hover:underline">
+        <Link prefetch={false} href="/guide" className="hover:underline">
           学習ガイド
         </Link>
         <span className="mx-2">/</span>
@@ -300,6 +315,7 @@ export default async function GuideArticlePage({
               <span>更新日：{article.updatedAt}</span>
             )}
             <Link
+              prefetch={false}
               href="/about#operator"
               className="text-blue-600 underline dark:text-blue-400"
             >
@@ -310,11 +326,7 @@ export default async function GuideArticlePage({
           <p className="mt-3 leading-relaxed text-black/70 dark:text-white/70">
             {article.description}
           </p>
-          {article.indexable === false && (
-            <p className="mt-4 rounded border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-100">
-              この記事は出典と内容を再確認中のため、現在は記事一覧と検索対象から外しています。
-            </p>
-          )}
+
         </header>
 
         <div>{article.blocks.map((b, i) => renderBlock(b, i))}</div>
@@ -324,10 +336,23 @@ export default async function GuideArticlePage({
         <ArticleSources sources={article.sources} />
       )}
 
+      <section className="mt-10 rounded-xl border border-slate-200 bg-slate-50 p-5 text-sm dark:border-slate-700 dark:bg-slate-900">
+        <h2 className="font-semibold">読んだ内容を練習する</h2>
+        <p className="mt-2 leading-relaxed">記事で迷った単語を一つ選び、例文を確認してお気に入りへ保存。次に開くときは、意味を見る前に思い出してみましょう。</p>
+        <div className="mt-3 flex flex-wrap gap-4">
+          <Link href="/words" prefetch={false} className="text-blue-700 underline dark:text-blue-300">単語を探す</Link>
+          <Link href="/favorites" prefetch={false} className="text-blue-700 underline dark:text-blue-300">お気に入りを確認</Link>
+          <Link href="/about#editorial-policy" prefetch={false} className="text-blue-700 underline dark:text-blue-300">編集・確認方針</Link>
+          <Link href="/contact" prefetch={false} className="text-blue-700 underline dark:text-blue-300">内容の誤りを報告</Link>
+        </div>
+        <p className="mt-3 text-xs leading-relaxed text-slate-600 dark:text-slate-300">記事の作成・改訂にAIを利用しています。専門家による監修済みとは表示していません。例文・練習問題は学習用の自作で、公式の試験問題ではありません。</p>
+      </section>
+
       <RelatedArticles article={article} />
 
       <div className="mt-10 text-center">
         <Link
+              prefetch={false}
           href="/guide"
           className="text-sm text-blue-600 underline hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
         >

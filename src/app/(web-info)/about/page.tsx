@@ -15,7 +15,7 @@ export default function AboutPage() {
   return (
     <>
       <nav className="mb-8 text-sm text-black/50 dark:text-white/50">
-        <Link href="/" className="hover:underline">
+        <Link prefetch={false} href="/" className="hover:underline">
           TOP
         </Link>
         <span className="mx-2">/</span>
@@ -41,7 +41,7 @@ export default function AboutPage() {
             運営者自身が TOEIC 学習に取り組む中で、「市販の単語帳は冊子としてかさばる」「Web で単語の意味を調べてもビジネス文脈に即した例文が見つからない」「派生語まで含めた解説が得られない」という不便を感じていました。
           </p>
           <p className="mt-2">
-            そこで、TOEIC のビジネス文脈に最適化された AI 解説と例文を、いつでもスマートフォンから無料で確認できる学習ツールが欲しいという動機で、本サイトを開発しました。学習者が「単語の意味だけでなく、ニュアンスとコロケーションまで含めて運用できる状態」に到達することを目標にしています。
+            そこで、ビジネス場面を想定した AI 解説と例文を、いつでもスマートフォンから無料で確認できる学習ツールが欲しいという動機で、本サイトを開発しました。学習者が「単語の意味だけでなく、ニュアンスとコロケーションまで含めて運用できる状態」に到達することを目標にしています。
           </p>
         </section>
 
@@ -61,7 +61,7 @@ export default function AboutPage() {
               {"：TOEIC のビジネス文脈に即した 3〜5 件の例文（音声付き）"}
             </li>
             <li>
-              <strong>ネイティブ発音</strong>
+              <strong>合成音声での発音確認</strong>
               {"：Google Cloud Text-to-Speech による高品質な英語・日本語音声"}
             </li>
             <li>
@@ -84,6 +84,7 @@ export default function AboutPage() {
               <strong>学習ガイド</strong>
               {"：スコア別戦略・Part 別対策・忘却曲線を活用した暗記法などの記事を公開（"}
               <Link
+                prefetch={false}
                 href="/guide"
                 className="text-blue-600 underline hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
               >
@@ -108,6 +109,7 @@ export default function AboutPage() {
           <p className="mt-3">
             選定基準とランクの定義については、
             <Link
+                prefetch={false}
               href="/guide/word-rank-criteria"
               className="text-blue-600 underline hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
             >
@@ -117,14 +119,14 @@ export default function AboutPage() {
           </p>
         </section>
 
-        <section>
+        <section id="editorial-policy">
           <h2 className="mb-3 text-lg font-semibold">解説の作成方針と品質管理</h2>
           <p>
             各単語の意味・ニュアンス・例文は Google Gemini を使って生成しています。形式の自動整合性チェックを行い、運営者が確認できた箇所や報告を受けた箇所から修正しています。全ページの人手確認が完了しているわけではありません。
           </p>
           <ol className="mt-2 list-inside list-decimal space-y-1">
             <li>
-              TOEIC のビジネス文脈に限定した下書き生成（一般会話の例文を排除）
+              仕事・買い物・旅行などの場面を想定した下書き生成
             </li>
             <li>
               必須フィールド・例文数・形式の整合性を自動チェック
@@ -133,12 +135,13 @@ export default function AboutPage() {
               優先度の高いページや指摘を受けたページを運営者が確認し、不自然な訳語・例文・コロケーションを修正
             </li>
             <li>
-              閲覧者から誤りの指摘を受けた場合は、該当単語のキャッシュをクリアし、解説を再作成・再確認
+              指摘された内容を辞書等と照合し、修正内容を保存。自動生成し直しても修正が失われないよう管理
             </li>
           </ol>
           <p className="mt-3">
-            なお、本サービスは個人運営のため、全 1,300 語以上のレビューには時間を要します。誤りや不自然な表現を見つけた場合は{" "}
+            学習ガイドには自作の例文・練習問題を掲載し、AIも編集補助に利用しています。AIによる照合と人による確認は区別し、専門家の監修が済んだ教材とは表示しません。出題例は公式試験問題の転載ではありません。なお、本サービスは個人運営のため、全 1,300 語以上のレビューには時間を要します。誤りや不自然な表現を見つけた場合は{" "}
             <Link
+                prefetch={false}
               href="/contact"
               className="text-blue-600 underline hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
             >
@@ -159,6 +162,7 @@ export default function AboutPage() {
               <strong>連絡先</strong>
               {"："}
               <Link
+                prefetch={false}
                 href="/contact"
                 className="text-blue-600 underline hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
               >
@@ -171,7 +175,7 @@ export default function AboutPage() {
             </li>
             <li>
               <strong>最終更新</strong>
-              {"：2026 年 8 月（コンテンツ・機能ともに継続的に更新中）"}
+              {"：2026 年 9 月（コンテンツ・機能ともに継続的に更新中）"}
             </li>
             <li>
               <strong>収益化</strong>
@@ -197,7 +201,7 @@ export default function AboutPage() {
               重複・誤分類は発見次第修正し、修正履歴を技術ドキュメントに記録
             </li>
             <li>
-              学習ガイド記事は月 1〜2 本のペースで追加・更新
+              学習ガイドは既存の説明・例文・演習の見直しを優先して更新
             </li>
             <li>
               サイト機能や技術スタックの変更も、すべて更新履歴に明記
@@ -217,6 +221,7 @@ export default function AboutPage() {
             <li>
               本サイトの利用により発生した損害について、運営者は責任を負いかねます。詳細は
               <Link
+                prefetch={false}
                 href="/terms"
                 className="text-blue-600 underline hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
               >

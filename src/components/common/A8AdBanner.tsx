@@ -1,8 +1,8 @@
-import { isAdsenseReviewMode } from "@/lib/adsense-review";
+import { isAffiliateAdvertisingEnabled } from "@/lib/advertising";
 
 export const A8AdBanner468x60 = () => {
-  // AdSense審査モード中はアフィリエイトバナーを出さない
-  if (isAdsenseReviewMode()) {
+  // 広告の設定は検索公開・サイトマップに影響させない。
+  if (!isAffiliateAdvertisingEnabled()) {
     return null;
   }
   return (
@@ -22,7 +22,7 @@ export const A8AdBanner468x60 = () => {
             style={{ border: 0 }}
             width="468"
             height="60"
-            alt=""
+            alt="広告：外部サービスの案内"
             src="https://www28.a8.net/svt/bgt?aid=260510505953&wid=001&eno=01&mid=s00000018721001009000&mc=1"
             className="w-full h-auto"
           />
@@ -42,7 +42,7 @@ export const A8AdBanner468x60 = () => {
 };
 
 export const A8AdBanner728x90 = () => {
-  if (isAdsenseReviewMode()) {
+  if (!isAffiliateAdvertisingEnabled()) {
     return null;
   }
   return (
@@ -62,7 +62,7 @@ export const A8AdBanner728x90 = () => {
             style={{ border: 0 }}
             width="728"
             height="90"
-            alt=""
+            alt="広告：外部サービスの案内"
             src="https://www25.a8.net/svt/bgt?aid=260510506011&wid=001&eno=01&mid=s00000015388002033000&mc=1"
             className="w-full h-auto"
           />
