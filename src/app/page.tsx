@@ -288,19 +288,19 @@ export default function Home() {
             </Link>
           </div>
         </header>
-        <section aria-labelledby="first-study-heading" className="rounded-2xl border border-blue-100 bg-blue-50/60 p-5">
-          <h2 id="first-study-heading" className="text-base font-bold text-slate-900">はじめての方へ：まず1問、理由まで確認</h2>
-          <p className="mt-2 text-sm leading-relaxed text-slate-700">単語の意味は分かるのに、文の中で選べない方へ。自作問題で迷った理由を確認し、単語・例文・復習へ進めます。ガイドと単語の閲覧、お気に入り保存は登録不要です。</p>
-          <div className="mt-3 flex flex-wrap gap-3 text-sm font-semibold">
-            <Link href="/guide/part5-frequent-words" prefetch={false} className="rounded-lg bg-blue-700 px-4 py-3 text-white hover:bg-blue-800 focus-visible:ring-2 focus-visible:ring-blue-500">Part 5の5問に挑戦</Link>
-            <Link href="/guide/confusing-word-pairs" prefetch={false} className="rounded-lg border border-blue-200 bg-white px-4 py-3 text-blue-800 hover:bg-blue-50 focus-visible:ring-2 focus-visible:ring-blue-500">紛らわしい語を比較</Link>
-            <Link href="/guide/forgetting-curve" prefetch={false} className="rounded-lg border border-blue-200 bg-white px-4 py-3 text-blue-800 hover:bg-blue-50 focus-visible:ring-2 focus-visible:ring-blue-500">7日間の復習例を見る</Link>
-          </div>
-        </section>
-        <SemanticSearchLauncher />
         <Suspense fallback={<TodayRecommendedWordsFallback />}>
           <TodayRecommendedWordsSection />
         </Suspense>
+        <section aria-labelledby="first-study-heading" className="rounded-xl border border-blue-100 bg-blue-50/60 p-3 sm:p-4">
+          <h2 id="first-study-heading" className="text-sm font-bold leading-relaxed text-slate-900">はじめての方へ：まず1問、理由まで確認</h2>
+          <p className="mt-1.5 text-xs leading-relaxed text-slate-700">単語の意味は分かるのに、文の中で選べない方へ。自作問題で迷った理由を確認し、単語・例文・復習へ進めます。ガイドと単語の閲覧、お気に入り保存は登録不要です。</p>
+          <div className="mt-2 flex flex-wrap gap-2 text-xs font-semibold">
+            <Link href="/guide/part5-frequent-words" prefetch={false} className="inline-flex min-h-11 items-center justify-center rounded-lg bg-blue-700 px-3 py-2 text-white transition-colors hover:bg-blue-800 active:bg-blue-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 sm:min-h-9">Part 5の5問に挑戦</Link>
+            <Link href="/guide/confusing-word-pairs" prefetch={false} className="inline-flex min-h-11 items-center justify-center rounded-lg border border-blue-200 bg-white px-3 py-2 text-blue-800 transition-colors hover:bg-blue-50 active:bg-blue-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 sm:min-h-9">紛らわしい語を比較</Link>
+            <Link href="/guide/forgetting-curve" prefetch={false} className="inline-flex min-h-11 items-center justify-center rounded-lg border border-blue-200 bg-white px-3 py-2 text-blue-800 transition-colors hover:bg-blue-50 active:bg-blue-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 sm:min-h-9">7日間の復習例を見る</Link>
+          </div>
+        </section>
+        <SemanticSearchLauncher />
         <Suspense fallback={<HomeWordDataFallback />}>
           <HomeWordDataSection />
         </Suspense>
