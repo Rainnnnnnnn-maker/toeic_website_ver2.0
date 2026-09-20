@@ -1,6 +1,6 @@
 # TOEIC重要単語（toeic_website_ver2.0）技術ドキュメント
 
-最終更新日: 2026-09-18（再申請準備：教材改訂・公開制御・永続修正・確認記録）
+最終更新日: 2026-09-20（TOPのおすすめ単語を先頭に移動・初回学習案内をコンパクト化）
 
 ## 1. プロジェクト概要
 
@@ -832,7 +832,7 @@
 * 入口UI
 
   * `/words`: `WordsExplorerClient` の「意味で探す」タブ → `SemanticSearchPanel`（結果表示を含む唯一のUI）
-  * TOP: `SemanticSearchLauncher`（ヘッダー直下・今日のおすすめの上）。結果UIは持たず、検索語を同一タブの `sessionStorage` へ保存してから `/words?mode=meaning&launch=<不透明ID>#word-explorer` へ遷移し、意味検索タブが `initialQuery` を自動実行する。検索語本文はURL、Vercelのリクエストログ、GA4の `page_location` に含めない。タブを閉じると一時データは削除され、URLだけを別タブへ共有しても検索語は復元されない
+  * TOP: `SemanticSearchLauncher`（今日のおすすめ・初回学習案内の下）。結果UIは持たず、検索語を同一タブの `sessionStorage` へ保存してから `/words?mode=meaning&launch=<不透明ID>#word-explorer` へ遷移し、意味検索タブが `initialQuery` を自動実行する。検索語本文はURL、Vercelのリクエストログ、GA4の `page_location` に含めない。タブを閉じると一時データは削除され、URLだけを別タブへ共有しても検索語は復元されない
   * 検索語の一時保存・復元は `src/lib/semantic-launch-store.ts`（`sessionStorage`＋SPA遷移用メモリフォールバック）が担当する。URLパラメータ（`mode`/`launch`）の検証と組み立て、検索語の100文字切り詰めは `src/lib/semantic-launch.ts` の純粋関数に集約する
   * `WordsExplorerClient` は Next.js の `useSearchParams` でURLを購読し、ブラウザの戻る・進むや同一ページ内のモード変更へ追従する。静的プリレンダリングを保つため、`src/app/words/page.tsx` 側で同クライアントコンポーネントを `<Suspense>` に包む
   * `SemanticSearchPanel` は同一クエリの実行中Promiseをモジュール内Mapで共有する。React Strict Modeによるマウントeffect再実行でもAPIへの初回POSTは1回に抑え、各effect側のキャンセル判定でアンマウント後の状態更新を防ぐ
@@ -1227,3 +1227,7 @@ RLS は `favorites` と同じく「自分の行のみ全操作可」（`auth.uid
 - 全語の人手確認は未完了。語義内の根拠のない頻度表示は撤去。修正語には修正点・参考資料を表示する。
 
 過去の更新履歴に記載された審査モードの「審査対象を絞る」という説明は当時の設計意図であり、現在の運用根拠ではない。noindexはAdSenseの審査除外を保証しない。
+
+### TOPページのセクション配置
+
+ヘッダー直下の先頭セクションは今日のおすすめ単語とし、初回学習案内、意味検索、単語一覧を続ける。初回学習案内は見出し14px・本文とリンク12px、余白はモバイル12px／sm以上16px。リンクは折り返し表示とし、モバイルは高さ44px以上、sm以上は36px以上を確保する。
