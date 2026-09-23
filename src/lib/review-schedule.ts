@@ -39,7 +39,7 @@ export const MAX_REVIEW_BOX = REVIEW_INTERVAL_DAYS.length;
 export const REVIEW_SESSION_LIMIT = 10;
 
 /** マイページの「苦手単語」に表示する件数。 */
-export const WEAK_WORDS_LIMIT = 5;
+export const WEAK_WORDS_LIMIT = 7;
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
