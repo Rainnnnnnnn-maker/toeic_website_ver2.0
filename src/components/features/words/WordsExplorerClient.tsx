@@ -15,6 +15,8 @@ import type { WordLevel } from "@/lib/word-level";
 import { parseSemanticLaunchParams } from "@/lib/semantic-launch";
 import { getSemanticLaunchQuery } from "@/lib/semantic-launch-store";
 
+import { filterWordsByTermQuery, normalizeTermQuery } from "@/lib/word-search";
+
 type LevelFilter = "all" | WordLevel;
 
 type SearchMode = "term" | "meaning";
@@ -32,21 +34,6 @@ const levelStyles = WORD_LEVEL_CARD_STYLES;
 
 /** 起動クエリは同一タブ内で一度読むだけで変化しないため、購読は不要。 */
 const subscribeToLaunchStore = () => () => {};
-
-function matchesQuery(term: string, query: string): boolean {
-  if (!query) return true;
-
-  const normalizedTerm = term.toLowerCase();
-  if (!query.includes("*")) return normalizedTerm.startsWith(query);
-
-  try {
-    const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    const pattern = escaped.replace(/\\\*/g, ".*");
-    return new RegExp(`^${pattern}$`, "i").test(term);
-  } catch {
-    return false;
-  }
-}
 
 export function WordsExplorerClient({ words }: Props) {
   const router = useRouter();
@@ -86,20 +73,10 @@ export function WordsExplorerClient({ words }: Props) {
     });
   };
 
-  const normalizedQuery = query.trim().toLowerCase();
-  const queryAndLetterMatchedWords = words.filter((word) => {
-    const matchesLetter = letter === "all" || word.term[0]?.toUpperCase() === letter;
-    return matchesLetter && matchesQuery(word.term, normalizedQuery);
-  });
+  const normalizedQuery = normalizeTermQuery(query);
+  const queryAndLetterMatchedWords = filterWordsByTermQuery(words, normalizedQuery)
+    .filter((word) => letter === "all" || normalizeTermQuery(word.term)[0]?.toUpperCase() === letter);
   const filteredWords = queryAndLetterMatchedWords.filter((word) => level === "all" || word.level === level);
-
-  if (normalizedQuery && !normalizedQuery.includes("*")) {
-    filteredWords.sort((a, b) => {
-      const aExact = a.term.toLowerCase() === normalizedQuery ? 0 : 1;
-      const bExact = b.term.toLowerCase() === normalizedQuery ? 0 : 1;
-      return aExact - bExact;
-    });
-  }
 
   const visibleWords = filteredWords.slice(0, visibleCount);
   const counts: Record<LevelFilter, number> = {

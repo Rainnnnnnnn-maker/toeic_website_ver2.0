@@ -33,3 +33,18 @@ export function filterWordsByTermPrefix<T extends { term: string }>(
   }
   return [...exact, ...prefixed];
 }
+
+/** 前方一致と * ワイルドカード検索。ワイルドカード使用時は元の順序を保つ。 */
+export function filterWordsByTermQuery<T extends { term: string }>(
+  words: readonly T[],
+  rawQuery: string
+): T[] {
+  const query = normalizeTermQuery(rawQuery);
+  if (!query.includes("*")) return filterWordsByTermPrefix(words, query);
+
+  // * 以外は正規表現ではなく文字として扱い、パターンは検索ごとに一度だけ作る。
+  const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const pattern = escaped.replace(/\\\*/g, ".*");
+  const regex = new RegExp(`^${pattern}$`);
+  return words.filter((word) => regex.test(normalizeTermQuery(word.term)));
+}

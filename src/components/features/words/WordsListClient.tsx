@@ -1,4 +1,5 @@
  "use client";
+import { filterWordsByTermQuery, normalizeTermQuery } from "@/lib/word-search";
 import { useState, useRef } from "react";
 import type { ChangeEvent, KeyboardEvent } from "react";
 import Link from "next/link";
@@ -50,30 +51,14 @@ export default function WordsListClient({ importantWords, mediumWords, highWords
     setPage(1);
   };
 
-  const filtered = (() => {
-    const q = query.trim().toLowerCase();
-    if (!q) {
-      if (activeTab === 'important') return importantWithCategory;
-      if (activeTab === 'medium') return mediumWithCategory;
-      return highWithCategory;
-    }
-
-    // ワイルドカード検索 (*) のサポート
-    if (q.includes('*')) {
-      try {
-        // 特殊文字をエスケープし、* を .* に置換
-        // 注意: エスケープ対象に * も含めることで、後続の replace で確実に .* に変換できるようにする
-        const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        const pattern = escaped.replace(/\\\*/g, '.*');
-        const regex = new RegExp(`^${pattern}$`, 'i');
-        return allWithCategory.filter((w) => regex.test(w.term));
-      } catch {
-        return [];
-      }
-    }
-
-    return allWithCategory.filter((w) => w.term.toLowerCase().startsWith(q));
-  })();
+  const normalizedQuery = normalizeTermQuery(query);
+  const activeWords = activeTab === 'important'
+    ? importantWithCategory
+    : activeTab === 'medium' ? mediumWithCategory : highWithCategory;
+  const filtered = filterWordsByTermQuery(
+    normalizedQuery ? allWithCategory : activeWords,
+    normalizedQuery,
+  );
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
   const currentPage = Math.min(page, totalPages);
@@ -83,7 +68,7 @@ export default function WordsListClient({ importantWords, mediumWords, highWords
   return (
     <section className="flex flex-col gap-3">
       <div className="mb-0">
-        {query ? (
+        {normalizedQuery ? (
           <div>
              <h2 className="text-lg font-bold text-slate-800 mb-1">検索結果: {filtered.length}件</h2>
           </div>
@@ -131,7 +116,7 @@ export default function WordsListClient({ importantWords, mediumWords, highWords
             placeholder="全単語から検索..."
             aria-label="単語検索"
           />
-          {query && (
+          {normalizedQuery && (
             <button
               className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center justify-center bg-transparent border-none p-0.5 cursor-pointer text-gray-400 rounded-full transition-all duration-200 hover:bg-gray-100 hover:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
               onClick={handleClear}
@@ -185,7 +170,7 @@ export default function WordsListClient({ importantWords, mediumWords, highWords
         </div>
       </div>
 
-      {query.trim() && filtered.length === 0 && (
+      {normalizedQuery && filtered.length === 0 && (
         <div className="rounded-xl border border-dashed border-slate-300 bg-white/90 px-5 py-8 text-center sm:px-6">
           <p role="status" className="break-words text-base font-bold text-slate-800">
             「{query.trim()}」に一致する単語が見つかりませんでした
@@ -227,7 +212,7 @@ export default function WordsListClient({ importantWords, mediumWords, highWords
             <WordLinkPending />
             <div className="flex items-center justify-between gap-2">
               <span className="text-base font-semibold text-gray-900">{word.term}</span>
-              {query && (
+              {normalizedQuery && (
                 <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-semibold whitespace-nowrap ${
                   word.category === 'important' ? 'bg-blue-100 text-blue-800' : 
                   word.category === 'medium' ? 'bg-purple-100 text-purple-800' : 
