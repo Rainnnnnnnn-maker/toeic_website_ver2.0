@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { filterWordsByTermPrefix, normalizeTermQuery } from "../word-search";
+import { filterWordsByTermQuery, filterWordsByTermPrefix, normalizeTermQuery } from "../word-search";
 
 const words = (...terms: string[]) => terms.map((term) => ({ slug: term, term }));
 const terms = (list: { term: string }[]) => list.map((w) => w.term);
@@ -52,5 +52,37 @@ describe("filterWordsByTermPrefix", () => {
     const result = filterWordsByTermPrefix(input, "");
     expect(result).not.toBe(input);
     expect(terms(input)).toEqual(["accept", "ability"]);
+  });
+});
+
+
+describe("filterWordsByTermQuery", () => {
+  it.each([
+    ["　ＡＣＣ　", ["accountant", "account", "accept"]],
+    ["ＡＣＣＯＵＮＴ", ["account", "accountant"]],
+    ["＊ＯＵＮＴ", ["account", "discount"]],
+    ["Ａ＊Ｔ", ["accountant", "account", "accept"]],
+    ["a**t", ["accountant", "account", "accept"]],
+    ["*", ["accountant", "account", "accept", "discount"]],
+    ["　 ", ["accountant", "account", "accept", "discount"]],
+    ["count", []],
+    ["zz*", []],
+  ])("matches %s using shared normalization and ordering", (query, expected) => {
+    const input = words("accountant", "account", "accept", "discount");
+    const original = [...input];
+    expect(terms(filterWordsByTermQuery(input, query))).toEqual(expected);
+    expect(input).toEqual(original);
+  });
+
+  it("treats regex metacharacters literally", () => {
+    const input = words("a.b", "axb", "a+b", "a[b", "a(b", "a?b");
+    for (const term of terms(input)) {
+      expect(terms(filterWordsByTermQuery(input, term + "*"))).toEqual([term]);
+    }
+  });
+
+  it("normalizes the corpus as well as the query", () => {
+    expect(terms(filterWordsByTermQuery(words("ＰＡＲＴ　　ＴＩＭＥ"), "part* time")))
+      .toEqual(["ＰＡＲＴ　　ＴＩＭＥ"]);
   });
 });
