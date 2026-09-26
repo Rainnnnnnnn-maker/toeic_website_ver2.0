@@ -1,6 +1,6 @@
 # TOEIC重要単語（toeic_website_ver2.0）技術ドキュメント
 
-最終更新日: 2026-09-26（TOPの単語検索0件時に検索クリア・意味検索への導線を追加）
+最終更新日: 2026-09-26（TOP・全単語一覧・お気に入りの検索正規化と完全一致優先順を統一）
 
 ## 1. プロジェクト概要
 
@@ -395,6 +395,8 @@
   * 内部で `useTTS().fetchTTS` を直接利用し、Audio 要素を Component 側で制御
 
 * 単語一覧UI `src/components/features/words/WordsListClient.tsx`（Client Component）
+
+  * 英単語検索の正規化は `src/lib/word-search.ts:normalizeTermQuery` に集約（NFKC・空白圧縮・trim・小文字化）。TOP/全単語一覧は `filterWordsByTermQuery`、お気に入りは `filterWordsByTermPrefix` を使用し、前方一致では完全一致を先頭に寄せる。TOP/全単語一覧の `*`（全角 `＊` も可）は全体一致パターンとして扱い、その他の正規表現記号は文字として扱う。ワイルドカード検索の結果は元の順序を維持する。
 
   * タブ切り替え（最重要/中級/高難易度の3タブ）、検索（前方一致＋ワイルドカード `*` 対応）、ページング（20件/ページ）
   * 検索結果表示時にはカテゴリバッジ（重要/中級/上級）を単語カードに表示する

@@ -4,6 +4,8 @@ TOEIC語彙ラボ is a comprehensive web application for learning essential TOEI
 
 ## 🚀 Features
 
+- **Consistent Term Search**: Home, all-words, and favorites share NFKC/case/whitespace normalization and exact-match-first prefix ordering. Home and all-words also share `*` wildcard matching, including full-width `＊`; favorites retain prefix-only search.
+
 - **Home Search Recovery**: Empty word-search results show spelling/prefix guidance, a clear button that restores input focus and the first page, and a link to the meaning-search tab. (Updated: 2026-09-26)
 
 - **Initial-load resources**: The UI uses system fonts without Geist downloads/preloads. A8 banners and their tracking pixels use native lazy loading, retaining their dimensions to reserve layout space.
