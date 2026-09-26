@@ -185,7 +185,36 @@ export default function WordsListClient({ importantWords, mediumWords, highWords
         </div>
       </div>
 
-      
+      {query.trim() && filtered.length === 0 && (
+        <div className="rounded-xl border border-dashed border-slate-300 bg-white/90 px-5 py-8 text-center sm:px-6">
+          <p role="status" className="break-words text-base font-bold text-slate-800">
+            「{query.trim()}」に一致する単語が見つかりませんでした
+          </p>
+          <p className="mt-2 text-sm leading-relaxed text-slate-600">
+            スペルを確認するか、英単語の先頭の数文字でお試しください。
+          </p>
+          <p className="mt-1 text-sm leading-relaxed text-slate-600">
+            日本語の意味や使う場面から探す場合は「意味で探す」をご利用ください。
+          </p>
+          <div className="mt-5 flex flex-col justify-center gap-3 sm:flex-row">
+            <button
+              type="button"
+              onClick={handleClear}
+              className="inline-flex min-h-11 items-center justify-center rounded-lg bg-slate-800 px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-800 focus-visible:ring-offset-2"
+            >
+              検索をクリア
+            </button>
+            <Link
+              href="/words?mode=meaning#word-explorer"
+              prefetch={false}
+              className="relative inline-flex min-h-11 items-center justify-center overflow-hidden rounded-lg border border-violet-200 bg-violet-50 px-4 py-2 text-sm font-bold text-violet-700 transition-colors hover:bg-violet-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2"
+            >
+              <WordLinkPending />
+              意味で探す
+            </Link>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {current.map((word) => (
