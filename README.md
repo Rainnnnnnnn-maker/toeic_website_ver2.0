@@ -4,6 +4,8 @@ TOEIC語彙ラボ is a comprehensive web application for learning essential TOEI
 
 ## 🚀 Features
 
+- **Inline Audio Recovery**: Word details and study/review cards show audio fetch/playback errors near the affected control with an explicit retry button. New playback clears the error; stale requests are ignored after switching audio, cards, or pages. Study word requests use the canonical slug (including uppercase terms such as CEO), and scope changes clear loading/error/retry state so revisiting a card remains playable.
+
 - **Consistent Term Search**: Home, all-words, and favorites share NFKC/case/whitespace normalization and exact-match-first prefix ordering. Home and all-words also share `*` wildcard matching, including full-width `＊`; favorites retain prefix-only search.
 
 - **Home Search Recovery**: Empty word-search results show spelling/prefix guidance, a clear button that restores input focus and the first page, and a link to the meaning-search tab. (Updated: 2026-09-26)
