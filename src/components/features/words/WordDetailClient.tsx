@@ -7,6 +7,8 @@ import { useFavorites } from "@/context/FavoritesContext";
 import type { WordDetails } from "@/types/word";
 import type { Word } from "@/data/words";
 import { SnsShareButtons } from "@/components/features/sns/SnsShareButtons";
+import { AudioErrorNotice } from "@/components/features/audio/AudioErrorNotice";
+import type { AudioError } from "@/hooks/useTTS";
 import { useTTS } from "@/hooks/useTTS";
 import { useShareTarget } from "@/context/ShareTargetContext";
 import {
@@ -28,11 +30,13 @@ type Props = {
 export function WordDetailClient({ initialData, linkedWords = {}, relatedWords = [], level }: Props) {
   const { isFavorite, toggleFavorite } = useFavorites();
   const {
+    audioError,
+    retryAudio,
     audioLoading,
     sentenceAudioLoading,
     handlePlayAudio,
     handlePlaySentenceAudio
-  } = useTTS();
+  } = useTTS(initialData.word);
   const { shareTarget } = useShareTarget();
 
   const data = initialData;
@@ -95,6 +99,7 @@ export function WordDetailClient({ initialData, linkedWords = {}, relatedWords =
           )}
         </div>
 
+        <AudioErrorNotice error={audioError} targets={[`word:${data.word}`]} onRetry={retryAudio} />
         <section className="flex flex-col gap-2">
           <h2 className="text-xs font-bold tracking-wider uppercase text-slate-500 flex items-center gap-1.5">
             <span className="w-0.5 h-2.5 bg-indigo-500 rounded-full"></span>
@@ -125,6 +130,8 @@ export function WordDetailClient({ initialData, linkedWords = {}, relatedWords =
                 data={data}
                 sentenceAudioLoading={sentenceAudioLoading}
                 onPlaySentence={handlePlaySentenceAudio}
+                audioError={audioError}
+                retryAudio={retryAudio}
               />
             </WordDetailDisclosure>
           ) : (
@@ -132,6 +139,8 @@ export function WordDetailClient({ initialData, linkedWords = {}, relatedWords =
               data={data}
               sentenceAudioLoading={sentenceAudioLoading}
               onPlaySentence={handlePlaySentenceAudio}
+              audioError={audioError}
+              retryAudio={retryAudio}
             />
           )}
         </section>
@@ -283,6 +292,7 @@ export function WordDetailClient({ initialData, linkedWords = {}, relatedWords =
                     </button>
                     <p className="text-xs text-slate-600 leading-relaxed mt-0.5">{ex.japanese}</p>
                   </div>
+                  <AudioErrorNotice error={audioError} targets={[`toeic-${i}`, `toeic-${i}-ja`]} onRetry={retryAudio} />
                 </div>
               ))}
             </div>
@@ -318,6 +328,8 @@ export function WordDetailClient({ initialData, linkedWords = {}, relatedWords =
 }
 
 type MeaningDetailsProps = {
+  audioError: AudioError | null;
+  retryAudio: () => void;
   data: WordDetails;
   sentenceAudioLoading: string | null;
   onPlaySentence: (
@@ -329,6 +341,8 @@ type MeaningDetailsProps = {
 };
 
 function MeaningDetails({
+  audioError,
+  retryAudio,
   data,
   sentenceAudioLoading,
   onPlaySentence,
@@ -415,6 +429,7 @@ function MeaningDetails({
                         {d.exampleJapanese}
                       </p>
                     </div>
+                    <AudioErrorNotice error={audioError} targets={[`meaning-${idx}-detail-${d.number}`, `meaning-${idx}-detail-${d.number}-ja`]} onRetry={retryAudio} />
                   </div>
 
                   <div className="flex flex-wrap gap-1.5 text-xs">

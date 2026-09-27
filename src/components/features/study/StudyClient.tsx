@@ -68,11 +68,13 @@ export default function StudyClient({
   const cardRef = useRef<HTMLElement>(null);
 
   const {
+    audioError,
+    retryAudio,
     audioLoading,
     sentenceAudioLoading,
     handlePlayAudio,
     handlePlaySentenceAudio
-  } = useTTS();
+  } = useTTS(currentWord?.slug);
 
   const {
     countdownValue,
@@ -277,8 +279,10 @@ export default function StudyClient({
             sentenceAudioLoading={sentenceAudioLoading}
             onHint={handleHint}
             onToggleFavorite={() => toggleFavorite(currentWord.slug)}
-            onPlayWordAudio={() => handlePlayAudio(currentWord.term)}
+            onPlayWordAudio={() => handlePlayAudio(currentWord.term, undefined, "en", currentWord.slug)}
             onPlaySentenceAudio={handlePlaySentenceAudio}
+            audioError={audioError}
+            onRetryAudio={retryAudio}
           />
 
           <StudyActions

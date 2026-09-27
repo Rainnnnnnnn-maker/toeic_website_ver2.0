@@ -1,11 +1,15 @@
 'use client';
 
+import { AudioErrorNotice } from "@/components/features/audio/AudioErrorNotice";
+import type { AudioError } from "@/hooks/useTTS";
 import { Star, Volume2, Loader2 } from 'lucide-react';
 import type { Word } from '@/data/words';
 import AutoResizingText from './AutoResizingText';
 import HintExample from './HintExample';
 
 type Props = {
+  audioError: AudioError | null;
+  onRetryAudio: () => void;
   cardRef: React.RefObject<HTMLElement | null>;
   word: Word;
   isFlipped: boolean;
@@ -26,6 +30,8 @@ type Props = {
 // 学習カード本体。表面は単語のみ、裏面（ヒント表示後）は単語 + 例文 + 音声ボタン。
 // カウントダウン・ヒントボタン・お気に入りボタンをオーバーレイ表示する。
 export default function StudyCard({
+  audioError,
+  onRetryAudio,
   cardRef,
   word,
   isFlipped,
@@ -70,6 +76,7 @@ export default function StudyCard({
                 </span>
               </button>
             </div>
+            <AudioErrorNotice error={audioError} targets={[`word:${word.term}`]} onRetry={onRetryAudio} />
             {isLoadingHint ? (
               <div className="flex flex-col items-center gap-1 w-full">
                 <div className="h-5 w-[80%] mx-auto mb-2 bg-blue-100 rounded relative overflow-hidden after:content-[''] after:absolute after:inset-0 after:-translate-x-full after:animate-shimmer after:bg-gradient-to-r after:from-transparent after:via-white/50 after:to-transparent" />
@@ -86,6 +93,7 @@ export default function StudyCard({
                 />
               )
             )}
+            <AudioErrorNotice error={audioError} targets={[`hint-example-${word.slug}`]} onRetry={onRetryAudio} />
           </div>
         )}
       </div>
