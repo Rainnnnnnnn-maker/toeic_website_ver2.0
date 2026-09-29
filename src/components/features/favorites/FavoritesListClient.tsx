@@ -11,18 +11,23 @@ export default function FavoritesListClient({ allWords }: { allWords: Word[] }) 
   const { favorites, clearFavorites } = useFavorites();
   const [page, setPage] = useState(1);
   const [query, setQuery] = useState("");
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const confirmDialogRef = useRef<HTMLDialogElement>(null);
+  const cancelButtonRef = useRef<HTMLButtonElement>(null);
+  const focusEmptyStateRef = useRef(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const pageSize = 20;
 
   const handleClearClick = () => {
-    setShowConfirmModal(true);
+    confirmDialogRef.current?.showModal();
+    cancelButtonRef.current?.focus();
   };
 
   const confirmClear = () => {
+    confirmDialogRef.current?.close();
+    focusEmptyStateRef.current = true;
     clearFavorites();
     setQuery("");
-    setShowConfirmModal(false);
+    setPage(1);
   };
 
   const handleQueryClear = () => {
@@ -53,7 +58,16 @@ export default function FavoritesListClient({ allWords }: { allWords: Word[] }) 
   if (favoriteWords.length === 0) {
     return (
       <div className="text-center py-16 text-slate-500">
-        <p className="text-lg font-medium mb-3">
+        <p
+          tabIndex={-1}
+          ref={(node) => {
+            if (node && focusEmptyStateRef.current) {
+              node.focus();
+              focusEmptyStateRef.current = false;
+            }
+          }}
+          className="text-lg font-medium mb-3"
+        >
           お気に入りの単語はまだありません
         </p>
         <p className="text-sm leading-[1.6]">
@@ -207,32 +221,38 @@ export default function FavoritesListClient({ allWords }: { allWords: Word[] }) 
         </div>
       )}
 
-      {showConfirmModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 transform transition-all animate-in zoom-in-95 duration-200">
-            <h3 className="text-lg font-bold text-gray-900 mb-2">確認</h3>
-            <p className="text-sm text-gray-600 mb-6 leading-relaxed">
-              お気に入り単語をすべて削除してもよろしいですか？
-              <br />
-              この操作は取り消せません。
-            </p>
-            <div className="flex gap-3 justify-end">
-              <button
-                onClick={() => setShowConfirmModal(false)}
-                className="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors"
-              >
-                キャンセル
-              </button>
-              <button
-                onClick={confirmClear}
-                className="px-4 py-2 rounded-lg text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition-colors shadow-sm"
-              >
-                削除する
-              </button>
-            </div>
-          </div>
+      <dialog
+        ref={confirmDialogRef}
+        aria-labelledby="clear-favorites-title"
+        aria-describedby="clear-favorites-description"
+        className="m-auto w-[calc(100%-2rem)] max-w-sm rounded-2xl bg-white p-6 shadow-xl backdrop:bg-black/50 backdrop:backdrop-blur-sm"
+      >
+        <h3 id="clear-favorites-title" className="mb-2 text-lg font-bold text-gray-900">
+          お気に入りをすべて削除
+        </h3>
+        <p id="clear-favorites-description" className="mb-6 text-sm leading-relaxed text-gray-600">
+          お気に入り単語をすべて削除してもよろしいですか？
+          <br />
+          この操作は取り消せません。
+        </p>
+        <div className="flex justify-end gap-3">
+          <button
+            ref={cancelButtonRef}
+            type="button"
+            onClick={() => confirmDialogRef.current?.close()}
+            className="min-h-11 rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-2"
+          >
+            キャンセル
+          </button>
+          <button
+            type="button"
+            onClick={confirmClear}
+            className="min-h-11 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
+          >
+            削除する
+          </button>
         </div>
-      )}
+      </dialog>
     </section>
   );
 }
