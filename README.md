@@ -4,6 +4,8 @@ TOEIC語彙ラボ is a comprehensive web application for learning essential TOEI
 
 ## 🚀 Features
 
+- **Accessible Favorites Confirmation**: Clear-all uses a native modal dialog with initial focus on Cancel, Escape dismissal, and browser-managed background interaction blocking. Cancel restores focus to the trigger; successful deletion focuses the empty-state message.
+
 - **Inline Audio Recovery**: Word details and study/review cards show audio fetch/playback errors near the affected control with an explicit retry button. New playback clears the error; stale requests are ignored after switching audio, cards, or pages. Study word requests use the canonical slug (including uppercase terms such as CEO), and scope changes clear loading/error/retry state so revisiting a card remains playable.
 
 - **Consistent Term Search**: Home, all-words, and favorites share NFKC/case/whitespace normalization and exact-match-first prefix ordering. Home and all-words also share `*` wildcard matching, including full-width `＊`; favorites retain prefix-only search.
