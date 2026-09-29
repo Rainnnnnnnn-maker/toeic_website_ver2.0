@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useFavorites } from "@/context/FavoritesContext";
 import type { Word } from "@/data/words";
@@ -14,6 +14,7 @@ export default function FavoritesListClient({ allWords }: { allWords: Word[] }) 
   const confirmDialogRef = useRef<HTMLDialogElement>(null);
   const cancelButtonRef = useRef<HTMLButtonElement>(null);
   const focusEmptyStateRef = useRef(false);
+  const emptyStateRef = useRef<HTMLParagraphElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const pageSize = 20;
 
@@ -55,19 +56,23 @@ export default function FavoritesListClient({ allWords }: { allWords: Word[] }) 
   const start = (currentPage - 1) * pageSize;
   const current = matchedWords.slice(start, start + pageSize);
 
-  if (favoriteWords.length === 0) {
+  const isEmpty = favoriteWords.length === 0;
+
+  // 削除確定直後のコミットで必ずフラグを消費する。clearFavorites は楽観的更新なので
+  // 確定後のコミットは必ず発生し、一覧が空にならなかった場合もフラグが残らない。
+  // これにより、後で別の理由で空状態になったときにフォーカスを奪うことはない。
+  useEffect(() => {
+    if (!focusEmptyStateRef.current) return;
+    focusEmptyStateRef.current = false;
+    if (isEmpty) emptyStateRef.current?.focus();
+  });
+
+  // 空状態では下の <dialog> を描画しない。確認中にリモート同期などで一覧が空になると
+  // close() を経ずにアンマウントされるが、トップレイヤーからも除去されるため問題ない。
+  if (isEmpty) {
     return (
       <div className="text-center py-16 text-slate-500">
-        <p
-          tabIndex={-1}
-          ref={(node) => {
-            if (node && focusEmptyStateRef.current) {
-              node.focus();
-              focusEmptyStateRef.current = false;
-            }
-          }}
-          className="text-lg font-medium mb-3"
-        >
+        <p ref={emptyStateRef} tabIndex={-1} className="text-lg font-medium mb-3">
           お気に入りの単語はまだありません
         </p>
         <p className="text-sm leading-[1.6]">
