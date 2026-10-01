@@ -2,6 +2,8 @@
 
 import { createPortal } from "react-dom";
 import Link from "next/link";
+import { WORD_LEVEL_INFO } from "@/lib/word-level";
+import { WORD_LEVEL_CARD_STYLES } from "./wordLevelStyles";
 import { Star, Volume2, Loader2, ArrowUpRight } from "lucide-react";
 import { useFavorites } from "@/context/FavoritesContext";
 import type { WordDetails } from "@/types/word";
@@ -73,13 +75,8 @@ export function WordDetailClient({ initialData, linkedWords = {}, relatedWords =
               />
             </button>
             {level && (
-              <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-semibold whitespace-nowrap ${
-                level === 'important' ? 'bg-blue-100 text-blue-800' :
-                level === 'medium' ? 'bg-purple-100 text-purple-800' :
-                'bg-red-100 text-red-800'
-              }`}>
-                {level === 'important' ? '重要' :
-                 level === 'medium' ? '中級' : '上級'}
+              <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-semibold whitespace-nowrap ${WORD_LEVEL_CARD_STYLES[level].badgeClass}`}>
+                {WORD_LEVEL_INFO[level].label}
               </span>
             )}
           </div>

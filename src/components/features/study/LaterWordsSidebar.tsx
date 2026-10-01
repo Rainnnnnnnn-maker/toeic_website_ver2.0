@@ -3,11 +3,7 @@
 import { Clock3 } from 'lucide-react';
 import type { Word } from '@/data/words';
 
-const LEVEL_LABELS: Record<Word['level'], string> = {
-  important: '重要',
-  medium: '中級',
-  high: '上級',
-};
+import { WORD_LEVEL_INFO } from "@/lib/word-level";
 
 type Props = {
   words: Word[];
@@ -50,7 +46,7 @@ export default function LaterWordsSidebar({ words, currentSlug, onSelect }: Prop
               <span className="min-w-0">
                 <span className="block truncate text-sm font-bold">{word.term}</span>
                 <span className="mt-0.5 block text-xs font-medium text-slate-500">
-                  {LEVEL_LABELS[word.level]}
+                  {WORD_LEVEL_INFO[word.level].label}
                 </span>
               </span>
               <span className={`shrink-0 rounded-full px-2 py-1 text-[11px] font-bold ${
