@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { WORD_LEVEL_INFO, WORD_LEVEL_ORDER } from "@/lib/word-level";
+import { WORD_LEVEL_CARD_STYLES } from "@/components/features/words/wordLevelStyles";
 import type { Metadata } from "next";
 import { Suspense, cache } from "react";
 import { BookOpen, Star, List } from "lucide-react";
@@ -132,18 +134,14 @@ async function HomeWordDataSection() {
           <div className="text-2xl font-bold text-slate-800">{totalCount}</div>
           <div className="text-xs text-slate-500 mt-0.5">収録単語数</div>
         </div>
-        <div className="bg-blue-50 rounded-xl border border-blue-200 p-4 text-center shadow-sm">
-          <div className="text-2xl font-bold text-blue-700">{importantWords.length}</div>
-          <div className="text-xs text-blue-600 mt-0.5">最重要（600点）</div>
-        </div>
-        <div className="bg-purple-50 rounded-xl border border-purple-200 p-4 text-center shadow-sm">
-          <div className="text-2xl font-bold text-purple-700">{mediumWords.length}</div>
-          <div className="text-xs text-purple-600 mt-0.5">中級（730〜800点）</div>
-        </div>
-        <div className="bg-red-50 rounded-xl border border-red-200 p-4 text-center shadow-sm">
-          <div className="text-2xl font-bold text-red-700">{highWords.length}</div>
-          <div className="text-xs text-red-600 mt-0.5">上級（800点以上）</div>
-        </div>
+        {WORD_LEVEL_ORDER.map((level) => (
+          <div key={level} className={`rounded-xl border p-4 text-center shadow-sm ${WORD_LEVEL_CARD_STYLES[level].summaryClass}`}>
+            <div className="text-2xl font-bold">
+              {{ important: importantWords.length, medium: mediumWords.length, high: highWords.length }[level]}
+            </div>
+            <div className="mt-0.5 text-xs">{WORD_LEVEL_INFO[level].label}（{WORD_LEVEL_INFO[level].score}）</div>
+          </div>
+        ))}
       </section>
 
       <div className="flex justify-center">
