@@ -61,8 +61,6 @@ type LevelIndexProps = {
   readonly words: Word[];
 };
 
-
-
 function LevelIndex({ level, words }: LevelIndexProps) {
   const info = WORD_LEVEL_INFO[level];
   const styles = WORD_LEVEL_CARD_STYLES[level];

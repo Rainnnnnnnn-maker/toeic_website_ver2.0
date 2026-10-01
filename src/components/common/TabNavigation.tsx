@@ -61,7 +61,7 @@ export default function TabNavigation({ activeTab, onTabChange }: TabNavigationP
                 className={`
                   relative flex items-center justify-center px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg border text-xs sm:text-sm font-bold whitespace-nowrap transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-1 group
                   ${isActive 
-                    ? WORD_LEVEL_CARD_STYLES[tab.id].activeClass
+                    ? `${WORD_LEVEL_CARD_STYLES[tab.id].activeClass} shadow-sm`
                     : `text-slate-600 bg-white border-slate-200 shadow-sm ${WORD_LEVEL_CARD_STYLES[tab.id].cardClass}`}
                   ${isInactive 
                     ? 'opacity-60 bg-slate-100 cursor-not-allowed hover:bg-slate-100 hover:border-slate-200 text-slate-400 shadow-none' 
