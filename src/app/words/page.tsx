@@ -19,6 +19,7 @@ import {
 import { getHighWords, getImportantWords, getMediumWords } from "@/data/words";
 import type { Word } from "@/data/words";
 import { WordsExplorerClient } from "@/components/features/words/WordsExplorerClient";
+import { WORD_LEVEL_CARD_STYLES } from "@/components/features/words/wordLevelStyles";
 import { WORD_LEVEL_INFO } from "@/lib/word-level";
 import type { WordLevel } from "@/lib/word-level";
 import { TODAY_WORDS_COUNT } from "@/lib/word-select";
@@ -60,17 +61,9 @@ type LevelIndexProps = {
   readonly words: Word[];
 };
 
-const levelIndexStyles: Readonly<
-  Record<WordLevel, { readonly accentClass: string; readonly countClass: string }>
-> = {
-  important: { accentClass: "bg-blue-600", countClass: "bg-blue-100 text-blue-800" },
-  medium: { accentClass: "bg-violet-600", countClass: "bg-violet-100 text-violet-800" },
-  high: { accentClass: "bg-rose-600", countClass: "bg-rose-100 text-rose-800" },
-};
-
 function LevelIndex({ level, words }: LevelIndexProps) {
   const info = WORD_LEVEL_INFO[level];
-  const styles = levelIndexStyles[level];
+  const styles = WORD_LEVEL_CARD_STYLES[level];
   const groups = groupByFirstLetter(words);
   const letters = Object.keys(groups).sort((a, b) => a.localeCompare(b));
 
@@ -89,7 +82,7 @@ function LevelIndex({ level, words }: LevelIndexProps) {
             <span className="min-w-0">
               <span className="flex flex-wrap items-center gap-2">
                 <span className="text-base font-bold text-slate-900 sm:text-lg">{info.indexTitle}</span>
-                <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${styles.countClass}`}>
+                <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${styles.badgeClass}`}>
                   TOEIC {info.score} · {words.length}語
                 </span>
               </span>
@@ -195,7 +188,7 @@ function LearningGuides({
             <ChevronDown className="size-4 transition-transform group-open:rotate-180" />
           </summary>
           <p className="mt-3 text-sm leading-7 text-slate-700">
-            高難易度単語{highCount}語では、法律・金融・人事など特定のビジネス文脈で使われる語彙も扱います。出現頻度だけでなく、
+            {WORD_LEVEL_INFO.high.indexTitle}{highCount}語では、法律・金融・人事など特定のビジネス文脈で使われる語彙も扱います。出現頻度だけでなく、
             <strong>長文の決定的な手がかりになる単語</strong>として例文の中で理解してください。
           </p>
         </details>

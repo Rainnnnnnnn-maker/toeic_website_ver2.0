@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { WORD_LEVEL_INFO } from "@/lib/word-level";
+import { WORD_LEVEL_CARD_STYLES } from "./wordLevelStyles";
 import type { Word } from "@/data/words";
 import { TODAY_WORDS_COUNT } from "@/lib/word-select";
 import { buildTodayNavigationQuery } from "@/lib/today-navigation";
@@ -10,18 +12,6 @@ type Props = {
   words: Word[];
   variant: "preview" | "full";
 };
-
-const levelStyles = {
-  important: "bg-blue-100 text-blue-800",
-  medium: "bg-purple-100 text-purple-800",
-  high: "bg-red-100 text-red-800",
-} as const;
-
-const levelLabels = {
-  important: "重要",
-  medium: "中級",
-  high: "上級",
-} as const;
 
 export default function TodayRecommendedWordsClient({ words, variant }: Props) {
   const todayQuery = buildTodayNavigationQuery(words);
@@ -56,8 +46,8 @@ export default function TodayRecommendedWordsClient({ words, variant }: Props) {
               >
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-sm font-semibold text-gray-900 leading-tight">{word.term}</span>
-                  <span className={`text-[9px] px-1 py-0.5 rounded-full font-semibold whitespace-nowrap ${levelStyles[word.level]}`}>
-                    {levelLabels[word.level]}
+                  <span className={`text-[9px] px-1 py-0.5 rounded-full font-semibold whitespace-nowrap ${WORD_LEVEL_CARD_STYLES[word.level].badgeClass}`}>
+                    {WORD_LEVEL_INFO[word.level].label}
                   </span>
                 </div>
                 <span className="text-[9px] text-gray-400">AI解説を見る</span>
@@ -98,8 +88,8 @@ export default function TodayRecommendedWordsClient({ words, variant }: Props) {
             >
               <div className="flex items-center justify-between gap-2">
                 <span className="text-sm font-semibold text-gray-900 leading-tight">{word.term}</span>
-                <span className={`text-[9px] px-1 py-0.5 rounded-full font-semibold whitespace-nowrap ${levelStyles[word.level]}`}>
-                  {levelLabels[word.level]}
+                <span className={`text-[9px] px-1 py-0.5 rounded-full font-semibold whitespace-nowrap ${WORD_LEVEL_CARD_STYLES[word.level].badgeClass}`}>
+                  {WORD_LEVEL_INFO[word.level].label}
                 </span>
               </div>
               <span className="text-[9px] text-gray-400">AI解説を見る</span>

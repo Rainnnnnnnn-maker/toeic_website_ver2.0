@@ -1,3 +1,4 @@
+import { WORD_LEVEL_INFO } from "@/lib/word-level";
 import { getEditorialWord } from "@/data/word-editorial";
 import { Suspense } from "react";
 import Link from "next/link";
@@ -53,9 +54,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   // （L1 Data Cache ヒット時は数ms。SSGビルド済みのため実質無コスト）
   const detailData = await getWordDetail(slug).catch(() => null);
 
-  const levelLabel =
-    wordEntry.level === "important" ? "重要" :
-    wordEntry.level === "medium" ? "中級" : "上級";
+  const levelLabel = WORD_LEVEL_INFO[wordEntry.level].label;
 
   const title = `${wordEntry.term} | TOEIC重要単語`;
 

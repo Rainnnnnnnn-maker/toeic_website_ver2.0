@@ -3,6 +3,8 @@ import { filterWordsByTermQuery, normalizeTermQuery } from "@/lib/word-search";
 import { useState, useRef } from "react";
 import type { ChangeEvent, KeyboardEvent } from "react";
 import Link from "next/link";
+import { WORD_LEVEL_INFO } from "@/lib/word-level";
+import { WORD_LEVEL_CARD_STYLES } from "./wordLevelStyles";
 import type { Word } from "@/data/words";
 import { X, ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight } from "lucide-react";
 import TabNavigation, { TabId } from "@/components/common/TabNavigation";
@@ -74,7 +76,7 @@ export default function WordsListClient({ importantWords, mediumWords, highWords
           </div>
         ) : activeTab === 'important' ? (
           <div>
-            <h2 className="text-lg font-bold text-slate-800 mb-1">最重要単語（TOEIC 600点レベル）</h2>
+            <h2 className="text-lg font-bold text-slate-800 mb-1">{WORD_LEVEL_INFO.important.indexTitle}（TOEIC {WORD_LEVEL_INFO.important.score}レベル）</h2>
             <p className="text-xs leading-relaxed text-slate-600">
               TOEICスコアアップのために最初に覚えるべき基礎単語です。
               まずはこのリストを完璧にすることで、スコアアップを目指しましょう。
@@ -82,7 +84,7 @@ export default function WordsListClient({ importantWords, mediumWords, highWords
           </div>
         ) : activeTab === 'medium' ? (
           <div>
-            <h2 className="text-lg font-bold text-slate-800 mb-1">中級単語（TOEIC 730〜800点レベル）</h2>
+            <h2 className="text-lg font-bold text-slate-800 mb-1">{WORD_LEVEL_INFO.medium.indexTitle}（TOEIC {WORD_LEVEL_INFO.medium.score}レベル）</h2>
             <p className="text-xs leading-relaxed text-slate-600">
               さらなるスコアアップを目指すための応用単語です。
               やや難易度の高い単語ですが、Part 5、Part 6、Part 7の問題対策としても有効です。
@@ -90,7 +92,7 @@ export default function WordsListClient({ importantWords, mediumWords, highWords
           </div>
         ) : (
           <div>
-            <h2 className="text-lg font-bold text-slate-800 mb-1">高難易度単語（TOEIC 800点以上レベル）</h2>
+            <h2 className="text-lg font-bold text-slate-800 mb-1">{WORD_LEVEL_INFO.high.indexTitle}（TOEIC {WORD_LEVEL_INFO.high.score}レベル）</h2>
             <p className="text-xs leading-relaxed text-slate-600">
               800点以上の高スコアを目指すための上級単語です。
               Part 7の長文読解や、より高度なビジネス表現に対応するための語彙力を強化します。
@@ -213,13 +215,8 @@ export default function WordsListClient({ importantWords, mediumWords, highWords
             <div className="flex items-center justify-between gap-2">
               <span className="text-base font-semibold text-gray-900">{word.term}</span>
               {normalizedQuery && (
-                <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-semibold whitespace-nowrap ${
-                  word.category === 'important' ? 'bg-blue-100 text-blue-800' : 
-                  word.category === 'medium' ? 'bg-purple-100 text-purple-800' : 
-                  'bg-red-100 text-red-800'
-                }`}>
-                  {word.category === 'important' ? '重要' : 
-                   word.category === 'medium' ? '中級' : '上級'}
+                <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-semibold whitespace-nowrap ${WORD_LEVEL_CARD_STYLES[word.category].badgeClass}`}>
+                  {WORD_LEVEL_INFO[word.category].label}
                 </span>
               )}
             </div>

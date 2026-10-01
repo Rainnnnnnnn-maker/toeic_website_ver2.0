@@ -2,7 +2,10 @@
 
 import { useState, useEffect } from 'react';
 
-export type TabId = 'important' | 'medium' | 'high';
+import { WORD_LEVEL_INFO, WORD_LEVEL_ORDER, type WordLevel } from "@/lib/word-level";
+import { WORD_LEVEL_CARD_STYLES } from "@/components/features/words/wordLevelStyles";
+
+export type TabId = WordLevel;
 
 interface Tab {
   id: TabId;
@@ -15,11 +18,11 @@ interface TabNavigationProps {
   onTabChange: (id: TabId) => void;
 }
 
-const TABS: Tab[] = [
-  { id: 'important', label: '重要単語', status: 'active' },
-  { id: 'medium', label: '中難易度単語', status: 'active' },
-  { id: 'high', label: '高難易度単語', status: 'active' },
-];
+const TABS: Tab[] = WORD_LEVEL_ORDER.map((id) => ({
+  id,
+  label: WORD_LEVEL_INFO[id].indexTitle,
+  status: 'active',
+}));
 
 export default function TabNavigation({ activeTab, onTabChange }: TabNavigationProps) {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -56,10 +59,10 @@ export default function TabNavigation({ activeTab, onTabChange }: TabNavigationP
                 aria-selected={isActive}
                 aria-disabled={isInactive}
                 className={`
-                  relative flex items-center justify-center px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg border text-xs sm:text-sm font-bold whitespace-nowrap transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1 group
+                  relative flex items-center justify-center px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg border text-xs sm:text-sm font-bold whitespace-nowrap transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-1 group
                   ${isActive 
-                    ? 'text-emerald-700 bg-emerald-50 border-emerald-300 shadow-sm' 
-                    : 'text-slate-600 bg-white border-emerald-100 shadow-sm hover:bg-emerald-50/50 hover:border-emerald-200 hover:text-emerald-800'}
+                    ? `${WORD_LEVEL_CARD_STYLES[tab.id].activeClass} shadow-sm`
+                    : `text-slate-600 bg-white border-slate-200 shadow-sm ${WORD_LEVEL_CARD_STYLES[tab.id].cardClass}`}
                   ${isInactive 
                     ? 'opacity-60 bg-slate-100 cursor-not-allowed hover:bg-slate-100 hover:border-slate-200 text-slate-400 shadow-none' 
                     : ''}

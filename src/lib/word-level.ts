@@ -24,7 +24,7 @@ export const WORD_LEVEL_INFO: Readonly<Record<WordLevel, WordLevelInfo>> = {
   },
   high: {
     label: "上級",
-    indexTitle: "高難易度単語",
+    indexTitle: "上級単語",
     score: "800点以上",
     indexDescription: "長文読解や高度なビジネス表現に対応する上級単語",
   },
