@@ -219,6 +219,12 @@ export default defineConfig({
 sonar.javascript.lcov.reportPaths=coverage/lcov.info
 ```
 
+Vitest のカバレッジ対象は `src/lib/**` のみ（ユニットテストは純粋ロジック限定、React コンポーネントやページはテストしない方針）。そのため `src/lib` 以外は `sonar.coverage.exclusions` でカバレッジ計測から外す。外さないと、コンポーネントやページを1行変えただけの PR でも「新規コードのカバレッジ 0%」として品質ゲートが失敗する。静的解析の対象には残る。
+
+```properties
+sonar.coverage.exclusions=src/app/**,src/components/**,src/context/**,src/hooks/**,src/data/**,src/actions/**,src/types/**,src/proxy.ts
+```
+
 ---
 
 ## 5. CI ワークフローに SonarCloud スキャンを追加
