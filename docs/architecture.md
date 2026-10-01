@@ -134,7 +134,7 @@
 
 * `BLOB_URL_MEDIUM`: 中重要単語ファイルの直接URL（設定時、Vercelのlist操作をスキップ）
 
-* `BLOB_URL_HIGH`: 高難易度単語ファイルの直接URL（設定時、Vercelのlist操作をスキップ）
+* `BLOB_URL_HIGH`: 上級単語ファイルの直接URL（設定時、Vercelのlist操作をスキップ）
 
 * `REVALIDATION_TOKEN`: キャッシュ再検証API保護用のトークン（推測困難なランダム文字列推奨）
 
@@ -160,7 +160,7 @@
 
 #### データ要件
 
-* 単語一覧は Vercel Blob 上の `words-file/word.txt`（最重要単語: 600点レベル）、`words-file/word_mid.txt`（中級単語: 730〜800点レベル）、`words-file/word_high.txt`（高難易度単語: 800点以上レベル）の3ファイルをソースとして読み込む
+* 単語一覧は Vercel Blob 上の `words-file/word.txt`（最重要単語: 600点レベル）、`words-file/word_mid.txt`（中級単語: 730〜800点レベル）、`words-file/word_high.txt`（上級単語: 800点以上レベル）の3ファイルをソースとして読み込む
 
   * 実装は `src/data/words.ts` でデータ取得を行う（`NODE_ENV=development` 時はローカルの `__words__/` 配下を読む）。ローカル／Blob の分岐と取得処理そのものは `src/lib/word-source.ts`（`server-only` なし）に集約し、`src/data/words.ts` はキャッシュ層（`'use cache'` / `cacheTag('word-list')`）としてこれを呼び出す。CLI の `scripts/embed-words.ts` も同じモジュールを使うため、サイトと投入対象のコーパスが一致する
 
@@ -172,7 +172,7 @@
 
   * Blob 取得の失敗（非 200 応答・fetch 例外・対象 Blob の欠損）は空配列で握りつぶさず例外を投げる。例外時はキャッシュに書き込まれず、バックグラウンド再検証の失敗時は直前の正常なキャッシュが使われ続けるため、「空の単語リストが長期キャッシュされて単語が消える」事故を防ぐ（ビルド時に Blob 取得が失敗した場合はビルド自体が失敗する）
 
-  * `slug` は `term.toLowerCase()` で生成し、最重要/中級/高難易度を統合する際に同一slugは重複排除される（各単語は `level: 'important' | 'medium' | 'high'` を保持）
+  * `slug` は `term.toLowerCase()` で生成し、最重要/中級/上級を統合する際に同一slugは重複排除される（各単語は `level: 'important' | 'medium' | 'high'` を保持）
 
 #### データ更新フロー
 
@@ -276,7 +276,7 @@
    * `.env.example` を参考に `.env.local` を作成し、各キーを設定
 3. 単語データ配置
 
-   * `./__words__/word.txt`（最重要）、`./__words__/word_mid.txt`（中級）、`./__words__/word_high.txt`（高難易度）が存在することを確認（1行1単語）
+   * `./__words__/word.txt`（最重要）、`./__words__/word_mid.txt`（中級）、`./__words__/word_high.txt`（上級）が存在することを確認（1行1単語）
 4. 開発サーバ起動
 
    * `npm run dev`
@@ -351,8 +351,8 @@
 * トップページ `src/app/page.tsx`
 
   * `Home` 本体は単語データ取得を直接 `await` せず、ページシェル・CTA・静的説明・学習ガイド導線を先に描画可能にする
-  * 「今日おすすめの6単語」コンパクトセクション、最重要/中級/高難易度の単語一覧＋統計、FAQ/FAQPage JSON-LD はそれぞれ async Server Component に分離し、個別の `<Suspense>` 境界とスケルトン fallback でストリーミング表示する
-  * 最重要/中級/高難易度の3レベルの単語を取得し、クライアント側一覧UIへ渡す
+  * 「今日おすすめの6単語」コンパクトセクション、最重要/中級/上級の単語一覧＋統計、FAQ/FAQPage JSON-LD はそれぞれ async Server Component に分離し、個別の `<Suspense>` 境界とスケルトン fallback でストリーミング表示する
+  * 最重要/中級/上級の3レベルの単語を取得し、クライアント側一覧UIへ渡す
   * CTA直下に「今日おすすめの6単語」コンパクトセクションを表示する
   * WebSite / BreadcrumbList / FAQPage のJSON-LDおよび統計数値・3つの機能・使い方ガイドを表示する。資格を授与しないサイトのため `EducationalOrganization` / `educationalCredentialAwarded` は出力しない
   * Google検索のサイト名候補だけを「TOEIC語彙ラボ」にする。対象は `WebSite.name`（初期サーバーHTMLへ直接出力）、`og:site_name`、Next.js `applicationName`。既存の上位表示を保護するため、SEOタイトル・description・H1・canonical・子ページタイトル末尾・publisher/author・PWA/OGP表記は従来の「TOEIC重要単語」を維持する。TOPの小ラベルとFooterでは「TOEIC語彙ラボ」と「TOEIC重要単語」を併記し、Googleのサイト名認識と既存キーワードの両方を補助する
@@ -361,7 +361,7 @@
 
   * 「TOEIC重要単語」検索上位獲得を目的とした全単語のハブページ
   * ファーストビューを学習ハブ化し、今日おすすめ6単語・暗記テスト・お気に入り・学習ガイドへの導線を配置する
-  * 全1,300語超をレベル別（最重要/中級/高難易度）・アルファベット順に掲載する。完全索引は Server Component の通常 `<a href>` を維持したまま、ネイティブ `<details>` で「レベル → 頭文字」の二段階に折りたたみ、内部リンク構造とモバイルの一覧性を両立する
+  * 全1,300語超をレベル別（最重要/中級/上級）・アルファベット順に掲載する。完全索引は Server Component の通常 `<a href>` を維持したまま、ネイティブ `<details>` で「レベル → 頭文字」の二段階に折りたたみ、内部リンク構造とモバイルの一覧性を両立する
   * 目標スコア別の学習ポイントは一覧から分離したアコーディオンで表示し、検索結果への到達を妨げずに静的なSEO本文を維持する
   * metadata description の固定レベル別件数を廃止し、単語リスト更新後に件数が乖離しない「1,300語以上」表記へ変更する
   * パンくずリスト（BreadcrumbList）やアイテムリスト（ItemList）の構造化データを配置
@@ -398,8 +398,8 @@
 
   * 英単語検索の正規化は `src/lib/word-search.ts:normalizeTermQuery` に集約（NFKC・空白圧縮・trim・小文字化）。TOP/全単語一覧は `filterWordsByTermQuery`、お気に入りは `filterWordsByTermPrefix` を使用し、前方一致では完全一致を先頭に寄せる。TOP/全単語一覧の `*`（全角 `＊` も可）は全体一致パターンとして扱い、その他の正規表現記号は文字として扱う。ワイルドカード検索の結果は元の順序を維持する。
 
-  * タブ切り替え（最重要/中級/高難易度の3タブ）、検索（前方一致＋ワイルドカード `*` 対応）、ページング（20件/ページ）
-  * 検索結果表示時にはカテゴリバッジ（重要/中級/上級）を単語カードに表示する
+  * タブ切り替え（最重要単語/中級単語/上級単語の3タブ）、検索（前方一致＋ワイルドカード `*` 対応）、ページング（20件/ページ）
+  * 検索結果表示時にはカテゴリバッジ（最重要/中級/上級、`WORD_LEVEL_INFO` / `WORD_LEVEL_CARD_STYLES` の共通定義）を単語カードに表示する
   * 空白以外の検索語で0件の場合、スペル・前方一致の案内、「検索をクリア」、「意味で探す」を表示する。クリアは入力欄へフォーカスを戻し、選択中の難易度の1ページ目を表示する。意味検索リンクは `/words?mode=meaning#word-explorer` を開き、検索語の転送や自動検索は行わない。
   * 詳細ページへの遷移リンク（`/words/[slug]?from=top`等で状態を引き継ぐ）
 
@@ -1046,7 +1046,7 @@ RLS は `favorites` と同じく「自分の行のみ全操作可」（`auth.uid
 
 * トップページ
 
-  * 一覧表示、タブ切り替え（最重要/中級/高難易度）、検索（前方一致＋ワイルドカード `*`）、ページングが期待通りに動作する
+  * 一覧表示、タブ切り替え（最重要単語/中級単語/上級単語）、検索（前方一致＋ワイルドカード `*`）、ページングが期待通りに動作する
   * 「今日おすすめの6単語」プレビューが表示され、同一日内で同一単語が選ばれる
 
 * セマンティック検索（`/words` の「意味で探す」タブ）
