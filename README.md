@@ -4,6 +4,8 @@ TOEIC語彙ラボ is a comprehensive web application for learning essential TOEI
 
 ## 🚀 Features
 
+- **Consistent Difficulty Labels**: Level UI uses 最重要 / 中級 / 上級 and shared blue / violet / rose styles across home, search, daily picks, and word details. Labels, score guidance, and styling come from the shared level definitions.
+
 - **Accessible Favorites Confirmation**: Clear-all uses a native modal dialog with initial focus on Cancel, Escape dismissal, and browser-managed background interaction blocking. Cancel restores focus to the trigger; successful deletion focuses the empty-state message.
 
 - **Inline Audio Recovery**: Word details and study/review cards show audio fetch/playback errors near the affected control with an explicit retry button. New playback clears the error; stale requests are ignored after switching audio, cards, or pages. Study word requests use the canonical slug (including uppercase terms such as CEO), and scope changes clear loading/error/retry state so revisiting a card remains playable.
