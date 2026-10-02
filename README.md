@@ -4,7 +4,7 @@ TOEIC語彙ラボ is a comprehensive web application for learning essential TOEI
 
 ## 🚀 Features
 
-- **Study Audio Controls**: Study/review word and hint-example audio buttons use 44×44px targets, 20px icons, blue styling, and visible keyboard focus. (Updated: 2026-10-02)
+- **Study Audio Controls**: Study/review word and hint-example audio buttons use 44×44px targets, 20px icons, blue styling, and visible keyboard focus. The hint-example button sits beside the sentence instead of inline, so wrapped sentences keep even line spacing. (Updated: 2026-10-02)
 
 - **Consistent Difficulty Labels**: Level UI uses 最重要 / 中級 / 上級 and shared blue / violet / rose styles across home, search, daily picks, and word details. Labels, score guidance, and styling come from the shared level definitions.
 
