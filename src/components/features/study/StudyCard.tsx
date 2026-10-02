@@ -62,18 +62,17 @@ export default function StudyCard({
                 <AutoResizingText text={word.term} className="text-5xl font-bold text-gray-900 text-center mb-0 whitespace-nowrap max-w-full overflow-hidden text-ellipsis" style={{ marginBottom: 0 }} />
               </div>
               <button
-                className="inline-flex items-center justify-center p-0 border-none bg-transparent cursor-pointer disabled:opacity-70 disabled:cursor-default align-middle group"
+                type="button"
+                className="inline-flex size-11 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600 align-middle transition-colors hover:bg-blue-100 active:bg-blue-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:opacity-70 disabled:cursor-default"
                 onClick={onPlayWordAudio}
                 disabled={audioLoading}
-                aria-label="Play word audio"
+                aria-label="発音を再生"
               >
-                <span className="w-[26px] h-[26px] rounded-full inline-flex items-center justify-center bg-gray-100 text-[#5780d8] text-lg leading-none transition-all duration-160 group-hover:translate-y-[-1px] group-hover:shadow-md">
-                  {audioLoading ? (
-                    <Loader2 className="animate-spin" size={14} />
-                  ) : (
-                    <Volume2 size={14} />
-                  )}
-                </span>
+                {audioLoading ? (
+                  <Loader2 className="animate-spin" size={20} />
+                ) : (
+                  <Volume2 size={20} />
+                )}
               </button>
             </div>
             <AudioErrorNotice error={audioError} targets={[`word:${word.term}`]} onRetry={onRetryAudio} />

@@ -29,19 +29,17 @@ export default function HintExample({ sentence, term, slug, sentenceAudioLoading
           )
         )}
         <button
-          className="inline-flex items-center justify-center p-0 border-none bg-transparent cursor-pointer align-middle disabled:opacity-70 disabled:cursor-default ml-2 group"
+          type="button"
+          className="inline-flex size-11 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600 align-middle transition-colors hover:bg-blue-100 active:bg-blue-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:opacity-70 disabled:cursor-default ml-2"
           onClick={() => onPlaySentenceAudio(sentence, audioId, 'en', slug)}
           disabled={isLoading}
-          aria-label="Play sample audio"
-          style={{ marginLeft: '8px', verticalAlign: 'middle', display: 'inline-flex' }}
+          aria-label="例文を再生"
         >
-          <span className="w-[26px] h-[26px] rounded-full inline-flex items-center justify-center bg-gray-100 text-[#5780d8] text-lg leading-none transition-all duration-160 group-hover:translate-y-[-1px] group-hover:shadow-md">
-            {isLoading ? (
-              <Loader2 className="animate-spin" size={14} />
-            ) : (
-              <Volume2 size={14} />
-            )}
-          </span>
+          {isLoading ? (
+            <Loader2 className="animate-spin" size={20} />
+          ) : (
+            <Volume2 size={20} />
+          )}
         </button>
       </div>
     </div>
