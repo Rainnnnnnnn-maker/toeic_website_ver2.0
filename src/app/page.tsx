@@ -13,11 +13,29 @@ import { SemanticSearchLauncher } from "@/components/features/words/SemanticSear
 import { getLatestGuideArticles,PUBLISHED_GUIDE_ARTICLE_COUNT} from "@/data/guide-articles";
 import { TODAY_WORDS_COUNT } from "@/lib/word-select";
 
+const homeTitle = "TOEIC 重要単語【2026年版】600点・730点・800点向け｜詳しい解説付き無料単語帳";
+const homeDescription = `【完全無料】TOEIC学習向け英単語1,300語以上を3段階に整理。ビジネス場面の例文、類義語、発音、学習・復習機能と学習ガイド${PUBLISHED_GUIDE_ARTICLE_COUNT}本を、登録不要で利用できます。`;
+
 export const metadata: Metadata = {
   title: {
-    absolute: "TOEIC 重要単語【2026年版】600点・730点・800点向け｜詳しい解説付き無料単語帳",
+    absolute: homeTitle,
   },
-  description: `【完全無料】TOEIC学習向け英単語1,300語以上を3段階に整理。ビジネス場面の例文、類義語、発音、学習・復習機能と学習ガイド${PUBLISHED_GUIDE_ARTICLE_COUNT}本を、登録不要で利用できます。`,
+  description: homeDescription,
+  openGraph: {
+    title: homeTitle,
+    description: homeDescription,
+    url: "https://www.toeic-words.com/",
+    siteName: "TOEIC語彙ラボ",
+    locale: "ja_JP",
+    type: "website",
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "TOEIC語彙ラボ｜例文・音声付き無料単語帳" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: homeTitle,
+    description: homeDescription,
+    images: ["/opengraph-image"],
+  },
   keywords: ["TOEIC 重要単語", "TOEIC 単語帳", "TOEIC 英単語", "2026年", "無料", "アプリ", "600点", "730点", "800点"],
   alternates: {
     canonical: "https://www.toeic-words.com/",

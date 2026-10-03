@@ -219,9 +219,21 @@ async function WordDetailFetcher({ word }: { word: string }) {
           <ul className="mt-2 list-inside list-disc">
             {editorial.sources.map((url) => <li key={url}><a href={url} target="_blank" rel="noopener noreferrer" className="text-blue-700 underline">語義・用法の参考資料</a></li>)}
           </ul>
-          <Link href="/contact" prefetch={false} className="mt-2 inline-block text-blue-700 underline">内容の誤りを報告</Link>
         </aside>
       )}
+      <aside className="mt-4 rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-700">
+        <h2 className="font-semibold">解説の内容について</h2>
+        <p className="mt-2">意味・例文・和訳などに誤りや不自然な表現がありましたら、問題の箇所をお知らせください。</p>
+        <a
+          href={`mailto:paulowniarain@gmail.com?subject=${encodeURIComponent(`単語解説の誤り報告：${detailData.word}`)}&body=${encodeURIComponent(`対象単語：${detailData.word}\nURL：https://www.toeic-words.com/words/${word}\n\n問題の箇所：\n\n修正案・参考資料（任意）：\n`)}`}
+          className="mt-3 inline-flex min-h-11 items-center rounded-lg px-3 text-blue-700 underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+        >
+          内容の誤りを報告（メール）
+        </a>
+        <p className="mt-2 text-xs">
+          メールアプリが開かない場合は、<Link href="/contact" prefetch={false} className="text-blue-700 underline">お問い合わせページ</Link>をご利用ください。
+        </p>
+      </aside>
     </>
   );
 }
