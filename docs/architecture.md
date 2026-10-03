@@ -1,6 +1,13 @@
 # TOEIC重要単語（toeic_website_ver2.0）技術ドキュメント
 
-最終更新日: 2026-10-02（難易度の名称・配色を共通定義に統一、学習カードの発音ボタンを拡大、ヒント例文の行高を安定化）
+最終更新日: 2026-10-02（難易度の名称・配色を共通定義に統一、学習カードの発音ボタンを拡大、ヒント例文の行高を安定化、全単語の誤り報告導線・TOPのSNSメタデータ・robotsのHost整理）
+
+### SEO・コンテンツ改善の初回対応（2026-10-02）
+
+- 単語詳細の説明本文を取得できた全語に、Server Componentで誤り報告欄を表示する。編集済み語だけにあった報告リンクを共通化し、メールの件名・本文へ単語と正規URLをURLエンコードして事前入力する。メールアプリが使えない場合は既存`/contact`へ案内する。報告リンクはメールの作成画面を開き、送信は利用者が行う。
+- TOP固有のOpen Graph／Twitter metadataはページtitle・descriptionを共用する。metadataのネスト項目は浅いマージで置き換わるため、siteName・locale・type・画像も明示する。他ページの共通metadataは維持する。
+- `src/app/robots.ts`のHost出力を削除する。Allow／Disallow／Sitemapの方針は維持する。
+- 人による確認バッジ、単語lastmod、RAGは未実装。進捗と残作業は[SEO・コンテンツ改善計画](plans/seo-content-improvement-plan.md)で管理する。
 
 ## 1. プロジェクト概要
 
