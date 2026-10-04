@@ -1,6 +1,6 @@
 # TOEIC重要単語（toeic_website_ver2.0）技術ドキュメント
 
-最終更新日: 2026-10-03（SEO計画を `docs/plans/seo-content-improvement-plan.md` に一本化し、Googlebot切断HTML問題の再検証結果を反映）
+最終更新日: 2026-10-04（TOPページの情報設計を整理：主ボタンの一本化、収録語数のヒーローバッジ化、セクション順の再編）
 
 ### SEO・コンテンツ改善の初回対応（2026-10-02）
 
@@ -358,10 +358,12 @@
 * トップページ `src/app/page.tsx`
 
   * `Home` 本体は単語データ取得を直接 `await` せず、ページシェル・CTA・静的説明・学習ガイド導線を先に描画可能にする
-  * 「今日おすすめの6単語」コンパクトセクション、最重要/中級/上級の単語一覧＋統計、FAQ/FAQPage JSON-LD はそれぞれ async Server Component に分離し、個別の `<Suspense>` 境界とスケルトン fallback でストリーミング表示する
+  * 「今日おすすめの6単語」コンパクトセクション、ヒーローの収録語数バッジ、最重要/中級/上級の単語一覧、FAQ/FAQPage JSON-LD はそれぞれ async Server Component に分離し、個別の `<Suspense>` 境界とスケルトン fallback でストリーミング表示する（語数バッジと一覧は `cache()` 済みの `getHomeWordData` を共有する）
   * 最重要/中級/上級の3レベルの単語を取得し、クライアント側一覧UIへ渡す
-  * CTA直下に「今日おすすめの6単語」コンパクトセクションを表示する
-  * WebSite / BreadcrumbList / FAQPage のJSON-LDおよび統計数値・3つの機能・使い方ガイドを表示する。資格を授与しないサイトのため `EducationalOrganization` / `educationalCredentialAwarded` は出力しない
+  * ファーストビューの塗りつぶしボタンはヒーローの「今日の6単語から始める」（`#today-words` へのページ内リンク）1つに限定する。学習モードは枠線ボタン、お気に入りは文字リンク、今日のおすすめ内の「聞き流し」は淡色ボタンとし、SNSシェアはページ末尾へ置く
+  * 表示順：ヒーロー → 今日おすすめの6単語 → 意味で探す（`SemanticSearchLauncher`）→ レベル別単語一覧（つづり検索）→ 全単語一覧 → はじめての方へ → 学習ガイド最新記事 → このサイトについて（3つの機能・使い方ガイド・運営者メッセージ）→ FAQ → 解説記事 → SNSシェア
+  * 2つの検索は見出し・説明・placeholder で「意味で探す」「英単語のつづりで検索」と役割を明示する
+  * WebSite / BreadcrumbList / FAQPage のJSON-LDおよび収録語数・3つの機能・使い方ガイドを表示する。資格を授与しないサイトのため `EducationalOrganization` / `educationalCredentialAwarded` は出力しない
   * Google検索のサイト名候補だけを「TOEIC語彙ラボ」にする。対象は `WebSite.name`（初期サーバーHTMLへ直接出力）、`og:site_name`、Next.js `applicationName`。既存の上位表示を保護するため、SEOタイトル・description・H1・canonical・子ページタイトル末尾・publisher/author・PWA/OGP表記は従来の「TOEIC重要単語」を維持する。TOPの小ラベルとFooterでは「TOEIC語彙ラボ」と「TOEIC重要単語」を併記し、Googleのサイト名認識と既存キーワードの両方を補助する
 
 * 全単語一覧インデックスページ `src/app/words/page.tsx`
@@ -844,7 +846,7 @@
 * 入口UI
 
   * `/words`: `WordsExplorerClient` の「意味で探す」タブ → `SemanticSearchPanel`（結果表示を含む唯一のUI）
-  * TOP: `SemanticSearchLauncher`（今日のおすすめ・初回学習案内の下）。結果UIは持たず、検索語を同一タブの `sessionStorage` へ保存してから `/words?mode=meaning&launch=<不透明ID>#word-explorer` へ遷移し、意味検索タブが `initialQuery` を自動実行する。検索語本文はURL、Vercelのリクエストログ、GA4の `page_location` に含めない。タブを閉じると一時データは削除され、URLだけを別タブへ共有しても検索語は復元されない
+  * TOP: `SemanticSearchLauncher`（今日のおすすめの下、単語一覧の上。見出しは「意味で探す」）。結果UIは持たず、検索語を同一タブの `sessionStorage` へ保存してから `/words?mode=meaning&launch=<不透明ID>#word-explorer` へ遷移し、意味検索タブが `initialQuery` を自動実行する。検索語本文はURL、Vercelのリクエストログ、GA4の `page_location` に含めない。タブを閉じると一時データは削除され、URLだけを別タブへ共有しても検索語は復元されない
   * 検索語の一時保存・復元は `src/lib/semantic-launch-store.ts`（`sessionStorage`＋SPA遷移用メモリフォールバック）が担当する。URLパラメータ（`mode`/`launch`）の検証と組み立て、検索語の100文字切り詰めは `src/lib/semantic-launch.ts` の純粋関数に集約する
   * `WordsExplorerClient` は Next.js の `useSearchParams` でURLを購読し、ブラウザの戻る・進むや同一ページ内のモード変更へ追従する。静的プリレンダリングを保つため、`src/app/words/page.tsx` 側で同クライアントコンポーネントを `<Suspense>` に包む
   * `SemanticSearchPanel` は同一クエリの実行中Promiseをモジュール内Mapで共有する。React Strict Modeによるマウントeffect再実行でもAPIへの初回POSTは1回に抑え、各effect側のキャンセル判定でアンマウント後の状態更新を防ぐ
@@ -1056,6 +1058,7 @@ RLS は `favorites` と同じく「自分の行のみ全操作可」（`auth.uid
 
   * 一覧表示、タブ切り替え（最重要単語/中級単語/上級単語）、検索（前方一致＋ワイルドカード `*`）、ページングが期待通りに動作する
   * 「今日おすすめの6単語」プレビューが表示され、同一日内で同一単語が選ばれる
+  * ヒーローの「今日の6単語から始める」で今日のおすすめへスクロールし、収録語数バッジが表示される。375px幅で横スクロールが発生しない
 
 * セマンティック検索（`/words` の「意味で探す」タブ）
 
@@ -1217,6 +1220,7 @@ RLS は `favorites` と同じく「自分の行のみ全操作可」（`auth.uid
 | 2026-09-15 | 5.37 | - | 技術スタックのバージョン表記を `package-lock.json` の実インストール版に合わせて更新。Next.js 16.2.0 → 16.3.5（`package.json` の `^16.2.11` の範囲内でロックファイルが先行していた）、eslint-config-next 16.2.0 → 16.2.12。README・`AGENTS.md`・`toeic-app-expert` スキルの「Next.js 16.2」表記も 16.3 に統一。依存関係自体の変更はなし。 |
 | 2026-09-15 | 5.38 | - | 復習モード（`/review` の `queue=due` / `weak` / `all` と指定なし）から開いた単語詳細で、前単語/次単語ナビを非表示化。従来はキューに関係なくお気に入り全件をたどるため、固定セッション外の単語へ逸れたり、同じセッションで未採点のカードの解説を採点前に見られたりした。戻り先はヘッダの「次の単語へ」だけにする。`from=favorites` / `mypage` / `today` / `study` の前後ナビは変更なし。Cypress E2E `word-detail-navigation.cy.ts` を追加。 |
 | 2026-10-03 | 5.39 | - | SEO計画を `docs/plans/seo-content-improvement-plan.md` に一本化し、旧 `seo-audit-action-plan.md` を削除。旧監査P0（Googlebot切断HTML）は Googlebot UA による本番再検証で再現しなかったため「調査中」から「再現せず」へ更新。サイト名の使い分けなど維持すべき判断、再発時の手順、残作業は統合先に移管。 |
+| 2026-10-04 | 5.40 | - | TOPページの情報設計を整理。ファーストビューの塗りつぶしボタンを「今日の6単語から始める」1つに絞り、学習モード・お気に入り・聞き流しを控えめな見た目へ変更。統計カードをヒーローの収録語数バッジへ移し、SNSシェアをページ末尾へ移動。「はじめての方へ」を単語一覧の後ろへ移し、意味検索を「意味で探す」、一覧検索を「英単語のつづりで検索」と明示。下部は学習ガイド → このサイトについて（3つの機能・使い方ガイド・運営者メッセージを統合）→ FAQ → 解説記事の順に再編し、ログイン必須の注記の重複を削減。本文・FAQ・JSON-LDの内容は維持。 |
 
 
 ### マイページの達成表示・定着度別一覧（2026-09-06）
