@@ -161,7 +161,12 @@ Repository-specific skills live in `.agents/skills/`, symlinked into `.claude/sk
 Word-list operations (syncing from Vercel Blob, alphabetical sorting, deduplication) each have a dedicated skill. Read the relevant `SKILL.md` before editing `__words__/*.txt` by hand. Do not maintain a list of skill names here; each skill's `description` frontmatter is the single source of truth and agents load it automatically.
 
 ### Document Update Rule
-Project documentation lives under `docs/`; use `docs/README.md` as the index. Any feature change must update **both** `README.md` and `docs/architecture.md` (including the "最終更新日") in the same commit or PR, plus any affected specification or operations guide.
+Project documentation lives under `docs/`; use `docs/README.md` as the index. Update documentation affected by a change in the same commit or PR:
+
+- Update `README.md` when the project overview, user-facing capabilities, setup requirements, or commands change.
+- Update `docs/architecture.md` when architecture, data flow, API contracts, data models, cache strategy, or server/client boundaries change. Update its "最終更新日" only when its content changes.
+- Keep detailed feature specifications in `docs/specs/` and setup, deployment, and troubleshooting procedures in `docs/operations/`; link to them instead of duplicating their contents in the overview documents. Update `docs/README.md` when adding or moving documents.
+- UI wording, styling, and internal refactors do not require edits to both overview documents unless their descriptions become inaccurate. Do not make date-only edits or append routine changes to the architecture history; Git/PR history records those changes.
 
 ### Working Agreements
 These carry over from the retired `.trae/rules/project_rules.md`; `AGENTS.md` is now their only home.
