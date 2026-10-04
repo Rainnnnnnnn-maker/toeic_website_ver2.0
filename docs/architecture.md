@@ -1,6 +1,6 @@
 # TOEIC重要単語（toeic_website_ver2.0）技術ドキュメント
 
-最終更新日: 2026-10-04（依存監査の許可リストを更新：braces の DoS を受容、解消済みの brace-expansion を削除）
+最終更新日: 2026-10-04（依存監査の許可リスト更新、Node.js 要件を実設定に整合）
 
 ### SEO・コンテンツ改善の初回対応（2026-10-02）
 
@@ -31,7 +31,7 @@
 | UI       | React / React DOM |   19.2.1 | コンポーネントUI                     |
 | デザイン | Tailwind CSS      |      3.4 | ユーティリティファーストCSSフレームワーク |
 | 言語       | TypeScript        |       ^5 | 型安全な実装                        |
-| 実行環境     | Node.js           | 20（CI設定） | 開発/ビルド/実行                     |
+| 実行環境     | Node.js           | 24以上（CIは24） | 開発/ビルド/実行                     |
 | コンパイラ | React Compiler | 1.0.0 | 自動メモ化最適化 (babel-plugin-react-compiler) |
 
 #### 外部サービス
@@ -105,7 +105,7 @@
 
 #### 開発（ローカル）
 
-* ソフトウェア: Node.js 20系、npm（`package-lock.json`に基づき `npm ci` を推奨）
+* ソフトウェア: Node.js 24以上（`package.json` の `engines.node` は `>=24`、CIは24）、npm（`package-lock.json`に基づき `npm ci` を推奨）
 
 * ハードウェア: Node.js/Next.jsの開発サーバが動作する一般的なPC
 
