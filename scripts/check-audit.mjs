@@ -13,17 +13,16 @@ import { evaluateAuditReport } from "./audit-report.mjs";
 // 受容済みアドバイザリ。期限を過ぎたら（上流が直った可能性があるため）失敗させて見直す。
 const ALLOWLIST = [
   {
-    id: "GHSA-mh99-v99m-4gvg",
-    expires: "2026-10-31",
+    id: "GHSA-vfj7-8cjw-p6xm",
+    expires: "2026-11-30",
     reason: [
-      "brace-expansion 1.x 系の DoS。修正版は 5.0.8 のみで 1.x へのバックポートは存在しない",
-      "（1.x は 1.1.16 で停止、2.x/3.x/4.x も全てアドバイザリ範囲 <=5.0.7 に含まれる）。",
-      "5.0.8 の CJS export は関数ではなくオブジェクトのため、minimatch@3 の expand(pattern)",
-      "呼び出しを壊す（TypeError: expand is not a function）。minimatch@10 も同様に非callable。",
-      "minimatch@^3.1.2 に依存しているのは eslint-plugin-import / jsx-a11y / react の3つで、",
-      "いずれも最新版のまま依存しているため上流が更新するまで回避手段が無い。",
-      "dev 依存のみで本番バンドルには入らず、悪用には自前の ESLint 設定へ細工した",
-      "glob パターンを書く必要があるため実質到達不能。",
+      "braces の深いネストによるスタック枯渇 DoS。アドバイザリ範囲 <=3.0.3 は最新版 3.0.3 を",
+      "含み、修正版が存在しないため overrides での回避もできない。",
+      "経路は tailwindcss@3（chokidar / micromatch / fast-glob）と eslint-config-next",
+      "（@next/eslint-plugin-next → fast-glob → micromatch）の2つ。npm audit が提示する",
+      "tailwindcss@4 への --force 更新は破壊的変更なうえ、eslint-config-next 側の経路が残る。",
+      "dev 依存のみで本番バンドルには入らず（npm audit --omit=dev は0件）、悪用には自前の",
+      "tailwind content / ESLint 設定へ細工した glob パターンを書く必要があるため実質到達不能。",
     ].join("\n      "),
   },
 ];
