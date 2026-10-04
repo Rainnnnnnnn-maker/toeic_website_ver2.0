@@ -22,7 +22,7 @@
 
 ## SEO・コンテンツ改善
 
-- [外部AI評価の検証と改善計画](plans/seo-content-improvement-plan.md) — 2026-10-02のコード・本番照合、指摘の判定、優先順位と完了条件
+- [SEO・コンテンツ改善計画](plans/seo-content-improvement-plan.md) — SEOの唯一の計画書。外部AI評価の検証、旧SEO監査（2026-07-21）の統合、Googlebot切断HTMLの再検証と再発時手順、維持すべき設計判断、優先順位と完了条件
 
 ## 管理ルール
 

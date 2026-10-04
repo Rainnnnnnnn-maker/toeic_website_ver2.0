@@ -1,6 +1,6 @@
 # TOEIC重要単語（toeic_website_ver2.0）技術ドキュメント
 
-最終更新日: 2026-10-02（難易度の名称・配色を共通定義に統一、学習カードの発音ボタンを拡大、ヒント例文の行高を安定化、全単語の誤り報告導線・TOPのSNSメタデータ・robotsのHost整理）
+最終更新日: 2026-10-03（SEO計画を `docs/plans/seo-content-improvement-plan.md` に一本化し、Googlebot切断HTML問題の再検証結果を反映）
 
 ### SEO・コンテンツ改善の初回対応（2026-10-02）
 
@@ -666,7 +666,7 @@
   * 学習ガイドは `indexable !== false` の記事だけを一覧・`generateStaticParams`・関連記事・sitemapへ出す。保留記事の直接URLは `noindex, nofollow` とし、内容確認が完了するまで公開記事数に含めない
   * manifest `src/app/manifest.ts` (PWA対応)
   * JSON-LD 生成ヘルパ `src/lib/json-ld.ts`（単語詳細用 Article/DefinedTerm など）
-  * **【調査中】Googlebot への切断 HTML 問題**: 本番の UA 別テストで、キャッシュ未生成（Vercel `x-vercel-cache: BYPASS`）の単語ページにおいて**メインクローラー Googlebot だけが `<Suspense>` 未解決の切断 HTML（h1・単語解説・`DefinedTerm` JSON-LD なし、`</html>` 欠落）を受信**する現象を確認（Bingbot/Slackbot は同 BYPASS でも完全 HTML）。当初 `next.config.ts` の `htmlLimitedBots` 上書きで対処を試みたが、Next.js ソース精査（`is-bot.js`／`streaming-metadata.js`／`app-page.js:349,372`）の結果、(1) `htmlLimitedBots` はメタデータのストリーミング可否 (`shouldServeStreamingMetadata`) にしか影響せず本体バッファには無関係、(2) `Googlebot` の botType はハードコードの `HEADLESS_BROWSER_BOT_UA_RE` で `'dom'` 判定され設定では不変、(3) `shouldWaitOnAllReady = Boolean(botType) && isRoutePPREnabled` は Googlebot/Bingbot 双方で既に true——であることが判明。よって設定変更は本問題に無効と結論しリバート。オープンソースのコード上は両 bot とも完全 HTML になるはずのため、原因は Vercel/ビルド層にあると推定し**ローカル再現（`npm run build && npm run start` + Googlebot UA）で Next.js 起因か Vercel 起因かを切り分けるのが次の一手**。有力な恒久対策候補は `words/[word]/page.tsx` の `next/dynamic`＋`<Suspense>` の動的境界を撤去し `getWordDetail`（`"use cache"`）を直接 await して単語本体を静的プリレンダーに含めること。詳細な調査記録・検証手順は `docs/plans/seo-audit-action-plan.md`
+  * **Googlebot への切断 HTML 問題（2026-10-03 時点で再現せず）**: 2026-07-21 の監査で、キャッシュ未生成（`x-vercel-cache: BYPASS`）の単語ページにて Googlebot だけが `<Suspense>` 未解決の切断 HTML を受信する現象を確認した。`htmlLimitedBots` の上書きは、Next.js ソース精査により本問題に無効と判明してリバート済み（メタデータ限定の設定で、Googlebot の botType は不変）。2026-10-03 の再検証では、Googlebot desktop／mobile にもプリレンダー済みの完全 HTML が返った。原因は未特定。経緯・再発時の切り分け手順・恒久対策候補（単語本体の動的境界撤去）は `docs/plans/seo-content-improvement-plan.md` に集約。
 
 ### 4.2 コンポーネント間の連携フロー
 
@@ -1179,7 +1179,7 @@ RLS は `favorites` と同じく「自分の行のみ全操作可」（`auth.uid
 | 2026-07-19 | 4.9 | -   | 「今日おすすめ」の選定数を5語から6語へ変更。`TODAY_WORDS_COUNT` を単一ソースとし、TOP／`/today-words`／`/today-words/listen`／単語詳細の `today` クエリナビゲーション／聞き流し完了表示を6語で統一。カードはモバイル2列・タブレット3列・PC6列に調整し、表示文言・メタデータ・聞き流し仕様・ユニットテスト・READMEを同期。 |
 | 2026-07-19 | 5.0 | -   | ローカル開発用の単語データフォルダーを `__doc__/` から `__words__/` へ変更。`src/data/words.ts`、Git ignore、開発手順、関連するリポジトリ内スキル／ルールの参照先を同期。 |
 | 2026-07-20 | 5.1 | -   | Claude Code向けプロジェクトスコープMCP設定を整備。Next.js DevTools／Playwright／GitHub／Upstashの用途、MCP認証用環境変数、最小権限・秘密情報管理の注意点をREADMEと本ドキュメントへ追加し、Upstash MCPを現行CLI形式へ更新。 |
-| 2026-07-21 | 5.2 | -   | 「TOEIC重要単語」検索上位化に向けた SEO 監査（記録: `docs/plans/seo-audit-action-plan.md`）と、確定した P1 修正の反映。**P0（Googlebot 切断 HTML）は調査中で未修正**：本番 UA 別テストでキャッシュ未生成の単語ページにて Googlebot だけが `<Suspense>` 未解決の切断 HTML を受信する現象を確認したが、当初対策の `htmlLimitedBots` 上書きは Next.js ソース精査により**本問題に無効**と判明（`htmlLimitedBots` はメタデータ限定・`Googlebot` の botType は設定で不変・`shouldWaitOnAllReady` は両 bot で既に true）したためリバート。原因は Vercel/ビルド層と推定し、ローカル再現による切り分けを次の一手とする。**P1（確定・反映済み）**: (1) sitemap から `noindex` ページ（`/favorites`・`/review`）を除外。(2) 実更新日を管理しない URL（全単語詳細・日次ローテーションの `/today-words`）の固定 `lastmod` を削除。(3) 旧 `public/robots.txt`（`robots.ts` に置換済みの残骸）を削除。※監査当初案の「JSON-LD publisher/author のサイト名統一」は変更履歴 4.7 の既存順位保護方針（意図的な分離）と競合するため**実施しない**判断で確定。 |
+| 2026-07-21 | 5.2 | -   | 「TOEIC重要単語」検索上位化に向けた SEO 監査（記録: 旧 `docs/plans/seo-audit-action-plan.md`。2026-10-03 に `seo-content-improvement-plan.md` へ統合）と、確定した P1 修正の反映。**P0（Googlebot 切断 HTML）は調査中で未修正**：本番 UA 別テストでキャッシュ未生成の単語ページにて Googlebot だけが `<Suspense>` 未解決の切断 HTML を受信する現象を確認したが、当初対策の `htmlLimitedBots` 上書きは Next.js ソース精査により**本問題に無効**と判明（`htmlLimitedBots` はメタデータ限定・`Googlebot` の botType は設定で不変・`shouldWaitOnAllReady` は両 bot で既に true）したためリバート。原因は Vercel/ビルド層と推定し、ローカル再現による切り分けを次の一手とする。**P1（確定・反映済み）**: (1) sitemap から `noindex` ページ（`/favorites`・`/review`）を除外。(2) 実更新日を管理しない URL（全単語詳細・日次ローテーションの `/today-words`）の固定 `lastmod` を削除。(3) 旧 `public/robots.txt`（`robots.ts` に置換済みの残骸）を削除。※監査当初案の「JSON-LD publisher/author のサイト名統一」は変更履歴 4.7 の既存順位保護方針（意図的な分離）と競合するため**実施しない**判断で確定。 |
 | 2026-07-22 | 5.3 | -   | TOP、全単語一覧、ログイン、お気に入り、今日のおすすめ、聞き流し、学習、復習の青系背景と、単語詳細のティール系背景を、色相はそのままに一段濃く調整。白に抜けていた中間・下端にも薄い色を残し、ログイン画面にも共通背景を適用。 |
 | 2026-07-22 | 5.4 | -   | 検索流入が多い全単語一覧 `/words` の直帰・迷子対策として、SEO索引を学習ハブUIへ刷新。(1) ファーストビューに今日おすすめ6語・暗記テスト・お気に入り・学習ガイド導線を集約。(2) `WordsExplorerClient` を新設し、前方一致／ワイルドカード検索、目標スコア、A〜Z頭文字の複合フィルター、36語ずつの段階表示、検索0件状態を実装。GA4に `words_search` / `words_filter` / `word_detail_open` を追加。(3) 全1,300語超の完全索引はServer Componentの通常リンクを維持しつつ、ネイティブ `<details>` でレベル→頭文字の二段階に折りたたみ。表示中の検索カードだけに `WordLinkPending` を限定して1,300件超のClient Component境界を削減。(4) 目標スコア別学習ポイントを独立アコーディオン化し、スコア別／忘却曲線ガイドへの文脈リンクを追加。(5) metadata description に残っていた旧固定件数を「1,300語以上」へ改め、単語リスト更新時の件数乖離を防止。 |
 | 2026-07-22 | 5.5 | -   | `/words` 検索UIのレビュー指摘を反映。(1) 目標スコアフィルターを名前付き `group` として支援技術へ公開し、検索欄のWebKitネイティブクリアを非表示化。(2) レベル件数を検索語・頭文字に連動するファセット件数へ変更し、A〜Z選択時は検索語を解除して意図しない0件を防止。(3) 頭文字ボタンを40pxへ拡大し、未参照の結果IDを削除。(4) 検索計測をsubmit依存の `words_search` から、700msデバウンス・2文字以上・重複抑止付きのGA4推奨 `search` へ変更。(5) レベル名・スコア・索引説明を中立モジュール `src/lib/word-level.ts` に集約。 |
@@ -1216,6 +1216,7 @@ RLS は `favorites` と同じく「自分の行のみ全操作可」（`auth.uid
 | 2026-09-08 | 5.36 | - | 今日おすすめの前後ナビを表示slugのsnapshot方式へ修正。キャッシュ版不一致による全単語への逸脱を防止し、復元不能時は一覧への案内を表示。日次キャッシュのSSG依存は追加しない。 |
 | 2026-09-15 | 5.37 | - | 技術スタックのバージョン表記を `package-lock.json` の実インストール版に合わせて更新。Next.js 16.2.0 → 16.3.5（`package.json` の `^16.2.11` の範囲内でロックファイルが先行していた）、eslint-config-next 16.2.0 → 16.2.12。README・`AGENTS.md`・`toeic-app-expert` スキルの「Next.js 16.2」表記も 16.3 に統一。依存関係自体の変更はなし。 |
 | 2026-09-15 | 5.38 | - | 復習モード（`/review` の `queue=due` / `weak` / `all` と指定なし）から開いた単語詳細で、前単語/次単語ナビを非表示化。従来はキューに関係なくお気に入り全件をたどるため、固定セッション外の単語へ逸れたり、同じセッションで未採点のカードの解説を採点前に見られたりした。戻り先はヘッダの「次の単語へ」だけにする。`from=favorites` / `mypage` / `today` / `study` の前後ナビは変更なし。Cypress E2E `word-detail-navigation.cy.ts` を追加。 |
+| 2026-10-03 | 5.39 | - | SEO計画を `docs/plans/seo-content-improvement-plan.md` に一本化し、旧 `seo-audit-action-plan.md` を削除。旧監査P0（Googlebot切断HTML）は Googlebot UA による本番再検証で再現しなかったため「調査中」から「再現せず」へ更新。サイト名の使い分けなど維持すべき判断、再発時の手順、残作業は統合先に移管。 |
 
 
 ### マイページの達成表示・定着度別一覧（2026-09-06）
