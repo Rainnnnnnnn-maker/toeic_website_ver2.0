@@ -88,7 +88,7 @@ TOEIC語彙ラボ is a comprehensive web application for learning essential TOEI
 
 ### Prerequisites
 
-- Node.js 20+
+- Node.js 24+ (`package.json` requires `>=24`; CI uses Node.js 24)
 - npm
 
 ### Installation
