@@ -3,7 +3,7 @@ import { WORD_LEVEL_INFO, WORD_LEVEL_ORDER } from "@/lib/word-level";
 import { WORD_LEVEL_CARD_STYLES } from "@/components/features/words/wordLevelStyles";
 import type { Metadata } from "next";
 import { Suspense, cache } from "react";
-import { ArrowDown, BookOpen, Star, List } from "lucide-react";
+import { BookOpen, Star, List } from "lucide-react";
 import { getImportantWords, getMediumWords, getHighWords, getTodayRecommendedSelection } from "@/data/words";
 import WordsListClient from "@/components/features/words/WordsListClient";
 import { SnsShareButtons } from "@/components/features/sns/SnsShareButtons";
@@ -277,30 +277,26 @@ export default function Home() {
           <Suspense fallback={<HeroStatsFallback />}>
             <HeroStats />
           </Suspense>
-          {/* 塗りつぶしの主ボタンは1つだけにし、ほかの入口は控えめに並べる */}
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
-            <a href="#today-words" className="group relative inline-flex min-h-11 items-center justify-center gap-1.5 overflow-hidden rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 px-5 py-2.5 text-sm font-bold text-white no-underline shadow-[0_4px_14px_0_rgba(37,99,235,0.39)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(37,99,235,0.23)] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 motion-reduce:transition-none">
+          <div className="flex gap-4 items-center flex-wrap">
+            <Link href="/study" prefetch={false} className="group relative inline-flex items-center justify-center gap-1.5 px-4 py-2 min-h-[36px] bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-lg font-bold text-sm shadow-[0_4px_14px_0_rgba(37,99,235,0.39)] overflow-hidden transition-all duration-300 hover:shadow-[0_6px_20px_rgba(37,99,235,0.23)] hover:-translate-y-1 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500">
               <div className="absolute inset-0 flex h-full w-full justify-center [transform:skew(-12deg)_translateX(-150%)] group-hover:duration-1000 group-hover:[transform:skew(-12deg)_translateX(150%)]">
                 <div className="relative h-full w-8 bg-white/20" />
               </div>
-              <span className="relative z-10">今日の{TODAY_WORDS_COUNT}単語から始める</span>
-              <ArrowDown size={16} className="relative z-10" aria-hidden />
-            </a>
-            <Link href="/study" prefetch={false} className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-bold text-slate-800 no-underline transition-colors hover:border-slate-400 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-2 sm:min-h-9">
-              <BookOpen size={16} className="text-blue-600" aria-hidden />
-              学習モード
+              <BookOpen size={16} className="transition-transform group-hover:scale-110" />
+              <span className="relative z-10">学習モード</span>
             </Link>
-            <Link href="/favorites" prefetch={false} className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-slate-700 no-underline hover:text-slate-900 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-2 rounded sm:min-h-9">
-              <Star size={16} className="text-amber-500" aria-hidden />
-              お気に入り
+            <Link href="/favorites" prefetch={false} className="group relative inline-flex items-center justify-center gap-1.5 px-4 py-2 min-h-[36px] bg-gradient-to-r from-amber-500 to-orange-400 text-white rounded-lg font-bold text-sm shadow-[0_4px_14px_0_rgba(245,158,11,0.39)] overflow-hidden transition-all duration-300 hover:shadow-[0_6px_20px_rgba(245,158,11,0.23)] hover:-translate-y-1 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-amber-500">
+              <div className="absolute inset-0 flex h-full w-full justify-center [transform:skew(-12deg)_translateX(-150%)] group-hover:duration-1000 group-hover:[transform:skew(-12deg)_translateX(150%)]">
+                <div className="relative h-full w-8 bg-white/20" />
+              </div>
+              <Star size={16} className="transition-transform group-hover:rotate-12 group-hover:scale-110" />
+              <span className="relative z-10">お気に入り</span>
             </Link>
           </div>
         </header>
-        <div id="today-words" className="scroll-mt-4">
-          <Suspense fallback={<TodayRecommendedWordsFallback />}>
-            <TodayRecommendedWordsSection />
-          </Suspense>
-        </div>
+        <Suspense fallback={<TodayRecommendedWordsFallback />}>
+          <TodayRecommendedWordsSection />
+        </Suspense>
         <SemanticSearchLauncher />
         <Suspense fallback={<HomeWordDataFallback />}>
           <HomeWordDataSection />
