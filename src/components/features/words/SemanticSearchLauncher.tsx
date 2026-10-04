@@ -52,12 +52,16 @@ export function SemanticSearchLauncher() {
           <Sparkles className="size-4" />
         </span>
         <h2 id="semantic-launcher-title" className="text-sm font-bold text-slate-900 sm:text-base">
-          意味からTOEIC単語をAI検索
+          意味で探す
         </h2>
         <span className="rounded-full bg-violet-100 px-2 py-0.5 text-[10px] font-bold text-violet-700">
           AI
         </span>
       </div>
+
+      <p className="mt-1.5 text-xs leading-relaxed text-slate-600">
+        日本語の意味や使う場面から英単語を探せます。つづりが分かる場合は、下の単語一覧の検索欄を使ってください。
+      </p>
 
       <form onSubmit={handleSubmit} role="search" className="relative mt-3">
         <label htmlFor="semantic-launcher-input" className="sr-only">
