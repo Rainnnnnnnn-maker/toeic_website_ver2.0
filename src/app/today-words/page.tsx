@@ -60,12 +60,6 @@ export default async function TodayWordsPage() {
             「今日のおすすめ {TODAY_WORDS_COUNT} 単語」は、当サイトに収録された 1,300 語以上の TOEIC 重要単語の中から、その日 1 日固定で {TODAY_WORDS_COUNT} 単語を選出して表示する機能です。同じ日にアクセスすれば必ず同じ {TODAY_WORDS_COUNT} 語が表示されるため、「今日はこの {TODAY_WORDS_COUNT} 語を覚える」という日次の目標を立てやすくなります。
           </p>
           <h3 className="mt-4 mb-2 text-sm font-semibold text-slate-800">
-            選出ロジック
-          </h3>
-          <p className="mb-3">
-            UTC 日付キーと単語スラッグのハッシュをもとに、サーバー側で {TODAY_WORDS_COUNT} 語を決定論的に選出しています（Cache Component 化）。これにより、トップページ・本ページ・聞き流しモードのいずれからアクセスしても、同じ {TODAY_WORDS_COUNT} 単語が表示されます。
-          </p>
-          <h3 className="mt-4 mb-2 text-sm font-semibold text-slate-800">
             おすすめの活用方法
           </h3>
           <ul className="mb-3 list-inside list-disc space-y-1">
