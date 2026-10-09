@@ -1,6 +1,6 @@
 # TOEIC重要単語（toeic_website_ver2.0）技術ドキュメント
 
-最終更新日: 2026-10-04（依存監査の許可リスト更新、Node.js 要件の整合、ドキュメント更新ルールの見直し）
+最終更新日: 2026-10-10（依存監査の重大度判定修正）
 
 ### SEO・コンテンツ改善の初回対応（2026-10-02）
 
@@ -329,6 +329,7 @@
 * 変更ファイルがすべて `*.sql` の push／PR 更新は `paths-ignore` でワークフロー自体を起動しない。SQL とソースコードが混在する変更は通常どおり実行する
 
   * `npm run test`（Vitest）は純粋ロジックのユニットテストのみを対象とし、外部シークレット（Gemini/Redis/Blob/TTS）を必要としない
+  * 依存監査は本番依存の `npm audit --audit-level=high --omit=dev` と全依存の `npm run audit:ci` に分離する。後者は根本アドバイザリ単位で high／critical を判定し、理由・見直し期限つきの許可済み項目だけを除外する。許可済み high と同じ親依存に合流した moderate 以下は失敗にしない。監査APIエラー、未知形式、根本原因を解決できない high／critical、重大度不明の未許可アドバイザリは失敗にする。
   * `nodejs-e2e` は `npm run typecheck:e2e` と `npm run test:e2e:ci` を実行する。固定データで一時コピーを本番ビルドし、Chromeで2フローを検証する。実Blobコーパスを使う通常の `npm run build` は引き続きローカルで確認する。
 
 #### Vercelデプロイ（Git連携＋GitHub Actions）
