@@ -1,4 +1,5 @@
 const BLOCKING_SEVERITIES = new Set(["high", "critical"]);
+const NON_BLOCKING_SEVERITIES = new Set(["info", "low", "moderate"]);
 const SUPPORTED_AUDIT_REPORT_VERSION = 2;
 
 function auditErrorMessage(report) {
@@ -107,8 +108,12 @@ export function evaluateAuditReport(report, allowedAdvisoryIds) {
       continue;
     }
 
+    // entry.severity は依存先全体の最大値。許可済み high と別の moderate が
+    // 合流していても moderate を high 扱いしない。未許可で重大度不明なら失敗させる。
     const blocking = advisories.filter(
-      (advisory) => !allowed.has(advisoryId(advisory.url))
+      (advisory) =>
+        !NON_BLOCKING_SEVERITIES.has(advisory.severity) &&
+        !allowed.has(advisoryId(advisory.url))
     );
 
     if (blocking.length === 0) {
