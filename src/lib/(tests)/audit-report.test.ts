@@ -49,6 +49,7 @@ describe("evaluateAuditReport", () => {
             {
               title: "accepted",
               url: `https://github.com/advisories/${ALLOWED_ID}`,
+              severity: "high",
             },
           ],
         },
@@ -73,6 +74,7 @@ describe("evaluateAuditReport", () => {
             {
               title: "new vulnerability",
               url: "https://github.com/advisories/GHSA-1111-2222-3333",
+              severity: "high",
             },
           ],
         },
@@ -83,6 +85,90 @@ describe("evaluateAuditReport", () => {
     expect(result.failures).toHaveLength(1);
     expect(result.failures[0].name).toBe("vulnerable");
   });
+
+  it.each(["info", "low", "moderate"])(
+    "許可済みhighと合流した未許可%sを失敗にしない",
+    (severity) => {
+      const result = evaluateAuditReport(
+        reportWith({
+          accepted: {
+            severity: "high",
+            via: [
+              {
+                title: "accepted",
+                url: `https://github.com/advisories/${ALLOWED_ID}`,
+                severity: "high",
+              },
+            ],
+          },
+          lower: {
+            severity,
+            via: [
+              {
+                title: "lower severity vulnerability",
+                url: "https://github.com/advisories/GHSA-1111-2222-3333",
+                severity,
+              },
+            ],
+          },
+          transitive: {
+            severity,
+            via: ["lower"],
+          },
+          aggregate: {
+            severity: "high",
+            via: ["accepted", "lower", "transitive"],
+          },
+        }),
+        [ALLOWED_ID]
+      );
+
+      expect(result.failures).toEqual([]);
+      expect(result.allowedCount).toBe(2);
+    }
+  );
+
+  it.each(["high", "critical", undefined, "unknown"])(
+    "許可済みhighと合流しても未許可の重大度%sを失敗にする",
+    (severity) => {
+      const unaccepted = {
+        title: "unaccepted vulnerability",
+        url: "https://github.com/advisories/GHSA-1111-2222-3333",
+        severity,
+      };
+      const result = evaluateAuditReport(
+        reportWith({
+          aggregate: {
+            severity: "critical",
+            via: [
+              {
+                title: "accepted",
+                url: `https://github.com/advisories/${ALLOWED_ID}`,
+                severity: "high",
+              },
+              {
+                title: "moderate vulnerability",
+                url: "https://github.com/advisories/GHSA-4444-5555-6666",
+                severity: "moderate",
+              },
+              unaccepted,
+            ],
+          },
+        }),
+        [ALLOWED_ID]
+      );
+
+      expect(result.failures).toEqual([
+        {
+          name: "aggregate",
+          severity: "critical",
+          advisories: [unaccepted],
+          reason: null,
+        },
+      ]);
+      expect(result.allowedCount).toBe(0);
+    }
+  );
 
   it("根本アドバイザリを解決できないhighをfail-closedにする", () => {
     const result = evaluateAuditReport(
