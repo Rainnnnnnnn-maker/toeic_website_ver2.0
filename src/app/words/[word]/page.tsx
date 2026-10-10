@@ -225,7 +225,7 @@ async function WordDetailFetcher({ word }: { word: string }) {
         <h2 className="font-semibold">解説の内容について</h2>
         <p className="mt-2">意味・例文・和訳などに誤りや不自然な表現がありましたら、問題の箇所をお知らせください。</p>
         <a
-          href={`mailto:paulowniarain@gmail.com?subject=${encodeURIComponent(`単語解説の誤り報告：${detailData.word}`)}&body=${encodeURIComponent(`対象単語：${detailData.word}\nURL：https://www.toeic-words.com/words/${word}\n\n問題の箇所：\n\n修正案・参考資料（任意）：\n`)}`}
+          href={`mailto:info.toeicwords@gmail.com?subject=${encodeURIComponent(`単語解説の誤り報告：${detailData.word}`)}&body=${encodeURIComponent(`対象単語：${detailData.word}\nURL：https://www.toeic-words.com/words/${word}\n\n問題の箇所：\n\n修正案・参考資料（任意）：\n`)}`}
           className="mt-3 inline-flex min-h-11 items-center rounded-lg px-3 text-blue-700 underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
         >
           内容の誤りを報告（メール）

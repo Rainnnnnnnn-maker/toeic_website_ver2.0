@@ -63,10 +63,10 @@ export default function ContactPage() {
             その他のお問い合わせは、下記メールアドレスまでご連絡ください。
           </p>
           <a
-            href="mailto:paulowniarain@gmail.com"
+            href="mailto:info.toeicwords@gmail.com"
             className="text-blue-600 underline hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
           >
-            paulowniarain@gmail.com
+            info.toeicwords@gmail.com
           </a>
           <p className="mt-3 text-xs text-black/50 dark:text-white/50">
             ※ 返信にお時間をいただく場合がございます。ご了承ください。
