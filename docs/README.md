@@ -20,6 +20,10 @@
 
 - [Cypress E2E実行手順](operations/cypress-e2e.md) — お気に入り保存と今日おすすめの前後移動
 
+## 障害対策
+
+- [Blob障害時の単語ページ継続表示 実装計画](plans/blob-outage-word-fallback-plan.md) — Blob取得失敗時に検証済みの前回コーパス／同梱スナップショットへフォールバックする設計、Phase分割、手動確認手順、完了条件
+
 ## SEO・コンテンツ改善
 
 - [SEO・コンテンツ改善計画](plans/seo-content-improvement-plan.md) — SEOの唯一の計画書。外部AI評価の検証、旧SEO監査（2026-07-21）の統合、Googlebot切断HTMLの再検証と再発時手順、維持すべき設計判断、優先順位と完了条件
