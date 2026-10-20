@@ -7,7 +7,9 @@ import { LogOut, UserRound } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { createClient } from "@/lib/supabase/client";
 import { sanitizeNextPath } from "@/lib/auth-redirect";
+import { LOGIN_MAINTENANCE } from "@/lib/auth-maintenance";
 import { LoginCardFallback } from "@/components/features/auth/LoginFallback";
+import { LoginMaintenanceNotice } from "@/components/features/auth/LoginMaintenanceNotice";
 
 function GoogleLogo() {
   return (
@@ -80,6 +82,11 @@ export default function LoginClient() {
         <p className="text-sm leading-relaxed text-slate-600">
           お気に入りと復習の記録はアカウントに保存され、他の端末でも続きから学習できます。
         </p>
+        {LOGIN_MAINTENANCE && (
+          <p className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-xs leading-relaxed text-amber-800">
+            ログイン機能はメンテナンス中です。ログアウトすると、復旧するまで再ログインできません。
+          </p>
+        )}
         <div className="flex flex-wrap items-center gap-3">
           <Link
             href={nextPath}
@@ -103,6 +110,10 @@ export default function LoginClient() {
         </div>
       </div>
     );
+  }
+
+  if (LOGIN_MAINTENANCE) {
+    return <LoginMaintenanceNotice />;
   }
 
   return (

@@ -304,3 +304,21 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...   # 3-1 で控えた Pub
 - [Supabase カスタム SMTP](https://supabase.com/docs/guides/auth/auth-smtp)
 - [Supabase RLS](https://supabase.com/docs/guides/database/postgres/row-level-security)
 - 元提案書: [improvement-proposal.md](./improvement-proposal.md)（§4.2 フルスキーマ / §8 実装コード例 / §9 リスク表）
+
+---
+
+## 10. ログイン一時停止（メンテナンス表示）
+
+Google ログインが使えない障害（例: Google Cloud プロジェクトを誤って削除し、ログイン時に `Error 401: deleted_client` が出る）では、`src/lib/auth-maintenance.ts` の `LOGIN_MAINTENANCE` を `true` にしてデプロイする。
+
+- 未ログインで `/login` を開くと、Google ログインボタンの代わりにメンテナンス表示が出る。ヘッダー・フッター・マイページなどのログイン導線はすべて `/login` を経由するため、ここだけ止めればよい
+- ログイン済みのセッションは Supabase 側で維持されるため、既存ユーザーはそのまま利用できる。ログイン済みで `/login` を開いた場合は、ログアウトすると復旧まで再ログインできない旨を表示する
+- ゲスト向け機能（閲覧・検索・この端末のお気に入り・学習モード・今日の6単語）は影響を受けない
+
+復旧手順:
+
+1. Google Cloud Console → **Google Auth Platform → Clients** で、ウェブアプリのクライアントが存在し、§3-3 のリダイレクト URI が登録されていることを確認する。削除から 30 日以内なら「API とサービス → 認証情報」の削除済み認証情報から復元できる
+2. 次の URL をシークレットウィンドウで開き、アカウント選択画面が出ることを確認する。`deleted_client` が出る場合は Google 側でまだ削除扱いのまま
+   `https://accounts.google.com/o/oauth2/v2/auth?client_id=<クライアントID>&redirect_uri=https://<project-ref>.supabase.co/auth/v1/callback&response_type=code&scope=openid%20email`
+3. プロジェクトを復元しても `deleted_client` が続く場合は、§3-3 と同じ設定で新しい OAuth クライアントを作成し、Supabase の Google Provider に新しい ID / シークレットを貼り付ける（コード変更は不要）
+4. `LOGIN_MAINTENANCE` を `false` に戻してデプロイし、§7 のスモークテスト（特に 2. ログイン）を行う
