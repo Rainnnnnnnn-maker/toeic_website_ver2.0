@@ -13,6 +13,10 @@ const config: Config = {
         foreground: "var(--foreground)",
       },
       keyframes: {
+        homeReveal: {
+          from: { opacity: "0", transform: "translateY(20px)" },
+          to: { opacity: "1", transform: "none" },
+        },
         countdownPop: {
           to: { transform: "translateY(0) scale(1)", opacity: "1" },
         },
@@ -36,6 +40,7 @@ const config: Config = {
         },
       },
       animation: {
+        homeReveal: "homeReveal 560ms cubic-bezier(0.22, 1, 0.36, 1) var(--home-reveal-delay, 0ms) both",
         countdownPop: "countdownPop 220ms ease-out forwards",
         countdownCenter: "countdownCenter 1s ease-out forwards",
         hintPop: "hintPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards",

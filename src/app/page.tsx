@@ -12,9 +12,11 @@ import TodayRecommendedWordsClient from "@/components/features/words/TodayRecomm
 import { SemanticSearchLauncher } from "@/components/features/words/SemanticSearchLauncher";
 import { getLatestGuideArticles,PUBLISHED_GUIDE_ARTICLE_COUNT} from "@/data/guide-articles";
 import { TODAY_WORDS_COUNT } from "@/lib/word-select";
+import { HomeScrollReveal } from "@/components/features/home/HomeScrollReveal";
 
 const homeTitle = "TOEIC 重要単語【2026年版】600点・730点・800点向け｜詳しい解説付き無料単語帳";
 const homeDescription = `【完全無料】TOEIC学習向け英単語1,300語以上を3段階に整理。ビジネス場面の例文、類義語、発音、学習・復習機能と学習ガイド${PUBLISHED_GUIDE_ARTICLE_COUNT}本を、登録不要で利用できます。`;
+const homeRevealDelays = [undefined, "short", "long"] as const;
 
 export const metadata: Metadata = {
   title: {
@@ -262,7 +264,7 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
-      <main className="w-full max-w-[960px] flex flex-col gap-5 relative">
+      <HomeScrollReveal>
         <div className="mb-[-8px] sm:mb-0 flex items-center gap-4">
           <AuthStatus />
         </div>
@@ -294,14 +296,20 @@ export default function Home() {
             </Link>
           </div>
         </header>
-        <Suspense fallback={<TodayRecommendedWordsFallback />}>
-          <TodayRecommendedWordsSection />
-        </Suspense>
-        <SemanticSearchLauncher />
-        <Suspense fallback={<HomeWordDataFallback />}>
-          <HomeWordDataSection />
-        </Suspense>
-        <div className="flex justify-center">
+        <div data-home-reveal="">
+          <Suspense fallback={<TodayRecommendedWordsFallback />}>
+            <TodayRecommendedWordsSection />
+          </Suspense>
+        </div>
+        <div data-home-reveal="">
+          <SemanticSearchLauncher />
+        </div>
+        <div data-home-reveal="">
+          <Suspense fallback={<HomeWordDataFallback />}>
+            <HomeWordDataSection />
+          </Suspense>
+        </div>
+        <div data-home-reveal="" className="flex justify-center">
           <Link href="/words" prefetch={false} className="group inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-bold text-slate-800 no-underline transition-colors hover:border-slate-400 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-2">
             <List size={16} aria-hidden />
             全単語一覧
@@ -310,7 +318,7 @@ export default function Home() {
         </div>
 
         {/* 目的別の入口（旧「はじめての方へ」）。ファーストビューの選択肢を減らすため一覧の後ろに置く */}
-        <section aria-labelledby="first-study-heading" className="rounded-xl border border-blue-100 bg-blue-50/60 p-3 sm:p-4">
+        <section data-home-reveal="" aria-labelledby="first-study-heading" className="rounded-xl border border-blue-100 bg-blue-50/60 p-3 sm:p-4">
           <h2 id="first-study-heading" className="text-sm font-bold leading-relaxed text-slate-900">はじめての方へ：まず1問、理由まで確認</h2>
           <p className="mt-1.5 text-xs leading-relaxed text-slate-700">単語の意味は分かるのに、文の中で選べない方へ。自作問題で迷った理由を確認し、単語・例文・復習へ進めます。ガイドと単語の閲覧、お気に入り保存は登録不要です。</p>
           <div className="mt-2 flex flex-wrap gap-2 text-xs font-semibold">
@@ -322,23 +330,27 @@ export default function Home() {
 
         {/* 学習ガイド最新記事セクション */}
         <section className="mt-12 pt-12 border-t border-slate-200 flex flex-col gap-6">
-          <div className="flex items-end justify-between gap-4 flex-wrap">
-            <h2 className="text-xl font-bold text-slate-800">学習ガイド｜最新記事</h2>
-            <Link
-              href="/guide"
-              prefetch={false}
-              className="text-sm text-blue-600 hover:underline whitespace-nowrap"
-            >
-              すべての記事を見る →
-            </Link>
+          <div data-home-reveal="" className="flex flex-col gap-6">
+            <div className="flex items-end justify-between gap-4 flex-wrap">
+              <h2 className="text-xl font-bold text-slate-800">学習ガイド｜最新記事</h2>
+              <Link
+                href="/guide"
+                prefetch={false}
+                className="text-sm text-blue-600 hover:underline whitespace-nowrap"
+              >
+                すべての記事を見る →
+              </Link>
+            </div>
+            <p className="text-sm text-slate-600 leading-relaxed">
+              学習の進め方・Part 別対策・語彙集など、運営者がまとめたガイドを <strong>{PUBLISHED_GUIDE_ARTICLE_COUNT} 本</strong> 公開しています。サイト機能の使い方や、復習計画、語形・コロケーションなど、単語一覧だけでは扱いにくい内容を補います。
+            </p>
           </div>
-          <p className="text-sm text-slate-600 leading-relaxed">
-            学習の進め方・Part 別対策・語彙集など、運営者がまとめたガイドを <strong>{PUBLISHED_GUIDE_ARTICLE_COUNT} 本</strong> 公開しています。サイト機能の使い方や、復習計画、語形・コロケーションなど、単語一覧だけでは扱いにくい内容を補います。
-          </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {latestGuideArticles.map((article) => (
+            {latestGuideArticles.map((article, index) => (
               <Link
                 key={article.slug}
+                data-home-reveal=""
+                data-home-reveal-delay={homeRevealDelays[index % homeRevealDelays.length]}
                 href={`/guide/${article.slug}`}
                 prefetch={false}
                 className="group flex flex-col gap-2 rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-blue-400 hover:shadow-md"
@@ -362,24 +374,24 @@ export default function Home() {
 
         {/* このサイトについて：できること・おすすめの使い方・運営者を1セクションにまとめる */}
         <section aria-labelledby="about-site-heading" className="mt-12 pt-12 border-t border-slate-200 flex flex-col gap-10">
-          <h2 id="about-site-heading" className="text-xl font-bold text-slate-800">このサイトについて</h2>
+          <h2 data-home-reveal="" id="about-site-heading" className="text-xl font-bold text-slate-800">このサイトについて</h2>
           <div className="flex flex-col gap-6">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-              <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col gap-3">
+              <div data-home-reveal="" className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col gap-3">
                 <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center text-xl font-bold mb-2">1</div>
                 <h3 className="text-lg font-bold text-slate-800">ビジネス文脈に絞った詳しい解説</h3>
                 <p className="text-sm text-slate-600 leading-relaxed">
                   単なる日本語訳だけでなく、語源、微妙なニュアンスの違い、ビジネスシーンでの具体的な使われ方まで踏み込んで解説。単語を文の中でどう使うかを確認できます。
                 </p>
               </div>
-              <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col gap-3">
+              <div data-home-reveal="" data-home-reveal-delay="short" className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col gap-3">
                 <div className="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center text-xl font-bold mb-2">2</div>
                 <h3 className="text-lg font-bold text-slate-800">忘却曲線を意識した復習</h3>
                 <p className="text-sm text-slate-600 leading-relaxed">
                   「学習モード」と「復習モード」を使い分け、覚えにくい語へ繰り返し触れられます。さらに「今日のおすすめ{TODAY_WORDS_COUNT}単語」機能で、少量からの継続をサポートします。
                 </p>
               </div>
-              <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col gap-3">
+              <div data-home-reveal="" data-home-reveal-delay="long" className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col gap-3">
                 <div className="w-12 h-12 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center text-xl font-bold mb-2">3</div>
                 <h3 className="text-lg font-bold text-slate-800">完全無料・登録不要</h3>
                 <p className="text-sm text-slate-600 leading-relaxed">
@@ -390,7 +402,7 @@ export default function Home() {
           </div>
 
           {/* 使い方ガイド */}
-          <div className="bg-slate-50 p-6 sm:p-8 rounded-2xl border border-slate-200">
+          <div data-home-reveal="" className="bg-slate-50 p-6 sm:p-8 rounded-2xl border border-slate-200">
             <h3 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
               <span className="text-blue-600" aria-hidden>💡</span> 効果的な使い方ガイド（おすすめルーティン）
             </h3>
@@ -420,7 +432,7 @@ export default function Home() {
           </div>
 
           {/* 開発者・運営からのメッセージ */}
-          <div className="flex flex-col gap-4 border-l-4 border-blue-600 pl-5 py-2">
+          <div data-home-reveal="" className="flex flex-col gap-4 border-l-4 border-blue-600 pl-5 py-2">
             <h3 className="text-lg font-bold text-slate-800">運営者からのメッセージ</h3>
             <p className="text-sm text-slate-600 leading-relaxed">
               運営者自身が TOEIC 学習を続ける中で、単語の意味・例文・音声をスマートフォンからまとめて確認したいと考え、このサイトを作りました。AI で生成した解説は自動チェックを行い、確認できた箇所や指摘を受けた箇所から改善しています。誤りや不自然な表現は、お問い合わせからお知らせください。
@@ -428,12 +440,14 @@ export default function Home() {
           </div>
         </section>
 
-        <Suspense fallback={<FaqFallback />}>
-          <FaqSection />
-        </Suspense>
+        <div data-home-reveal="" className="flow-root">
+          <Suspense fallback={<FaqFallback />}>
+            <FaqSection />
+          </Suspense>
+        </div>
         {/* TOEIC最新単語 説明セクション */}
         <section className="mt-12 pt-12 border-t border-slate-200 flex flex-col gap-8">
-          <article className="flex flex-col gap-4">
+          <article data-home-reveal="" className="flex flex-col gap-4">
             <h2 className="text-xl font-bold text-slate-800 mb-2">2026年版の収録語を、ビジネス場面の例文で確認。</h2>
             <p className="text-[15px] leading-[1.8] text-slate-600">
               TOEIC L&amp;R では、オフィス、会議、契約、出張、顧客対応など、さまざまなビジネス場面の英文が扱われます。
@@ -446,7 +460,7 @@ export default function Home() {
             </p>
           </article>
 
-          <article className="flex flex-col gap-4">
+          <article data-home-reveal="" className="flex flex-col gap-4">
             <h2 className="text-xl font-bold text-slate-800 mb-2">TOEIC重要単語の効率的な覚え方</h2>
             <p className="text-[15px] leading-[1.8] text-slate-600">
               TOEICスコアアップの鍵は、試験に出る「TOEIC重要単語」を確実にマスターすることです。
@@ -466,7 +480,7 @@ export default function Home() {
             </ul>
           </article>
 
-          <article className="flex flex-col gap-4">
+          <article data-home-reveal="" className="flex flex-col gap-4">
             <h2 className="text-xl font-bold text-slate-800 mb-2">目標スコア別 TOEIC重要単語の選び方</h2>
             <p className="text-[15px] leading-[1.8] text-slate-600">
               現在のスコアや目標に応じて、優先して覚えるべき重要単語は異なります。
@@ -479,14 +493,14 @@ export default function Home() {
           </article>
         </section>
 
-        <div className="mt-8 flex flex-col items-center gap-2 border-t border-slate-200 pt-8">
+        <div data-home-reveal="" className="mt-8 flex flex-col items-center gap-2 border-t border-slate-200 pt-8">
           <p className="text-xs text-slate-500">役に立ったら共有してください</p>
           <SnsShareButtons
             url="https://www.toeic-words.com/"
             title="【2026年版】TOEIC 重要単語 | 英単語を効率よく学習"
           />
         </div>
-      </main>
+      </HomeScrollReveal>
     </div>
   );
 }
