@@ -7,6 +7,7 @@ import type { Word } from "@/data/words";
 import { TODAY_WORDS_COUNT } from "@/lib/word-select";
 import { buildTodayNavigationQuery } from "@/lib/today-navigation";
 import { Headphones } from "lucide-react";
+import { WordLinkPending } from "./WordLinkPending";
 
 type Props = {
   words: Word[];
@@ -39,8 +40,9 @@ export default function TodayRecommendedWordsClient({ words, variant }: Props) {
                 key={word.slug}
                 href={`/words/${word.slug}?${todayQuery}`}
                 // prefetch={false}
-                className="flex flex-col gap-0.5 p-2.5 bg-white rounded-md border border-slate-200 no-underline transition-all duration-200 shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:-translate-y-0.5 hover:shadow-sm hover:border-slate-300"
+                className="relative flex flex-col gap-0.5 p-2.5 bg-white rounded-md border border-slate-200 no-underline transition-all duration-200 shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:-translate-y-0.5 hover:shadow-sm hover:border-slate-300"
               >
+                <WordLinkPending />
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-sm font-semibold text-gray-900 leading-tight">{word.term}</span>
                   <span className={`text-[9px] px-1 py-0.5 rounded-full font-semibold whitespace-nowrap ${WORD_LEVEL_CARD_STYLES[word.level].badgeClass}`}>
@@ -80,8 +82,9 @@ export default function TodayRecommendedWordsClient({ words, variant }: Props) {
               key={word.slug}
               href={`/words/${word.slug}?${todayQuery}`}
               // prefetch={false}
-              className="flex flex-col gap-1 p-3 bg-white rounded-md border border-slate-200 no-underline transition-all duration-200 shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:-translate-y-0.5 hover:shadow-sm hover:border-slate-300"
+              className="relative flex flex-col gap-1 p-3 bg-white rounded-md border border-slate-200 no-underline transition-all duration-200 shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:-translate-y-0.5 hover:shadow-sm hover:border-slate-300"
             >
+              <WordLinkPending />
               <div className="flex items-center justify-between gap-2">
                 <span className="text-sm font-semibold text-gray-900 leading-tight">{word.term}</span>
                 <span className={`text-[9px] px-1 py-0.5 rounded-full font-semibold whitespace-nowrap ${WORD_LEVEL_CARD_STYLES[word.level].badgeClass}`}>
