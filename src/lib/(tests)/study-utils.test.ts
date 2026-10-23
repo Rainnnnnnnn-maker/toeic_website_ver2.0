@@ -9,6 +9,7 @@ import {
   buildWordMap,
   splitWordsByLevel,
   selectWordPool,
+  getStreakFlameCount,
   pickRandomStudyWord,
   pickSequentialStudyWord,
   splitSentenceByTerm,
@@ -184,6 +185,28 @@ describe("selectWordPool", () => {
   it("returns the full list when every level pool is empty", () => {
     const all = [word("x")];
     expect(selectWordPool(0, 0.1, { all, important: [], medium: [], high: [] })).toBe(all);
+  });
+});
+
+describe("getStreakFlameCount", () => {
+  it("returns 0 when there is no streak", () => {
+    expect(getStreakFlameCount(0)).toBe(0);
+    expect(getStreakFlameCount(-1)).toBe(0);
+  });
+
+  it("shows 1 flame for 1-5 in a row", () => {
+    expect(getStreakFlameCount(1)).toBe(1);
+    expect(getStreakFlameCount(5)).toBe(1);
+  });
+
+  it("shows 2 flames for 6-10 in a row", () => {
+    expect(getStreakFlameCount(6)).toBe(2);
+    expect(getStreakFlameCount(10)).toBe(2);
+  });
+
+  it("shows 3 flames from 11 in a row onward", () => {
+    expect(getStreakFlameCount(11)).toBe(3);
+    expect(getStreakFlameCount(100)).toBe(3);
   });
 });
 
