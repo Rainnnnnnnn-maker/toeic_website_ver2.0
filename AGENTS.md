@@ -34,7 +34,7 @@ Production builds switch the word-list loader to Vercel Blob, so a complete buil
 ## Architecture
 
 ### Tech Stack
-- **Next.js 16.3** — App Router with `reactCompiler: true` and `cacheComponents: true`
+- **Next.js 16.4.2** — App Router with `reactCompiler: true` and `cacheComponents: true`
 - **React 19** with React Compiler (automatic memoization via `babel-plugin-react-compiler`) — do not add `useMemo`/`useCallback` manually
 - **Tailwind CSS 3.4** — utility-first only; minimize arbitrary CSS
 - **TypeScript 5** strict mode — import alias `@/` maps to `src/`
@@ -215,7 +215,7 @@ Required in `.env.local` for local development:
 
 <!-- BEGIN:nextjs-agent-rules -->
 
-# This is NOT the Next.js you know
+## This is NOT the Next.js you know
 
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
 
