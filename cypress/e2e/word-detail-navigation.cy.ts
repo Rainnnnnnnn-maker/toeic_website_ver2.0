@@ -23,7 +23,7 @@ describe("Word detail previous/next navigation", () => {
     for (const { search, backHref } of cases) {
       visitWithFavorites(`/words/accept${search}`);
       // The return link exists only after the client header replaces the Suspense fallback.
-      cy.contains("header a:visible", "次の単語へ").should("have.attr", "href", backHref);
+      cy.contains("header a:visible", "復習に戻る").should("have.attr", "href", backHref);
       cy.get(nav).should("not.exist");
     }
   });
