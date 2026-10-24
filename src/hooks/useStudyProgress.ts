@@ -11,6 +11,7 @@ import {
 function writePersistedState(
     storageKey: string,
     slug: string,
+    revealed: boolean,
     remembered: string[],
     forgotten: string[],
     later: string[],
@@ -25,6 +26,7 @@ function writePersistedState(
             forgottenSlugs: forgotten,
             laterSlugs: later,
             consecutiveRememberCount: count,
+            revealed,
             updatedAt: Date.now(),
         };
         window.sessionStorage.setItem(storageKey, JSON.stringify(nextState));
@@ -52,10 +54,11 @@ export function clearPersistedState(storageKey: string): void {
 }
 
 /**
- * 覚えた / 覚えていない / あとで の学習進捗と連続正解カウントを管理し、
- * 変更を sessionStorage へ自動永続化するフック。
+ * 覚えた / 覚えていない / あとで の学習進捗と連続正解カウント、表示中カードの
+ * 答えの開閉を管理し、変更を sessionStorage へ自動永続化するフック。
+ * 「詳しい解説を見る」で単語詳細へ移動しても、戻ったときに同じカードの答えから再開できる。
  */
-export function useStudyProgress(storageKey: string, currentSlug: string | null) {
+export function useStudyProgress(storageKey: string, currentSlug: string | null, revealed: boolean) {
     const [rememberedSlugs, setRememberedSlugs] = useState<string[]>([]);
     const [forgottenSlugs, setForgottenSlugs] = useState<string[]>([]);
     const [laterSlugs, setLaterSlugs] = useState<string[]>([]);
@@ -63,8 +66,8 @@ export function useStudyProgress(storageKey: string, currentSlug: string | null)
 
     useEffect(() => {
         if (!currentSlug) return;
-        writePersistedState(storageKey, currentSlug, rememberedSlugs, forgottenSlugs, laterSlugs, consecutiveRememberCount);
-    }, [storageKey, currentSlug, rememberedSlugs, forgottenSlugs, laterSlugs, consecutiveRememberCount]);
+        writePersistedState(storageKey, currentSlug, revealed, rememberedSlugs, forgottenSlugs, laterSlugs, consecutiveRememberCount);
+    }, [storageKey, currentSlug, revealed, rememberedSlugs, forgottenSlugs, laterSlugs, consecutiveRememberCount]);
 
     /** 「覚えている」: 連続カウントを増やし、増加後のカウントを返す */
     const markRemembered = (slug: string): number => {
@@ -76,22 +79,12 @@ export function useStudyProgress(storageKey: string, currentSlug: string | null)
         return newCount;
     };
 
-    /**
-     * 「覚えていない」: 連続カウントをリセットする。
-     * 直後の router.push でアンマウントされ useEffect が走らない可能性があるため、
-     * ここで同期的に永続化する。resumeSlug は詳細確認後の復帰位置。
-     */
-    const markForgot = (slug: string, resumeSlug: string = slug): void => {
-        const newForgot = addUnique(forgottenSlugs, slug);
-        const newRemembered = removeValue(rememberedSlugs, slug);
-        const newLater = removeValue(laterSlugs, slug);
-
-        setForgottenSlugs(newForgot);
-        setRememberedSlugs(newRemembered);
-        setLaterSlugs(newLater);
+    /** 「覚えていない」: 連続カウントをリセットする */
+    const markForgot = (slug: string): void => {
+        setForgottenSlugs((prev) => addUnique(prev, slug));
+        setRememberedSlugs((prev) => removeValue(prev, slug));
+        setLaterSlugs((prev) => removeValue(prev, slug));
         setConsecutiveRememberCount(0);
-
-        writePersistedState(storageKey, resumeSlug, newRemembered, newForgot, newLater, 0);
     };
 
     /** 「あとで」: 判断保留なので連続カウントはリセットしない */

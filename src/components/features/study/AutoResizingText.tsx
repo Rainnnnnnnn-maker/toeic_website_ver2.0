@@ -6,11 +6,13 @@ type Props = {
   text: string;
   className?: string;
   style?: React.CSSProperties;
+  /** 縮小を始める最大フォントサイズ（px）。className の font-size と揃える */
+  maxSize?: number;
 };
 
 // 親要素の幅に収まるまでフォントサイズを段階的に縮小するテキスト。
 // 最小サイズまで縮小しても収まらない場合は折り返しに切り替える。
-export default function AutoResizingText({ text, className, style }: Props) {
+export default function AutoResizingText({ text, className, style, maxSize = 48 }: Props) {
   const ref = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
@@ -27,7 +29,7 @@ export default function AutoResizingText({ text, className, style }: Props) {
       el.style.textOverflow = 'clip';
       el.style.whiteSpace = 'nowrap';
 
-      let size = 48; // CSS のデフォルトサイズ
+      let size = maxSize;
       el.style.fontSize = `${size}px`;
 
       const maxWidth = parent.clientWidth - 10;
@@ -48,7 +50,7 @@ export default function AutoResizingText({ text, className, style }: Props) {
     adjustSize();
     window.addEventListener('resize', adjustSize);
     return () => window.removeEventListener('resize', adjustSize);
-  }, [text]);
+  }, [text, maxSize]);
 
   return <span ref={ref} className={className} style={style}>{text}</span>;
 }

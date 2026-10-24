@@ -10,6 +10,7 @@ import {
   splitWordsByLevel,
   selectWordPool,
   getStreakFlameCount,
+  getGradeAvailability,
   pickRandomStudyWord,
   pickSequentialStudyWord,
   splitSentenceByTerm,
@@ -44,6 +45,7 @@ describe("parsePersistedStudyState", () => {
     forgottenSlugs: ["cherry"],
     laterSlugs: ["date"],
     consecutiveRememberCount: 3,
+    revealed: true,
     updatedAt: 1700000000000,
   };
 
@@ -87,6 +89,11 @@ describe("parsePersistedStudyState", () => {
 
   it("returns null when consecutiveRememberCount is not a number", () => {
     expect(parsePersistedStudyState(JSON.stringify({ ...valid, consecutiveRememberCount: "3" }))).toBeNull();
+  });
+
+  it("returns null when revealed is not a boolean", () => {
+    expect(parsePersistedStudyState(JSON.stringify({ ...valid, revealed: "true" }))).toBeNull();
+    expect(parsePersistedStudyState(JSON.stringify({ ...valid, revealed: 1 }))).toBeNull();
   });
 
   it("returns null when updatedAt is missing", () => {
@@ -207,6 +214,20 @@ describe("getStreakFlameCount", () => {
   it("shows 3 flames from 11 in a row onward", () => {
     expect(getStreakFlameCount(11)).toBe(3);
     expect(getStreakFlameCount(100)).toBe(3);
+  });
+});
+
+describe("getGradeAvailability", () => {
+  it("enables every grade once the answer has loaded", () => {
+    expect(getGradeAvailability("ready")).toEqual({ remembered: true, forgot: true, later: true });
+  });
+
+  it("disables every grade while the answer is loading", () => {
+    expect(getGradeAvailability("loading")).toEqual({ remembered: false, forgot: false, later: false });
+  });
+
+  it("keeps only 「あとで」 when the answer failed to load", () => {
+    expect(getGradeAvailability("error")).toEqual({ remembered: false, forgot: false, later: true });
   });
 });
 

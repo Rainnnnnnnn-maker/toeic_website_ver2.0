@@ -133,7 +133,7 @@ export default function WordNavigationClient({
               className="group inline-flex items-center justify-center gap-1.5 h-10 px-4 bg-white border border-gray-200 rounded-full text-slate-600 text-[15px] font-semibold no-underline transition-all duration-200 shadow-sm select-none hover:bg-gray-50 hover:border-gray-300 hover:text-slate-900 hover:-translate-y-px hover:shadow-md active:translate-y-0 active:shadow-sm"
             >
               <ChevronLeft size={18} className="transition-transform group-hover:-translate-x-0.5 text-slate-400 group-hover:text-slate-600" />
-              次の単語へ
+              復習に戻る
             </Link>
           ) : isFromMyPage ? (
             <Link
@@ -181,7 +181,7 @@ export default function WordNavigationClient({
         </p>
       )}
 
-      {/* 復習モードからの詳細は「次の単語へ」でセッションへ戻る一本道にする。
+      {/* 復習モードからの詳細は「復習に戻る」でセッションへ戻る一本道にする。
           前後ナビがあると同じセッションの未採点カードを先に見られ、採点が実力より甘くなる。 */}
       {!isFromReview && (
         <nav className="flex justify-between items-center -mt-2 pb-0 -mb-2" aria-label="単語ナビゲーション">

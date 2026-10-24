@@ -8,6 +8,8 @@ export type PersistedStudyStateV1 = {
   forgottenSlugs: string[];
   laterSlugs?: string[];
   consecutiveRememberCount?: number;
+  /** 表示中カードの答えを開いているか（単語詳細から戻ったとき採点へ直行させる） */
+  revealed?: boolean;
   updatedAt: number;
 };
 
@@ -46,6 +48,7 @@ export function parsePersistedStudyState(raw: string): PersistedStudyStateV1 | n
       return null;
     }
     if (obj.consecutiveRememberCount !== undefined && typeof obj.consecutiveRememberCount !== "number") return null;
+    if (obj.revealed !== undefined && typeof obj.revealed !== "boolean") return null;
     if (typeof obj.updatedAt !== "number") return null;
     return obj as PersistedStudyStateV1;
   } catch {
@@ -132,6 +135,29 @@ export function getStreakFlameCount(consecutiveRememberCount: number): number {
   if (consecutiveRememberCount <= 5) return 1;
   if (consecutiveRememberCount <= 10) return 2;
   return 3;
+}
+
+/** 学習カードの答え（訳・例文）の取得状態 */
+export type StudyAnswerStatus = "loading" | "ready" | "error";
+
+/** 採点ボタンごとに押せるかどうか */
+export type GradeAvailability = {
+  remembered: boolean;
+  forgot: boolean;
+  later: boolean;
+};
+
+/**
+ * 答えの取得状態から押せる採点ボタンを決める。
+ * - 取得済み: 3つとも押せる
+ * - 読み込み中: 答えを見ていないので3つとも押せない
+ * - 取得失敗: 「覚えている/覚えていない」は判定できないので押せない。
+ *   「あとで」は判定ではなく先送りなので残し、解説を取れない単語でも先へ進めるようにする
+ */
+export function getGradeAvailability(status: StudyAnswerStatus): GradeAvailability {
+  if (status === "ready") return { remembered: true, forgot: true, later: true };
+  if (status === "error") return { remembered: false, forgot: false, later: true };
+  return { remembered: false, forgot: false, later: false };
 }
 
 /**
