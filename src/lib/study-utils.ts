@@ -137,6 +137,29 @@ export function getStreakFlameCount(consecutiveRememberCount: number): number {
   return 3;
 }
 
+/** 学習カードの答え（訳・例文）の取得状態 */
+export type StudyAnswerStatus = "loading" | "ready" | "error";
+
+/** 採点ボタンごとに押せるかどうか */
+export type GradeAvailability = {
+  remembered: boolean;
+  forgot: boolean;
+  later: boolean;
+};
+
+/**
+ * 答えの取得状態から押せる採点ボタンを決める。
+ * - 取得済み: 3つとも押せる
+ * - 読み込み中: 答えを見ていないので3つとも押せない
+ * - 取得失敗: 「覚えている/覚えていない」は判定できないので押せない。
+ *   「あとで」は判定ではなく先送りなので残し、解説を取れない単語でも先へ進めるようにする
+ */
+export function getGradeAvailability(status: StudyAnswerStatus): GradeAvailability {
+  if (status === "ready") return { remembered: true, forgot: true, later: true };
+  if (status === "error") return { remembered: false, forgot: false, later: true };
+  return { remembered: false, forgot: false, later: false };
+}
+
 /**
  * ランダム出題: 難易度調整済みプールから次の単語を選ぶ。
  * 現在の単語と同じものは最大 10 回まで再抽選する（単語が 2 語以上ある場合のみ）。
