@@ -44,6 +44,7 @@ describe("parsePersistedStudyState", () => {
     forgottenSlugs: ["cherry"],
     laterSlugs: ["date"],
     consecutiveRememberCount: 3,
+    revealed: true,
     updatedAt: 1700000000000,
   };
 
@@ -87,6 +88,11 @@ describe("parsePersistedStudyState", () => {
 
   it("returns null when consecutiveRememberCount is not a number", () => {
     expect(parsePersistedStudyState(JSON.stringify({ ...valid, consecutiveRememberCount: "3" }))).toBeNull();
+  });
+
+  it("returns null when revealed is not a boolean", () => {
+    expect(parsePersistedStudyState(JSON.stringify({ ...valid, revealed: "true" }))).toBeNull();
+    expect(parsePersistedStudyState(JSON.stringify({ ...valid, revealed: 1 }))).toBeNull();
   });
 
   it("returns null when updatedAt is missing", () => {
