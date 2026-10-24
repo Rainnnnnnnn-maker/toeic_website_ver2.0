@@ -11,6 +11,7 @@ import { useStudyWordDetails } from '@/hooks/useStudyWordDetails';
 import type { ReviewGrade, ReviewQueue } from '@/lib/review-schedule';
 import {
   buildWordMap,
+  getGradeAvailability,
   getNavigationType,
   splitWordsByLevel,
   pickRandomStudyWord,
@@ -86,6 +87,11 @@ export default function StudyClient({
   } = useStudyProgress(storageKey, currentWord?.slug ?? null, isRevealed);
 
   const { detailBySlug, loadDetail } = useStudyWordDetails();
+  const answerStatus = currentWord ? (detailBySlug[currentWord.slug]?.status ?? 'loading') : 'loading';
+  const gradeAvailability = getGradeAvailability(answerStatus);
+
+  /** 答えを開き、その内容を取得できた採点だけ受け付ける（ボタンの無効化と二重に守る） */
+  const canGrade = (grade: ReviewGrade) => isRevealed && gradeAvailability[grade];
 
   const wordBySlug = buildWordMap(words);
 
@@ -179,7 +185,7 @@ export default function StudyClient({
   };
 
   const handleRemembered = () => {
-    if (!currentWord) return;
+    if (!currentWord || !canGrade('remembered')) return;
     onGrade?.(currentWord.slug, 'remembered');
     const newCount = markRemembered(currentWord.slug);
     advanceToNextWord(newCount);
@@ -187,14 +193,14 @@ export default function StudyClient({
 
   // 答えはカード上で確認済みなので、単語詳細へは移動せず次の単語へ進む
   const handleForgot = () => {
-    if (!currentWord) return;
+    if (!currentWord || !canGrade('forgot')) return;
     onGrade?.(currentWord.slug, 'forgot');
     markForgot(currentWord.slug);
     advanceToNextWord(0);
   };
 
   const handleLater = () => {
-    if (!currentWord) return;
+    if (!currentWord || !canGrade('later')) return;
     onGrade?.(currentWord.slug, 'later');
     markLater(currentWord.slug);
     advanceToNextWord();
@@ -283,6 +289,7 @@ export default function StudyClient({
             actionsRef={actionsRef}
             revealButtonRef={revealButtonRef}
             isRevealed={isRevealed}
+            answerStatus={answerStatus}
             onReveal={handleReveal}
             onRemembered={handleRemembered}
             onForgot={handleForgot}
