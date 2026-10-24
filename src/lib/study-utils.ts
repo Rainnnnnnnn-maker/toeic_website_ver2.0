@@ -121,6 +121,20 @@ export function selectWordPool(consecutiveRememberCount: number, r: number, pool
 }
 
 /**
+ * 連続正解バッジに表示する 🔥 の数を返す。
+ * - 1〜5回: 1つ
+ * - 6〜10回: 2つ
+ * - 11回〜: 3つ
+ * 0 回以下はバッジ自体を出さないため 0 を返す。
+ */
+export function getStreakFlameCount(consecutiveRememberCount: number): number {
+  if (consecutiveRememberCount <= 0) return 0;
+  if (consecutiveRememberCount <= 5) return 1;
+  if (consecutiveRememberCount <= 10) return 2;
+  return 3;
+}
+
+/**
  * ランダム出題: 難易度調整済みプールから次の単語を選ぶ。
  * 現在の単語と同じものは最大 10 回まで再抽選する（単語が 2 語以上ある場合のみ）。
  * random は 1 試行につき 2 回呼ばれる（プール選択用・インデックス用）。

@@ -1,5 +1,7 @@
 'use client';
 
+import { getStreakFlameCount } from '@/lib/study-utils';
+
 type Props = {
   onRemembered: () => void;
   onForgot: () => void;
@@ -53,7 +55,7 @@ export default function StudyActions({
           <span>連続で「覚えている」を選ぶと難易度が上がります</span>
           {consecutiveRememberCount > 0 && (
             <span className="ml-1 px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-full text-xs font-bold animate-pulse">
-              {consecutiveRememberCount}連続中 🔥
+              {consecutiveRememberCount}連続中 {'🔥'.repeat(getStreakFlameCount(consecutiveRememberCount))}
             </span>
           )}
         </div>
