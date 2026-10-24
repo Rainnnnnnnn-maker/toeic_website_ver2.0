@@ -1,15 +1,13 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ChevronLeft } from 'lucide-react';
 import { useFavorites } from '@/context/FavoritesContext';
 import type { Word } from '@/data/words';
-import { fetchWordDetail } from '@/actions/word';
 import { useTTS } from '@/hooks/useTTS';
-import { useStudyCountdown } from '@/hooks/useStudyCountdown';
 import { useStudyProgress, readPersistedState, clearPersistedState } from '@/hooks/useStudyProgress';
+import { useStudyWordDetails } from '@/hooks/useStudyWordDetails';
 import type { ReviewGrade, ReviewQueue } from '@/lib/review-schedule';
 import {
   buildWordMap,
@@ -34,7 +32,7 @@ type Props = {
    * 学習モードでは undefined なので、既存の挙動は変わらない。
    */
   onGrade?: (slug: string, grade: ReviewGrade) => void;
-  /** 「覚えていない」で単語詳細へ遷移する際の from パラメータ */
+  /** 「詳しい解説を見る」で単語詳細へ遷移する際の from パラメータ */
   wordDetailFrom?: 'review' | 'study';
   /** 復習詳細から戻る際に復元するキュー */
   reviewQueue?: ReviewQueue;
@@ -58,14 +56,15 @@ export default function StudyClient({
   reviewQueue,
   sessionProgress,
 }: Props) {
-  const router = useRouter();
   const { isFavorite, toggleFavorite } = useFavorites();
   const [currentWord, setCurrentWord] = useState<Word | null>(null);
-  const [hintExample, setHintExample] = useState<string | null>(null);
-  const [isFlipped, setIsFlipped] = useState(false);
-  const [isLoadingHint, setIsLoadingHint] = useState(false);
+  const [isRevealed, setIsRevealed] = useState(false);
+  const [isHintVisible, setIsHintVisible] = useState(false);
   const initializedRef = useRef(false);
   const cardRef = useRef<HTMLElement>(null);
+  const answerRef = useRef<HTMLDivElement>(null);
+  const actionsRef = useRef<HTMLElement>(null);
+  const revealButtonRef = useRef<HTMLButtonElement>(null);
 
   const {
     audioError,
@@ -77,14 +76,6 @@ export default function StudyClient({
   } = useTTS(currentWord?.slug);
 
   const {
-    countdownValue,
-    countdownKey,
-    showHintButton,
-    setShowHintButton,
-    startCountdown,
-  } = useStudyCountdown(isFlipped);
-
-  const {
     laterSlugs,
     consecutiveRememberCount,
     markRemembered,
@@ -92,7 +83,9 @@ export default function StudyClient({
     markLater,
     restoreProgress,
     resetProgress,
-  } = useStudyProgress(storageKey, currentWord?.slug ?? null);
+  } = useStudyProgress(storageKey, currentWord?.slug ?? null, isRevealed);
+
+  const { detailBySlug, loadDetail } = useStudyWordDetails();
 
   const wordBySlug = buildWordMap(words);
 
@@ -100,24 +93,29 @@ export default function StudyClient({
     .map((slug) => wordBySlug.get(slug))
     .filter((word): word is Word => Boolean(word));
 
-  /** カウントダウンを開始し、ヒント関連の状態をリセットする */
-  const startCardCountdown = () => {
-    startCountdown();
-    setHintExample(null);
-    setIsFlipped(false);
-    setIsLoadingHint(false);
+  /**
+   * 単語をカードに表示する。答えとヒントは閉じた状態から始め、
+   * 「答えを見る」で待たせないよう詳細を先に取得しておく。
+   */
+  const showWord = (word: Word, revealed = false) => {
+    setCurrentWord(word);
+    setIsRevealed(revealed);
+    setIsHintVisible(false);
+    void loadDetail(word.slug);
   };
 
   /** 次の単語を選んで表示する（random は難易度調整付き） */
   const advanceToNextWord = (overrideCount?: number) => {
     if (words.length === 0) return;
-    startCardCountdown();
     const count = overrideCount ?? consecutiveRememberCount;
     const next =
       order === 'sequential'
         ? pickSequentialStudyWord(words, currentWord?.slug ?? null)
         : pickRandomStudyWord(splitWordsByLevel(words), currentWord?.slug ?? null, count);
-    if (next) setCurrentWord(next);
+    if (!next) return;
+    showWord(next);
+    // 採点ボタンは表面に戻ると消えるため、キーボード操作を「答えを見る」から続けられるようにする
+    window.requestAnimationFrame(() => revealButtonRef.current?.focus({ preventScroll: true }));
   };
 
   // 初回マウント時: リロードなら状態を破棄し、それ以外は sessionStorage からの復元を試みる
@@ -134,24 +132,51 @@ export default function StudyClient({
         const persisted = readPersistedState(storageKey);
         const word = persisted ? wordBySlug.get(persisted.currentSlug) : undefined;
         if (persisted && word) {
-          setCurrentWord(word);
           restoreProgress(persisted);
-          setShowHintButton(true);
+          setCurrentWord(word);
+          // 「詳しい解説を見る」から戻った場合は、開いていた答えから採点を続けられる
+          setIsRevealed(persisted.revealed === true);
+          void loadDetail(word.slug);
           return;
         }
       }
 
       if (words.length === 0) return;
-      startCountdown();
       const first =
         order === 'sequential'
           ? pickSequentialStudyWord(words, null)
           : pickRandomStudyWord(splitWordsByLevel(words), null, 0);
-      if (first) setCurrentWord(first);
+      if (first) {
+        setCurrentWord(first);
+        void loadDetail(first.slug);
+      }
     }, 0);
 
     return () => window.clearTimeout(timer);
-  }, [words, order, storageKey, wordBySlug, restoreProgress, resetProgress, setShowHintButton, startCountdown]);
+  }, [words, order, storageKey, wordBySlug, restoreProgress, resetProgress, loadDetail]);
+
+  const handleReveal = () => {
+    if (!currentWord) return;
+    setIsRevealed(true);
+    void loadDetail(currentWord.slug);
+    window.requestAnimationFrame(() => {
+      // 答えを読み上げ環境へ伝え、伸びたカードの下にある採点ボタンを画面内へ寄せる
+      answerRef.current?.focus({ preventScroll: true });
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      actionsRef.current?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'nearest' });
+    });
+  };
+
+  const handleToggleHint = () => {
+    if (!currentWord) return;
+    setIsHintVisible((visible) => !visible);
+    void loadDetail(currentWord.slug);
+  };
+
+  const handleRetryDetail = () => {
+    if (!currentWord) return;
+    void loadDetail(currentWord.slug);
+  };
 
   const handleRemembered = () => {
     if (!currentWord) return;
@@ -160,29 +185,12 @@ export default function StudyClient({
     advanceToNextWord(newCount);
   };
 
+  // 答えはカード上で確認済みなので、単語詳細へは移動せず次の単語へ進む
   const handleForgot = () => {
     if (!currentWord) return;
-    // 直後の router.push でアンマウントされるため、記録は同期的に呼び出す
     onGrade?.(currentWord.slug, 'forgot');
-    const resumeWord =
-      wordDetailFrom === 'review'
-        ? pickSequentialStudyWord(words, currentWord.slug)
-        : currentWord;
-    markForgot(currentWord.slug, resumeWord?.slug ?? currentWord.slug);
-    if (wordDetailFrom === 'review' && resumeWord) {
-      // Next Router が戻り先の画面状態を保持しても、同じ単語を再表示しない。
-      // ヒント（例文）とカウントダウンも next カードの初期状態へ戻す。
-      // これがないと、戻ったときに次の単語へ前の単語の例文が残って見える。
-      setCurrentWord(resumeWord);
-      startCardCountdown();
-    }
-    const fromParam =
-      wordDetailFrom ?? (backLink === '/favorites' ? 'review' : 'study');
-    const params = new URLSearchParams({ from: fromParam });
-    if (fromParam === 'review' && reviewQueue) {
-      params.set('queue', reviewQueue);
-    }
-    router.push(`/words/${currentWord.slug}?${params.toString()}`);
+    markForgot(currentWord.slug);
+    advanceToNextWord(0);
   };
 
   const handleLater = () => {
@@ -193,34 +201,11 @@ export default function StudyClient({
   };
 
   const handleSelectLaterWord = (word: Word) => {
-    setCurrentWord(word);
-    startCardCountdown();
+    showWord(word);
     // モバイル（lg未満）ではサイドバーがカードの下に表示されるため、
     // 選択した単語が反映されたカードを画面内へスクロールする
     if (window.innerWidth < 1024) {
       cardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-  };
-
-  const handleHint = async () => {
-    if (!currentWord) return;
-
-    setShowHintButton(false);
-    setIsFlipped(true);
-    setIsLoadingHint(true);
-
-    try {
-      const detail = await fetchWordDetail(currentWord.slug);
-      if (detail && detail.toeicExamples && detail.toeicExamples.length > 0) {
-        setHintExample(detail.toeicExamples[0].english);
-      } else {
-        setHintExample('No example available.');
-      }
-    } catch (e) {
-      console.error(e);
-      setHintExample('Failed to load example.');
-    } finally {
-      setIsLoadingHint(false);
     }
   };
 
@@ -234,6 +219,13 @@ export default function StudyClient({
     );
   }
 
+  const fromParam = wordDetailFrom ?? (backLink === '/favorites' ? 'review' : 'study');
+  const detailParams = new URLSearchParams({ from: fromParam });
+  if (fromParam === 'review' && reviewQueue) {
+    detailParams.set('queue', reviewQueue);
+  }
+  const detailHref = `/words/${currentWord.slug}?${detailParams.toString()}`;
+
   return (
     <div className="min-h-screen w-full flex justify-center items-center py-8 px-4 bg-[radial-gradient(circle_at_top,#bae6fd_0,#eff6ff_45%,#f8fafc_100%)] sm:py-12 sm:px-6">
       <div
@@ -243,7 +235,7 @@ export default function StudyClient({
             : 'max-w-[600px]'
         }`}
       >
-        <main className="w-full max-w-[600px] flex flex-col gap-8 items-center lg:max-w-none">
+        <main className="w-full max-w-[600px] flex flex-col gap-6 items-center lg:max-w-none">
           <header className="flex flex-col gap-3 text-center w-full items-center relative">
             <Link
               href={backLink}
@@ -260,24 +252,26 @@ export default function StudyClient({
                 <progress aria-label="今回の復習の進捗" className="mt-2 h-2 w-full accent-emerald-600" max={sessionProgress.total} value={sessionProgress.total - sessionProgress.remaining} />
               </div>
             )}
-            <p className="text-sm leading-[1.6] text-gray-500">
-              表示された単語を知っていますか？
+            <p className="text-sm leading-[1.6] text-slate-600">
+              {isRevealed
+                ? '思い出せたかどうかを選んでください'
+                : '意味を思い浮かべてから答えを確認しましょう'}
             </p>
           </header>
 
           <StudyCard
             cardRef={cardRef}
+            answerRef={answerRef}
             word={currentWord}
-            isFlipped={isFlipped}
-            isLoadingHint={isLoadingHint}
-            hintExample={hintExample}
-            countdownValue={countdownValue}
-            countdownKey={countdownKey}
-            showHintButton={showHintButton}
+            isRevealed={isRevealed}
+            isHintVisible={isHintVisible}
+            detailState={detailBySlug[currentWord.slug] ?? { status: 'loading' }}
+            detailHref={detailHref}
             isFavorite={isFavorite(currentWord.slug)}
             audioLoading={audioLoading}
             sentenceAudioLoading={sentenceAudioLoading}
-            onHint={handleHint}
+            onToggleHint={handleToggleHint}
+            onRetryDetail={handleRetryDetail}
             onToggleFavorite={() => toggleFavorite(currentWord.slug)}
             onPlayWordAudio={() => handlePlayAudio(currentWord.term, undefined, "en", currentWord.slug)}
             onPlaySentenceAudio={handlePlaySentenceAudio}
@@ -286,6 +280,10 @@ export default function StudyClient({
           />
 
           <StudyActions
+            actionsRef={actionsRef}
+            revealButtonRef={revealButtonRef}
+            isRevealed={isRevealed}
+            onReveal={handleReveal}
             onRemembered={handleRemembered}
             onForgot={handleForgot}
             onLater={handleLater}
