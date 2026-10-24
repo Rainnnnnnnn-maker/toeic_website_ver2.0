@@ -8,6 +8,8 @@ export type PersistedStudyStateV1 = {
   forgottenSlugs: string[];
   laterSlugs?: string[];
   consecutiveRememberCount?: number;
+  /** 表示中カードの答えを開いているか（単語詳細から戻ったとき採点へ直行させる） */
+  revealed?: boolean;
   updatedAt: number;
 };
 
@@ -46,6 +48,7 @@ export function parsePersistedStudyState(raw: string): PersistedStudyStateV1 | n
       return null;
     }
     if (obj.consecutiveRememberCount !== undefined && typeof obj.consecutiveRememberCount !== "number") return null;
+    if (obj.revealed !== undefined && typeof obj.revealed !== "boolean") return null;
     if (typeof obj.updatedAt !== "number") return null;
     return obj as PersistedStudyStateV1;
   } catch {
