@@ -26,7 +26,7 @@ export default function RetentionBreakdown({ summary, words }: Props) {
   const selectedWords = words.filter((item) => item.level === selected);
 
   return (
-    <section className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+    <section className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-xs sm:p-6">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h3 className="text-sm font-bold text-slate-800">定着度の内訳</h3>
         <p className="text-xs text-slate-500">
@@ -55,7 +55,7 @@ export default function RetentionBreakdown({ summary, words }: Props) {
           <li key={key}>
             <button type="button" aria-expanded={selected === key} aria-controls={listId}
               onClick={() => setSelected(selected === key ? null : key)}
-              className={`flex min-h-11 w-full items-center gap-2 rounded-lg border px-2 text-left transition-colors hover:bg-slate-100 active:bg-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 ${selected === key ? "border-emerald-600 bg-emerald-50" : "border-slate-200"}`}>
+              className={`flex min-h-11 w-full items-center gap-2 rounded-lg border px-2 text-left transition-colors hover:bg-slate-100 active:bg-slate-200 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-emerald-600 ${selected === key ? "border-emerald-600 bg-emerald-50" : "border-slate-200"}`}>
             <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${dot}`} />
             <span className="text-xs text-slate-500">{label}</span>
             <span className="ml-auto text-sm font-bold text-slate-800 sm:ml-0">
@@ -75,7 +75,7 @@ export default function RetentionBreakdown({ summary, words }: Props) {
               <ul className="grid max-h-80 grid-cols-1 gap-2 overflow-y-auto sm:grid-cols-2">
                 {selectedWords.map(({ word }) => (
                   <li key={word.slug}><Link href={`/words/${word.slug}?from=mypage`} prefetch={false}
-                    className="flex min-h-11 items-center rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-emerald-50 active:bg-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600">{word.term}</Link></li>
+                    className="flex min-h-11 items-center rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-emerald-50 active:bg-emerald-100 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-emerald-600">{word.term}</Link></li>
                 ))}
               </ul>
             )}

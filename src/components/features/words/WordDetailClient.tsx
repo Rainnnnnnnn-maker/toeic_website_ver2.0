@@ -58,13 +58,13 @@ export function WordDetailClient({ initialData, linkedWords = {}, relatedWords =
           />,
           shareTarget
         )}
-      <div className="mt-0 p-4 bg-white rounded-xl border border-gray-100 shadow-sm relative flex flex-col gap-3 sm:p-5">
+      <div className="mt-0 p-4 bg-white rounded-xl border border-gray-100 shadow-xs relative flex flex-col gap-3 sm:p-5">
         <div className="border-b border-gray-100 pb-3">
           <div className="flex items-center gap-2 sm:gap-3">
             <h1 className="text-2xl text-slate-900 font-bold tracking-tight sm:text-3xl">{data.word}</h1>
             <button
               onClick={() => toggleFavorite(data.word)}
-              className="shrink-0 inline-flex items-center justify-center size-11 sm:size-9 rounded-full border border-gray-200 bg-white text-slate-400 transition-all hover:text-amber-400 hover:border-amber-200 hover:bg-amber-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+              className="shrink-0 inline-flex items-center justify-center size-11 sm:size-9 rounded-full border border-gray-200 bg-white text-slate-400 transition-all hover:text-amber-400 hover:border-amber-200 hover:bg-amber-50 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-500"
               aria-label={isFavorite(data.word) ? "お気に入りから削除" : "お気に入りに追加"}
             >
               <Star
@@ -82,10 +82,10 @@ export function WordDetailClient({ initialData, linkedWords = {}, relatedWords =
           </div>
           {data.pronunciation && (
             <div className="mt-1.5 inline-flex items-center gap-2">
-              <span className="text-sm text-gray-600 font-mono bg-gray-50 border border-gray-200 rounded px-1.5 py-0.5">{data.pronunciation}</span>
+              <span className="text-sm text-gray-600 font-mono bg-gray-50 border border-gray-200 rounded-sm px-1.5 py-0.5">{data.pronunciation}</span>
               <button
                 type="button"
-                className="inline-flex items-center justify-center size-11 shrink-0 sm:size-6 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                className="inline-flex items-center justify-center size-11 shrink-0 sm:size-6 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500"
                 onClick={() => handlePlayAudio(data.word)}
                 disabled={audioLoading}
                 aria-label="発音を再生"
@@ -105,7 +105,7 @@ export function WordDetailClient({ initialData, linkedWords = {}, relatedWords =
           
           <div className="bg-slate-50 rounded-lg p-3 border border-slate-100">
              <p className="text-base text-slate-900 font-medium">
-              <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded text-xs font-bold bg-slate-200 text-slate-700 mr-1.5">主要</span>
+              <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded-sm text-xs font-bold bg-slate-200 text-slate-700 mr-1.5">主要</span>
               {data.japaneseTranslation}
             </p>
           </div>
@@ -181,7 +181,7 @@ export function WordDetailClient({ initialData, linkedWords = {}, relatedWords =
           >
             <ul className="flex flex-wrap gap-1.5 list-none m-0 p-0">
               {data.collocations.map((col, i) => (
-                <li key={`col-${i}`} className="px-2 py-1 rounded bg-pink-50 text-pink-700 text-sm border border-pink-200 font-medium">
+                <li key={`col-${i}`} className="px-2 py-1 rounded-sm bg-pink-50 text-pink-700 text-sm border border-pink-200 font-medium">
                   {col}
                 </li>
               ))}
@@ -202,9 +202,9 @@ export function WordDetailClient({ initialData, linkedWords = {}, relatedWords =
           >
             <ul className="flex flex-wrap gap-1.5 list-none m-0 p-0">
               {data.wordForms.map((wf, i) => (
-                <li key={`${wf.form}-${i}`} className="px-2 py-1 rounded bg-slate-50 text-slate-700 text-sm border border-slate-200 flex items-center gap-1.5">
+                <li key={`${wf.form}-${i}`} className="px-2 py-1 rounded-sm bg-slate-50 text-slate-700 text-sm border border-slate-200 flex items-center gap-1.5">
                   <span className="font-medium">{wf.form}</span>
-                  <span className="text-xs text-slate-400 bg-white px-1 rounded border border-slate-100">
+                  <span className="text-xs text-slate-400 bg-white px-1 rounded-sm border border-slate-100">
                     {wf.type}
                   </span>
                 </li>
@@ -229,13 +229,13 @@ export function WordDetailClient({ initialData, linkedWords = {}, relatedWords =
                     <Link
                       href={`/words/${linkedWords[s]}`}
                       prefetch={false}
-                      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-green-50 text-green-700 border border-green-200 hover:bg-green-100 hover:border-green-300 transition-all shadow-sm group"
+                      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-green-50 text-green-700 border border-green-200 hover:bg-green-100 hover:border-green-300 transition-all shadow-xs group"
                     >
                       <span className="font-medium">{s}</span>
                       <ArrowUpRight size={12} className="opacity-50 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
                     </Link>
                   ) : (
-                    <span className="inline-flex items-center px-2 py-1 rounded bg-slate-50 text-slate-600 border border-slate-200">
+                    <span className="inline-flex items-center px-2 py-1 rounded-sm bg-slate-50 text-slate-600 border border-slate-200">
                       {s}
                     </span>
                   )}
@@ -260,7 +260,7 @@ export function WordDetailClient({ initialData, linkedWords = {}, relatedWords =
                   <div className="flex items-start gap-2 mb-2">
                     <button
                       type="button"
-                      className="shrink-0 inline-flex min-h-11 min-w-11 items-center justify-center p-1.5 sm:min-h-0 sm:min-w-0 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-md transition-colors border border-purple-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
+                      className="shrink-0 inline-flex min-h-11 min-w-11 items-center justify-center p-1.5 sm:min-h-0 sm:min-w-0 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-md transition-colors border border-purple-200 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-purple-500"
                       onClick={() => handlePlaySentenceAudio(ex.english, `toeic-${i}`, "en", data.word)}
                       disabled={sentenceAudioLoading === `toeic-${i}`}
                       aria-label="例文を再生"
@@ -276,7 +276,7 @@ export function WordDetailClient({ initialData, linkedWords = {}, relatedWords =
                   <div className="flex items-start gap-2 border-t border-slate-200/50 pt-2">
                     <button
                       type="button"
-                      className="shrink-0 inline-flex min-h-11 min-w-11 items-center justify-center p-1.5 sm:min-h-0 sm:min-w-0 bg-white hover:bg-slate-50 text-slate-600 rounded-md transition-colors border border-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500"
+                      className="shrink-0 inline-flex min-h-11 min-w-11 items-center justify-center p-1.5 sm:min-h-0 sm:min-w-0 bg-white hover:bg-slate-50 text-slate-600 rounded-md transition-colors border border-slate-200 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-slate-500"
                       onClick={() => handlePlaySentenceAudio(ex.japanese, `toeic-${i}-ja`, "ja", data.word)}
                       disabled={sentenceAudioLoading === `toeic-${i}-ja`}
                       aria-label="日本語訳を再生"
@@ -310,7 +310,7 @@ export function WordDetailClient({ initialData, linkedWords = {}, relatedWords =
             <ul className="flex flex-wrap gap-1.5 list-none m-0 p-0">
               {relatedWords.map((w) => (
                 <li key={w.slug}>
-                  <Link href={`/words/${w.slug}`} prefetch={false} className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-white text-slate-700 text-sm border border-slate-200 hover:border-blue-300 hover:text-blue-600 hover:shadow-md transition-all shadow-sm group">
+                  <Link href={`/words/${w.slug}`} prefetch={false} className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-white text-slate-700 text-sm border border-slate-200 hover:border-blue-300 hover:text-blue-600 hover:shadow-md transition-all shadow-xs group">
                     <span className="font-medium">{w.term}</span>
                     <ArrowUpRight size={12} className="text-slate-400 group-hover:text-blue-500 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
                   </Link>
@@ -369,11 +369,11 @@ function MeaningDetails({
                     )}
                   </div>
 
-                  <div className="bg-white rounded-lg border border-slate-200 p-2.5 shadow-sm">
+                  <div className="bg-white rounded-lg border border-slate-200 p-2.5 shadow-xs">
                     <div className="flex items-start gap-2 mb-2">
                       <button
                         type="button"
-                        className="shrink-0 inline-flex min-h-11 min-w-11 items-center justify-center p-1.5 sm:min-h-0 sm:min-w-0 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-md transition-colors border border-blue-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                        className="shrink-0 inline-flex min-h-11 min-w-11 items-center justify-center p-1.5 sm:min-h-0 sm:min-w-0 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-md transition-colors border border-blue-200 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500"
                         onClick={() =>
                           onPlaySentence(
                             d.example,
@@ -400,7 +400,7 @@ function MeaningDetails({
                     <div className="flex items-start gap-2 border-t border-slate-100 pt-2">
                       <button
                         type="button"
-                        className="shrink-0 inline-flex min-h-11 min-w-11 items-center justify-center p-1.5 sm:min-h-0 sm:min-w-0 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-md transition-colors border border-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500"
+                        className="shrink-0 inline-flex min-h-11 min-w-11 items-center justify-center p-1.5 sm:min-h-0 sm:min-w-0 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-md transition-colors border border-slate-200 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-slate-500"
                         onClick={() =>
                           onPlaySentence(
                             d.exampleJapanese,

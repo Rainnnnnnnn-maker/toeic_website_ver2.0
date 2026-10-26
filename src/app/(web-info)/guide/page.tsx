@@ -86,7 +86,7 @@ export default function GuideIndexPage() {
           >
             <Link prefetch={false} href={`/guide/${article.slug}`} className="block">
               <div className="mb-2 flex flex-wrap items-center gap-2 text-xs text-black/50 dark:text-white/50">
-                <span className="rounded bg-black/5 px-2 py-0.5 dark:bg-white/10">
+                <span className="rounded-sm bg-black/5 px-2 py-0.5 dark:bg-white/10">
                   {article.category}
                 </span>
                 <span>約 {article.estimatedReadingMin} 分で読める</span>

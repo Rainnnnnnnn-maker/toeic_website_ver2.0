@@ -57,7 +57,7 @@ export default function ListenPlayerView({ player, title, completionMessage }: P
         <div className="w-9" />
       </div>
 
-      <div className="bg-white rounded-xl border border-slate-200 p-6 sm:p-8 shadow-sm flex flex-col items-center text-center gap-6">
+      <div className="bg-white rounded-xl border border-slate-200 p-6 sm:p-8 shadow-xs flex flex-col items-center text-center gap-6">
         <div className="text-sm font-medium text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
           {currentIndex + 1} / {wordsLength}
         </div>
@@ -83,8 +83,8 @@ export default function ListenPlayerView({ player, title, completionMessage }: P
             </>
           ) : (
             <div className="flex flex-col items-center justify-center h-full w-full gap-4 animate-pulse px-4">
-              <div className="h-4 bg-slate-200 rounded w-3/4"></div>
-              <div className="h-5 bg-slate-200 rounded w-full max-w-[90%]"></div>
+              <div className="h-4 bg-slate-200 rounded-sm w-3/4"></div>
+              <div className="h-5 bg-slate-200 rounded-sm w-full max-w-[90%]"></div>
             </div>
           )}
         </div>

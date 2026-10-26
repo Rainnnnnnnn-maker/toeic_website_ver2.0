@@ -61,7 +61,7 @@ export default function ReviewMenu() {
           href={href}
           prefetch={false}
           onClick={() => trackMyPageCta(target)}
-          className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-1"
+          className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-1"
         >
           <span
             className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${tone}`}

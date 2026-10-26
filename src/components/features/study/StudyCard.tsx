@@ -75,7 +75,7 @@ export default function StudyCard({
         <button
           type="button"
           onClick={onToggleFavorite}
-          className="inline-flex size-11 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 transition-colors hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2"
+          className="inline-flex size-11 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 transition-colors hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2"
           aria-label={isFavorite ? 'お気に入りから削除' : 'お気に入りに追加'}
         >
           <Star
@@ -123,7 +123,7 @@ export default function StudyCard({
             onClick={onToggleHint}
             aria-expanded={isHintVisible}
             aria-controls={isHintVisible ? `study-hint-${word.slug}` : undefined}
-            className="mx-auto mt-3 flex min-h-11 items-center gap-1.5 rounded-full border border-slate-200 bg-white px-4 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+            className="mx-auto mt-3 flex min-h-11 items-center gap-1.5 rounded-full border border-slate-200 bg-white px-4 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
           >
             <Lightbulb size={16} aria-hidden />
             {isHintVisible ? '例文ヒントを隠す' : '例文ヒントを見る'}
@@ -134,7 +134,7 @@ export default function StudyCard({
           ref={answerRef}
           tabIndex={-1}
           aria-label={`${word.term} の答え`}
-          className="mt-4 flex flex-col gap-4 animate-flipIn focus:outline-none motion-reduce:animate-none"
+          className="mt-4 flex flex-col gap-4 animate-flipIn focus:outline-hidden motion-reduce:animate-none"
         >
           <div className="flex items-center gap-3">
             <div className="min-w-0 flex-1">
@@ -192,7 +192,7 @@ export default function StudyCard({
           <Link
             href={detailHref}
             prefetch={false}
-            className="inline-flex min-h-11 items-center gap-1 self-start rounded-lg text-sm font-medium text-blue-700 no-underline transition-colors hover:text-blue-900 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+            className="inline-flex min-h-11 items-center gap-1 self-start rounded-lg text-sm font-medium text-blue-700 no-underline transition-colors hover:text-blue-900 hover:underline focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
           >
             詳しい解説を見る
             <ChevronRight size={16} aria-hidden />
@@ -207,7 +207,7 @@ function WordAudioButton({ loading, onClick }: { loading: boolean; onClick: () =
   return (
     <button
       type="button"
-      className="inline-flex size-11 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600 transition-colors hover:bg-blue-100 active:bg-blue-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:opacity-70 disabled:cursor-default"
+      className="inline-flex size-11 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600 transition-colors hover:bg-blue-100 active:bg-blue-200 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:opacity-70 disabled:cursor-default"
       onClick={onClick}
       disabled={loading}
       aria-label="発音を再生"
@@ -220,8 +220,8 @@ function WordAudioButton({ loading, onClick }: { loading: boolean; onClick: () =
 function SentenceSkeleton() {
   return (
     <div className="flex flex-col gap-2 rounded-2xl bg-slate-50 p-4" aria-hidden>
-      <div className="h-5 w-[85%] animate-pulse rounded bg-slate-200" />
-      <div className="h-5 w-[60%] animate-pulse rounded bg-slate-200" />
+      <div className="h-5 w-[85%] animate-pulse rounded-sm bg-slate-200" />
+      <div className="h-5 w-[60%] animate-pulse rounded-sm bg-slate-200" />
     </div>
   );
 }
@@ -233,7 +233,7 @@ function DetailError({ onRetry }: { onRetry: () => void }) {
       <button
         type="button"
         onClick={onRetry}
-        className="inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-amber-300 bg-white px-3 font-bold text-amber-900 transition-colors hover:bg-amber-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2"
+        className="inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-amber-300 bg-white px-3 font-bold text-amber-900 transition-colors hover:bg-amber-100 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2"
       >
         <RefreshCw size={15} aria-hidden />
         再読み込み

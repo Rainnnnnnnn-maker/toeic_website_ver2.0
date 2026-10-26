@@ -76,14 +76,14 @@ export function SemanticSearchLauncher() {
           placeholder="例：延期する / 感謝を伝えるメールで使う単語"
           autoComplete="off"
           spellCheck={false}
-          className="h-12 w-full rounded-xl border border-slate-300 bg-white pl-4 pr-12 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-violet-500 focus:ring-4 focus:ring-violet-100 [&::-webkit-search-cancel-button]:hidden"
+          className="h-12 w-full rounded-xl border border-slate-300 bg-white pl-4 pr-12 text-base text-slate-900 outline-hidden transition placeholder:text-slate-400 focus:border-violet-500 focus:ring-4 focus:ring-violet-100 [&::-webkit-search-cancel-button]:hidden"
         />
         <button
           type="submit"
           aria-label="意味で検索する"
           aria-busy={isNavigating}
           disabled={isNavigating || !query.trim()}
-          className="absolute right-2 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-lg bg-violet-600 text-white transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2"
+          className="absolute right-2 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-lg bg-violet-600 text-white transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2"
         >
           {isNavigating ? (
             <LoaderCircle className="size-4 animate-spin" />
@@ -100,7 +100,7 @@ export function SemanticSearchLauncher() {
             type="button"
             onClick={() => launch(example)}
             disabled={isNavigating}
-            className="inline-flex min-h-8 items-center rounded-full border border-violet-200 bg-violet-50 px-3 text-xs font-semibold text-violet-700 transition hover:border-violet-300 hover:bg-violet-100 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500"
+            className="inline-flex min-h-8 items-center rounded-full border border-violet-200 bg-violet-50 px-3 text-xs font-semibold text-violet-700 transition hover:border-violet-300 hover:bg-violet-100 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-violet-500"
           >
             {example}
           </button>

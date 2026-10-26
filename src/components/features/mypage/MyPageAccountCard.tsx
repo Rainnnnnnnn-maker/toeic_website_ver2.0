@@ -20,7 +20,7 @@ export default function MyPageAccountCard({ user, onSignOut }: Props) {
       : (user.email ?? "ログイン中");
 
   return (
-    <section className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+    <section className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-xs">
       <div className="flex min-w-0 items-center gap-3">
         <span className="relative shrink-0">
           {avatarUrl ? (
@@ -30,7 +30,7 @@ export default function MyPageAccountCard({ user, onSignOut }: Props) {
               src={avatarUrl}
               alt=""
               referrerPolicy="no-referrer"
-              className="h-9 w-9 rounded-full border border-white shadow-sm"
+              className="h-9 w-9 rounded-full border border-white shadow-xs"
             />
           ) : (
             <span className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
@@ -51,7 +51,7 @@ export default function MyPageAccountCard({ user, onSignOut }: Props) {
       <button
         type="button"
         onClick={onSignOut}
-        className="inline-flex h-8 shrink-0 items-center gap-1 rounded-full border border-slate-200 bg-white px-3 text-xs font-medium text-slate-500 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-700 hover:shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-1"
+        className="inline-flex h-8 shrink-0 items-center gap-1 rounded-full border border-slate-200 bg-white px-3 text-xs font-medium text-slate-500 shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-700 hover:shadow-sm focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-1"
       >
         <LogOut size={13} />
         ログアウト

@@ -14,7 +14,7 @@ type Props = {
 // 「あとで確認」に積んだ単語の一覧サイドバー。クリックでその単語をカードに表示する。
 export default function LaterWordsSidebar({ words, currentSlug, onSelect }: Props) {
   return (
-    <aside className="w-full rounded-3xl border border-gray-200 bg-white/90 p-5 shadow-[0_10px_25px_rgba(15,23,42,0.08)] backdrop-blur-sm lg:sticky lg:top-8">
+    <aside className="w-full rounded-3xl border border-gray-200 bg-white/90 p-5 shadow-[0_10px_25px_rgba(15,23,42,0.08)] backdrop-blur-xs lg:sticky lg:top-8">
       <div className="mb-4 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-amber-100 text-amber-700">
@@ -38,8 +38,8 @@ export default function LaterWordsSidebar({ words, currentSlug, onSelect }: Prop
               onClick={() => onSelect(word)}
               className={`group flex w-full items-center justify-between gap-3 rounded-2xl border px-3.5 py-3 text-left transition-all duration-200 ${
                 isActive
-                  ? 'border-blue-300 bg-blue-50 text-blue-900 shadow-sm'
-                  : 'border-slate-200 bg-white text-slate-700 hover:border-amber-300 hover:bg-amber-50 hover:-translate-y-0.5 hover:shadow-sm'
+                  ? 'border-blue-300 bg-blue-50 text-blue-900 shadow-xs'
+                  : 'border-slate-200 bg-white text-slate-700 hover:border-amber-300 hover:bg-amber-50 hover:-translate-y-0.5 hover:shadow-xs'
               }`}
               aria-current={isActive ? 'true' : undefined}
             >

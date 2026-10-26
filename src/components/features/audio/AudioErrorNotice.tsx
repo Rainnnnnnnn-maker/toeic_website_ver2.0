@@ -14,7 +14,7 @@ export function AudioErrorNotice({ error, targets, onRetry }: Props) {
       <button
         type="button"
         onClick={onRetry}
-        className="mt-2 inline-flex min-h-11 items-center justify-center rounded-lg border border-rose-300 bg-white px-3 font-semibold transition-colors hover:bg-rose-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-2"
+        className="mt-2 inline-flex min-h-11 items-center justify-center rounded-lg border border-rose-300 bg-white px-3 font-semibold transition-colors hover:bg-rose-100 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-2"
       >
         音声を再試行
       </button>

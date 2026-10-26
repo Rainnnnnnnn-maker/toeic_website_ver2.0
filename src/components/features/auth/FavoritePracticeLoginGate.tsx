@@ -71,7 +71,7 @@ export default function FavoritePracticeLoginGate({ feature }: Props) {
   }, [feature]);
 
   return (
-    <section className="flex w-full flex-col gap-5 rounded-2xl border border-emerald-100 bg-white p-6 text-left shadow-sm sm:p-8">
+    <section className="flex w-full flex-col gap-5 rounded-2xl border border-emerald-100 bg-white p-6 text-left shadow-xs sm:p-8">
       <div className="flex flex-col gap-2">
         <span className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
           <Lock size={18} />
@@ -108,7 +108,7 @@ export default function FavoritePracticeLoginGate({ feature }: Props) {
               target: "login",
             })
           }
-          className="group relative inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-emerald-600 to-emerald-500 px-5 py-2.5 text-sm font-bold text-white shadow-[0_4px_14px_0_rgba(5,150,105,0.39)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_6px_20px_rgba(5,150,105,0.23)] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+          className="group relative inline-flex items-center justify-center gap-2 rounded-lg bg-linear-to-r from-emerald-600 to-emerald-500 px-5 py-2.5 text-sm font-bold text-white shadow-[0_4px_14px_0_rgba(5,150,105,0.39)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_6px_20px_rgba(5,150,105,0.23)] active:scale-95 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
         >
           <CircleUserRound size={16} />
           Google でログインしてマイページへ
@@ -122,7 +122,7 @@ export default function FavoritePracticeLoginGate({ feature }: Props) {
               target: "favorites",
             })
           }
-          className="group inline-flex items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-50 hover:shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-1"
+          className="group inline-flex items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-50 hover:shadow-sm focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-1"
         >
           <ChevronLeft
             size={16}

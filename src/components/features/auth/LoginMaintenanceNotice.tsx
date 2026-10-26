@@ -4,7 +4,7 @@ import { Wrench } from "lucide-react";
 // LOGIN_MAINTENANCE 中に、未ログインの訪問者へ Google ログインボタンの代わりに出すカード。
 export function LoginMaintenanceNotice() {
   return (
-    <div className="mx-auto flex max-w-md flex-col gap-6 rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+    <div className="mx-auto flex max-w-md flex-col gap-6 rounded-2xl border border-slate-200 bg-white p-8 shadow-xs">
       <div className="flex flex-col gap-3">
         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-100 text-amber-600">
           <Wrench size={20} aria-hidden />
@@ -30,7 +30,7 @@ export function LoginMaintenanceNotice() {
         <Link
           href="/"
           prefetch={false}
-          className="inline-flex items-center justify-center rounded-lg bg-emerald-600 px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+          className="inline-flex items-center justify-center rounded-lg bg-emerald-600 px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-emerald-700 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
         >
           トップへ戻る
         </Link>

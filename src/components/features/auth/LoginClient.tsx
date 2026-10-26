@@ -69,7 +69,7 @@ export default function LoginClient() {
 
   if (user) {
     return (
-      <div className="mx-auto flex max-w-md flex-col gap-5 rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+      <div className="mx-auto flex max-w-md flex-col gap-5 rounded-2xl border border-slate-200 bg-white p-8 shadow-xs">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
             <UserRound size={20} />
@@ -91,7 +91,7 @@ export default function LoginClient() {
           <Link
             href={nextPath}
             prefetch={false}
-            className="inline-flex items-center justify-center rounded-lg bg-emerald-600 px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+            className="inline-flex items-center justify-center rounded-lg bg-emerald-600 px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-emerald-700 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
           >
             {nextPath === "/"
               ? "トップへ戻る"
@@ -102,7 +102,7 @@ export default function LoginClient() {
           <button
             type="button"
             onClick={signOut}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
           >
             <LogOut size={14} />
             ログアウト
@@ -117,7 +117,7 @@ export default function LoginClient() {
   }
 
   return (
-    <div className="mx-auto flex max-w-md flex-col gap-6 rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+    <div className="mx-auto flex max-w-md flex-col gap-6 rounded-2xl border border-slate-200 bg-white p-8 shadow-xs">
       <div className="flex flex-col gap-2">
         <h1 className="text-xl font-bold text-slate-900">ログイン</h1>
         <p className="text-sm leading-relaxed text-slate-600">
@@ -139,7 +139,7 @@ export default function LoginClient() {
         type="button"
         onClick={handleGoogleLogin}
         disabled={isSigningIn}
-        className="inline-flex w-full items-center justify-center gap-3 rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm font-bold text-slate-700 shadow-sm transition-all hover:bg-slate-50 hover:shadow disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+        className="inline-flex w-full items-center justify-center gap-3 rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm font-bold text-slate-700 shadow-xs transition-all hover:bg-slate-50 hover:shadow-sm disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
       >
         <GoogleLogo />
         {isSigningIn ? "リダイレクト中..." : "Google でログイン"}
@@ -164,7 +164,7 @@ export default function LoginClient() {
         <Link
           href="/"
           prefetch={false}
-          className="inline-flex items-center justify-center rounded-lg bg-emerald-600 px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+          className="inline-flex items-center justify-center rounded-lg bg-emerald-600 px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-emerald-700 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
         >
           トップへ戻る
         </Link>

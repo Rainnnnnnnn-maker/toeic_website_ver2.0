@@ -20,7 +20,7 @@ export default function WeakWordsPanel({ items, sessionCount }: Props) {
   if (items.length === 0) return null;
 
   return (
-    <section className="flex flex-col gap-4 rounded-2xl border border-rose-100 bg-white p-5 shadow-sm sm:p-6">
+    <section className="flex flex-col gap-4 rounded-2xl border border-rose-100 bg-white p-5 shadow-xs sm:p-6">
       <div className="flex items-center gap-2">
         <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-rose-50 text-rose-500">
           <TriangleAlert size={16} />
@@ -35,7 +35,7 @@ export default function WeakWordsPanel({ items, sessionCount }: Props) {
             <Link
               href={`/words/${word.slug}?from=mypage`}
               prefetch={false}
-              className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white py-1.5 pl-3 pr-2 text-sm font-bold text-slate-700 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-700 hover:shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400 focus-visible:ring-offset-1"
+              className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white py-1.5 pl-3 pr-2 text-sm font-bold text-slate-700 shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-700 hover:shadow-sm focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-rose-400 focus-visible:ring-offset-1"
             >
               {word.term}
               <span className="rounded-full bg-rose-100 px-1.5 py-0.5 text-[10px] font-bold text-rose-600">

@@ -104,7 +104,7 @@ export default function WordsListClient({ importantWords, mediumWords, highWords
       <TabNavigation activeTab={activeTab} onTabChange={handleTabChange} />
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
         <div className="relative w-full flex-1 sm:mr-2">
-          <div className={`absolute bottom-full left-0 mb-1 bg-slate-400/30 text-slate-800 px-2 py-1.5 rounded-lg text-[10px] font-medium pointer-events-none opacity-0 translate-y-1 transition-all duration-200 whitespace-nowrap z-10 backdrop-blur-md shadow-sm border border-white/20 after:content-[''] after:absolute after:-bottom-1 after:left-6 after:w-2 after:h-2 after:bg-slate-400/30 after:rotate-45 after:backdrop-blur-md after:border-b after:border-r after:border-white/20 ${isFocused && !query ? 'opacity-100 translate-y-0' : ''}`}>
+          <div className={`absolute bottom-full left-0 mb-1 bg-slate-400/30 text-slate-800 px-2 py-1.5 rounded-lg text-[10px] font-medium pointer-events-none opacity-0 translate-y-1 transition-all duration-200 whitespace-nowrap z-10 backdrop-blur-md shadow-xs border border-white/20 after:content-[''] after:absolute after:-bottom-1 after:left-6 after:w-2 after:h-2 after:bg-slate-400/30 after:rotate-45 after:backdrop-blur-md after:border-b after:border-r after:border-white/20 ${isFocused && !query ? 'opacity-100 translate-y-0' : ''}`}>
             💡 ワイルドカード（*）検索が利用可能です
           </div>
           <input
@@ -114,13 +114,13 @@ export default function WordsListClient({ importantWords, mediumWords, highWords
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
             onKeyDown={handleKeyDown}
-            className="w-full flex-1 border border-gray-300 rounded-lg px-3 py-2 pr-9 text-base sm:text-[13px] bg-white/90 transition-all duration-180 focus:outline-none focus:border-blue-300 focus:ring-4 focus:ring-blue-300/35"
+            className="w-full flex-1 border border-gray-300 rounded-lg px-3 py-2 pr-9 text-base sm:text-[13px] bg-white/90 transition-all duration-180 focus:outline-hidden focus:border-blue-300 focus:ring-4 focus:ring-blue-300/35"
             placeholder="英単語のつづりで検索（例: acc）"
             aria-label="英単語のつづりで検索"
           />
           {normalizedQuery && (
             <button
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center justify-center bg-transparent border-none p-0.5 cursor-pointer text-gray-400 rounded-full transition-all duration-200 hover:bg-gray-100 hover:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center justify-center bg-transparent border-none p-0.5 cursor-pointer text-gray-400 rounded-full transition-all duration-200 hover:bg-gray-100 hover:text-gray-500 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-300"
               onClick={handleClear}
               aria-label="検索条件をクリア"
               type="button"
@@ -131,7 +131,7 @@ export default function WordsListClient({ importantWords, mediumWords, highWords
         </div>
         <div className="flex items-center gap-1.5 sm:ml-auto">
           <button
-            className="min-h-11 min-w-11 sm:min-h-0 sm:min-w-0 p-1.5 flex items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 transition-all duration-180 hover:bg-gray-100 hover:text-gray-900 hover:border-gray-300 hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            className="min-h-11 min-w-11 sm:min-h-0 sm:min-w-0 p-1.5 flex items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 transition-all duration-180 hover:bg-gray-100 hover:text-gray-900 hover:border-gray-300 hover:shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={() => setPage(1)}
             disabled={currentPage === 1}
             aria-label="最初のページ"
@@ -140,7 +140,7 @@ export default function WordsListClient({ importantWords, mediumWords, highWords
             <ChevronsLeft size={16} />
           </button>
           <button
-            className="min-h-11 min-w-11 sm:min-h-0 sm:min-w-0 p-1.5 flex items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 transition-all duration-180 hover:bg-gray-100 hover:text-gray-900 hover:border-gray-300 hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            className="min-h-11 min-w-11 sm:min-h-0 sm:min-w-0 p-1.5 flex items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 transition-all duration-180 hover:bg-gray-100 hover:text-gray-900 hover:border-gray-300 hover:shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={currentPage === 1}
             aria-label="前のページ"
@@ -148,11 +148,11 @@ export default function WordsListClient({ importantWords, mediumWords, highWords
           >
             <ChevronLeft size={16} />
           </button>
-          <span className="text-xs text-gray-500 min-w-[3rem] text-center font-medium">
+          <span className="text-xs text-gray-500 min-w-12 text-center font-medium">
             {currentPage} / {totalPages}
           </span>
           <button
-            className="min-h-11 min-w-11 sm:min-h-0 sm:min-w-0 p-1.5 flex items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 transition-all duration-180 hover:bg-gray-100 hover:text-gray-900 hover:border-gray-300 hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            className="min-h-11 min-w-11 sm:min-h-0 sm:min-w-0 p-1.5 flex items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 transition-all duration-180 hover:bg-gray-100 hover:text-gray-900 hover:border-gray-300 hover:shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={currentPage >= totalPages}
             aria-label="次のページ"
@@ -161,7 +161,7 @@ export default function WordsListClient({ importantWords, mediumWords, highWords
             <ChevronRight size={16} />
           </button>
           <button
-            className="min-h-11 min-w-11 sm:min-h-0 sm:min-w-0 p-1.5 flex items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 transition-all duration-180 hover:bg-gray-100 hover:text-gray-900 hover:border-gray-300 hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            className="min-h-11 min-w-11 sm:min-h-0 sm:min-w-0 p-1.5 flex items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 transition-all duration-180 hover:bg-gray-100 hover:text-gray-900 hover:border-gray-300 hover:shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={() => setPage(totalPages)}
             disabled={currentPage >= totalPages}
             aria-label="最後のページ"
@@ -174,7 +174,7 @@ export default function WordsListClient({ importantWords, mediumWords, highWords
 
       {normalizedQuery && filtered.length === 0 && (
         <div className="rounded-xl border border-dashed border-slate-300 bg-white/90 px-5 py-8 text-center sm:px-6">
-          <p role="status" className="break-words text-base font-bold text-slate-800">
+          <p role="status" className="wrap-break-word text-base font-bold text-slate-800">
             「{query.trim()}」に一致する単語が見つかりませんでした
           </p>
           <p className="mt-2 text-sm leading-relaxed text-slate-600">
@@ -187,14 +187,14 @@ export default function WordsListClient({ importantWords, mediumWords, highWords
             <button
               type="button"
               onClick={handleClear}
-              className="inline-flex min-h-11 items-center justify-center rounded-lg bg-slate-800 px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-800 focus-visible:ring-offset-2"
+              className="inline-flex min-h-11 items-center justify-center rounded-lg bg-slate-800 px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-slate-700 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-slate-800 focus-visible:ring-offset-2"
             >
               検索をクリア
             </button>
             <Link
               href="/words?mode=meaning#word-explorer"
               prefetch={false}
-              className="relative inline-flex min-h-11 items-center justify-center overflow-hidden rounded-lg border border-violet-200 bg-violet-50 px-4 py-2 text-sm font-bold text-violet-700 transition-colors hover:bg-violet-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2"
+              className="relative inline-flex min-h-11 items-center justify-center overflow-hidden rounded-lg border border-violet-200 bg-violet-50 px-4 py-2 text-sm font-bold text-violet-700 transition-colors hover:bg-violet-100 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2"
             >
               <WordLinkPending />
               意味で探す

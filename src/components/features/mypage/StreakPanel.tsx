@@ -44,7 +44,7 @@ export default function StreakPanel({
       {items.map(({ icon: Icon, label, value, unit, tone }) => (
         <div
           key={label}
-          className="flex flex-col gap-2 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
+          className="flex flex-col gap-2 rounded-2xl border border-slate-200 bg-white p-4 shadow-xs"
         >
           <span
             className={`flex h-8 w-8 items-center justify-center rounded-lg ${tone}`}

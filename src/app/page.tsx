@@ -152,8 +152,8 @@ async function HeroStats() {
 
 function HomeWordDataFallback() {
   return (
-    <section className="bg-white/90 border border-slate-200 rounded-xl p-4 shadow-sm animate-pulse min-h-[420px]">
-      <div className="h-5 w-36 rounded bg-slate-200" />
+    <section className="bg-white/90 border border-slate-200 rounded-xl p-4 shadow-xs animate-pulse min-h-[420px]">
+      <div className="h-5 w-36 rounded-sm bg-slate-200" />
       <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
         {Array.from({ length: 20 }).map((_, index) => (
           <div key={index} className="h-8 rounded-md bg-slate-100" />
@@ -172,7 +172,7 @@ async function HomeWordDataSection() {
 function FaqFallback() {
   return (
     <section className="mt-12 pt-12 border-t border-slate-200 flex flex-col gap-6 animate-pulse">
-      <div className="h-6 w-56 rounded bg-slate-200" />
+      <div className="h-6 w-56 rounded-sm bg-slate-200" />
       <div className="flex flex-col gap-4">
         {Array.from({ length: 5 }).map((_, index) => (
           <div key={index} className="h-[54px] rounded-xl border border-slate-200 bg-white" />
@@ -208,7 +208,7 @@ async function FaqSection() {
         <h2 className="text-xl font-bold text-slate-800">TOEIC重要単語 よくある質問</h2>
         <div className="flex flex-col gap-4">
           {faqEntries.map((entry, i) => (
-            <details key={i} className="group bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <details key={i} className="group bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
               <summary className="flex items-center justify-between gap-3 px-5 py-4 cursor-pointer text-sm font-semibold text-slate-800 hover:bg-slate-50 transition-colors list-none [&::-webkit-details-marker]:hidden">
                 <span>{entry.name}</span>
                 <span className="text-slate-400 transition-transform duration-200 group-open:rotate-180 shrink-0">▼</span>
@@ -280,15 +280,15 @@ export default function Home() {
             <HeroStats />
           </Suspense>
           <div className="flex gap-4 items-center flex-wrap">
-            <Link href="/study" prefetch={false} className="group relative inline-flex items-center justify-center gap-1.5 px-4 py-2 min-h-[36px] bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-lg font-bold text-sm shadow-[0_4px_14px_0_rgba(37,99,235,0.39)] overflow-hidden transition-all duration-300 hover:shadow-[0_6px_20px_rgba(37,99,235,0.23)] hover:-translate-y-1 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500">
-              <div className="absolute inset-0 flex h-full w-full justify-center [transform:skew(-12deg)_translateX(-150%)] group-hover:duration-1000 group-hover:[transform:skew(-12deg)_translateX(150%)]">
+            <Link href="/study" prefetch={false} className="group relative inline-flex items-center justify-center gap-1.5 px-4 py-2 min-h-[36px] bg-linear-to-r from-blue-600 to-blue-500 text-white rounded-lg font-bold text-sm shadow-[0_4px_14px_0_rgba(37,99,235,0.39)] overflow-hidden transition-all duration-300 hover:shadow-[0_6px_20px_rgba(37,99,235,0.23)] hover:-translate-y-1 active:scale-95 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500">
+              <div className="absolute inset-0 flex h-full w-full justify-center transform-[skew(-12deg)_translateX(-150%)] group-hover:duration-1000 group-hover:transform-[skew(-12deg)_translateX(150%)]">
                 <div className="relative h-full w-8 bg-white/20" />
               </div>
               <BookOpen size={16} className="transition-transform group-hover:scale-110" />
               <span className="relative z-10">学習モード</span>
             </Link>
-            <Link href="/favorites" prefetch={false} className="group relative inline-flex items-center justify-center gap-1.5 px-4 py-2 min-h-[36px] bg-gradient-to-r from-amber-500 to-orange-400 text-white rounded-lg font-bold text-sm shadow-[0_4px_14px_0_rgba(245,158,11,0.39)] overflow-hidden transition-all duration-300 hover:shadow-[0_6px_20px_rgba(245,158,11,0.23)] hover:-translate-y-1 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-amber-500">
-              <div className="absolute inset-0 flex h-full w-full justify-center [transform:skew(-12deg)_translateX(-150%)] group-hover:duration-1000 group-hover:[transform:skew(-12deg)_translateX(150%)]">
+            <Link href="/favorites" prefetch={false} className="group relative inline-flex items-center justify-center gap-1.5 px-4 py-2 min-h-[36px] bg-linear-to-r from-amber-500 to-orange-400 text-white rounded-lg font-bold text-sm shadow-[0_4px_14px_0_rgba(245,158,11,0.39)] overflow-hidden transition-all duration-300 hover:shadow-[0_6px_20px_rgba(245,158,11,0.23)] hover:-translate-y-1 active:scale-95 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-amber-500">
+              <div className="absolute inset-0 flex h-full w-full justify-center transform-[skew(-12deg)_translateX(-150%)] group-hover:duration-1000 group-hover:transform-[skew(-12deg)_translateX(150%)]">
                 <div className="relative h-full w-8 bg-white/20" />
               </div>
               <Star size={16} className="transition-transform group-hover:rotate-12 group-hover:scale-110" />
@@ -310,7 +310,7 @@ export default function Home() {
           </Suspense>
         </div>
         <div data-home-reveal="" className="flex justify-center">
-          <Link href="/words" prefetch={false} className="group inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-bold text-slate-800 no-underline transition-colors hover:border-slate-400 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-2">
+          <Link href="/words" prefetch={false} className="group inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-bold text-slate-800 no-underline transition-colors hover:border-slate-400 hover:bg-slate-50 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-2">
             <List size={16} aria-hidden />
             全単語一覧
             <span className="transition-transform duration-300 group-hover:translate-x-1 motion-reduce:transition-none" aria-hidden>→</span>
@@ -322,9 +322,9 @@ export default function Home() {
           <h2 id="first-study-heading" className="text-sm font-bold leading-relaxed text-slate-900">はじめての方へ：まず1問、理由まで確認</h2>
           <p className="mt-1.5 text-xs leading-relaxed text-slate-700">単語の意味は分かるのに、文の中で選べない方へ。自作問題で迷った理由を確認し、単語・例文・復習へ進めます。ガイドと単語の閲覧、お気に入り保存は登録不要です。</p>
           <div className="mt-2 flex flex-wrap gap-2 text-xs font-semibold">
-            <Link href="/guide/part5-frequent-words" prefetch={false} className="inline-flex min-h-11 items-center justify-center rounded-lg bg-blue-700 px-3 py-2 text-white transition-colors hover:bg-blue-800 active:bg-blue-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 sm:min-h-9">Part 5の5問に挑戦</Link>
-            <Link href="/guide/confusing-word-pairs" prefetch={false} className="inline-flex min-h-11 items-center justify-center rounded-lg border border-blue-200 bg-white px-3 py-2 text-blue-800 transition-colors hover:bg-blue-50 active:bg-blue-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 sm:min-h-9">紛らわしい語を比較</Link>
-            <Link href="/guide/forgetting-curve" prefetch={false} className="inline-flex min-h-11 items-center justify-center rounded-lg border border-blue-200 bg-white px-3 py-2 text-blue-800 transition-colors hover:bg-blue-50 active:bg-blue-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 sm:min-h-9">7日間の復習例を見る</Link>
+            <Link href="/guide/part5-frequent-words" prefetch={false} className="inline-flex min-h-11 items-center justify-center rounded-lg bg-blue-700 px-3 py-2 text-white transition-colors hover:bg-blue-800 active:bg-blue-900 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 sm:min-h-9">Part 5の5問に挑戦</Link>
+            <Link href="/guide/confusing-word-pairs" prefetch={false} className="inline-flex min-h-11 items-center justify-center rounded-lg border border-blue-200 bg-white px-3 py-2 text-blue-800 transition-colors hover:bg-blue-50 active:bg-blue-100 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 sm:min-h-9">紛らわしい語を比較</Link>
+            <Link href="/guide/forgetting-curve" prefetch={false} className="inline-flex min-h-11 items-center justify-center rounded-lg border border-blue-200 bg-white px-3 py-2 text-blue-800 transition-colors hover:bg-blue-50 active:bg-blue-100 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 sm:min-h-9">7日間の復習例を見る</Link>
           </div>
         </section>
 
@@ -353,10 +353,10 @@ export default function Home() {
                 data-home-reveal-delay={homeRevealDelays[index % homeRevealDelays.length]}
                 href={`/guide/${article.slug}`}
                 prefetch={false}
-                className="group flex flex-col gap-2 rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-blue-400 hover:shadow-md"
+                className="group flex flex-col gap-2 rounded-xl border border-slate-200 bg-white p-4 shadow-xs transition hover:border-blue-400 hover:shadow-md"
               >
                 <div className="flex items-center gap-2 text-xs text-slate-500">
-                  <span className="rounded bg-slate-100 px-2 py-0.5 font-medium text-slate-600">
+                  <span className="rounded-sm bg-slate-100 px-2 py-0.5 font-medium text-slate-600">
                     {article.category}
                   </span>
                   <span>約 {article.estimatedReadingMin} 分</span>
@@ -377,21 +377,21 @@ export default function Home() {
           <h2 data-home-reveal="" id="about-site-heading" className="text-xl font-bold text-slate-800">このサイトについて</h2>
           <div className="flex flex-col gap-6">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-              <div data-home-reveal="" className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col gap-3">
+              <div data-home-reveal="" className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col gap-3">
                 <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center text-xl font-bold mb-2">1</div>
                 <h3 className="text-lg font-bold text-slate-800">ビジネス文脈に絞った詳しい解説</h3>
                 <p className="text-sm text-slate-600 leading-relaxed">
                   単なる日本語訳だけでなく、語源、微妙なニュアンスの違い、ビジネスシーンでの具体的な使われ方まで踏み込んで解説。単語を文の中でどう使うかを確認できます。
                 </p>
               </div>
-              <div data-home-reveal="" data-home-reveal-delay="short" className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col gap-3">
+              <div data-home-reveal="" data-home-reveal-delay="short" className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col gap-3">
                 <div className="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center text-xl font-bold mb-2">2</div>
                 <h3 className="text-lg font-bold text-slate-800">忘却曲線を意識した復習</h3>
                 <p className="text-sm text-slate-600 leading-relaxed">
                   「学習モード」と「復習モード」を使い分け、覚えにくい語へ繰り返し触れられます。さらに「今日のおすすめ{TODAY_WORDS_COUNT}単語」機能で、少量からの継続をサポートします。
                 </p>
               </div>
-              <div data-home-reveal="" data-home-reveal-delay="long" className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col gap-3">
+              <div data-home-reveal="" data-home-reveal-delay="long" className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col gap-3">
                 <div className="w-12 h-12 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center text-xl font-bold mb-2">3</div>
                 <h3 className="text-lg font-bold text-slate-800">完全無料・登録不要</h3>
                 <p className="text-sm text-slate-600 leading-relaxed">
@@ -408,21 +408,21 @@ export default function Home() {
             </h3>
             <ol className="flex flex-col gap-4">
               <li className="flex gap-4 items-start">
-                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold mt-0.5">1</span>
+                <span className="shrink-0 w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold mt-0.5">1</span>
                 <div>
                   <p className="font-bold text-slate-800">朝のスキマ時間：今日のおすすめ{TODAY_WORDS_COUNT}単語をチェック</p>
                   <p className="text-sm text-slate-600 mt-1">トップページに表示される{TODAY_WORDS_COUNT}単語を通勤・通学中に確認し、英語脳にスイッチを入れます。</p>
                 </div>
               </li>
               <li className="flex gap-4 items-start">
-                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold mt-0.5">2</span>
+                <span className="shrink-0 w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold mt-0.5">2</span>
                 <div>
                   <p className="font-bold text-slate-800">まとまった時間：学習モードで新規単語をインプット</p>
                   <p className="text-sm text-slate-600 mt-1">「学習モード」を使って、目標スコアの単語を1日10〜20語ペースで進めます。音声も必ず再生しましょう。</p>
                 </div>
               </li>
               <li className="flex gap-4 items-start">
-                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold mt-0.5">3</span>
+                <span className="shrink-0 w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold mt-0.5">3</span>
                 <div>
                   <p className="font-bold text-slate-800">週末や夜：お気に入り＆復習モードで知識を定着</p>
                   <p className="text-sm text-slate-600 mt-1">覚えにくい単語は「お気に入り」に登録し、週末に「復習モード」で一気に振り返ります。</p>
