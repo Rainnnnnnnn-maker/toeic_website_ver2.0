@@ -1,6 +1,21 @@
-@import "tailwindcss";
+/* Scan only src/ for class names, as the v3 `content` globs did. */
+@import "tailwindcss" source("..");
 
 @theme {
+  /*
+    v4 ships unitless line-heights, which children with an arbitrary size such
+    as text-[9px] inherit as a ratio. Keep the v3 rem values so they inherit the
+    parent's absolute line-height as before.
+  */
+  --text-xs--line-height: 1rem;
+  --text-sm--line-height: 1.25rem;
+  --text-base--line-height: 1.5rem;
+  --text-lg--line-height: 1.75rem;
+  --text-xl--line-height: 1.75rem;
+  --text-2xl--line-height: 2rem;
+  --text-3xl--line-height: 2.25rem;
+  --text-4xl--line-height: 2.5rem;
+
   --animate-homeReveal: homeReveal 560ms cubic-bezier(0.22, 1, 0.36, 1) var(--home-reveal-delay, 0ms) both;
   --animate-flipIn: flipIn 0.3s ease-out;
   --animate-shimmer: shimmer 1.5s infinite;
@@ -51,5 +66,11 @@
     color: var(--foreground);
     background: var(--background);
     font-family: Arial, Helvetica, sans-serif;
+  }
+
+  /* v4 Preflight resets buttons to cursor: default; keep the v3 pointer. */
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
   }
 }

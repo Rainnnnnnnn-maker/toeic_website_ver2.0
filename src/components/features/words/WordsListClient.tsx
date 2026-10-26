@@ -114,7 +114,7 @@ export default function WordsListClient({ importantWords, mediumWords, highWords
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
             onKeyDown={handleKeyDown}
-            className="w-full flex-1 border border-gray-300 rounded-lg px-3 py-2 pr-9 text-base sm:text-[13px] bg-white/90 transition-all duration-180 focus:outline-hidden focus:border-blue-300 focus:ring-4 focus:ring-blue-300/35"
+            className="w-full flex-1 border border-gray-300 rounded-lg px-3 py-2 pr-9 text-base sm:text-[13px] bg-white/90 placeholder:text-gray-400 transition-all duration-180 focus:outline-hidden focus:border-blue-300 focus:ring-4 focus:ring-blue-300/35"
             placeholder="英単語のつづりで検索（例: acc）"
             aria-label="英単語のつづりで検索"
           />
