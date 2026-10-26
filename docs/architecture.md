@@ -1,6 +1,6 @@
 # TOEIC重要単語（toeic_website_ver2.0）技術ドキュメント
 
-最終更新日: 2026-10-25（学習・復習カードを「答えを見る→3択採点」に変更）
+最終更新日: 2026-10-25（Tailwind CSS v4 へ移行、学習・復習カードを「答えを見る→3択採点」に変更）
 
 ### SEO・コンテンツ改善の初回対応（2026-10-02）
 
@@ -29,7 +29,7 @@
 | -------- | ----------------- | -------: | ----------------------------- |
 | フロント/サーバ | Next.js           |   16.4.2 | App RouterでUIとAPIを同一プロジェクトで提供 |
 | UI       | React / React DOM |   19.2.1 | コンポーネントUI                     |
-| デザイン | Tailwind CSS      |      3.4 | ユーティリティファーストCSSフレームワーク |
+| デザイン | Tailwind CSS      |      4.3 | ユーティリティファーストCSSフレームワーク（設定は `src/app/globals.css` の `@theme`） |
 | 言語       | TypeScript        |       ^5 | 型安全な実装                        |
 | 実行環境     | Node.js           | 24以上（CIは24） | 開発/ビルド/実行                     |
 | コンパイラ | React Compiler | 1.0.0 | 自動メモ化最適化 (babel-plugin-react-compiler) |
@@ -261,7 +261,7 @@
 ### 3.2 主要なライブラリと依存関係
 
 * `next`, `react`, `react-dom`: アプリ本体
-* `tailwindcss`, `postcss`, `autoprefixer`: CSSフレームワークとビルドツール
+* `tailwindcss`, `@tailwindcss/postcss`, `postcss`: CSSフレームワークとビルドツール（ベンダープレフィックスは Tailwind v4 が付与するため `autoprefixer` は不要）
 * `@google/genai`（`GoogleGenAI`）: サーバ側データ取得（`src/data/word-detail.ts`）でGeminiを呼び出す
 * `@upstash/redis`: サーバ側キャッシュ（`src/lib/upstash.ts`, `src/lib/wordCache.ts`）
 * `@vercel/blob`: Vercel Blob から単語リストファイル（`words-file/word.txt`, `word_mid.txt`, `word_high.txt`）を取得する

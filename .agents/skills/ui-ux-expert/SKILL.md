@@ -59,8 +59,8 @@ When the user asks for a "design system" or "style guide", generate a structured
 -   **Icons**: Use `lucide-react`.
 
 ### 3. Anti-Patterns to Avoid
--   Hardcoded hex values in components (use `tailwind.config.ts` or standard palette).
--   Inaccessible focus states (`outline-none` without replacement).
+-   Hardcoded hex values in components (use `@theme` in `src/app/globals.css` or standard palette).
+-   Inaccessible focus states (`outline-hidden` without replacement).
 -   Over-complicated animations that distract from learning content.
 -   Inconsistent spacing (stick to `gap-2`, `gap-4`, `p-4`, `p-6` etc.).
 
