@@ -31,7 +31,7 @@ export function WordDetailDisclosure({
       onToggle={(event) => setIsOpen(event.currentTarget.open)}
       className="group/disclosure overflow-hidden rounded-xl border border-slate-200 bg-white transition-colors open:border-blue-200 open:bg-blue-50/20"
     >
-      <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-3 py-2.5 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500 [&::-webkit-details-marker]:hidden sm:px-4">
+      <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-3 py-2.5 transition-colors hover:bg-slate-50 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500 [&::-webkit-details-marker]:hidden sm:px-4">
         <span className="min-w-0">
           <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-600">
             <span className={`h-2.5 w-0.5 shrink-0 rounded-full ${accentClassName}`} aria-hidden="true" />

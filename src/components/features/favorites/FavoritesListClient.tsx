@@ -81,8 +81,8 @@ export default function FavoritesListClient({ allWords }: { allWords: Word[] }) 
           ここにリストとして保存されます。
         </p>
         <div className="mt-8">
-          <Link href="/" prefetch={false} className="group relative inline-flex items-center justify-center gap-1.5 px-4 py-2 min-h-[36px] bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-lg font-bold text-sm shadow-[0_4px_14px_0_rgba(37,99,235,0.39)] overflow-hidden transition-all duration-300 hover:shadow-[0_6px_20px_rgba(37,99,235,0.23)] hover:-translate-y-1 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500">
-            <div className="absolute inset-0 flex h-full w-full justify-center [transform:skew(-12deg)_translateX(-150%)] group-hover:duration-1000 group-hover:[transform:skew(-12deg)_translateX(150%)]">
+          <Link href="/" prefetch={false} className="group relative inline-flex items-center justify-center gap-1.5 px-4 py-2 min-h-[36px] bg-linear-to-r from-blue-600 to-blue-500 text-white rounded-lg font-bold text-sm shadow-[0_4px_14px_0_rgba(37,99,235,0.39)] overflow-hidden transition-all duration-300 hover:shadow-[0_6px_20px_rgba(37,99,235,0.23)] hover:-translate-y-1 active:scale-95 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500">
+            <div className="absolute inset-0 flex h-full w-full justify-center transform-[skew(-12deg)_translateX(-150%)] group-hover:duration-1000 group-hover:transform-[skew(-12deg)_translateX(150%)]">
               <div className="relative h-full w-8 bg-white/20" />
             </div>
             <Search size={16} className="transition-transform group-hover:scale-110" />
@@ -121,14 +121,14 @@ export default function FavoritesListClient({ allWords }: { allWords: Word[] }) 
           autoCorrect="off"
           spellCheck={false}
           enterKeyHint="search"
-          className="h-11 w-full rounded-xl border border-slate-300 bg-white pl-10 pr-11 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 [&::-webkit-search-cancel-button]:hidden"
+          className="h-11 w-full rounded-xl border border-slate-300 bg-white pl-10 pr-11 text-base text-slate-900 outline-hidden transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 [&::-webkit-search-cancel-button]:hidden"
         />
         {query && (
           <button
             type="button"
             onClick={handleQueryClear}
             aria-label="検索語をクリア"
-            className="absolute right-1.5 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+            className="absolute right-1.5 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500"
           >
             <X className="size-4" />
           </button>
@@ -139,7 +139,7 @@ export default function FavoritesListClient({ allWords }: { allWords: Word[] }) 
         <div className="flex items-center gap-3">
           <button
             onClick={handleClearClick}
-            className="px-3 py-2 rounded-[10px] border border-gray-200 bg-white text-gray-900 text-[13px] transition-all duration-180 hover:bg-gray-100 hover:border-gray-300 hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-2 rounded-[10px] border border-gray-200 bg-white text-gray-900 text-[13px] transition-all duration-180 hover:bg-gray-100 hover:border-gray-300 hover:shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label="お気に入りをすべて削除"
           >
             すべて削除
@@ -152,7 +152,7 @@ export default function FavoritesListClient({ allWords }: { allWords: Word[] }) 
         </div>
         <div className="flex items-center gap-1.5 ml-auto">
           <button
-            className="min-h-11 min-w-11 sm:min-h-0 sm:min-w-0 p-1.5 flex items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 transition-all duration-180 hover:bg-gray-100 hover:text-gray-900 hover:border-gray-300 hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            className="min-h-11 min-w-11 sm:min-h-0 sm:min-w-0 p-1.5 flex items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 transition-all duration-180 hover:bg-gray-100 hover:text-gray-900 hover:border-gray-300 hover:shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={() => setPage(1)}
             disabled={currentPage === 1}
             aria-label="最初のページ"
@@ -161,7 +161,7 @@ export default function FavoritesListClient({ allWords }: { allWords: Word[] }) 
             <ChevronsLeft size={16} />
           </button>
           <button
-            className="min-h-11 min-w-11 sm:min-h-0 sm:min-w-0 p-1.5 flex items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 transition-all duration-180 hover:bg-gray-100 hover:text-gray-900 hover:border-gray-300 hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            className="min-h-11 min-w-11 sm:min-h-0 sm:min-w-0 p-1.5 flex items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 transition-all duration-180 hover:bg-gray-100 hover:text-gray-900 hover:border-gray-300 hover:shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={currentPage === 1}
             aria-label="前のページ"
@@ -169,11 +169,11 @@ export default function FavoritesListClient({ allWords }: { allWords: Word[] }) 
           >
             <ChevronLeft size={16} />
           </button>
-          <span className="text-xs text-gray-500 min-w-[3rem] text-center font-medium">
+          <span className="text-xs text-gray-500 min-w-12 text-center font-medium">
             {currentPage} / {totalPages}
           </span>
           <button
-            className="min-h-11 min-w-11 sm:min-h-0 sm:min-w-0 p-1.5 flex items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 transition-all duration-180 hover:bg-gray-100 hover:text-gray-900 hover:border-gray-300 hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            className="min-h-11 min-w-11 sm:min-h-0 sm:min-w-0 p-1.5 flex items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 transition-all duration-180 hover:bg-gray-100 hover:text-gray-900 hover:border-gray-300 hover:shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={currentPage >= totalPages}
             aria-label="次のページ"
@@ -182,7 +182,7 @@ export default function FavoritesListClient({ allWords }: { allWords: Word[] }) 
             <ChevronRight size={16} />
           </button>
           <button
-            className="min-h-11 min-w-11 sm:min-h-0 sm:min-w-0 p-1.5 flex items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 transition-all duration-180 hover:bg-gray-100 hover:text-gray-900 hover:border-gray-300 hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            className="min-h-11 min-w-11 sm:min-h-0 sm:min-w-0 p-1.5 flex items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 transition-all duration-180 hover:bg-gray-100 hover:text-gray-900 hover:border-gray-300 hover:shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={() => setPage(totalPages)}
             disabled={currentPage >= totalPages}
             aria-label="最後のページ"
@@ -210,7 +210,7 @@ export default function FavoritesListClient({ allWords }: { allWords: Word[] }) 
         </div>
       ) : (
         <div className="rounded-xl border border-dashed border-slate-300 bg-white/70 px-6 py-10 text-center">
-          <p className="text-base font-bold text-slate-800 break-words">
+          <p className="text-base font-bold text-slate-800 wrap-break-word">
             「{query.trim()}」で始まるお気に入り単語はありません
           </p>
           <p className="mt-2 text-sm text-slate-500">
@@ -219,7 +219,7 @@ export default function FavoritesListClient({ allWords }: { allWords: Word[] }) 
           <button
             type="button"
             onClick={handleQueryClear}
-            className="mt-5 min-h-11 rounded-xl bg-slate-800 px-5 text-sm font-bold text-white transition hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-800 focus-visible:ring-offset-2"
+            className="mt-5 min-h-11 rounded-xl bg-slate-800 px-5 text-sm font-bold text-white transition hover:bg-slate-700 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-slate-800 focus-visible:ring-offset-2"
           >
             検索をクリア
           </button>
@@ -230,7 +230,7 @@ export default function FavoritesListClient({ allWords }: { allWords: Word[] }) 
         ref={confirmDialogRef}
         aria-labelledby="clear-favorites-title"
         aria-describedby="clear-favorites-description"
-        className="m-auto w-[calc(100%-2rem)] max-w-sm rounded-2xl bg-white p-6 shadow-xl backdrop:bg-black/50 backdrop:backdrop-blur-sm"
+        className="m-auto w-[calc(100%-2rem)] max-w-sm rounded-2xl bg-white p-6 shadow-xl backdrop:bg-black/50 backdrop:backdrop-blur-xs"
       >
         <h3 id="clear-favorites-title" className="mb-2 text-lg font-bold text-gray-900">
           お気に入りをすべて削除
@@ -245,14 +245,14 @@ export default function FavoritesListClient({ allWords }: { allWords: Word[] }) 
             ref={cancelButtonRef}
             type="button"
             onClick={() => confirmDialogRef.current?.close()}
-            className="min-h-11 rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-2"
+            className="min-h-11 rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-2"
           >
             キャンセル
           </button>
           <button
             type="button"
             onClick={confirmClear}
-            className="min-h-11 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
+            className="min-h-11 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white shadow-xs transition-colors hover:bg-red-700 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
           >
             削除する
           </button>

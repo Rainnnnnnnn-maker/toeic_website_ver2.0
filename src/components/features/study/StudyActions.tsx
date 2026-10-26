@@ -18,7 +18,7 @@ type Props = {
 };
 
 const GRADE_BUTTON_CLASS =
-  'flex h-16 flex-col items-center justify-center gap-1 rounded-2xl border-[1.5px] text-[13px] font-bold leading-none transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 sm:h-[72px] sm:text-sm';
+  'flex h-16 flex-col items-center justify-center gap-1 rounded-2xl border-[1.5px] text-[13px] font-bold leading-none transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 sm:h-[72px] sm:text-sm';
 
 const ANSWER_STATUS_MESSAGE_ID = 'study-answer-status';
 
@@ -92,7 +92,7 @@ export default function StudyActions({
           ref={revealButtonRef}
           type="button"
           onClick={onReveal}
-          className="flex h-14 w-full max-w-md items-center justify-center gap-2 rounded-2xl bg-blue-600 text-base font-bold text-white shadow-sm transition-colors hover:bg-blue-700 active:bg-blue-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+          className="flex h-14 w-full max-w-md items-center justify-center gap-2 rounded-2xl bg-blue-600 text-base font-bold text-white shadow-xs transition-colors hover:bg-blue-700 active:bg-blue-800 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
         >
           <Eye size={20} aria-hidden />
           答えを見る
@@ -100,7 +100,7 @@ export default function StudyActions({
       )}
 
       {showDifficultyTip && (
-        <div className="flex flex-wrap items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white/60 px-4 py-2 text-[13px] font-medium text-slate-600 shadow-sm">
+        <div className="flex flex-wrap items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white/60 px-4 py-2 text-[13px] font-medium text-slate-600 shadow-xs">
           <Lightbulb size={16} className="text-amber-600" aria-hidden />
           <span>連続で「覚えている」を選ぶと難易度が上がります</span>
           {consecutiveRememberCount > 0 && (

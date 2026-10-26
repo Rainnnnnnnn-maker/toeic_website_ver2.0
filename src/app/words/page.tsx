@@ -70,10 +70,10 @@ function LevelIndex({ level, words }: LevelIndexProps) {
   return (
     <section
       id={`section-${level}`}
-      className="scroll-mt-24 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
+      className="scroll-mt-24 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs"
     >
       <details className="group/level">
-        <summary className="flex min-h-24 cursor-pointer list-none items-center justify-between gap-4 px-4 py-5 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500 [&::-webkit-details-marker]:hidden sm:px-6">
+        <summary className="flex min-h-24 cursor-pointer list-none items-center justify-between gap-4 px-4 py-5 transition hover:bg-slate-50 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500 [&::-webkit-details-marker]:hidden sm:px-6">
           <span className="flex min-w-0 items-start gap-3 sm:items-center">
             <span
               aria-hidden="true"
@@ -101,7 +101,7 @@ function LevelIndex({ level, words }: LevelIndexProps) {
           <div className="flex flex-col gap-2">
             {letters.map((letter) => (
               <details key={letter} className="group/letter overflow-hidden rounded-xl border border-slate-200 bg-white">
-                <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500 [&::-webkit-details-marker]:hidden">
+                <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 transition hover:bg-slate-50 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500 [&::-webkit-details-marker]:hidden">
                   <span className="flex items-center gap-3">
                     <span className="flex size-8 items-center justify-center rounded-lg bg-slate-900 text-sm font-bold text-white">
                       {letter}
@@ -116,7 +116,7 @@ function LevelIndex({ level, words }: LevelIndexProps) {
                       key={word.slug}
                       href={`/words/${word.slug}`}
                       prefetch={false}
-                      className="flex min-h-11 items-center rounded-lg border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 no-underline shadow-sm transition hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1"
+                      className="flex min-h-11 items-center rounded-lg border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 no-underline shadow-xs transition hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1"
                     >
                       <span className="truncate">{word.term}</span>
                     </Link>
@@ -141,7 +141,7 @@ function LearningGuides({
   readonly highCount: number;
 }) {
   return (
-    <section aria-labelledby="learning-guide-title" className="rounded-3xl border border-slate-200 bg-white/85 p-5 shadow-sm sm:p-7">
+    <section aria-labelledby="learning-guide-title" className="rounded-3xl border border-slate-200 bg-white/85 p-5 shadow-xs sm:p-7">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-xs font-bold tracking-[0.16em] text-blue-600">LEARNING GUIDE</p>
@@ -269,13 +269,13 @@ export default async function WordsListPage() {
             ホーム
           </Link>
           <ChevronRight className="size-4 text-slate-400" />
-          <span className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white/90 px-2.5 py-1 font-semibold text-slate-800 shadow-sm">
+          <span className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white/90 px-2.5 py-1 font-semibold text-slate-800 shadow-xs">
             <BookOpen className="size-4 text-blue-600" />
             単語一覧
           </span>
         </nav>
 
-        <header className="relative overflow-hidden rounded-3xl border border-white/80 bg-gradient-to-br from-white via-blue-50 to-indigo-100 shadow-[0_28px_80px_-40px_rgba(30,64,175,0.45)]">
+        <header className="relative overflow-hidden rounded-3xl border border-white/80 bg-linear-to-br from-white via-blue-50 to-indigo-100 shadow-[0_28px_80px_-40px_rgba(30,64,175,0.45)]">
           <div aria-hidden="true" className="absolute -right-24 -top-28 size-72 rounded-full bg-blue-300/25 blur-3xl" />
           <div aria-hidden="true" className="absolute -bottom-32 left-1/3 size-64 rounded-full bg-violet-300/20 blur-3xl" />
 
@@ -295,7 +295,7 @@ export default async function WordsListPage() {
 
               <Link
                 href="#word-explorer"
-                className="mt-5 flex min-h-12 items-center justify-between rounded-xl bg-slate-900 px-4 text-sm font-bold text-white no-underline shadow-lg shadow-slate-900/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2 sm:hidden"
+                className="mt-5 flex min-h-12 items-center justify-between rounded-xl bg-slate-900 px-4 text-sm font-bold text-white no-underline shadow-lg shadow-slate-900/15 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2 sm:hidden"
               >
                 <span className="flex items-center gap-2">
                   <Search className="size-4" />
@@ -312,7 +312,7 @@ export default async function WordsListPage() {
                 ].map(({ icon: Icon, label }) => (
                   <span
                     key={label}
-                    className="inline-flex items-center gap-1.5 rounded-full border border-white bg-white/80 px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm"
+                    className="inline-flex items-center gap-1.5 rounded-full border border-white bg-white/80 px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-xs"
                   >
                     <Icon className="size-3.5 text-blue-600" />
                     {label}
@@ -321,7 +321,7 @@ export default async function WordsListPage() {
               </div>
             </div>
 
-            <aside className="rounded-2xl border border-white bg-white/80 p-4 shadow-xl shadow-blue-950/5 backdrop-blur-sm sm:p-5">
+            <aside className="rounded-2xl border border-white bg-white/80 p-4 shadow-xl shadow-blue-950/5 backdrop-blur-xs sm:p-5">
               <div className="flex items-start gap-3">
                 <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-700">
                   <Sparkles className="size-5" />
@@ -337,7 +337,7 @@ export default async function WordsListPage() {
               <Link
                 href="/today-words"
                 prefetch={false}
-                className="mt-4 flex min-h-12 items-center justify-between rounded-xl bg-gradient-to-r from-blue-700 to-indigo-600 px-4 text-sm font-bold text-white no-underline shadow-lg shadow-blue-600/20 transition hover:-translate-y-0.5 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
+                className="mt-4 flex min-h-12 items-center justify-between rounded-xl bg-linear-to-r from-blue-700 to-indigo-600 px-4 text-sm font-bold text-white no-underline shadow-lg shadow-blue-600/20 transition hover:-translate-y-0.5 hover:shadow-xl focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
               >
                 今日のおすすめ{TODAY_WORDS_COUNT}単語
                 <ArrowRight className="size-4" />
@@ -345,7 +345,7 @@ export default async function WordsListPage() {
               <Link
                 href="/study"
                 prefetch={false}
-                className="mt-2 flex min-h-12 items-center justify-between rounded-xl border border-slate-300 bg-white px-4 text-sm font-bold text-slate-800 no-underline transition hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                className="mt-2 flex min-h-12 items-center justify-between rounded-xl border border-slate-300 bg-white px-4 text-sm font-bold text-slate-800 no-underline transition hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
               >
                 <span className="flex items-center gap-2">
                   <BrainCircuit className="size-4 text-blue-600" />
@@ -420,7 +420,7 @@ export default async function WordsListPage() {
           <Link
             href="/today-words/listen"
             prefetch={false}
-            className="group flex items-center justify-between rounded-2xl border border-emerald-200 bg-white p-5 text-slate-900 no-underline shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-md"
+            className="group flex items-center justify-between rounded-2xl border border-emerald-200 bg-white p-5 text-slate-900 no-underline shadow-xs transition hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-md"
           >
             <span>
               <span className="block text-base font-bold">今日の単語を聞き流す</span>
@@ -432,7 +432,7 @@ export default async function WordsListPage() {
 
         <Link
           href="#word-explorer"
-          className="mx-auto inline-flex min-h-11 items-center gap-2 rounded-full border border-slate-300 bg-white/80 px-5 text-sm font-bold text-slate-700 no-underline shadow-sm transition hover:border-blue-300 hover:text-blue-700"
+          className="mx-auto inline-flex min-h-11 items-center gap-2 rounded-full border border-slate-300 bg-white/80 px-5 text-sm font-bold text-slate-700 no-underline shadow-xs transition hover:border-blue-300 hover:text-blue-700"
         >
           <Search className="size-4" />
           単語検索へ戻る

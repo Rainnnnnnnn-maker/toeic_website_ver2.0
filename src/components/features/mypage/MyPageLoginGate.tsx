@@ -33,7 +33,7 @@ const BENEFITS = [
 export default function MyPageLoginGate() {
   return (
     <div className="flex flex-col gap-5">
-      <section className="flex flex-col gap-5 rounded-2xl border border-emerald-100 bg-white p-6 shadow-sm sm:p-8">
+      <section className="flex flex-col gap-5 rounded-2xl border border-emerald-100 bg-white p-6 shadow-xs sm:p-8">
         <div className="flex flex-col gap-2">
           <p className="text-xs uppercase tracking-[0.12em] text-emerald-600">
             MY PAGE
@@ -66,14 +66,14 @@ export default function MyPageLoginGate() {
           href="/login?next=/mypage"
           prefetch={false}
           onClick={() => trackMyPageCta("login")}
-          className="group relative inline-flex items-center justify-center gap-2 self-start rounded-lg bg-gradient-to-r from-emerald-600 to-emerald-500 px-5 py-2.5 text-sm font-bold text-white shadow-[0_4px_14px_0_rgba(5,150,105,0.39)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_6px_20px_rgba(5,150,105,0.23)] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+          className="group relative inline-flex items-center justify-center gap-2 self-start rounded-lg bg-linear-to-r from-emerald-600 to-emerald-500 px-5 py-2.5 text-sm font-bold text-white shadow-[0_4px_14px_0_rgba(5,150,105,0.39)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_6px_20px_rgba(5,150,105,0.23)] active:scale-95 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
         >
           <CircleUserRound size={16} />
           Google でログイン
         </Link>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white/70 p-5 shadow-sm">
+      <section className="rounded-2xl border border-slate-200 bg-white/70 p-5 shadow-xs">
         <p className="text-sm font-bold text-slate-800">
           ログインしなくても使える機能
         </p>
@@ -85,7 +85,7 @@ export default function MyPageLoginGate() {
             href="/favorites"
             prefetch={false}
             onClick={() => trackMyPageCta("favorites")}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-[13px] font-bold text-amber-700 transition-all duration-200 hover:-translate-y-0.5 hover:border-amber-300 hover:shadow-sm"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-[13px] font-bold text-amber-700 transition-all duration-200 hover:-translate-y-0.5 hover:border-amber-300 hover:shadow-xs"
           >
             <Star size={14} />
             お気に入り
@@ -94,7 +94,7 @@ export default function MyPageLoginGate() {
             href="/study"
             prefetch={false}
             onClick={() => trackMyPageCta("study")}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-[13px] font-bold text-blue-700 transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-sm"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-[13px] font-bold text-blue-700 transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-xs"
           >
             <BookOpen size={14} />
             学習モード
@@ -103,7 +103,7 @@ export default function MyPageLoginGate() {
             href="/today-words"
             prefetch={false}
             onClick={() => trackMyPageCta("today_words")}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-[13px] font-bold text-slate-600 transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-sm"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-[13px] font-bold text-slate-600 transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-xs"
           >
             今日の6単語
           </Link>

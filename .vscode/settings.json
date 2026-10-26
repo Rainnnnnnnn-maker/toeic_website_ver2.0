@@ -3,5 +3,8 @@
         "connectionId": "rainnnnnnnn-maker",
         "projectKey": "Rainnnnnnnn-maker_toeic_website_ver2.0"
     },
-    "git.openRepositoryInParentFolders": "never"
+    "git.openRepositoryInParentFolders": "never",
+    "files.associations": {
+        "globals.css": "tailwindcss"
+    }
 }

@@ -48,13 +48,13 @@ function renderBlock(block: ArticleBlock, idx: number) {
           <h3 className="font-semibold leading-relaxed">{block.question}</h3>
           <ol className="my-3 grid list-none gap-2 sm:grid-cols-2">
             {block.options.map((option, optionIndex) => (
-              <li key={optionIndex} className="rounded border border-black/10 bg-white p-2 dark:border-white/20 dark:bg-slate-900">
+              <li key={optionIndex} className="rounded-sm border border-black/10 bg-white p-2 dark:border-white/20 dark:bg-slate-900">
                 <span className="mr-2 font-semibold">{String.fromCharCode(65 + optionIndex)}.</span>{option}
               </li>
             ))}
           </ol>
-          <details className="rounded border border-blue-200 bg-white p-3 dark:border-blue-800 dark:bg-slate-900">
-            <summary className="cursor-pointer font-semibold text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:text-blue-300">答えと理由を確認</summary>
+          <details className="rounded-sm border border-blue-200 bg-white p-3 dark:border-blue-800 dark:bg-slate-900">
+            <summary className="cursor-pointer font-semibold text-blue-700 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 dark:text-blue-300">答えと理由を確認</summary>
             <p className="mt-3 leading-relaxed">{block.explanation}</p>
           </details>
         </section>
@@ -106,7 +106,7 @@ function renderBlock(block: ArticleBlock, idx: number) {
       return (
         <div
           key={idx}
-          className={`my-4 rounded border-l-4 p-4 text-sm ${toneClass}`}
+          className={`my-4 rounded-sm border-l-4 p-4 text-sm ${toneClass}`}
         >
           {block.text}
         </div>
@@ -159,7 +159,7 @@ function renderBlock(block: ArticleBlock, idx: number) {
               prefetch={false}
                 key={w}
                 href={`/words/${w}`}
-                className="rounded border border-black/15 px-2 py-1 font-mono text-xs hover:border-blue-500 hover:text-blue-600 dark:border-white/20 dark:hover:border-blue-400 dark:hover:text-blue-400"
+                className="rounded-sm border border-black/15 px-2 py-1 font-mono text-xs hover:border-blue-500 hover:text-blue-600 dark:border-white/20 dark:hover:border-blue-400 dark:hover:text-blue-400"
               >
                 {w}
               </Link>
@@ -189,7 +189,7 @@ function RelatedArticles({ article }: { article: GuideArticle }) {
             <Link
               prefetch={false}
               href={`/guide/${r.slug}`}
-              className="block rounded border border-black/10 p-3 hover:border-blue-500 dark:border-white/10 dark:hover:border-blue-400"
+              className="block rounded-sm border border-black/10 p-3 hover:border-blue-500 dark:border-white/10 dark:hover:border-blue-400"
             >
               <p className="text-sm font-semibold">{r.title}</p>
               <p className="mt-1 text-xs text-black/60 dark:text-white/60">
@@ -306,7 +306,7 @@ export default async function GuideArticlePage({
       <article className="text-sm text-black/85 dark:text-white/85">
         <header className="mb-6">
           <div className="mb-3 flex flex-wrap items-center gap-2 text-xs text-black/50 dark:text-white/50">
-            <span className="rounded bg-black/5 px-2 py-0.5 dark:bg-white/10">
+            <span className="rounded-sm bg-black/5 px-2 py-0.5 dark:bg-white/10">
               {article.category}
             </span>
             <span>約 {article.estimatedReadingMin} 分で読める</span>

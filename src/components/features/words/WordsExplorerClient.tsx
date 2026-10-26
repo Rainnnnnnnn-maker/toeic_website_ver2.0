@@ -166,7 +166,7 @@ export function WordsExplorerClient({ words }: Props) {
     <section
       id="word-explorer"
       aria-labelledby="word-explorer-title"
-      className="scroll-mt-3 rounded-3xl border border-white/80 bg-white/90 shadow-[0_24px_70px_-34px_rgba(15,23,42,0.35)] backdrop-blur-sm"
+      className="scroll-mt-3 rounded-3xl border border-white/80 bg-white/90 shadow-[0_24px_70px_-34px_rgba(15,23,42,0.35)] backdrop-blur-xs"
     >
       <div className="border-b border-slate-200 px-4 py-5 sm:px-6 sm:py-6 lg:px-8">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
@@ -188,7 +188,7 @@ export function WordsExplorerClient({ words }: Props) {
             type="button"
             aria-pressed={searchMode === "term"}
             onClick={() => handleModeChange("term")}
-            className={`flex min-h-11 items-center justify-center gap-2 rounded-xl border px-3 text-sm font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${
+            className={`flex min-h-11 items-center justify-center gap-2 rounded-xl border px-3 text-sm font-bold transition focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${
               searchMode === "term"
                 ? "border-slate-800 bg-slate-800 text-white shadow-lg shadow-slate-900/15"
                 : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50"
@@ -201,7 +201,7 @@ export function WordsExplorerClient({ words }: Props) {
             type="button"
             aria-pressed={searchMode === "meaning"}
             onClick={() => handleModeChange("meaning")}
-            className={`flex min-h-11 items-center justify-center gap-2 rounded-xl border px-3 text-sm font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2 ${
+            className={`flex min-h-11 items-center justify-center gap-2 rounded-xl border px-3 text-sm font-bold transition focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2 ${
               searchMode === "meaning"
                 ? "border-violet-600 bg-violet-600 text-white shadow-lg shadow-violet-600/20"
                 : "border-slate-200 bg-white text-slate-600 hover:border-violet-200 hover:bg-violet-50 hover:text-violet-700"
@@ -241,7 +241,7 @@ export function WordsExplorerClient({ words }: Props) {
               placeholder="英単語を入力（例：implement / impl*）"
               autoComplete="off"
               spellCheck={false}
-              className="h-12 w-full rounded-xl border border-slate-300 bg-white pl-12 pr-20 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 [&::-webkit-search-cancel-button]:hidden"
+              className="h-12 w-full rounded-xl border border-slate-300 bg-white pl-12 pr-20 text-base text-slate-900 outline-hidden transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 [&::-webkit-search-cancel-button]:hidden"
             />
             {query && (
               <button
@@ -251,7 +251,7 @@ export function WordsExplorerClient({ words }: Props) {
                   setVisibleCount(RESULT_PAGE_SIZE);
                 }}
                 aria-label="検索語をクリア"
-                className="absolute right-12 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                className="absolute right-12 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500"
               >
                 <X className="size-4" />
               </button>
@@ -259,7 +259,7 @@ export function WordsExplorerClient({ words }: Props) {
             <button
               type="submit"
               aria-label="検索する"
-              className="absolute right-2 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-lg bg-blue-600 text-white transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+              className="absolute right-2 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-lg bg-blue-600 text-white transition hover:bg-blue-700 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
             >
               <ArrowRight className="size-4" />
             </button>
@@ -278,7 +278,7 @@ export function WordsExplorerClient({ words }: Props) {
                   type="button"
                   aria-pressed={isActive}
                   onClick={() => handleLevelChange(option.id)}
-                  className={`min-h-14 rounded-xl border px-3 py-2 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${
+                  className={`min-h-14 rounded-xl border px-3 py-2 text-left transition focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${
                     isActive
                       ? `${option.activeClass} shadow-lg`
                       : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
@@ -298,13 +298,13 @@ export function WordsExplorerClient({ words }: Props) {
             })}
           </div>
 
-          <div className="mt-3 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div className="mt-3 overflow-x-auto pb-1 scrollbar-none [&::-webkit-scrollbar]:hidden">
             <div className="flex min-w-max gap-1" role="group" aria-label="頭文字で絞り込み">
               <button
                 type="button"
                 aria-pressed={letter === "all"}
                 onClick={() => handleLetterChange("all")}
-                className={`min-h-10 rounded-lg px-3 text-xs font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
+                className={`min-h-10 rounded-lg px-3 text-xs font-bold transition focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 ${
                   letter === "all"
                     ? "bg-slate-800 text-white"
                     : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
@@ -318,7 +318,7 @@ export function WordsExplorerClient({ words }: Props) {
                   type="button"
                   aria-pressed={letter === item}
                   onClick={() => handleLetterChange(item)}
-                  className={`size-10 rounded-lg text-xs font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
+                  className={`size-10 rounded-lg text-xs font-bold transition focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 ${
                     letter === item
                       ? "bg-blue-600 text-white"
                       : "border border-slate-200 bg-white text-slate-600 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
@@ -374,7 +374,7 @@ export function WordsExplorerClient({ words }: Props) {
                         source: "words_explorer",
                       })
                     }
-                    className={`group relative flex min-h-16 items-center justify-between gap-2 overflow-hidden rounded-xl border border-slate-200 bg-white px-3 py-2.5 no-underline shadow-sm transition hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${styles.cardClass}`}
+                    className={`group relative flex min-h-16 items-center justify-between gap-2 overflow-hidden rounded-xl border border-slate-200 bg-white px-3 py-2.5 no-underline shadow-xs transition hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${styles.cardClass}`}
                   >
                     <WordLinkPending />
                     <span className="min-w-0">
@@ -394,7 +394,7 @@ export function WordsExplorerClient({ words }: Props) {
                 <button
                   type="button"
                   onClick={() => setVisibleCount((current) => current + RESULT_PAGE_SIZE)}
-                  className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-300 bg-white px-6 text-sm font-bold text-slate-700 shadow-sm transition hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                  className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-300 bg-white px-6 text-sm font-bold text-slate-700 shadow-xs transition hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                 >
                   さらに{Math.min(RESULT_PAGE_SIZE, filteredWords.length - visibleCount)}語を表示
                 </button>
@@ -408,7 +408,7 @@ export function WordsExplorerClient({ words }: Props) {
             <button
               type="button"
               onClick={handleReset}
-              className="mt-5 min-h-11 rounded-xl bg-slate-800 px-5 text-sm font-bold text-white transition hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-800 focus-visible:ring-offset-2"
+              className="mt-5 min-h-11 rounded-xl bg-slate-800 px-5 text-sm font-bold text-white transition hover:bg-slate-700 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-slate-800 focus-visible:ring-offset-2"
             >
               全単語を表示する
             </button>

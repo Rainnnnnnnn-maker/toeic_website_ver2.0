@@ -46,7 +46,7 @@ export default function TabNavigation({ activeTab, onTabChange }: TabNavigationP
 
   return (
     <div className="w-full flex flex-col gap-1.5 relative mb-2">
-      <div className="w-full overflow-x-auto p-1 -m-1 [&::-webkit-scrollbar]:hidden [scrollbar-width:none] [-ms-overflow-style:none]">
+      <div className="w-full overflow-x-auto p-1 -m-1 [&::-webkit-scrollbar]:hidden scrollbar-none [-ms-overflow-style:none]">
         <div className="flex gap-2 min-w-min" role="tablist">
           {TABS.map((tab) => {
             const isActive = activeTab === tab.id;
@@ -59,10 +59,10 @@ export default function TabNavigation({ activeTab, onTabChange }: TabNavigationP
                 aria-selected={isActive}
                 aria-disabled={isInactive}
                 className={`
-                  relative flex items-center justify-center px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg border text-xs sm:text-sm font-bold whitespace-nowrap transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-1 group
+                  relative flex items-center justify-center px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg border text-xs sm:text-sm font-bold whitespace-nowrap transition-all duration-200 outline-hidden focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-1 group
                   ${isActive 
-                    ? `${WORD_LEVEL_CARD_STYLES[tab.id].activeClass} shadow-sm`
-                    : `text-slate-600 bg-white border-slate-200 shadow-sm ${WORD_LEVEL_CARD_STYLES[tab.id].cardClass}`}
+                    ? `${WORD_LEVEL_CARD_STYLES[tab.id].activeClass} shadow-xs`
+                    : `text-slate-600 bg-white border-slate-200 shadow-xs ${WORD_LEVEL_CARD_STYLES[tab.id].cardClass}`}
                   ${isInactive 
                     ? 'opacity-60 bg-slate-100 cursor-not-allowed hover:bg-slate-100 hover:border-slate-200 text-slate-400 shadow-none' 
                     : ''}
@@ -71,7 +71,7 @@ export default function TabNavigation({ activeTab, onTabChange }: TabNavigationP
               >
                 {tab.label}
                 {isInactive && (
-                  <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-[10px] rounded pointer-events-none opacity-0 transition-opacity duration-200 whitespace-nowrap z-10 group-hover:opacity-100">
+                  <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-[10px] rounded-sm pointer-events-none opacity-0 transition-opacity duration-200 whitespace-nowrap z-10 group-hover:opacity-100">
                     近日実装予定
                   </span>
                 )}

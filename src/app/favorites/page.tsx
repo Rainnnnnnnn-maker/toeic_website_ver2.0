@@ -62,7 +62,7 @@ export default async function FavoritesPage() {
             <ListenModeButton />
             <ReviewModeButton />
             <MyPageLinkButton variant="solid" />
-            <Link href="/" prefetch={false} className="group relative inline-flex items-center justify-center gap-1.5 px-4 py-2 min-h-[36px] bg-white text-slate-700 border border-slate-200 rounded-lg font-bold text-sm shadow-sm transition-all duration-300 hover:border-slate-300 hover:bg-slate-50 hover:shadow-md hover:-translate-y-1 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-slate-500">
+            <Link href="/" prefetch={false} className="group relative inline-flex items-center justify-center gap-1.5 px-4 py-2 min-h-[36px] bg-white text-slate-700 border border-slate-200 rounded-lg font-bold text-sm shadow-xs transition-all duration-300 hover:border-slate-300 hover:bg-slate-50 hover:shadow-md hover:-translate-y-1 active:scale-95 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-slate-500">
               <ArrowLeft size={16} className="transition-transform group-hover:-translate-x-1" />
               <span>単語一覧</span>
             </Link>

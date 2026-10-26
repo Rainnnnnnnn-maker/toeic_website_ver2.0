@@ -36,7 +36,7 @@ Production builds switch the word-list loader to Vercel Blob, so a complete buil
 ### Tech Stack
 - **Next.js 16.4.2** — App Router with `reactCompiler: true` and `cacheComponents: true`
 - **React 19** with React Compiler (automatic memoization via `babel-plugin-react-compiler`) — do not add `useMemo`/`useCallback` manually
-- **Tailwind CSS 3.4** — utility-first only; minimize arbitrary CSS
+- **Tailwind CSS 4** — utility-first only; minimize arbitrary CSS. Configuration is CSS-first in `src/app/globals.css` (`@theme`; there is no `tailwind.config.ts`) and class scanning is limited to `src/` via `source("..")`. The `--text-*--line-height` overrides there keep v3's rem line-heights so arbitrary sizes such as `text-[9px]` inherit the parent's absolute line-height; re-check those elements before removing them
 - **TypeScript 5** strict mode — import alias `@/` maps to `src/`
 - **AI**: Google Gemini (`@google/genai`, models: `gemini-2.5-flash-lite` for word details, `gemini-embedding-001` for semantic-search embeddings)
 - **Cache L2**: Upstash Redis (`@upstash/redis`)

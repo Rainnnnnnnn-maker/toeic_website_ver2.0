@@ -77,7 +77,7 @@ export default function TodayReviewCard({
   // お気に入りがまだ無い
   if (totalFavorites === 0) {
     return (
-      <section className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+      <section className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-xs sm:p-8">
         <div className="flex items-center gap-2 text-amber-500">
           <Star size={18} />
           <p className="text-xs font-bold uppercase tracking-[0.12em]">
@@ -97,7 +97,7 @@ export default function TodayReviewCard({
             href="/today-words"
             prefetch={false}
             onClick={() => trackMyPageCta("today_words")}
-            className="group inline-flex items-center justify-center gap-1.5 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 px-4 py-2.5 text-sm font-bold text-white shadow-[0_4px_14px_0_rgba(37,99,235,0.39)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_6px_20px_rgba(37,99,235,0.23)] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+            className="group inline-flex items-center justify-center gap-1.5 rounded-lg bg-linear-to-r from-blue-600 to-blue-500 px-4 py-2.5 text-sm font-bold text-white shadow-[0_4px_14px_0_rgba(37,99,235,0.39)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_6px_20px_rgba(37,99,235,0.23)] active:scale-95 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
           >
             <Sparkles size={16} className="transition-transform group-hover:scale-110" />
             今日の6単語を見る
@@ -106,7 +106,7 @@ export default function TodayReviewCard({
             href="/words"
             prefetch={false}
             onClick={() => trackMyPageCta("words")}
-            className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-slate-300 hover:bg-slate-50 hover:shadow-md active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-2"
+            className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 shadow-xs transition-all duration-300 hover:-translate-y-1 hover:border-slate-300 hover:bg-slate-50 hover:shadow-md active:scale-95 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-2"
           >
             <Search size={16} />
             単語を探す
@@ -124,7 +124,7 @@ export default function TodayReviewCard({
   // 今日の分は消化済み
   if (dueCount === 0) {
     return (
-      <section className="flex flex-col gap-5 rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-white p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:p-8">
+      <section className="flex flex-col gap-5 rounded-2xl border border-emerald-200 bg-linear-to-br from-emerald-50 to-white p-6 shadow-xs sm:flex-row sm:items-center sm:justify-between sm:p-8">
         <div className="flex flex-col gap-2">
           <p className="text-xs font-bold uppercase tracking-[0.12em] text-emerald-600">
             ALL DONE
@@ -150,7 +150,7 @@ export default function TodayReviewCard({
             href="/review?queue=all"
             prefetch={false}
             onClick={() => trackMyPageCta("review_all")}
-            className="mt-2 inline-flex items-center justify-center gap-1.5 self-start rounded-lg border border-emerald-300 bg-white px-4 py-2.5 text-sm font-bold text-emerald-700 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:bg-emerald-50 hover:shadow-md active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+            className="mt-2 inline-flex items-center justify-center gap-1.5 self-start rounded-lg border border-emerald-300 bg-white px-4 py-2.5 text-sm font-bold text-emerald-700 shadow-xs transition-all duration-300 hover:-translate-y-1 hover:bg-emerald-50 hover:shadow-md active:scale-95 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
           >
             <PlayCircle size={16} />
             先取りで復習する
@@ -162,7 +162,7 @@ export default function TodayReviewCard({
   }
 
   return (
-    <section className="flex flex-col gap-5 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:p-8">
+    <section className="flex flex-col gap-5 rounded-2xl border border-slate-200 bg-white p-6 shadow-xs sm:flex-row sm:items-center sm:justify-between sm:p-8">
       <div className="flex flex-col gap-3">
         <p className="text-xs font-bold uppercase tracking-[0.12em] text-emerald-600">
           TODAY&apos;S REVIEW
@@ -189,9 +189,9 @@ export default function TodayReviewCard({
           href="/review?queue=due"
           prefetch={false}
           onClick={() => trackMyPageCta("review_due")}
-          className="group relative mt-1 inline-flex items-center justify-center gap-2 self-start overflow-hidden rounded-lg bg-gradient-to-r from-indigo-600 to-purple-500 px-5 py-3 text-sm font-bold text-white shadow-[0_4px_14px_0_rgba(79,70,229,0.39)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_6px_20px_rgba(79,70,229,0.23)] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
+          className="group relative mt-1 inline-flex items-center justify-center gap-2 self-start overflow-hidden rounded-lg bg-linear-to-r from-indigo-600 to-purple-500 px-5 py-3 text-sm font-bold text-white shadow-[0_4px_14px_0_rgba(79,70,229,0.39)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_6px_20px_rgba(79,70,229,0.23)] active:scale-95 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
         >
-          <div className="absolute inset-0 flex h-full w-full justify-center [transform:skew(-12deg)_translateX(-150%)] group-hover:duration-1000 group-hover:[transform:skew(-12deg)_translateX(150%)]">
+          <div className="absolute inset-0 flex h-full w-full justify-center transform-[skew(-12deg)_translateX(-150%)] group-hover:duration-1000 group-hover:transform-[skew(-12deg)_translateX(150%)]">
             <div className="relative h-full w-8 bg-white/20" />
           </div>
           <PlayCircle size={18} className="relative z-10" />

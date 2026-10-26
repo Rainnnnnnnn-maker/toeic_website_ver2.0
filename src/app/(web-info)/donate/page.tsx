@@ -54,11 +54,11 @@ export default function DonatePage() {
             </li>
           </ol>
 
-          <div className="mt-5 rounded-lg border border-black/10 bg-black/[0.02] p-5 dark:border-white/10 dark:bg-white/[0.03]">
+          <div className="mt-5 rounded-lg border border-black/10 bg-black/2 p-5 dark:border-white/10 dark:bg-white/3">
             <p className="mb-3">
               <span className="font-semibold">寄付先アカウント（送り先メールアドレス）</span>
               <br />
-              <code className="mt-1 inline-block rounded bg-black/5 px-2 py-1 text-sm dark:bg-white/10">
+              <code className="mt-1 inline-block rounded-sm bg-black/5 px-2 py-1 text-sm dark:bg-white/10">
                 {DONATION_ACCOUNT}
               </code>
             </p>

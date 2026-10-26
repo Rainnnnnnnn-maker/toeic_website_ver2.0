@@ -26,7 +26,7 @@ export default function FavoritesListenClient({ allWords }: Props) {
 
   if (favoritesStatus === "error") {
     return (
-      <section className="flex flex-col items-start gap-4 rounded-2xl border border-amber-200 bg-white p-6 shadow-sm">
+      <section className="flex flex-col items-start gap-4 rounded-2xl border border-amber-200 bg-white p-6 shadow-xs">
         <div>
           <p className="text-sm font-bold text-slate-800">
             お気に入りを読み込めませんでした
@@ -38,7 +38,7 @@ export default function FavoritesListenClient({ allWords }: Props) {
         <button
           type="button"
           onClick={retryFavoritesSync}
-          className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-50 hover:shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-1"
+          className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-50 hover:shadow-sm focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-1"
         >
           <RefreshCw size={15} />
           再読み込み

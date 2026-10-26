@@ -32,7 +32,7 @@ export function CookieConsent() {
   if (dismissed) return null;
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-50 border-t border-black/10 bg-white/95 p-4 shadow-lg backdrop-blur-sm dark:border-white/10 dark:bg-black/95">
+    <div className="fixed inset-x-0 bottom-0 z-50 border-t border-black/10 bg-white/95 p-4 shadow-lg backdrop-blur-xs dark:border-white/10 dark:bg-black/95">
       <div className="mx-auto flex max-w-5xl flex-col items-center gap-3 sm:flex-row sm:justify-between">
         <p className="text-center text-xs leading-relaxed text-black/70 dark:text-white/70 sm:text-left">
           当サイトでは、利用状況の分析（Google Analytics）にCookieを使用します。許可しない場合も、単語学習機能はそのまま利用できます。詳しくは

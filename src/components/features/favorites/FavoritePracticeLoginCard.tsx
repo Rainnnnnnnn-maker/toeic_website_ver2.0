@@ -28,7 +28,7 @@ export default function FavoritePracticeLoginCard() {
   if (!isGuestWithFavorites) return null;
 
   return (
-    <section className="flex flex-col gap-4 rounded-2xl border border-emerald-100 bg-white p-5 shadow-sm sm:p-6">
+    <section className="flex flex-col gap-4 rounded-2xl border border-emerald-100 bg-white p-5 shadow-xs sm:p-6">
       <div className="flex items-start gap-3">
         <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
           <Lock size={17} />
@@ -52,7 +52,7 @@ export default function FavoritePracticeLoginCard() {
             target: "login",
           })
         }
-        className="inline-flex items-center justify-center gap-2 self-start rounded-lg bg-gradient-to-r from-emerald-600 to-emerald-500 px-5 py-2.5 text-sm font-bold text-white shadow-[0_4px_14px_0_rgba(5,150,105,0.39)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_6px_20px_rgba(5,150,105,0.23)] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+        className="inline-flex items-center justify-center gap-2 self-start rounded-lg bg-linear-to-r from-emerald-600 to-emerald-500 px-5 py-2.5 text-sm font-bold text-white shadow-[0_4px_14px_0_rgba(5,150,105,0.39)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_6px_20px_rgba(5,150,105,0.23)] active:scale-95 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
       >
         <CircleUserRound size={16} />
         Google でログインしてマイページへ
