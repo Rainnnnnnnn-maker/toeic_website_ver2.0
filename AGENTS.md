@@ -78,6 +78,7 @@ Validate that snapshots are nonempty, contain at most `TODAY_WORDS_COUNT` unique
 - Only `NEXT_PUBLIC_*` env vars may be used client-side.
 - Navigation links use `prefetch={false}` site-wide to reduce Vercel Edge Requests. Use the existing `WordLinkPending` pattern (via `useLinkStatus`) for click-feedback on links that need a loading pulse.
   - Counterintuitive gotcha: on Suspense-streaming pages (e.g. `/words/[word]`, where `page.tsx` wraps the data fetcher in `<Suspense fallback={<Loading />}>`), `prefetch={false}` *disables* the instant `loading.tsx` skeleton — prefetch is what caches the loading shell so it can render on click. Without prefetch the router waits on the current page, so the skeleton never visibly fires. Enable prefetch only when you intentionally want that fallback to show.
+  - `next.config.ts` sets `partialPrefetching: false` on purpose (added in Next.js 16.3; leaving it unset under `cacheComponents` logs a warning). It keeps the previous prefetch behavior. Turning it on changes what default and `prefetch={true}` links download, so follow `node_modules/next/dist/docs/01-app/02-guides/adopting-partial-prefetching.md` before flipping it. The option is slated for removal in the next major, when Partial Prefetching becomes always-on.
 
 ### Supabase Auth and Favorites Sync
 

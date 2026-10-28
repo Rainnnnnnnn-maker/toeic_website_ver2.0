@@ -31,7 +31,7 @@ Vercel Blob から単語リストを取得できないときでも、単語詳�
   - コーパスに無いスラッグ（`dynamicParams` は既定の `true`）。本来は 404 だが、Blob 障害中は `getWordBySlug()` が例外を投げて 500 になる。
   - ビルド後に追加された単語、`/api/tts` の許可リスト確認、`/api/revalidate/word`、`/api/sitemap`。
 
-### Next.js 16.3 のドキュメントから確定していること
+### Next.js 16.3 のドキュメントから確定していること（16.4.2 でも同内容を確認）
 
 `node_modules/next/dist/docs/01-app/03-api-reference/01-directives/use-cache.md` の「Runtime caching considerations」による:
 

@@ -1,6 +1,6 @@
 # TOEIC重要単語（toeic_website_ver2.0）技術ドキュメント
 
-最終更新日: 2026-10-25（Tailwind CSS v4 へ移行、学習・復習カードを「答えを見る→3択採点」に変更）
+最終更新日: 2026-10-28（Next.js 16.4.2 更新に伴う記述の修正）
 
 ### SEO・コンテンツ改善の初回対応（2026-10-02）
 
@@ -48,7 +48,7 @@
 
 | 区分      | 技術                          |       バージョン | 用途                           |
 | ------- | --------------------------- | ----------: | ---------------------------- |
-| Lint    | ESLint / eslint-config-next | ^9 / 16.2.12 | Next.js推奨ルールに準拠              |
+| Lint    | ESLint / eslint-config-next | ^9 / 16.4.0 | Next.js推奨ルールに準拠              |
 | テスト       | Vitest                      |     ^4.0.15 | 純粋ロジックのユニットテスト（CIで実行）。主要2フローはCypress E2E、その他の結合/UIは手動テスト |
 | SNSシェア | react-share | ^5.2.2 | Twitter/Facebook/LINEへのシェアボタン機能 |
 | ユーティリティ | server-only | ^0.0.1 | サーバー専用コードの誤import防止 |
@@ -271,7 +271,7 @@
 * `react-share`: SNSシェア機能の実装
 * `p-retry`: 外部HTTP呼び出しとSDK処理の選択的再送（`src/lib/http-retry.ts`）。Google TTS / Vercel Blob / Google Fonts / Upstash Vector Custom Requester の `fetchWithRetry` と、内蔵retryを無効化したGeminiの `retryWithTimeout` に使用する。Redisは非冪等コマンド保護のためSDKのnetwork retryだけを使う
 * `server-only`: Next.js のモジュールグラフ内で、サーバー専用コードの Client Component への誤 import を防止する。`scripts/embed-words.ts` のようにNode/`tsx` が直接実行するCLIでは、通常のNode条件でパッケージの既定エントリが例外を投げるため import しない。代わりに Client Component から参照不可とする
-* `babel-plugin-react-compiler`: React Compilerによる自動メモ化（`next.config.ts` で `reactCompiler: true` を指定、`cacheComponents: true` も併用）。`partialPrefetching: false` を明示し、Next.js 更新後も従来のプリフェッチ動作を維持する
+* `babel-plugin-react-compiler`: React Compilerによる自動メモ化（`next.config.ts` で `reactCompiler: true` を指定、`cacheComponents: true` も併用）。`partialPrefetching`（Next.js 16.3 で追加。`cacheComponents` 有効時に未指定だと警告が出る）は `false` を明示し、従来のプリフェッチ動作を維持する。有効化すると既定・`prefetch={true}` のリンクが取得する内容が変わるため、切り替える前に `node_modules/next/dist/docs/01-app/02-guides/adopting-partial-prefetching.md` の手順で確認する。次のメジャーで常時有効になり、このオプションは削除される予定
 
 ### 3.3 開発環境構築手順
 
