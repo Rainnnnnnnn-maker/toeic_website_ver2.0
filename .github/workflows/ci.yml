@@ -116,12 +116,10 @@ jobs:
   nodejs-test-coverage:
     runs-on: ubuntu-latest
     environment: Production
+    # テストは純粋ロジックのみで外部サービスに接続しない。
+    # npm ci / テストコードが読めるため、本番の資格情報（Redis / Gemini など）は渡さないこと。
     env:
       NEXT_TELEMETRY_DISABLED: 1
-      UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
-      UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
-      # あえてGemini API Keyを設定しない
-      # GEMINI_API_KEY: なし
 
     steps:
       - uses: actions/checkout@v6
