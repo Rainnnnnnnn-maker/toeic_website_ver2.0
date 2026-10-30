@@ -1,6 +1,6 @@
 # TOEIC重要単語（toeic_website_ver2.0）技術ドキュメント
 
-最終更新日: 2026-10-28（Next.js 16.4.2 更新に伴う記述の修正）
+最終更新日: 2026-10-31（JSON-LD の共通シリアライザを追記）
 
 ### SEO・コンテンツ改善の初回対応（2026-10-02）
 
@@ -669,7 +669,7 @@
   * robots `src/app/robots.ts` / sitemap `src/app/api/sitemap/route.ts`（動的生成、`/sitemap.xml` へrewrite）。robots は App Router のメタデータルート `robots.ts` が唯一の生成元（旧 `public/robots.txt` は競合する残骸だったため削除済み）。sitemap には `noindex` ページ（`/favorites`・`/review`・`/login`・`*/listen`）を掲載しない（sitemap 掲載と `noindex` は矛盾シグナルになるため）。`lastmod` は静的ページ・ガイド記事のみ出力し、実更新日を管理していない URL（全単語詳細ページ、および日次ローテーションする `/today-words`）では出力しない（同一固定日を出すと Google が lastmod を信用しなくなるため、偽の日付を出すより省略する方針。`changefreq`/`priority` は残置しているが Google は無視する）
   * 学習ガイドは `indexable !== false` の記事だけを一覧・`generateStaticParams`・関連記事・sitemapへ出す。保留記事の直接URLは `noindex, nofollow` とし、内容確認が完了するまで公開記事数に含めない
   * manifest `src/app/manifest.ts` (PWA対応)
-  * JSON-LD 生成ヘルパ `src/lib/json-ld.ts`（単語詳細用 Article/DefinedTerm など）
+  * JSON-LD ヘルパ `src/lib/json-ld.ts`（単語詳細用の BreadcrumbList / DefinedTerm 生成と、全ページの JSON-LD を `</script>` で抜け出せない形に文字列化する `serializeJsonLd`）
   * **Googlebot への切断 HTML 問題（2026-10-03 時点で再現せず）**: 2026-07-21 の監査で、キャッシュ未生成（`x-vercel-cache: BYPASS`）の単語ページにて Googlebot だけが `<Suspense>` 未解決の切断 HTML を受信する現象を確認した。`htmlLimitedBots` の上書きは、Next.js ソース精査により本問題に無効と判明してリバート済み（メタデータ限定の設定で、Googlebot の botType は不変）。2026-10-03 の再検証では、Googlebot desktop／mobile にもプリレンダー済みの完全 HTML が返った。原因は未特定。経緯・再発時の切り分け手順・恒久対策候補（単語本体の動的境界撤去）は `docs/plans/seo-content-improvement-plan.md` に集約。
 
 ### 4.2 コンポーネント間の連携フロー
