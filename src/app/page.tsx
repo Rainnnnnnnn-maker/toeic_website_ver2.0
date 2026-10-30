@@ -12,6 +12,7 @@ import TodayRecommendedWordsClient from "@/components/features/words/TodayRecomm
 import { SemanticSearchLauncher } from "@/components/features/words/SemanticSearchLauncher";
 import { getLatestGuideArticles,PUBLISHED_GUIDE_ARTICLE_COUNT} from "@/data/guide-articles";
 import { TODAY_WORDS_COUNT } from "@/lib/word-select";
+import { serializeJsonLd } from "@/lib/json-ld";
 import { HomeScrollReveal } from "@/components/features/home/HomeScrollReveal";
 
 const homeTitle = "TOEIC 重要単語【2026年版】600点・730点・800点向け｜詳しい解説付き無料単語帳";
@@ -202,7 +203,7 @@ async function FaqSection() {
       <script
         id="ldjson-faq"
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(faqJsonLd) }}
       />
       <section className="mt-12 pt-12 border-t border-slate-200 flex flex-col gap-6">
         <h2 className="text-xl font-bold text-slate-800">TOEIC重要単語 よくある質問</h2>
@@ -257,12 +258,12 @@ export default function Home() {
       <script
         id="ldjson-website"
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(websiteJsonLd) }}
       />
       <script
         id="ldjson-breadcrumb"
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }}
       />
       <HomeScrollReveal>
         <div className="mb-[-8px] sm:mb-0 flex items-center gap-4">

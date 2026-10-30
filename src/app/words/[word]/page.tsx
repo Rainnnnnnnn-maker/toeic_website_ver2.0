@@ -8,7 +8,7 @@ import dynamic from "next/dynamic";
 import { Metadata } from "next";
 import { getWordBySlug, getAllWords, getRelatedWords } from "@/data/words";
 import { getWordDetail } from "@/data/word-detail";
-import { generateWordDetailJsonLd } from "@/lib/json-ld";
+import { generateWordDetailJsonLd, serializeJsonLd } from "@/lib/json-ld";
 import Loading from "./loading";
 
 // Vercel Hobbyプランの制限対策 (60秒)
@@ -152,7 +152,7 @@ async function WordDetailFetcher({ word }: { word: string }) {
         <Script
           id="json-ld-structured-data"
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
         />
         <div className="mt-0 p-5 bg-white/96 rounded-[20px] border border-gray-200 shadow-[0_18px_40px_rgba(15,23,42,0.08)] relative flex flex-col gap-4">
           <p className="text-red-500 text-lg font-medium mb-6">
@@ -203,7 +203,7 @@ async function WordDetailFetcher({ word }: { word: string }) {
       <Script
         id="json-ld-structured-data"
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
       />
       <WordDetailClient 
         initialData={detailData} 

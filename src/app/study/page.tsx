@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getAllWords } from "@/data/words";
 import StudyClient from "@/components/features/study/StudyClient";
 import Script from "next/script";
+import { serializeJsonLd } from "@/lib/json-ld";
 
 export const metadata = {
 	title: "Webで使えるTOEIC単語帳 | 英単語学習モード",
@@ -38,7 +39,7 @@ export default async function StudyPage() {
       <Script
         id="json-ld-breadcrumb"
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
       />
 
       <StudyClient words={words} />

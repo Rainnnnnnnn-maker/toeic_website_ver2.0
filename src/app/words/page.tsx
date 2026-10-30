@@ -23,6 +23,7 @@ import { WORD_LEVEL_CARD_STYLES } from "@/components/features/words/wordLevelSty
 import { WORD_LEVEL_INFO } from "@/lib/word-level";
 import type { WordLevel } from "@/lib/word-level";
 import { TODAY_WORDS_COUNT } from "@/lib/word-select";
+import { serializeJsonLd } from "@/lib/json-ld";
 
 export const metadata: Metadata = {
   title: {
@@ -250,12 +251,12 @@ export default async function WordsListPage() {
       <Script
         id="ldjson-breadcrumb"
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }}
       />
       <Script
         id="ldjson-itemlist"
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(itemListJsonLd) }}
       />
 
       <main className="relative mx-auto flex w-full max-w-[1120px] flex-col gap-8 sm:gap-10">
