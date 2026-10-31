@@ -7,6 +7,7 @@ import type { Metadata } from "next";
 import ReviewModeButton from "@/components/features/review/ReviewModeButton";
 import MyPageLinkButton from "@/components/features/mypage/MyPageLinkButton";
 import Script from "next/script";
+import { serializeJsonLd } from "@/lib/json-ld";
 import { ArrowLeft } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -47,7 +48,7 @@ export default async function FavoritesPage() {
       <Script
         id="json-ld-breadcrumb"
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
       />
       <main className="w-full max-w-[960px] flex flex-col gap-5 relative">
         <header className="flex flex-col gap-5 sm:flex-row sm:justify-between sm:items-start">

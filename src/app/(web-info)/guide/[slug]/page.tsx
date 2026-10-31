@@ -8,6 +8,7 @@ import {
   type GuideArticle,
   type GuideSource,
 } from "@/data/guide-articles";
+import { serializeJsonLd } from "@/lib/json-ld";
 
 const SITE_URL = "https://www.toeic-words.com";
 
@@ -284,11 +285,11 @@ export default async function GuideArticlePage({
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(articleJsonLd) }}
       />
 
       <nav className="mb-8 text-sm text-black/50 dark:text-white/50">
