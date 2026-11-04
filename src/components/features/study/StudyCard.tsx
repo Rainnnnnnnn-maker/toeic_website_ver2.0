@@ -5,7 +5,7 @@ import { AudioErrorNotice } from "@/components/features/audio/AudioErrorNotice";
 import { WORD_LEVEL_CARD_STYLES } from "@/components/features/words/wordLevelStyles";
 import type { StudyDetailState } from "@/hooks/useStudyWordDetails";
 import type { AudioError } from "@/hooks/useTTS";
-import { ChevronRight, Lightbulb, Loader2, RefreshCw, Star, Volume2 } from 'lucide-react';
+import { BookOpen, ChevronRight, Lightbulb, Loader2, RefreshCw, Star, Volume2 } from 'lucide-react';
 import type { Word } from '@/data/words';
 import { pickExample } from '@/lib/listen-utils';
 import { WORD_LEVEL_INFO } from '@/lib/word-level';
@@ -89,7 +89,7 @@ export default function StudyCard({
 
       {!isRevealed ? (
         <>
-          <div className="flex min-h-[176px] flex-col items-center justify-center gap-3 py-4 text-center">
+          <div className="flex min-h-44 flex-col items-center justify-center gap-3 py-4 text-center">
             <div className="flex w-full justify-center">
               <AutoResizingText text={word.term} className="max-w-full overflow-hidden text-ellipsis whitespace-nowrap text-5xl font-bold text-slate-900" />
             </div>
@@ -189,13 +189,27 @@ export default function StudyCard({
             </>
           )}
 
+          {/* 採点ボタンと競合しないよう塗りボタンにはせず、区切り線の下に「行」として置く。
+              補足文で詳細ページに何があるかを伝え、全幅にして押しやすくする */}
+          <div className="h-px bg-slate-200" aria-hidden />
           <Link
             href={detailHref}
             prefetch={false}
-            className="inline-flex min-h-11 items-center gap-1 self-start rounded-lg text-sm font-medium text-blue-700 no-underline transition-colors hover:text-blue-900 hover:underline focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+            className="group -mx-2 flex items-center gap-3 rounded-xl px-2 py-2 no-underline transition-colors hover:bg-slate-50 active:bg-slate-100 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
           >
-            詳しい解説を見る
-            <ChevronRight size={16} aria-hidden />
+            <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700" aria-hidden>
+              <BookOpen size={20} />
+            </span>
+            <span className="flex min-w-0 flex-1 flex-col">
+              <span className="text-base font-bold text-blue-700">詳しい解説を見る</span>
+              {/* 狭い画面でも「・」の位置でだけ折り返す（「例文な／ど」のような分かれ方を防ぐ） */}
+              <span className="break-keep wrap-anywhere text-xs text-slate-600">ニュアンス・<wbr />類義語・<wbr />例文など</span>
+            </span>
+            <ChevronRight
+              size={20}
+              className="shrink-0 text-slate-400 transition-transform group-hover:translate-x-0.5 group-hover:text-blue-700"
+              aria-hidden
+            />
           </Link>
         </div>
       )}

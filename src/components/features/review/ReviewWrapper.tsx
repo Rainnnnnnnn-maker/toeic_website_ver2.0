@@ -43,7 +43,7 @@ const QUEUE_CONFIG: Record<
 function CenteredMessage({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen w-full flex justify-center items-center py-8 px-4 bg-[radial-gradient(circle_at_top,#bae6fd_0,#eff6ff_45%,#f8fafc_100%)] sm:py-12 sm:px-6">
-      <main className="w-full max-w-[600px] flex flex-col gap-8 items-center">
+      <main className="w-full max-w-150 flex flex-col gap-8 items-center">
         {children}
       </main>
     </div>
@@ -295,7 +295,7 @@ function ReviewSession({
               <Link
                 href="/"
                 prefetch={false}
-                className="inline-flex items-center justify-center gap-2 px-4 py-2 min-h-[36px] bg-blue-50 text-blue-700 border-2 border-blue-600 rounded-lg font-bold text-sm tracking-wide no-underline transition-all duration-200 hover:bg-blue-100 hover:-translate-y-0.5 active:translate-y-0 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500"
+                className="inline-flex items-center justify-center gap-2 px-4 py-2 min-h-9 bg-blue-50 text-blue-700 border-2 border-blue-600 rounded-lg font-bold text-sm tracking-wide no-underline transition-all duration-200 hover:bg-blue-100 hover:-translate-y-0.5 active:translate-y-0 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500"
               >
                 <span className="inline-flex items-center">単語を探す</span>
               </Link>
