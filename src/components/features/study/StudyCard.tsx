@@ -89,7 +89,7 @@ export default function StudyCard({
 
       {!isRevealed ? (
         <>
-          <div className="flex min-h-[176px] flex-col items-center justify-center gap-3 py-4 text-center">
+          <div className="flex min-h-44 flex-col items-center justify-center gap-3 py-4 text-center">
             <div className="flex w-full justify-center">
               <AutoResizingText text={word.term} className="max-w-full overflow-hidden text-ellipsis whitespace-nowrap text-5xl font-bold text-slate-900" />
             </div>

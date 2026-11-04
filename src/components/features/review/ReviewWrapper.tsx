@@ -43,7 +43,7 @@ const QUEUE_CONFIG: Record<
 function CenteredMessage({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen w-full flex justify-center items-center py-8 px-4 bg-[radial-gradient(circle_at_top,#bae6fd_0,#eff6ff_45%,#f8fafc_100%)] sm:py-12 sm:px-6">
-      <main className="w-full max-w-[600px] flex flex-col gap-8 items-center">
+      <main className="w-full max-w-150 flex flex-col gap-8 items-center">
         {children}
       </main>
     </div>
