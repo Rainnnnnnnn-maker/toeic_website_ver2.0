@@ -1,14 +1,23 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useSyncExternalStore } from 'react';
 import Link from 'next/link';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, ClipboardList } from 'lucide-react';
 import { useFavorites } from '@/context/FavoritesContext';
 import type { Word } from '@/data/words';
 import { useTTS } from '@/hooks/useTTS';
 import { useStudyProgress, readPersistedState, clearPersistedState } from '@/hooks/useStudyProgress';
 import { useStudyWordDetails } from '@/hooks/useStudyWordDetails';
 import type { ReviewGrade, ReviewQueue } from '@/lib/review-schedule';
+import { filterSavedStudyWords } from '@/lib/study-saved-words';
+import {
+  subscribeSavedStudyWords,
+  getSavedStudyWordsSnapshot,
+  getSavedStudyWordsServerSnapshot,
+  getSavedStudyWordsPersistenceSnapshot,
+  setSavedStudyWord,
+  type SavedStudyWordsPersistence,
+} from '@/lib/study-saved-words-store';
 import {
   buildWordMap,
   getGradeAvailability,
@@ -20,6 +29,9 @@ import {
 import StudyCard from './StudyCard';
 import StudyActions from './StudyActions';
 import LaterWordsSidebar from './LaterWordsSidebar';
+import SavedStudyWordsPanel from './SavedStudyWordsPanel';
+import StudySavedWordsSummary from './StudySavedWordsSummary';
+import StudySavedWordsNotice from './StudySavedWordsNotice';
 
 type Props = {
   words: Word[];
@@ -38,6 +50,8 @@ type Props = {
   /** 復習詳細から戻る際に復元するキュー */
   reviewQueue?: ReviewQueue;
   sessionProgress?: { total: number; remaining: number };
+  /** /study の確認用一覧を、このブラウザに保存する。復習セッションとは共有しない。 */
+  saveWordLists?: boolean;
 };
 
 const DEFAULT_STORAGE_KEY = 'toeic-study-state-v1';
@@ -56,11 +70,13 @@ export default function StudyClient({
   wordDetailFrom,
   reviewQueue,
   sessionProgress,
+  saveWordLists = false,
 }: Props) {
   const { isFavorite, toggleFavorite } = useFavorites();
   const [currentWord, setCurrentWord] = useState<Word | null>(null);
   const [isRevealed, setIsRevealed] = useState(false);
   const [isHintVisible, setIsHintVisible] = useState(false);
+  const [showSavedSummary, setShowSavedSummary] = useState(false);
   const initializedRef = useRef(false);
   const cardRef = useRef<HTMLElement>(null);
   const answerRef = useRef<HTMLDivElement>(null);
@@ -94,8 +110,22 @@ export default function StudyClient({
   const canGrade = (grade: ReviewGrade) => isRevealed && gradeAvailability[grade];
 
   const wordBySlug = buildWordMap(words);
+  const savedWords = useSyncExternalStore(
+    saveWordLists ? subscribeSavedStudyWords : subscribeToNothing,
+    saveWordLists ? getSavedStudyWordsSnapshot : getSavedStudyWordsServerSnapshot,
+    getSavedStudyWordsServerSnapshot,
+  );
+  const savedWordsPersistence = useSyncExternalStore(
+    saveWordLists ? subscribeSavedStudyWords : subscribeToNothing,
+    saveWordLists ? getSavedStudyWordsPersistenceSnapshot : getPersistenceServerSnapshot,
+    getPersistenceServerSnapshot,
+  );
+  const savedLists = filterSavedStudyWords(savedWords, new Set(wordBySlug.keys()));
+  const forgottenWords = savedLists.forgottenSlugs
+    .map((slug) => wordBySlug.get(slug))
+    .filter((word): word is Word => Boolean(word));
 
-  const laterWords = laterSlugs
+  const laterWords = (saveWordLists ? savedLists.laterSlugs : laterSlugs)
     .map((slug) => wordBySlug.get(slug))
     .filter((word): word is Word => Boolean(word));
 
@@ -187,6 +217,7 @@ export default function StudyClient({
   const handleRemembered = () => {
     if (!currentWord || !canGrade('remembered')) return;
     onGrade?.(currentWord.slug, 'remembered');
+    if (saveWordLists) setSavedStudyWord(currentWord.slug, null);
     const newCount = markRemembered(currentWord.slug);
     advanceToNextWord(newCount);
   };
@@ -195,6 +226,7 @@ export default function StudyClient({
   const handleForgot = () => {
     if (!currentWord || !canGrade('forgot')) return;
     onGrade?.(currentWord.slug, 'forgot');
+    if (saveWordLists) setSavedStudyWord(currentWord.slug, 'forgotten');
     markForgot(currentWord.slug);
     advanceToNextWord(0);
   };
@@ -202,17 +234,24 @@ export default function StudyClient({
   const handleLater = () => {
     if (!currentWord || !canGrade('later')) return;
     onGrade?.(currentWord.slug, 'later');
+    if (saveWordLists) setSavedStudyWord(currentWord.slug, 'later');
     markLater(currentWord.slug);
     advanceToNextWord();
   };
 
-  const handleSelectLaterWord = (word: Word) => {
+  const handleSelectSavedWord = (word: Word) => {
+    setShowSavedSummary(false);
     showWord(word);
-    // モバイル（lg未満）ではサイドバーがカードの下に表示されるため、
-    // 選択した単語が反映されたカードを画面内へスクロールする
-    if (window.innerWidth < 1024) {
-      cardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
+    focusStudyCard();
+  };
+
+  const focusStudyCard = (revealed = false) => {
+    window.requestAnimationFrame(() => {
+      const focusTarget = revealed ? answerRef.current : revealButtonRef.current;
+      focusTarget?.focus({ preventScroll: true });
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      cardRef.current?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+    });
   };
 
   if (!currentWord) {
@@ -232,16 +271,35 @@ export default function StudyClient({
   }
   const detailHref = `/words/${currentWord.slug}?${detailParams.toString()}`;
 
+  if (saveWordLists && showSavedSummary) {
+    return (
+      <StudySavedWordsSummary
+        forgottenWords={forgottenWords}
+        laterWords={laterWords}
+        persistence={savedWordsPersistence}
+        backLink={backLink}
+        backLinkText={backLinkText}
+        onSelect={handleSelectSavedWord}
+        onContinue={() => {
+          setShowSavedSummary(false);
+          focusStudyCard(isRevealed);
+        }}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen w-full flex justify-center items-center py-8 px-4 bg-[radial-gradient(circle_at_top,#bae6fd_0,#eff6ff_45%,#f8fafc_100%)] sm:py-12 sm:px-6">
       <div
         className={`w-full items-start ${
-          laterWords.length > 0
+          saveWordLists
+            ? 'grid max-w-7xl grid-cols-1 gap-6 lg:grid-cols-[minmax(200px,1fr)_minmax(0,600px)_minmax(200px,1fr)]'
+            : laterWords.length > 0
             ? 'grid max-w-245 grid-cols-1 gap-6 lg:grid-cols-[minmax(0,600px)_minmax(260px,320px)]'
             : 'max-w-150'
         }`}
       >
-        <main className="w-full max-w-150 flex flex-col gap-6 items-center lg:max-w-none">
+        <main className={`mx-auto w-full min-w-0 max-w-150 flex flex-col gap-6 items-center lg:max-w-none ${saveWordLists ? 'lg:col-start-2 lg:row-start-1' : ''}`}>
           <header className="flex flex-col gap-3 text-center w-full items-center relative">
             <Link
               href={backLink}
@@ -297,16 +355,58 @@ export default function StudyClient({
             showDifficultyTip={order !== 'sequential'}
             consecutiveRememberCount={consecutiveRememberCount}
           />
+
+          {saveWordLists && (
+            <div className="flex w-full flex-col items-center gap-2 text-center">
+              <button
+                type="button"
+                onClick={() => setShowSavedSummary(true)}
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-slate-300 bg-white px-5 py-2 text-sm font-semibold text-slate-700 shadow-xs transition-colors hover:bg-slate-50 active:bg-slate-100 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+              >
+                <ClipboardList size={18} aria-hidden />
+                学習を終えて確認
+              </button>
+              <StudySavedWordsNotice persistence={savedWordsPersistence} />
+            </div>
+          )}
         </main>
 
-        {laterWords.length > 0 && (
+        {saveWordLists && (
+          <div className="min-w-0 lg:col-start-1 lg:row-start-1 lg:sticky lg:top-8">
+            <SavedStudyWordsPanel
+              kind="forgotten"
+              words={forgottenWords}
+              currentSlug={currentWord.slug}
+              onSelect={handleSelectSavedWord}
+            />
+          </div>
+        )}
+
+        {saveWordLists ? (
+          <div className="min-w-0 lg:col-start-3 lg:row-start-1 lg:sticky lg:top-8">
+            <SavedStudyWordsPanel
+              kind="later"
+              words={laterWords}
+              currentSlug={currentWord.slug}
+              onSelect={handleSelectSavedWord}
+            />
+          </div>
+        ) : laterWords.length > 0 && (
           <LaterWordsSidebar
             words={laterWords}
             currentSlug={currentWord.slug}
-            onSelect={handleSelectLaterWord}
+            onSelect={handleSelectSavedWord}
           />
         )}
       </div>
     </div>
   );
+}
+
+function subscribeToNothing() {
+  return () => {};
+}
+
+function getPersistenceServerSnapshot(): SavedStudyWordsPersistence {
+  return 'persistent';
 }
