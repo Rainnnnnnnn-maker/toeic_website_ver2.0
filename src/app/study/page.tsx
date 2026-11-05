@@ -42,7 +42,7 @@ export default async function StudyPage() {
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
       />
 
-      <StudyClient words={words} />
+      <StudyClient words={words} saveWordLists />
 
       <section className="mx-auto max-w-3xl px-4 pt-8 pb-2 text-sm leading-relaxed text-slate-700">
         {/* <nav className="mb-4 text-xs text-slate-500">
@@ -55,6 +55,9 @@ export default async function StudyPage() {
         </h2>
         <p className="mb-3">
           学習モードは、当サイトに収録された 1,300 語以上の TOEIC 重要単語からランダムに出題し、暗記の定着度をフラッシュカード形式でチェックできる機能です。レベル（important / mid / high）を絞って出題することもでき、目標スコア帯に最適化された学習が可能です。
+        </p>
+        <p className="mb-3">
+          「覚えていない」と「あとで」を選んだ単語は、それぞれの一覧にたまり、このブラウザに保存されます。次回開いたときも一覧から確認でき、「覚えている」を選ぶと一覧から外れます。「学習を終えて確認」で、これまでに保存した単語をまとめて見返せます。保存はこのブラウザ内のみで、ほかの端末には同期されません。
         </p>
         <h2 className="mt-5 mb-2 text-base font-semibold text-slate-800">
           ランダム出題を使う目的
