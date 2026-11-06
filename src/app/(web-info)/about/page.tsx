@@ -177,14 +177,6 @@ export default function AboutPage() {
               <strong>最終更新</strong>
               {"：2026 年 9 月（コンテンツ・機能ともに継続的に更新中）"}
             </li>
-            <li>
-              <strong>収益化</strong>
-              {"：広告掲載を準備中（単語詳細ページには広告を掲載しない方針）"}
-            </li>
-            <li>
-              <strong>ソースコード</strong>
-              {"：GitHub にて一部公開（個人プロジェクト）"}
-            </li>
           </ul>
         </section>
 
