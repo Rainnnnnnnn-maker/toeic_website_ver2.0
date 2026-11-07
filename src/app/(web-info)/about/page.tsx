@@ -175,7 +175,7 @@ export default function AboutPage() {
             </li>
             <li>
               <strong>最終更新</strong>
-              {"：2026 年 9 月（コンテンツ・機能ともに継続的に更新中）"}
+              {"：2026 年 11 月（コンテンツ・機能ともに継続的に更新中）"}
             </li>
           </ul>
         </section>
