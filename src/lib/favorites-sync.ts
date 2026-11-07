@@ -39,6 +39,17 @@ export function mergeFavorites(remote: string[], local: string[]): string[] {
   return dedupe([...remote, ...local]);
 }
 
+// 一括追加の対象を返す。登録済み・空文字・重複を除き、渡された順を保つ。
+export function pickUnfavoritedSlugs(
+  favorites: readonly string[],
+  slugs: readonly string[]
+): string[] {
+  const registered = new Set(favorites);
+  return dedupe(
+    slugs.filter((slug) => slug.length > 0 && !registered.has(slug))
+  );
+}
+
 // localStorage のお気に入りをログイン中ユーザーのアカウントへマージしてよいか判定する。
 // 持ち主の印がない（純粋なゲストのデータ）か、印が本人ならマージ可。別人の印なら不可。
 export function shouldMergeLocalFavorites(

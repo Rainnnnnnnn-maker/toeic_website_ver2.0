@@ -378,6 +378,7 @@ export default function StudyClient({
               words={forgottenWords}
               currentSlug={currentWord.slug}
               onSelect={handleSelectSavedWord}
+              bulkFavoriteSource="study_sidebar"
             />
           </div>
         )}

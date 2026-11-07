@@ -69,6 +69,7 @@ export default function StudySavedWordsSummary({
             kind="forgotten"
             onSelect={onSelect}
             collapsible={false}
+            bulkFavoriteSource="study_summary"
           />
           <SavedStudyWordsPanel
             words={laterWords}
