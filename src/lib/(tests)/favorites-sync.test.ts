@@ -5,6 +5,7 @@ import {
   isPreviousFavoriteSession,
   mergeFavorites,
   parseStoredFavorites,
+  pickUnfavoritedSlugs,
   shouldMergeLocalFavorites,
 } from "@/lib/favorites-sync";
 
@@ -74,6 +75,28 @@ describe("mergeFavorites", () => {
 
   it("local が空なら remote をそのまま返す", () => {
     expect(mergeFavorites(["x"], [])).toEqual(["x"]);
+  });
+});
+
+describe("pickUnfavoritedSlugs", () => {
+  it("登録済みの語を除き、渡された順を保つ", () => {
+    expect(pickUnfavoritedSlugs(["b"], ["c", "b", "a"])).toEqual(["c", "a"]);
+  });
+
+  it("重複と空文字を除く", () => {
+    expect(pickUnfavoritedSlugs([], ["a", "", "a", "b"])).toEqual(["a", "b"]);
+  });
+
+  it("すべて登録済みなら空配列を返す", () => {
+    expect(pickUnfavoritedSlugs(["a", "b"], ["b", "a"])).toEqual([]);
+  });
+
+  it("入力配列を変更しない", () => {
+    const favorites = ["a"];
+    const slugs = ["a", "b"];
+    pickUnfavoritedSlugs(favorites, slugs);
+    expect(favorites).toEqual(["a"]);
+    expect(slugs).toEqual(["a", "b"]);
   });
 });
 
