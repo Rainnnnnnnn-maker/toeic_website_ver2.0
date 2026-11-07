@@ -14,11 +14,28 @@ type Props = {
   source: BulkFavoriteSource;
 };
 
+type ButtonAppearance = {
+  labelChunks: string[];
+  starColor: string;
+  starFill: string;
+};
+
+// 狭いサイドバーでも語の途中で折り返さないよう、ラベルは改行してよい位置で区切る
+function getButtonAppearance(isLoading: boolean, pendingCount: number): ButtonAppearance {
+  if (isLoading) {
+    return { labelChunks: ['お気に入りを', '読み込み中…'], starColor: 'currentColor', starFill: 'none' };
+  }
+  if (pendingCount === 0) {
+    return { labelChunks: ['すべて', 'お気に入り済み'], starColor: '#F59E0B', starFill: '#F59E0B' };
+  }
+  return { labelChunks: ['一括お気に入り', `（${pendingCount}語）`], starColor: '#D97706', starFill: 'none' };
+}
+
 /**
  * 「覚えていない」一覧の未登録語をまとめてお気に入りに追加する。追加専用で、一括解除はしない。
  * 押せない状態でもフォーカスを失わないよう、disabled ではなく aria-disabled を使う。
  */
-export default function StudyBulkFavoriteButton({ slugs, source }: Props) {
+export default function StudyBulkFavoriteButton({ slugs, source }: Readonly<Props>) {
   const { favorites, favoritesStatus, addFavorites } = useFavorites();
   const [addedCount, setAddedCount] = useState<number | null>(null);
   const pendingSlugs = pickUnfavoritedSlugs(favorites, slugs);
@@ -35,15 +52,9 @@ export default function StudyBulkFavoriteButton({ slugs, source }: Props) {
     setAddedCount(count);
   };
 
-  // 狭いサイドバーでも語の途中で折り返さないよう、改行してよい位置で区切る
-  const labelChunks = isLoading
-    ? ['お気に入りを', '読み込み中…']
-    : isDone
-      ? ['すべて', 'お気に入り済み']
-      : ['一括お気に入り', `（${pendingSlugs.length}語）`];
+  const { labelChunks, starColor, starFill } = getButtonAppearance(isLoading, pendingSlugs.length);
   // 新たな未登録語が増えたら、前回の結果は表示しない
   const message = addedCount !== null && isDone ? `${addedCount}語をお気に入りに追加しました` : '';
-  const starColor = isLoading ? 'currentColor' : isDone ? '#F59E0B' : '#D97706';
 
   return (
     <div>
@@ -61,7 +72,7 @@ export default function StudyBulkFavoriteButton({ slugs, source }: Props) {
           size={18}
           aria-hidden
           className="shrink-0"
-          fill={!isLoading && isDone ? '#F59E0B' : 'none'}
+          fill={starFill}
           color={starColor}
         />
         <span>
@@ -70,10 +81,10 @@ export default function StudyBulkFavoriteButton({ slugs, source }: Props) {
           ))}
         </span>
       </button>
-      {/* 読み上げ環境へ結果を伝えるため、空でも領域は残す */}
-      <p role="status" className={`text-xs font-medium leading-relaxed text-slate-600 ${message ? 'mt-1.5' : ''}`}>
+      {/* 読み上げ環境へ結果を伝えるため、空でも領域は残す（output は暗黙の status ロール） */}
+      <output className={`block text-xs font-medium leading-relaxed text-slate-600 ${message ? 'mt-1.5' : ''}`}>
         {message}
-      </p>
+      </output>
     </div>
   );
 }

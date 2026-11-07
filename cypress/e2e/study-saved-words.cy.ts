@@ -206,7 +206,7 @@ describe("Saved study words", () => {
       bulkButton().should("have.text", "すべてお気に入り済み")
         .and("have.attr", "aria-disabled", "true")
         .and("be.focused");
-      savedPanel("覚えていない").contains('[role="status"]', "1語をお気に入りに追加しました").should("be.visible");
+      savedPanel("覚えていない").contains("output", "1語をお気に入りに追加しました").should("be.visible");
       savedPanel("覚えていない").contains("li", newFavorite).should("contain.text", "お気に入り登録済み");
       savedPanel("覚えていない").find("li").should("have.length", 2);
       cy.window().should((win) => {
