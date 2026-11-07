@@ -17,6 +17,7 @@ import {
   isCurrentFavoriteSession,
   isPreviousFavoriteSession,
   mergeFavorites,
+  pickUnfavoritedSlugs,
   buildFavoriteRows,
   shouldMergeLocalFavorites,
 } from "@/lib/favorites-sync";
@@ -39,6 +40,8 @@ type FavoritesContextType = {
   favoritesStatus: FavoritesStatus;
   retryFavoritesSync: () => void;
   addFavorite: (slug: string) => void;
+  /** 未登録の語だけをまとめて追加し、追加した語数を返す。 */
+  addFavorites: (slugs: string[]) => number;
   removeFavorite: (slug: string) => void;
   toggleFavorite: (slug: string) => void;
   clearFavorites: () => void;
@@ -194,12 +197,13 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
     writeLocalFavorites(updater(getLocalFavoritesSnapshot()));
   };
 
-  // ログイン中のみ、サーバーへ変更を反映する（楽観的更新の裏側）
-  const syncAddToServer = (slug: string) => {
+  // ログイン中のみ、サーバーへ変更を反映する（楽観的更新の裏側）。
+  // 一括追加でも1回の upsert にまとめ、語数ぶんの通信を発生させない。
+  const syncAddToServer = (slugs: string[]) => {
     if (!userId) return;
     createClient()
       .from("favorites")
-      .upsert(buildFavoriteRows(userId, [slug]), {
+      .upsert(buildFavoriteRows(userId, slugs), {
         onConflict: "user_id,word_slug",
         ignoreDuplicates: true,
       })
@@ -250,7 +254,20 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
     } else {
       updateLocalFavorites(add);
     }
-    syncAddToServer(slug);
+    syncAddToServer([slug]);
+  };
+
+  const addFavorites = (slugs: string[]): number => {
+    const missing = pickUnfavoritedSlugs(favorites, slugs);
+    if (missing.length === 0) return 0;
+    const add = (current: string[]) => mergeFavorites(current, missing);
+    if (isRemote) {
+      updateRemoteFavorites(add);
+    } else {
+      updateLocalFavorites(add);
+    }
+    syncAddToServer(missing);
+    return missing.length;
   };
 
   const removeFavorite = (slug: string) => {
@@ -309,6 +326,7 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
         favoritesStatus,
         retryFavoritesSync,
         addFavorite,
+        addFavorites,
         removeFavorite,
         toggleFavorite,
         clearFavorites,

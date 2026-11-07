@@ -1,9 +1,11 @@
 'use client';
 
 import { useId, useState } from 'react';
-import { ChevronDown, Clock3, RotateCcw } from 'lucide-react';
+import { ChevronDown, Clock3, RotateCcw, Star } from 'lucide-react';
+import { useFavorites } from '@/context/FavoritesContext';
 import type { Word } from '@/data/words';
 import { WORD_LEVEL_INFO } from '@/lib/word-level';
+import StudyBulkFavoriteButton, { type BulkFavoriteSource } from './StudyBulkFavoriteButton';
 
 type Props = {
   words: Word[];
@@ -11,6 +13,8 @@ type Props = {
   currentSlug?: string;
   onSelect: (word: Word) => void;
   collapsible?: boolean;
+  /** 指定すると「覚えていない」一覧に一括お気に入りボタンを出す。値は GA の押下場所。 */
+  bulkFavoriteSource?: BulkFavoriteSource;
 };
 
 export default function SavedStudyWordsPanel({
@@ -19,7 +23,9 @@ export default function SavedStudyWordsPanel({
   currentSlug,
   onSelect,
   collapsible = true,
+  bulkFavoriteSource,
 }: Props) {
+  const { isFavorite } = useFavorites();
   const panelId = useId();
   const titleId = `${panelId}-title`;
   const listId = `${panelId}-list`;
@@ -70,6 +76,16 @@ export default function SavedStudyWordsPanel({
         )}
       </div>
 
+      {/* 折りたたみ中のモバイルでも押せるよう、一覧の外に置く */}
+      {isForgotten && bulkFavoriteSource && words.length > 0 && (
+        <div className="mt-4">
+          <StudyBulkFavoriteButton
+            slugs={words.map((word) => word.slug)}
+            source={bulkFavoriteSource}
+          />
+        </div>
+      )}
+
       <div
         id={listId}
         className={`mt-4 ${collapsible ? 'max-h-96 overflow-y-auto pr-1' : ''} ${
@@ -86,6 +102,7 @@ export default function SavedStudyWordsPanel({
           <ul className="space-y-2">
             {words.map((word) => {
               const isActive = currentSlug === word.slug;
+              const showFavoriteMark = isForgotten && isFavorite(word.slug);
 
               return (
                 <li key={word.slug}>
@@ -102,7 +119,21 @@ export default function SavedStudyWordsPanel({
                     }`}
                   >
                     <span className="min-w-0">
-                      <span className="block break-words text-sm font-bold">{word.term}</span>
+                      <span className="block break-words text-sm font-bold">
+                        {word.term}
+                        {showFavoriteMark && (
+                          <>
+                            <Star
+                              size={13}
+                              aria-hidden
+                              className="ml-1 inline-block align-[-1px]"
+                              fill="#F59E0B"
+                              color="#F59E0B"
+                            />
+                            <span className="sr-only">（お気に入り登録済み）</span>
+                          </>
+                        )}
+                      </span>
                       <span className="mt-0.5 block text-xs font-medium text-slate-600">
                         {WORD_LEVEL_INFO[word.level].label}
                       </span>

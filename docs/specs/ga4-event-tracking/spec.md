@@ -38,6 +38,12 @@ GA4の導入が完了しましたが、デフォルトのページビュー計�
     - `action`: "add" または "remove"
     - `word`: 対象の単語slug
 
+### Requirement: Bulk Favorite Tracking
+学習モードの「覚えていない」一覧で「一括お気に入り」を押し、1語以上を追加した際に `favorite_bulk_add` イベントを1回だけ送信しなければならない（語ごとの `favorite_toggle` は送らない）。単語slugは送らない。
+- **Parameters**:
+    - `count`: 追加した語数
+    - `source`: "study_sidebar"（学習中の一覧）または "study_summary"（「保存した単語を確認」画面）
+
 ### Requirement: Share Tracking
 システムはユーザーがSNSシェアボタンをクリックした際に `share` イベントを送信しなければならない。
 - **Parameters**:

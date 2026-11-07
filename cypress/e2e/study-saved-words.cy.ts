@@ -1,3 +1,4 @@
+import { FAVORITES_STORAGE_KEY } from "../../src/lib/favorites-sync";
 import { STUDY_SAVED_WORDS_KEY } from "../../src/lib/study-saved-words";
 
 // Cache Components retains hidden pages, so every interaction targets the active page.
@@ -107,6 +108,7 @@ describe("Saved study words", () => {
       savedPanel("覚えていない").find("li button").should("not.be.visible");
       savedPanel("あとで確認").find("li button").should("not.be.visible");
       savedPanel("覚えていない").contains('[role="status"]', "1語").should("be.visible");
+      savedPanel("覚えていない").contains("button:visible", "一括お気に入り（1語）").should("be.visible");
       cy.get(wordCard).scrollIntoView();
       cy.screenshot("study-saved-mobile", { capture: "viewport" });
 
@@ -175,6 +177,58 @@ describe("Saved study words", () => {
           laterSlugs: [laterSlug],
         });
       });
+    });
+  });
+
+  it("adds every unfavorited forgotten word to favorites at once and keeps the list unchanged", () => {
+    cy.fixture<{ important: string[]; medium: string[] }>("words.json").then((words) => {
+      const [alreadyFavorite, newFavorite] = words.important;
+      const laterSlug = words.medium[0];
+      const savedWords = JSON.stringify({
+        v: 1,
+        forgottenSlugs: [alreadyFavorite, newFavorite],
+        laterSlugs: [laterSlug],
+      });
+      const bulkButton = () => savedPanel("覚えていない").contains("button:visible", /一括お気に入り|すべてお気に入り済み/);
+      cy.visit("/study", {
+        onBeforeLoad(win) {
+          win.localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify([alreadyFavorite]));
+          win.localStorage.setItem(STUDY_SAVED_WORDS_KEY, savedWords);
+        },
+      });
+
+      savedPanel("あとで確認").contains("button", /一括お気に入り|すべてお気に入り済み/).should("not.exist");
+      savedPanel("覚えていない").contains("li", alreadyFavorite).should("contain.text", "お気に入り登録済み");
+      savedPanel("覚えていない").contains("li", newFavorite).should("not.contain.text", "お気に入り登録済み");
+
+      // Only the unfavorited word is counted and added; focus stays on the now-unavailable button.
+      bulkButton().should("have.text", "一括お気に入り（1語）").and("have.attr", "aria-disabled", "false").click();
+      bulkButton().should("have.text", "すべてお気に入り済み")
+        .and("have.attr", "aria-disabled", "true")
+        .and("be.focused");
+      savedPanel("覚えていない").contains("output", "1語をお気に入りに追加しました").should("be.visible");
+      savedPanel("覚えていない").contains("li", newFavorite).should("contain.text", "お気に入り登録済み");
+      savedPanel("覚えていない").find("li").should("have.length", 2);
+      cy.window().should((win) => {
+        expect(JSON.parse(win.localStorage.getItem(FAVORITES_STORAGE_KEY)!)).to.deep.equal([alreadyFavorite, newFavorite]);
+      });
+      assertSavedWordsRaw(savedWords);
+
+      // A second press is a no-op.
+      bulkButton().click();
+      cy.window().should((win) => {
+        expect(JSON.parse(win.localStorage.getItem(FAVORITES_STORAGE_KEY)!)).to.deep.equal([alreadyFavorite, newFavorite]);
+      });
+
+      cy.contains("button:visible", "学習を終えて確認").click();
+      cy.get('main[aria-label="学習の振り返り"]:visible').should("be.visible");
+      bulkButton().should("have.text", "すべてお気に入り済み").and("have.attr", "aria-disabled", "true");
+      savedPanel("覚えていない").find("li").should("have.length", 2);
+
+      cy.reload();
+      bulkButton().should("have.text", "すべてお気に入り済み");
+      cy.visit("/favorites");
+      cy.get(`main a[href^="/words/${newFavorite}?"]`).should("have.length", 1);
     });
   });
 
