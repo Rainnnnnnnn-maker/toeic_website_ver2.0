@@ -1,6 +1,6 @@
 # TOEIC重要単語（toeic_website_ver2.0）技術ドキュメント
 
-最終更新日: 2026-11-06
+最終更新日: 2026-11-07
 
 ### SEO・コンテンツ改善の初回対応（2026-10-02）
 
@@ -549,11 +549,12 @@
   * 持ち越すデータは `localStorage` の `toeic-study-saved-words-v1` に `{ v: 1, forgottenSlugs, laterSlugs }` のみを保存する。ログインは任意で、同じブラウザ・端末の一覧を使い、アカウント連携や Supabase 同期はしない。再読み込み・再訪・タブを開き直した後も保持し、自動期限は設けない。ブラウザのサイトデータを削除すると一覧も消える。既知の版では配列型を検証し、重複と空値を除去する。配列内の文字列以外の要素は1件ずつ捨て、残りの単語は保持する。表示時は現行コーパスにある単語だけを対象にする
   * `parseSavedStudyWords()` は `{ status, words }` を返し、正常値・未保存を `ready`、不正JSONや既知の版の不正な構造を `invalid`、明示された `v` が `1` 以外なら `unsupported-version` として区別する。未知の版はスキーマを解釈する前に判定し、元の保存文字列を上書き・削除・自動移行しない。採点はタブ内メモリで継続でき、「以前の保存データを保護」と「今回の一覧はこのタブ内でのみ保持」を案内する。不正JSONや既知の版の不正な構造は、従来どおり次に一覧が変わる採点で正常な値へ復旧する
   * ランダム出題には自動的な終端がないため、「学習を終えて確認」で「保存した単語を確認」画面を開く。過去の学習分を含む両一覧を展開表示し、単語選択でカード表面へ戻る。「学習を続ける」では中断したカードへ戻る。終了操作では保存一覧を消去しない
+  * 「覚えていない」一覧（学習中のサイドバーと「保存した単語を確認」画面の両方）には「一括お気に入り（N語）」ボタンを置き、未登録の語だけをまとめてお気に入りへ追加する。追加専用で一括解除はせず、追加しても学習一覧からは外さない（学習一覧から外れるのは従来どおり「覚えている」のみ）。モバイルで一覧を折りたたんでいても押せるよう、ボタンは一覧の外に置く。一覧の登録済みの語には★と読み上げ用の「お気に入り登録済み」を付ける。全語が登録済みなら「すべてお気に入り済み」、ログイン直後に Supabase から読み込む間（`favoritesStatus === 'loading'`）は未登録数がずれるため押せない状態にする。押せない状態でもフォーカスを失わないよう `disabled` ではなく `aria-disabled` を使い、追加語数を `role="status"` で伝える。GA4 には `favorite_bulk_add`（`count` と押下場所 `source`＝`study_sidebar` / `study_summary`）を1回だけ送り、単語名は送らない。「あとで確認」一覧と `/review` には出さない
   * カードを表示した時点で AI 詳細（`fetchWordDetail`）を1回だけ先読みし、「答えを見る」とヒントで共有する。取得状態（読み込み中・取得済み・失敗）は `src/hooks/useStudyWordDetails.ts` が slug ごとに保持し、失敗時はカード上の「再読み込み」で再要求する
   * 学習状況（表示中カード・連続正解数・答えの開閉＝`revealed` を含む）は既存の `sessionStorage` に保存し、戻る/進むや単語詳細からの復帰でも同じカードの同じ面から続けられる。再読み込みではこの一時状態をリセットするが、`/study` の保存一覧は保持する
   * 学習・復習カードの単語／例文の音声ボタンは全画面幅で44×44px、アイコン20pxとし、単語詳細と同じ青系の配色とキーボードフォーカス表示を使う。単語横のボタンは縮まないようにする。例文は文章とボタンを横並びの別要素に分け、44pxのボタンが最終行の行高だけを押し広げないようにする。
   * 採点ボタンは色だけに頼らず、明度の違う配色（青・オレンジ淡色・白）とアイコン・文字で区別する。答えを開くとフォーカスを答え領域へ移し、採点後は次のカードの「答えを見る」へ戻す
-  * `StudyClient.tsx` は状態のオーケストレーションに専念し、UI は同ディレクトリの `StudyCard` / `StudyActions` / `SavedStudyWordsPanel` / `StudySavedWordsSummary` / `StudySavedWordsNotice` / `LaterWordsSidebar` / `ExampleSentence` / `AutoResizingText` に分割
+  * `StudyClient.tsx` は状態のオーケストレーションに専念し、UI は同ディレクトリの `StudyCard` / `StudyActions` / `SavedStudyWordsPanel` / `StudyBulkFavoriteButton` / `StudySavedWordsSummary` / `StudySavedWordsNotice` / `LaterWordsSidebar` / `ExampleSentence` / `AutoResizingText` に分割
   * 学習進捗（覚えた/覚えていない/あとで・連続正解数・答えの開閉）と `sessionStorage` 永続化は `src/hooks/useStudyProgress.ts` が担当
   * 保存一覧の検証・分類移動・コーパス絞り込みは純粋関数 `src/lib/study-saved-words.ts`、永続化は `src/lib/study-saved-words-store.ts` が担当する。一覧が変わる採点だけを同期保存し（保存語がない状態での「覚えている」のように変化がなければ書き込みも通知もしない）、`useSyncExternalStore` の固定空サーバースナップショットでハイドレーションを揃える。同一タブの変更通知と別タブの `storage` イベントを購読し、メモリ保持中も採点ごとに最新の保存値を読み直すため、通知前に未知の版へ変わった場合も保護できる。外部から対応する保存値へ戻された場合はその一覧を正本として復元し、互換性のないタブ内データを混ぜずに永続保存を再開する。`getSavedStudyWordsPersistenceSnapshot()` は `persistent` / `memory-only` / `unsupported-version` を返し、`StudySavedWordsNotice` が学習画面・終了確認画面で保持範囲を案内する。ストレージ拒否時もタブ内メモリで操作を続けられる
   * 出題選定（連続正解数による難易度プール選択・同一単語の再抽選・順番出題）、保存状態のパース、例文ハイライト分割などの純粋ロジックは `src/lib/study-utils.ts` に集約（ユニットテスト対象）
@@ -625,6 +626,7 @@
   * `localStorage` は `src/lib/favorites-store.ts` の外部ストアとして `useSyncExternalStore` で購読する。マウント時に effect から `setState` する必要がなくなり、`react-hooks/set-state-in-effect` に抵触しない。SSR・ハイドレーション時は `getServerSnapshot()` が空配列を返すため描画の食い違いも起きない
   * `AuthContext` はユーザーIDが切り替わるたびに `authEpoch` を増やす。Supabase由来のremoteには `userId` と `authEpoch` の両方を記録し、現在の認証世代と一致する取得済みremoteだけを正とする。同一アカウントへの再ログインでも古いremoteを使わないため、Supabase再取得が失敗してもログアウト中に追加したlocalStorageのお気に入りを隠したり上書きしたりしない
   * ログアウト時の `localStorage` 書き戻しは layout effect で行う。`useEffect` だと書き戻し前の1フレームが描画され、D-2 で修正した「ログアウトでお気に入りが消えたように見える」症状が再発するため。書き戻し対象は直前の `authEpoch` で取得済みのremoteだけに限定する
+  * `addFavorites(slugs)` は未登録の語（`pickUnfavoritedSlugs`）だけを末尾へ足し、追加した語数を返す。ログイン中は語数ぶんではなく1回の upsert（`ignoreDuplicates`）で Supabase へ送る。単体の追加と同じく楽観的更新で、失敗は `console.error` に記録する
   * `favoritesStatus`（`guest` / `loading` / `ready` / `error`）と `retryFavoritesSync()` を公開する。ログイン必須の画面（マイページ・復習キュー）は `ready` のときだけ描画することで、Supabase 取得前の `localStorage` の値を表示しない。復習画面で `error` の場合はローカル値へフォールバックせず再試行させる
 
 * Favorites Store `src/lib/favorites-store.ts`
@@ -1042,7 +1044,7 @@ RLS は `favorites` と同じく「自分の行のみ全操作可」（`auth.uid
   * `word-detail-parse.test.ts` — Gemini 応答の JSON 抽出（コードフェンス除去・truncation 検知）と正規化（既定値補完・件数上限）
   * `tts-utils.test.ts` — テキスト正規化、slug サニタイズ、TTS キャッシュキー生成、例文 allowlist マッチング
   * `listen-utils.test.ts` — 聞き流しモードの `pickExample` フォールバック
-  * `favorites-sync.test.ts` — お気に入り同期（保存データのパース、マージ、マージ可否判定、upsert 行の構築）
+  * `favorites-sync.test.ts` — お気に入り同期（保存データのパース、マージ、一括追加対象の抽出、マージ可否判定、upsert 行の構築）
   * `review-schedule.test.ts` — Leitner遷移、JST日境界、期限・苦手順、集計、ストリーク、Supabase行変換、未送信進捗との統合
   * `review-progress-outbox.test.ts` — 再送アウトボックスの保存形式検証と壊れた行／JSONの安全な除外
   * `review-session-store.test.ts` — 固定した復習集合／残りslugの保存形式と、集合外slug・不正JSONの拒否
@@ -1096,7 +1098,7 @@ RLS は `favorites` と同じく「自分の行のみ全操作可」（`auth.uid
 
   * 戻る/進むで学習状態が継続しやすい（`sessionStorage`）
 
-  * 「覚えていない」と「あとで」が別一覧に蓄積し、再読み込み・再訪後も保持される。一覧の語を選び、「覚えている」で削除できる。PCの左右配置と375px幅の折りたたみ表示を確認し、「学習を終えて確認」で過去分を含む一覧を見返せる。保存拒否時は保持範囲の案内が出る（Cypressの自動検証範囲は [実行手順](operations/cypress-e2e.md) を参照）
+  * 「覚えていない」と「あとで」が別一覧に蓄積し、再読み込み・再訪後も保持される。一覧の語を選び、「覚えている」で削除できる。PCの左右配置と375px幅の折りたたみ表示を確認し、「学習を終えて確認」で過去分を含む一覧を見返せる。保存拒否時は保持範囲の案内が出る。「覚えていない」一覧の「一括お気に入り」で未登録の語だけが追加され、一覧には残る。ログイン中は別端末のお気に入りにも反映される（Cypressの自動検証範囲は [実行手順](operations/cypress-e2e.md) を参照）
 
 * お気に入り機能
 
