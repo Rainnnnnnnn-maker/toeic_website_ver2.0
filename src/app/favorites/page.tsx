@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getAllWords } from "@/data/words";
+import { getGuideArticleBySlug } from "@/data/guide-articles";
 import FavoritesListClient from "@/components/features/favorites/FavoritesListClient";
 import ListenModeButton from "@/components/features/favorites/ListenModeButton";
 import FavoritePracticeLoginCard from "@/components/features/favorites/FavoritePracticeLoginCard";
@@ -23,6 +24,8 @@ export const metadata: Metadata = {
 
 export default async function FavoritesPage() {
   const allWords = await getAllWords();
+  // ログイン案内カードが紹介する解説記事。タイトルは記事データを唯一の出どころにする。
+  const forgettingCurveGuide = getGuideArticleBySlug("forgetting-curve");
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -69,7 +72,12 @@ export default async function FavoritesPage() {
             </Link>
           </div>
         </header>
-        <FavoritePracticeLoginCard />
+        {forgettingCurveGuide && (
+          <FavoritePracticeLoginCard
+            guideTitle={forgettingCurveGuide.title}
+            guideReadingMin={forgettingCurveGuide.estimatedReadingMin}
+          />
+        )}
         <FavoritesListClient allWords={allWords} />
       </main>
     </div>
