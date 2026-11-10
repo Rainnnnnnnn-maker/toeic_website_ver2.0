@@ -1,6 +1,6 @@
 # TOEIC重要単語（toeic_website_ver2.0）技術ドキュメント
 
-最終更新日: 2026-11-07
+最終更新日: 2026-11-10
 
 ### SEO・コンテンツ改善の初回対応（2026-10-02）
 
@@ -489,7 +489,7 @@
 
   * 復習モードへの遷移ボタン（`ReviewModeButton`）と、お気に入り単語を聞き流すための遷移ボタン（`ListenModeButton`）を表示する。どちらも**ログイン中かつ Supabase 由来のお気に入りが取得済み（`favoritesStatus === "ready"`）のときだけ**表示する
 
-  * 未ログインでお気に入りが1件以上あるときは、上記2ボタンの代わりに `FavoritePracticeLoginCard` を一覧の上に表示する。「復習モードと聞き流しはマイページから利用できる」「お気に入りの登録・一覧はログイン不要」を伝え、`/login?next=/mypage` へ直接送る（`/mypage` を経由させず、ログインまでのタップ数を増やさない）。お気に入り0件のときは一覧側が空状態を出すため何も表示しない
+  * 未ログインのときは、上記2ボタンの代わりに `FavoritePracticeLoginCard` を一覧の上に表示する。「忘却曲線 × 間隔反復」を見出しに据え、お気に入り件数・復習間隔（`REVIEW_INTERVAL_DAYS` の 1→3→7→14→30 日）の図解・`/login?next=/mypage` への主ボタン（`/mypage` を経由させず、ログインまでのタップ数を増やさない）・解説記事 `/guide/forgetting-curve` へのリンク・「お気に入りの登録・一覧はログイン不要」の注記を1枚にまとめる。記事タイトルと読了目安は `page.tsx`（Server Component）が `getGuideArticleBySlug` から props で渡し、記事データをクライアントバンドルに含めない。お気に入り0件のゲストにも表示する（別端末で登録済みのユーザー向けに「ログインするとここに表示される」と案内）が、空状態を押し下げないよう間隔の図解は省く
 
 * ログインページ `src/app/login/page.tsx` / `src/components/features/auth/LoginClient.tsx`
 
@@ -539,7 +539,7 @@
   * お気に入り0件のときは「今日の6単語」から始める空状態、期限到来0件のときは完了表示＋次回予定日＋先取り復習CTAへ切り替える
   * 未ログイン時は `MyPageLoginGate` を表示する。同期・自動スケジュール・連続日数の3点を提示しつつ、ログインなしで使える機能（お気に入りの登録・一覧／学習モード／今日の6単語）へのリンクも併記する。ログイン導線は `/login?next=/mypage` で、ログイン後にマイページへ戻る
   * TOP は `AuthStatus` の1つの認証枠を使い、未ログイン時の「ログイン」を認証完了後に `MyPageLinkButton` の「マイページ」へ自動で置き換える（ログイン中バッジや別のマイページボタンは重ねない）。`/favorites` ヘッダーには `MyPageLinkButton` の solid 版を置き、どちらも**ログイン中のみ**マイページ導線を表示する
-  * GA4: `mypage_view`（期限到来数・お気に入り数・連続日数）、`mypage_login_gate_view`、`mypage_cta_click`（遷移先）。お気に入り復習・聞き流しのゲートは `favorite_practice_gate_view` と `favorite_practice_gate_cta`（いずれも `feature`＝`review` / `listen` / `card`）を送る
+  * GA4: `mypage_view`（期限到来数・お気に入り数・連続日数）、`mypage_login_gate_view`、`mypage_cta_click`（遷移先）。お気に入り復習・聞き流しのゲートは `favorite_practice_gate_view` と `favorite_practice_gate_cta`（いずれも `feature`＝`review` / `listen` / `card`。`/favorites` のカードは view に `has_favorites`、cta の `target` に `login` / `guide`）を送る
 
 * 学習モード `src/app/study/page.tsx` / `src/components/features/study/StudyClient.tsx`
 
