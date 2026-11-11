@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   HTTP_TIMEOUT_MS,
   HttpResponseError,
@@ -9,6 +9,7 @@ import {
   isRetryableStatus,
   isTimeoutError,
   retryWithTimeout,
+  runWithTimeout,
 } from "@/lib/http-retry";
 
 /**
@@ -145,6 +146,69 @@ describe("classifyUpstreamFailure", () => {
       status: 500,
       reason: "unknown",
     });
+  });
+});
+
+describe("runWithTimeout", () => {
+  afterEach(() => vi.useRealTimers());
+
+  it("成功時は結果を返し、期限のタイマーを片付ける", async () => {
+    vi.useFakeTimers();
+    await expect(runWithTimeout(async () => "ok", { timeoutMs: 50_000 })).resolves.toBe("ok");
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it.each([false, true])("処理の失敗を再送せず返し、タイマーを片付ける（同期例外: %s）", async (synchronous) => {
+    vi.useFakeTimers();
+    const error = new Error("failed");
+    const operation = vi.fn(() => {
+      if (synchronous) throw error;
+      return Promise.reject(error);
+    });
+    await expect(runWithTimeout(operation, { timeoutMs: 50_000 })).rejects.toBe(error);
+    expect(operation).toHaveBeenCalledTimes(1);
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it("signal に応答しない取得も50秒で待機を打ち切り、分類可能なエラーを返す", async () => {
+    vi.useFakeTimers();
+    let receivedSignal: AbortSignal | undefined;
+    const promise = runWithTimeout((signal) => {
+      receivedSignal = signal;
+      return new Promise<never>(() => {});
+    }, { timeoutMs: HTTP_TIMEOUT_MS.quizGeneration, label: "daily quiz generation" });
+    const rejected = expect(promise).rejects.toBeInstanceOf(UpstreamTimeoutError);
+
+    await vi.advanceTimersByTimeAsync(49_999);
+    expect(receivedSignal?.aborted).toBe(false);
+    await vi.advanceTimersByTimeAsync(1);
+    await rejected;
+    expect(receivedSignal?.aborted).toBe(true);
+    expect(classifyUpstreamFailure(receivedSignal?.reason)).toEqual({ status: 504, reason: "timeout" });
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it("複数の取得を通算し、期限後に取得が完了しても次の取得や保存へ進めない", async () => {
+    vi.useFakeTimers();
+    const read = vi.fn(() => new Promise<void>((resolve) => setTimeout(resolve, 24_000)));
+    const save = vi.fn();
+    const promise = runWithTimeout(async (signal) => {
+      for (let index = 0; index < 6; index += 1) {
+        signal.throwIfAborted();
+        await read();
+        signal.throwIfAborted();
+      }
+      save();
+    }, { timeoutMs: HTTP_TIMEOUT_MS.quizGeneration });
+    const rejected = expect(promise).rejects.toBeInstanceOf(UpstreamTimeoutError);
+
+    await vi.advanceTimersByTimeAsync(50_000);
+    await rejected;
+    expect(read).toHaveBeenCalledTimes(3);
+    await vi.advanceTimersByTimeAsync(30_000);
+    expect(read).toHaveBeenCalledTimes(3);
+    expect(save).not.toHaveBeenCalled();
+    expect(vi.getTimerCount()).toBe(0);
   });
 });
 
