@@ -42,7 +42,15 @@ GA4の導入が完了しましたが、デフォルトのページビュー計�
 学習モードの「覚えていない」一覧で「一括お気に入り」を押し、1語以上を追加した際に `favorite_bulk_add` イベントを1回だけ送信しなければならない（語ごとの `favorite_toggle` は送らない）。単語slugは送らない。
 - **Parameters**:
     - `count`: 追加した語数
-    - `source`: "study_sidebar"（学習中の一覧）または "study_summary"（「保存した単語を確認」画面）
+    - `source`: "study_sidebar"（学習中の一覧）、"study_summary"（「保存した単語を確認」画面）、または "quiz_result"（今日の6語クイズの結果画面）
+
+### Requirement: Daily Quiz Tracking
+システムは今日の6語クイズ（`/today-words/quiz`）の利用状況を次のイベントで送信しなければならない。出題語や選択肢の文面は送らない。詳細は `docs/specs/daily-quiz/spec.md` を参照。
+- `quiz_start`: その日の1問目に回答したとき（`question_count`, `is_today`）
+- `quiz_answer`: 回答のたび（`question_index`, `is_correct`）
+- `quiz_complete`: 最後の問題に回答したとき（`correct_count`, `question_count`, `is_today`）
+- `quiz_retry`: 「もう一度チャレンジ」を押したとき（`is_today`）
+- 「詳しい解説を見る」は既存の `word_detail_open` を `source: "quiz"` で送信する。
 
 ### Requirement: Share Tracking
 システムはユーザーがSNSシェアボタンをクリックした際に `share` イベントを送信しなければならない。

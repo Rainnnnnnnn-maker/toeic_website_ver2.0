@@ -1,6 +1,6 @@
 # TOEIC重要単語（toeic_website_ver2.0）技術ドキュメント
 
-最終更新日: 2026-11-10
+最終更新日: 2026-11-11
 
 ### SEO・コンテンツ改善の初回対応（2026-10-02）
 
@@ -1274,3 +1274,13 @@ RLS は `favorites` と同じく「自分の行のみ全操作可」（`auth.uid
 ### 難易度の名称・配色
 
 名称・見出し・目標スコアは `src/lib/word-level.ts` の `WORD_LEVEL_INFO` に集約する。表記は「最重要／中級／上級」、見出しは「最重要単語／中級単語／上級単語」。`wordLevelStyles.ts` の青／violet／roseを、TOPタブ・統計・検索結果・全単語一覧・意味検索・今日のおすすめ・単語詳細で共有する。学習画面の「あとで確認」と詳細メタ情報も共通名称を使う。ブランド名の「TOEIC重要単語」は変更しない。
+
+## 今日の6語クイズ（2026-11-11）
+
+`/today-words/quiz` は、その日の「今日おすすめの6単語」を4択で確認する登録不要の機能で、今日を含む直近7日分を解ける。詳細な仕様と手動実行の手順は `docs/specs/daily-quiz/spec.md` に集約する。
+
+* **生成**: 日次 Cron（`/api/revalidate/today-words`）が `ensureDailyQuiz()` を呼び、再検証の前に当日分を用意する。ページの描画や利用者のリクエストでは Gemini を呼ばない。正解と例文は既存の WordDetails を使い、誤答だけを `gemini-2.5-flash` に生成させる。候補は機械的な検証（`filterAiDistractors`）と別依頼の確認（`verifyQuizDistractors`）を通し、3つ残らない語は他の収録語の訳で代替する。
+* **保存**: Upstash Redis のキー `quiz:v1:<dateKey>`（TTL 8日）。保存済みで当日の6語と一致していれば再生成しない。
+* **読み取り**: `getRecentQuizzes()`（`'use cache'`、タグは `today-recommended-words` と `word-list`）が7日分を MGET で読む。当日分があれば `cacheLife('max')`、無ければ `cacheLife('hours')` とし、欠けている間だけ1時間ごとに読み直す。`/words/[word]` から到達できる箇所では呼ばない。
+* **API**: `GET /api/revalidate/today-words` の応答に `quiz`（`status`: `generated` / `exists` / `failed`）が加わった。`quizDate=YYYY-MM-DD` で直近7日以内の日を生成し、`quiz=regenerate` で作り直す。クイズの生成に失敗しても再検証は行う。
+* **クライアント**: 回答の進み具合は `localStorage` の `toeic-daily-quiz:v1` に保存し、`useSyncExternalStore` で読む。単語詳細の `from=quiz` は「クイズに戻る」だけを表示し、前後リンクを出さない。
