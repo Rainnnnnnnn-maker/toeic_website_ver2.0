@@ -29,8 +29,9 @@ const QUIZ_MODEL = "gemini-2.5-flash";
 async function requestJson(
   client: GoogleGenAI,
   prompt: string,
-  options: { temperature: number; maxOutputTokens: number; label: string },
+  options: { temperature: number; maxOutputTokens: number; label: string; signal?: AbortSignal },
 ): Promise<string> {
+  options.signal?.throwIfAborted();
   const response = await retryWithTimeout(
     (signal) =>
       client.models.generateContent({
@@ -45,7 +46,7 @@ async function requestJson(
           abortSignal: signal,
         },
       }),
-    { ...GEMINI_RETRY_POLICY.quiz, label: options.label },
+    { ...GEMINI_RETRY_POLICY.quiz, label: options.label, signal: options.signal },
   );
   const text = response.text;
   if (!text) throw new Error("Empty response from Gemini");
@@ -56,11 +57,13 @@ async function requestJson(
 export async function generateQuizDistractors(
   client: GoogleGenAI,
   targets: readonly QuizSourceWord[],
+  signal?: AbortSignal,
 ): Promise<Map<string, unknown>> {
   const text = await requestJson(client, buildDistractorPrompt(targets), {
     temperature: 0.4,
     maxOutputTokens: 1536,
     label: "gemini quiz distractors",
+    signal,
   });
   return parseDistractorResponse(text);
 }
@@ -69,12 +72,14 @@ export async function generateQuizDistractors(
 export async function verifyQuizDistractors(
   client: GoogleGenAI,
   items: readonly VerificationItem[],
+  signal?: AbortSignal,
 ): Promise<Map<string, Set<number>>> {
   const text = await requestJson(client, buildVerificationPrompt(items), {
     // 判定なので揺らぎを抑える
     temperature: 0,
     maxOutputTokens: 512,
     label: "gemini quiz verification",
+    signal,
   });
   return parseVerificationResponse(text);
 }
