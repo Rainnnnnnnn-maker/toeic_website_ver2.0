@@ -28,7 +28,7 @@ export default async function TodayQuizPage() {
           <Link
             href="/today-words"
             prefetch={false}
-            className="group inline-flex w-fit items-center gap-1 text-sm font-semibold text-slate-600 no-underline hover:text-slate-900"
+            className="group inline-flex min-h-11 w-fit items-center justify-center gap-1.5 rounded-lg border border-slate-300 bg-white px-4 text-sm font-bold text-slate-700 no-underline transition-colors hover:border-slate-400 hover:bg-slate-50 active:bg-slate-100 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-2"
           >
             <ArrowLeft size={16} className="transition-transform group-hover:-translate-x-0.5" aria-hidden />
             今日の{TODAY_WORDS_COUNT}単語
