@@ -6,7 +6,7 @@ import { classifyUpstreamFailure } from '@/lib/http-retry';
 import { safeEqual } from '@/lib/safe-compare';
 import { getTodayKey, parseTodayDateKey } from '@/lib/word-select';
 
-// クイズの生成（Gemini 2 依頼 x 最大 2 試行 x 10 秒 + 代替用の Redis 読み取り）が収まる上限
+// クイズ全体は HTTP_TIMEOUT_MS.quizGeneration（50 秒）で打ち切り、再検証と応答に10 秒残す
 export const maxDuration = 60;
 
 // Vercel Cron からは Authorization: Bearer <CRON_SECRET> ヘッダ、

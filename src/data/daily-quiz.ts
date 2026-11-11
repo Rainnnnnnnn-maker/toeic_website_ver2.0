@@ -19,7 +19,7 @@ import {
 } from "@/lib/daily-quiz";
 import { getStoredQuizzes, setStoredQuiz } from "@/lib/daily-quiz-cache";
 import { generateQuizDistractors, verifyQuizDistractors } from "@/lib/daily-quiz-gemini";
-import { classifyUpstreamFailure } from "@/lib/http-retry";
+import { HTTP_TIMEOUT_MS, classifyUpstreamFailure, runWithTimeout } from "@/lib/http-retry";
 import { toQuizSourceWord, type QuizSourceWord } from "@/lib/quiz-question-builder";
 import { getRedis } from "@/lib/upstash";
 import { parseStoredWordDetails } from "@/lib/word-detail-parse";
@@ -79,12 +79,14 @@ export type QuizGenerationResult =
   | { status: "failed"; dateKey: string; reason: string };
 
 /** 代替の誤答に使う、収録語すべての訳を Redis から読む（MGET のみ）。 */
-async function loadFallbackPool(words: readonly Word[]): Promise<QuizSourceWord[]> {
+async function loadFallbackPool(words: readonly Word[], signal: AbortSignal): Promise<QuizSourceWord[]> {
   const redis = getRedis();
   const pool: QuizSourceWord[] = [];
   for (let offset = 0; offset < words.length; offset += REDIS_MGET_BATCH) {
+    signal.throwIfAborted();
     const batch = words.slice(offset, offset + REDIS_MGET_BATCH);
     const values = await redis.mget<unknown[]>(...batch.map((word) => `word:${word.slug}`));
+    signal.throwIfAborted();
     batch.forEach((word, index) => {
       // サイトと同じく、編集済みデータがあれば Redis より優先する
       const detail = getEditorialWord(word.slug)?.detail ?? parseStoredWordDetails(values[index]);
@@ -95,14 +97,18 @@ async function loadFallbackPool(words: readonly Word[]): Promise<QuizSourceWord[
   return pool;
 }
 
-async function loadTargets(words: readonly Word[]): Promise<QuizSourceWord[]> {
+async function loadTargets(words: readonly Word[], signal: AbortSignal): Promise<QuizSourceWord[]> {
   const targets: QuizSourceWord[] = [];
   for (const word of words) {
+    signal.throwIfAborted();
     try {
+      // 共有キャッシュの取得自体はキャンセルできない。完了後も期限を確認し、次の語へ進めない
       const detail = await getWordDetail(word.slug);
+      signal.throwIfAborted();
       const source = detail ? toQuizSourceWord(word, detail) : null;
       if (source) targets.push(source);
     } catch (error) {
+      signal.throwIfAborted();
       console.warn("[daily-quiz] word detail unavailable:", classifyUpstreamFailure(error).reason);
     }
   }
@@ -114,7 +120,8 @@ async function loadTargets(words: readonly Word[]): Promise<QuizSourceWord[]> {
  * 3つ残った語だけ結果に入れる。Gemini を使えない・失敗した場合は空の Map を返し、
  * 呼び出し側がすべての語を代替の誤答に切り替える。
  */
-async function buildAiDistractors(targets: readonly QuizSourceWord[]): Promise<Map<string, string[]>> {
+async function buildAiDistractors(targets: readonly QuizSourceWord[], signal: AbortSignal): Promise<Map<string, string[]>> {
+  signal.throwIfAborted();
   const result = new Map<string, string[]>();
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
@@ -125,7 +132,8 @@ async function buildAiDistractors(targets: readonly QuizSourceWord[]): Promise<M
   try {
     // retryOptions を指定すると SDK が 429 も再送する。再送は daily-quiz-gemini.ts の共通ラッパーに任せる
     const client = new GoogleGenAI({ apiKey });
-    const candidates = await generateQuizDistractors(client, targets);
+    const candidates = await generateQuizDistractors(client, targets, signal);
+    signal.throwIfAborted();
 
     const toVerify = targets.flatMap((target) => {
       const { accepted, rejected } = filterAiDistractors(target, candidates.get(target.slug));
@@ -135,7 +143,8 @@ async function buildAiDistractors(targets: readonly QuizSourceWord[]): Promise<M
     });
     if (toVerify.length === 0) return result;
 
-    const invalid = await verifyQuizDistractors(client, toVerify);
+    const invalid = await verifyQuizDistractors(client, toVerify, signal);
+    signal.throwIfAborted();
     for (const { target, distractors } of toVerify) {
       const flagged = invalid.get(target.slug);
       // 確認の応答に含まれなかった語は未確認として扱い、AI の誤答を使わない
@@ -143,6 +152,7 @@ async function buildAiDistractors(targets: readonly QuizSourceWord[]): Promise<M
       if (verified) result.set(target.slug, verified);
     }
   } catch (error) {
+    signal.throwIfAborted();
     console.warn("[daily-quiz] Gemini request failed:", classifyUpstreamFailure(error).reason);
     return new Map();
   }
@@ -161,6 +171,16 @@ async function buildAiDistractors(targets: readonly QuizSourceWord[]): Promise<M
 export async function ensureDailyQuiz(
   options: { dateKey?: string; force?: boolean } = {},
 ): Promise<QuizGenerationResult> {
+  return runWithTimeout((signal) => generateDailyQuiz(options, signal), {
+    timeoutMs: HTTP_TIMEOUT_MS.quizGeneration,
+    label: "daily quiz generation",
+  });
+}
+
+async function generateDailyQuiz(
+  options: { dateKey?: string; force?: boolean },
+  signal: AbortSignal,
+): Promise<QuizGenerationResult> {
   const todayKey = getTodayKey();
   const dateKey = options.dateKey ?? todayKey;
   if (!listRecentDateKeys(todayKey, QUIZ_HISTORY_DAYS).includes(dateKey)) {
@@ -168,18 +188,21 @@ export async function ensureDailyQuiz(
   }
 
   const allWords = await getAllWords();
+  signal.throwIfAborted();
   const picks = selectTodayWords(allWords, dateKey, TODAY_WORDS_COUNT);
   if (picks.length === 0) return { status: "failed", dateKey, reason: "empty-word-list" };
 
   if (!options.force) {
     const [existing] = await getStoredQuizzes([dateKey]);
+    signal.throwIfAborted();
     if (existing && quizMatchesWords(existing, picks)) return { status: "exists", dateKey };
   }
 
-  const targets = await loadTargets(picks);
+  const targets = await loadTargets(picks, signal);
   if (targets.length === 0) return { status: "failed", dateKey, reason: "no-usable-words" };
 
-  const aiDistractors = await buildAiDistractors(targets);
+  const aiDistractors = await buildAiDistractors(targets, signal);
+  signal.throwIfAborted();
   const questions = new Map<string, DailyQuizQuestion>();
   const needsFallback: QuizSourceWord[] = [];
   for (const target of targets) {
@@ -192,8 +215,9 @@ export async function ensureDailyQuiz(
   if (needsFallback.length > 0) {
     let pool: QuizSourceWord[] = [];
     try {
-      pool = await loadFallbackPool(allWords);
+      pool = await loadFallbackPool(allWords, signal);
     } catch (error) {
+      signal.throwIfAborted();
       console.warn("[daily-quiz] fallback pool unavailable:", classifyUpstreamFailure(error).reason);
     }
     for (const target of needsFallback) {
@@ -208,6 +232,7 @@ export async function ensureDailyQuiz(
   });
   if (ordered.length === 0) return { status: "failed", dateKey, reason: "no-questions" };
 
+  signal.throwIfAborted();
   await setStoredQuiz({
     version: DAILY_QUIZ_VERSION,
     dateKey,
