@@ -4,15 +4,18 @@ import { pickExample } from "@/lib/listen-utils";
 import { hashString, parseTodayDateKey } from "@/lib/word-select";
 
 /**
- * 「今日の6語チャレンジ」E案の試作：既存の WordDetails（訳・品詞・類義語・例文）だけから
- * 4択問題を組み立てる純粋ロジック。Redis / Gemini / Next.js のキャッシュ API に依存しない。
+ * 既存の WordDetails（訳・品詞・類義語・例文）を、4択問題の選択肢に使える形へ整える純粋ロジック。
+ * Redis / Gemini / Next.js のキャッシュ API に依存しない。
  *
- * 正解は出題語の `japaneseTranslation`、誤答は他の収録語の `japaneseTranslation` から選ぶ。
+ * 「今日の6語クイズ」（`daily-quiz.ts`）が次の2つに使う。
+ * - 正解の選択肢：出題語の `japaneseTranslation` から訳語を選ぶ（`toQuizSourceWord`）。
+ * - 代替の誤答：Gemini の誤答を使えないとき、他の収録語の訳から選ぶ（`pickDistractors`）。
+ *
  * 新しい文章は生成しない。選択肢の文面は訳語の一部を選ぶだけで、書き換えはしない。
- * 組み立ては決定論的で、同じ入力なら同じ問題になる。
+ * 組み立ては決定論的で、同じ入力なら同じ結果になる。
  *
- * 試作段階のため、ここでの除外規則は「誤答が正解として成立する恐れ」を機械的に減らすだけで、
- * 正解の一意性を保証しない。出力は人が確認する前提で `flags` を付ける。
+ * 除外規則は「誤答が正解として成立する恐れ」を機械的に減らすだけで、正解の一意性を保証しない。
+ * `buildQuizQuestion` と `flags` は、全語での品質を確かめる CLI（`scripts/prototype-quiz-questions.ts`）用である。
  */
 
 export type TranslationClass = "verb" | "adjective" | "adverb" | "noun";

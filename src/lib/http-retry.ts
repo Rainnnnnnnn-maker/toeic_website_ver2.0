@@ -51,6 +51,8 @@ export const GEMINI_RETRY_POLICY = {
   wordDetail: { timeoutMs: 12_000, retries: 1 },
   /** クエリ／文書 embedding。通常は 1 秒未満 */
   embedding: { timeoutMs: 10_000, retries: 1 },
+  /** 日次クイズの誤答の生成と確認（各1回、6語をまとめて依頼）。2 依頼 x 最大 2 試行 x 10 秒 < Cron ルートの maxDuration 60 秒 */
+  quiz: { timeoutMs: 10_000, retries: 1 },
 } as const;
 
 /** 応答は返ったが `!ok` だった場合のエラー。 */
