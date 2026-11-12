@@ -22,7 +22,15 @@ export async function startFixtureServer() {
         for await (const chunk of req) chunks.push(chunk);
         const body = JSON.parse(Buffer.concat(chunks).toString());
         const commands = req.url === "/pipeline" ? body : [body];
-        const results = commands.map(([command, key]) => {
+        const results = commands.map(([command, ...keys]) => {
+          // The quiz page reads recent days during prerendering. No quiz has
+          // been generated in this fixture, so Redis returns a miss per date.
+          if (command.toLowerCase() === "mget" && keys.length > 0
+            && keys.every((key) => typeof key === "string" && /^quiz:v1:\d{4}-\d{2}-\d{2}$/.test(key))) {
+            requests.redis += keys.length;
+            return { result: keys.map(() => null) };
+          }
+          const [key] = keys;
           const word = typeof key === "string" ? key.replace(/^word:/, "") : "";
           if (command.toLowerCase() !== "get" || !key.startsWith("word:") || !words.has(word)) {
             throw new Error("Unexpected Redis command or key");

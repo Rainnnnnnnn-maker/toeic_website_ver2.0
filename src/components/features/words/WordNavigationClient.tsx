@@ -24,6 +24,7 @@ export default function WordNavigationClient({
   const isFromStudy = from === "study";
   const isFromReview = from === "review";
   const isFromMyPage = from === "mypage";
+  const isFromQuiz = from === "quiz";
   const rawReviewQueue = searchParams.get("queue");
   const reviewQueue = parseReviewQueue(rawReviewQueue);
   const { favorites } = useFavorites();
@@ -135,6 +136,15 @@ export default function WordNavigationClient({
               <ChevronLeft size={18} className="transition-transform group-hover:-translate-x-0.5 text-slate-400 group-hover:text-slate-600" />
               復習に戻る
             </Link>
+          ) : isFromQuiz ? (
+            <Link
+              href="/today-words/quiz"
+              prefetch={false}
+              className="group inline-flex items-center justify-center gap-1.5 h-10 px-4 bg-white border border-gray-200 rounded-full text-slate-600 text-[15px] font-semibold no-underline transition-all duration-200 shadow-xs select-none hover:bg-gray-50 hover:border-gray-300 hover:text-slate-900 hover:-translate-y-px hover:shadow-md active:translate-y-0 active:shadow-xs"
+            >
+              <ChevronLeft size={18} className="transition-transform group-hover:-translate-x-0.5 text-slate-400 group-hover:text-slate-600" />
+              クイズに戻る
+            </Link>
           ) : isFromMyPage ? (
             <Link
               href="/mypage"
@@ -182,8 +192,9 @@ export default function WordNavigationClient({
       )}
 
       {/* 復習モードからの詳細は「復習に戻る」でセッションへ戻る一本道にする。
-          前後ナビがあると同じセッションの未採点カードを先に見られ、採点が実力より甘くなる。 */}
-      {!isFromReview && (
+          前後ナビがあると同じセッションの未採点カードを先に見られ、採点が実力より甘くなる。
+          クイズからの詳細も同じ理由で、未回答の問題の単語を先に見られないよう「クイズに戻る」だけにする。 */}
+      {!isFromReview && !isFromQuiz && (
         <nav className="flex justify-between items-center -mt-2 pb-0 -mb-2" aria-label="単語ナビゲーション">
           {prevWord ? (
             <Link

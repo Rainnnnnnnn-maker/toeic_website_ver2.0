@@ -118,7 +118,7 @@ function buildFaqEntries({
 
 function TodayRecommendedWordsFallback() {
   return (
-    <section className="bg-white/90 border border-slate-200 rounded-xl p-3 sm:p-4 shadow-[0_1px_2px_rgba(0,0,0,0.05)] animate-pulse min-h-[208px] sm:min-h-[182px] lg:min-h-[118px]" />
+    <section className="bg-white/90 border border-slate-200 rounded-xl p-3 sm:p-4 shadow-[0_1px_2px_rgba(0,0,0,0.05)] animate-pulse min-h-[217px] sm:min-h-[182px] lg:min-h-[118px]" />
   );
 }
 

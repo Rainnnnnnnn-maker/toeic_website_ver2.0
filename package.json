@@ -20,7 +20,8 @@
     "typecheck:e2e": "tsc --project cypress/tsconfig.json",
     "test:e2e:ci": "node cypress/scripts/run-ci.mjs",
     "audit:content": "tsx --env-file=.env.local scripts/audit-word-content.ts",
-    "review:content": "tsx scripts/content-review-report.ts"
+    "review:content": "tsx scripts/content-review-report.ts",
+    "quiz:prototype": "tsx --env-file=.env.local scripts/prototype-quiz-questions.ts"
   },
   "dependencies": {
     "@google/genai": "^1.50.1",

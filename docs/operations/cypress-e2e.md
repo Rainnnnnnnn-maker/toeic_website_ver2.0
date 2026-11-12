@@ -1,6 +1,6 @@
 # Cypress E2Eテスト
 
-最終更新日: 2026-11-07
+最終更新日: 2026-11-11
 
 ## CIと同じ構成で実行（シークレット不要）
 
@@ -14,7 +14,7 @@ npm run test:e2e:ci
 
 `cypress/scripts/run-ci.mjs` はアプリを一時ディレクトリへコピーし、許可したOS変数だけを引き継ぐ。共有node_modulesシンボリックリンクに対応するWebpackで本番ビルドし、空きポートで本番サーバーを起動、テスト終了後は停止・一時コピーを削除する。
 
-`cypress/fixtures/words.json` の固定9語をテスト用HTTPから既存のBlob直接URL経路へ渡し、Redis SDKのGETへ固定解説を返す。未知のテスト用HTTP要求は失敗扱い。実際の単語ローダー・キャッシュ・日次選定・保存・画面遷移を使い、Gemini生成・本物のRedis／Blobへの接続を必要としない。ゲスト認証用URLもローカルを指定する。広告・解析の外部ホストはCI実行時のCypress設定で遮断する。
+`cypress/fixtures/words.json` の固定9語をテスト用HTTPから既存のBlob直接URL経路へ渡し、Redis SDKのGETへ固定解説を返す。クイズページの事前生成で行う `MGET quiz:v1:<日付> ...` には、各日未生成を表す `null` の配列を返す。未知のテスト用HTTP要求は失敗扱い。実際の単語ローダー・キャッシュ・日次選定・保存・画面遷移を使い、Gemini生成・本物のRedis／Blobへの接続を必要としない。ゲスト認証用URLもローカルを指定する。広告・解析の外部ホストはCI実行時のCypress設定で遮断する。
 
 GitHub Actionsの `nodejs-e2e` はPR・push・手動実行時にChromeで実行し、15分でタイムアウトする。workflow全体の既存 `paths-ignore` は引き継ぐ。Cypress本体をキャッシュし、他ジョブではバイナリのダウンロードを省略する。失敗時は `cypress/results/` のビルド／サーバーログ・スクリーンショット・動画をartifactとして7日保存する。実サービスの接続確認とSupabase同期はこのCIの対象外。
 

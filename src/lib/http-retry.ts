@@ -28,6 +28,8 @@ export function isRetryableStatus(status: number): boolean {
 
 /** 用途別のタイムアウト（ミリ秒）。 */
 export const HTTP_TIMEOUT_MS = {
+  /** 日次クイズ全体。Cron の maxDuration 60 秒より前に再検証と応答へ進む */
+  quizGeneration: 50_000,
   /** Google Cloud TTS の音声合成。長い例文だと数秒かかる */
   tts: 10_000,
   /** Vercel Blob からの単語リスト取得と list 操作 */
@@ -51,6 +53,8 @@ export const GEMINI_RETRY_POLICY = {
   wordDetail: { timeoutMs: 12_000, retries: 1 },
   /** クエリ／文書 embedding。通常は 1 秒未満 */
   embedding: { timeoutMs: 10_000, retries: 1 },
+  /** 日次クイズの誤答の生成と確認（各1回、6語をまとめて依頼）。別途、全体の期限も適用する */
+  quiz: { timeoutMs: 10_000, retries: 1 },
 } as const;
 
 /** 応答は返ったが `!ok` だった場合のエラー。 */
@@ -151,6 +155,33 @@ export type RetryWithTimeoutOptions = {
   /** 呼び出し元からのキャンセル。タイムアウトと合成し、キャンセル時は再送しない */
   signal?: AbortSignal;
 };
+
+/**
+ * 複数の上流呼び出しを含む処理全体を、再試行せず期限内に打ち切る。
+ * signal を扱えない共有キャッシュ等の待機も打ち切るため、Promise.race を使う。
+ * operation 側は signal を上流へ渡し、キャンセルできない await の後にも確認して
+ * 期限後の追加リクエストや書き込みを防ぐこと。
+ */
+export async function runWithTimeout<T>(
+  operation: (signal: AbortSignal) => Promise<T>,
+  { timeoutMs, label = "upstream operation" }: Pick<RetryWithTimeoutOptions, "timeoutMs" | "label">,
+): Promise<T> {
+  const controller = new AbortController();
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<never>((_resolve, reject) => {
+    timer = setTimeout(() => {
+      const error = new UpstreamTimeoutError(label);
+      controller.abort(error);
+      reject(error);
+    }, timeoutMs);
+  });
+
+  try {
+    return await Promise.race([operation(controller.signal), timeout]);
+  } finally {
+    clearTimeout(timer);
+  }
+}
 
 /**
  * SDK 呼び出しを含む任意の上流処理へ、試行ごとの timeout と選択的 retry を適用する。

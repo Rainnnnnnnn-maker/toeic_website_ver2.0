@@ -6,7 +6,7 @@ import { Star } from 'lucide-react';
 import { useFavorites } from '@/context/FavoritesContext';
 import { pickUnfavoritedSlugs } from '@/lib/favorites-sync';
 
-export type BulkFavoriteSource = 'study_sidebar' | 'study_summary';
+export type BulkFavoriteSource = 'study_sidebar' | 'study_summary' | 'quiz_result';
 
 type Props = {
   slugs: string[];
@@ -32,7 +32,7 @@ function getButtonAppearance(isLoading: boolean, pendingCount: number): ButtonAp
 }
 
 /**
- * 「覚えていない」一覧の未登録語をまとめてお気に入りに追加する。追加専用で、一括解除はしない。
+ * 「覚えていない」一覧やクイズの不正解語のうち、未登録の語をまとめてお気に入りに追加する。追加専用で、一括解除はしない。
  * 押せない状態でもフォーカスを失わないよう、disabled ではなく aria-disabled を使う。
  */
 export default function StudyBulkFavoriteButton({ slugs, source }: Readonly<Props>) {
