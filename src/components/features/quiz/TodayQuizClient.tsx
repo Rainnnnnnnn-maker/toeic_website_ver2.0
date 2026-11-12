@@ -8,6 +8,7 @@ import {
   advanceQuestion,
   answerQuestion,
   getDayProgress,
+  isSelectableQuizDay,
   pruneDays,
   resetDay,
   resolveSelectedDateKey,
@@ -40,8 +41,8 @@ export default function TodayQuizClient({ todayKey, days }: Readonly<Props>) {
   const selectedDateKey = resolveSelectedDateKey(session, days, todayKey);
   const selectedDay = days.find((day) => day.dateKey === selectedDateKey) ?? null;
   const quiz = selectedDay?.quiz ?? null;
-  // 今日は未生成でも選べるようにし、過去の日はクイズがある日だけ並べる
-  const visibleDays = days.filter((day, index) => index === 0 || day.quiz);
+  // 今日は未生成でも選べる（「準備中」の案内を開く）。過去の日はクイズがある日だけ並べる
+  const visibleDays = days.filter((day) => isSelectableQuizDay(day, todayKey));
   const validDateKeys = days.map((day) => day.dateKey);
 
   const handleSelectDay = (dateKey: string) => {
