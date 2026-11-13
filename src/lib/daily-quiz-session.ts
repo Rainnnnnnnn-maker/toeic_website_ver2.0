@@ -1,4 +1,4 @@
-import type { DailyQuiz } from "@/lib/daily-quiz";
+import type { DailyQuiz, QuizDay } from "@/lib/daily-quiz";
 
 /**
  * 「今日の6語クイズ」の回答の進み具合を端末に保存するための純粋ロジック。
@@ -65,17 +65,27 @@ export function parseQuizSession(raw: string | null): QuizSessionState {
 }
 
 /**
+ * 日付ボタンに並べ、選べる日か。過去の日はクイズがある日だけにする。
+ * 今日は未生成でも選べるようにし、「準備中」の案内を開けるようにする。
+ */
+export function isSelectableQuizDay(day: QuizDay, todayKey: string): boolean {
+  return day.quiz !== null || day.dateKey === todayKey;
+}
+
+/**
  * 表示する日を決める。同じ「今日」のうちに利用者が選んだ日があればそれを、
  * 無ければクイズのある最も新しい日（通常は今日）を返す。
+ * 選んだ日はボタンと同じ `isSelectableQuizDay` で確かめる。選べるのに開けない日を作らないためである。
  */
 export function resolveSelectedDateKey(
   state: QuizSessionState,
-  days: ReadonlyArray<{ dateKey: string; quiz: DailyQuiz | null }>,
+  days: ReadonlyArray<QuizDay>,
   todayKey: string,
 ): string | null {
   const selected = state.selected;
-  if (selected && selected.todayKey === todayKey && days.some((day) => day.dateKey === selected.dateKey && day.quiz)) {
-    return selected.dateKey;
+  if (selected && selected.todayKey === todayKey) {
+    const day = days.find((entry) => entry.dateKey === selected.dateKey);
+    if (day && isSelectableQuizDay(day, todayKey)) return day.dateKey;
   }
   return days.find((day) => day.quiz)?.dateKey ?? days[0]?.dateKey ?? null;
 }

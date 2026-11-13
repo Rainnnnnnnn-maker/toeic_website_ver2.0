@@ -5,6 +5,7 @@ import {
   advanceQuestion,
   answerQuestion,
   getDayProgress,
+  isSelectableQuizDay,
   parseQuizSession,
   pruneDays,
   resetDay,
@@ -73,6 +74,15 @@ describe("parseQuizSession", () => {
   });
 });
 
+describe("isSelectableQuizDay", () => {
+  it("offers today even without a quiz, and a past day only with one", () => {
+    expect(isSelectableQuizDay({ dateKey: "2026-11-11", quiz: null }, "2026-11-11")).toBe(true);
+    expect(isSelectableQuizDay({ dateKey: "2026-11-11", quiz: today }, "2026-11-11")).toBe(true);
+    expect(isSelectableQuizDay({ dateKey: "2026-11-10", quiz: quiz("2026-11-10") }, "2026-11-11")).toBe(true);
+    expect(isSelectableQuizDay({ dateKey: "2026-11-10", quiz: null }, "2026-11-11")).toBe(false);
+  });
+});
+
 describe("resolveSelectedDateKey", () => {
   const days = [
     { dateKey: "2026-11-11", quiz: today },
@@ -101,6 +111,14 @@ describe("resolveSelectedDateKey", () => {
     expect(resolveSelectedDateKey(EMPTY_QUIZ_SESSION, withoutToday, "2026-11-11")).toBe("2026-11-10");
     expect(resolveSelectedDateKey(EMPTY_QUIZ_SESSION, [{ dateKey: "2026-11-11", quiz: null }], "2026-11-11")).toBe("2026-11-11");
     expect(resolveSelectedDateKey(EMPTY_QUIZ_SESSION, [], "2026-11-11")).toBeNull();
+  });
+
+  it("opens today when chosen before its quiz is ready, but still rejects a past day without one", () => {
+    const withoutToday = [{ dateKey: "2026-11-11", quiz: null }, days[1], days[2]];
+    const chooseToday = selectDay(EMPTY_QUIZ_SESSION, "2026-11-11", "2026-11-11");
+    expect(resolveSelectedDateKey(chooseToday, withoutToday, "2026-11-11")).toBe("2026-11-11");
+    const choosePast = selectDay(EMPTY_QUIZ_SESSION, "2026-11-09", "2026-11-11");
+    expect(resolveSelectedDateKey(choosePast, withoutToday, "2026-11-11")).toBe("2026-11-10");
   });
 });
 
