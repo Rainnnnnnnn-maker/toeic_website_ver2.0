@@ -30,7 +30,7 @@ export default async function TodayWordsPage() {
               毎日同じ{TODAY_WORDS_COUNT}語を固定表示。まずはここから短時間で学習を始めましょう。
             </p>
           </div>
-          <div className="flex gap-4 items-center justify-center flex-wrap">
+          <div className="flex gap-4 items-center justify-end flex-wrap">
             <Link href="/study" prefetch={false} className="group relative inline-flex items-center justify-center gap-1.5 px-4 py-2 min-h-[36px] bg-linear-to-r from-blue-600 to-blue-500 text-white rounded-lg font-bold text-sm shadow-[0_4px_14px_0_rgba(37,99,235,0.39)] overflow-hidden transition-all duration-300 hover:shadow-[0_6px_20px_rgba(37,99,235,0.23)] hover:-translate-y-1 active:scale-95 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500">
               <div className="absolute inset-0 flex h-full w-full justify-center transform-[skew(-12deg)_translateX(-150%)] group-hover:duration-1000 group-hover:transform-[skew(-12deg)_translateX(150%)]">
                 <div className="relative h-full w-8 bg-white/20" />

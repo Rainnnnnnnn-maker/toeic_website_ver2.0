@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { ArrowLeft } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import TodayQuizClient from "@/components/features/quiz/TodayQuizClient";
 import { getRecentQuizzes } from "@/data/daily-quiz";
 import { QUIZ_HISTORY_DAYS } from "@/lib/daily-quiz";
@@ -28,10 +28,10 @@ export default async function TodayQuizPage() {
           <Link
             href="/today-words"
             prefetch={false}
-            className="group inline-flex min-h-11 w-fit items-center justify-center gap-1.5 rounded-lg border border-slate-300 bg-white px-4 text-sm font-bold text-slate-700 no-underline transition-colors hover:border-slate-400 hover:bg-slate-50 active:bg-slate-100 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-2"
+            className="group inline-flex h-10 w-fit items-center justify-center gap-1.5 rounded-full border border-gray-200 bg-white px-4 text-[15px] font-semibold text-slate-600 no-underline shadow-xs transition-all duration-200 select-none hover:-translate-y-px hover:border-gray-300 hover:bg-gray-50 hover:text-slate-900 hover:shadow-md active:translate-y-0 active:shadow-xs focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-2"
           >
-            <ArrowLeft size={16} className="transition-transform group-hover:-translate-x-0.5" aria-hidden />
-            今日の{TODAY_WORDS_COUNT}単語
+            <ChevronLeft size={18} className="text-slate-400 transition-transform group-hover:-translate-x-0.5 group-hover:text-slate-600" aria-hidden />
+            今日のおすすめ単語
           </Link>
           <div>
             <p className="text-xs tracking-[0.12em] uppercase text-slate-500">DAILY QUIZ</p>
