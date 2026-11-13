@@ -51,8 +51,8 @@ export default function TodayRecommendedWordsClient({ words, variant }: Props) {
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between gap-2 mb-1">
             <h2 className="text-base font-bold text-slate-800">
-              {/* 狭い画面でボタン2つと並ぶと折り返すため、「6単語」の途中では切らせない */}
-              今日おすすめの<span className="inline-block">{TODAY_WORDS_COUNT}単語</span>
+              {/* 狭い画面ではボタン2つと並んで折り返すため、sm 未満は「おすすめ6単語」に短縮する */}
+              <span className="hidden sm:inline">今日</span>おすすめ<span className="hidden sm:inline">の</span>{TODAY_WORDS_COUNT}単語
             </h2>
             {actions}
           </div>
@@ -84,7 +84,7 @@ export default function TodayRecommendedWordsClient({ words, variant }: Props) {
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between gap-2 mb-1">
           <h2 className="text-base font-bold text-slate-800">
-            今日おすすめの<span className="inline-block">{TODAY_WORDS_COUNT}単語</span>
+            <span className="hidden sm:inline">今日</span>おすすめ<span className="hidden sm:inline">の</span>{TODAY_WORDS_COUNT}単語
           </h2>
           {actions}
         </div>
