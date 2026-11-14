@@ -1,6 +1,6 @@
 # TOEIC重要単語（toeic_website_ver2.0）技術ドキュメント
 
-最終更新日: 2026-11-11
+最終更新日: 2026-11-13
 
 ### SEO・コンテンツ改善の初回対応（2026-10-02）
 
@@ -272,6 +272,16 @@
 * `p-retry`: 外部HTTP呼び出しとSDK処理の選択的再送（`src/lib/http-retry.ts`）。Google TTS / Vercel Blob / Google Fonts / Upstash Vector Custom Requester の `fetchWithRetry` と、内蔵retryを無効化したGeminiの `retryWithTimeout` に使用する。Redisは非冪等コマンド保護のためSDKのnetwork retryだけを使う
 * `server-only`: Next.js のモジュールグラフ内で、サーバー専用コードの Client Component への誤 import を防止する。`scripts/embed-words.ts` のようにNode/`tsx` が直接実行するCLIでは、通常のNode条件でパッケージの既定エントリが例外を投げるため import しない。代わりに Client Component から参照不可とする
 * `babel-plugin-react-compiler`: React Compilerによる自動メモ化（`next.config.ts` で `reactCompiler: true` を指定、`cacheComponents: true` も併用）。`partialPrefetching`（Next.js 16.3 で追加。`cacheComponents` 有効時に未指定だと警告が出る）は `false` を明示し、従来のプリフェッチ動作を維持する。有効化すると既定・`prefetch={true}` のリンクが取得する内容が変わるため、切り替える前に `node_modules/next/dist/docs/01-app/02-guides/adopting-partial-prefetching.md` の手順で確認する。次のメジャーで常時有効になり、このオプションは削除される予定
+
+#### セキュリティヘッダー
+
+`next.config.ts` の `headers()` で、全レスポンスに固定値のヘッダーを付ける。
+
+* `Content-Security-Policy: frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'`（他サイトの iframe への埋め込み、プラグイン、`<base>` の書き換え、外部へのフォーム送信を禁止）
+* `X-Content-Type-Options: nosniff`
+* `Referrer-Policy: strict-origin-when-cross-origin`
+
+`script-src` / `connect-src` は含めていない。nonce 方式はリクエストごとの動的レンダリングが必要で、静的プリレンダーと `src/proxy.ts` の matcher を絞る方針に反するため採用しない。これらを追加する場合は、GA4・Supabase・TTS 音声再生が壊れないことを `Content-Security-Policy-Report-Only` で先に確認する。
 
 ### 3.3 開発環境構築手順
 
