@@ -104,6 +104,35 @@ export default function GuideIndexPage() {
         ))}
       </ul>
 
+      <section aria-labelledby="related-services" className="mt-12">
+        <h2 id="related-services" className="mb-2 text-lg font-semibold">
+          あわせて使いたい学習サービス
+        </h2>
+        <p className="mb-4 text-sm leading-relaxed text-black/70 dark:text-white/70">
+          暗記の合間に、遊びながら語彙に触れたい方へ。運営者が相互に紹介している外部サービスです。
+        </p>
+        <a
+          href="https://word-forge.replit.app/"
+          target="_blank"
+          rel="noopener"
+          className="block rounded-lg border border-black/10 p-5 transition hover:border-black/30 dark:border-white/10 dark:hover:border-white/30"
+        >
+          <div className="mb-2 flex flex-wrap items-center gap-2 text-xs text-black/50 dark:text-white/50">
+            <span className="rounded-sm bg-black/5 px-2 py-0.5 dark:bg-white/10">
+              英単語ゲーム
+            </span>
+            <span>無料・登録なしで遊べる</span>
+            <span>外部サイト</span>
+          </div>
+          <h3 className="mb-2 text-lg font-semibold text-black hover:underline dark:text-white">
+            WordForge - 英単語の魔法
+          </h3>
+          <p className="text-sm leading-relaxed text-black/70 dark:text-white/70">
+            手持ちのアルファベットから英単語を作って競う、スクラブル風のワードゲームです。45 ステージの冒険モード、AI 対戦・オンライン対戦に加え、5,273 語以上を収録した学習モードと辞書も備えています。当サイトで覚えた単語を「自分で綴って使う」練習として、スキマ時間の息抜きにどうぞ。
+          </p>
+        </a>
+      </section>
+
       <p className="mt-10 text-xs text-black/40 dark:text-white/40">
         記事は順次追加・更新しています。リクエストがあれば
         <Link
