@@ -48,7 +48,7 @@ export default async function TodayQuizPage() {
 
         <section aria-labelledby="quiz-related-game" className="mt-6">
           <h2 id="quiz-related-game" className="mb-3 text-base font-semibold text-slate-900">
-            クイズのあとは、ゲームで単語を綴ってみる
+            クイズのあとは、ゲームで単語を綴ってみよう
           </h2>
           <a
             href="https://word-forge.replit.app/"
