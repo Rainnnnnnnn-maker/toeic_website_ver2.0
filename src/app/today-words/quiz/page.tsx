@@ -48,6 +48,7 @@ export default async function TodayQuizPage() {
 
         <section aria-labelledby="quiz-related-game" className="mt-6">
           <h2 id="quiz-related-game" className="mb-3 text-base font-semibold text-slate-900">
+            <span aria-hidden="true">🎮</span>{" "}
             クイズのあとは、ゲームで単語を綴ってみよう！
           </h2>
           <a
