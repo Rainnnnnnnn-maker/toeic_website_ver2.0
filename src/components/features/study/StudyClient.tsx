@@ -277,7 +277,7 @@ export default function StudyClient({
   }
 
   return (
-    <div className="min-h-screen w-full flex justify-center items-center py-8 px-4 bg-[radial-gradient(circle_at_top,#bae6fd_0,#eff6ff_45%,#f8fafc_100%)] sm:py-12 sm:px-6">
+    <div className="min-h-screen w-full flex justify-center items-start py-8 px-4 bg-[radial-gradient(circle_at_top,#bae6fd_0,#eff6ff_45%,#f8fafc_100%)] sm:py-12 sm:px-6">
       <div
         className={`w-full items-start ${
           saveWordLists
