@@ -1062,6 +1062,7 @@ RLS は `favorites` と同じく「自分の行のみ全操作可」（`auth.uid
   * `review-progress-outbox.test.ts` — 再送アウトボックスの保存形式検証と壊れた行／JSONの安全な除外
   * `review-session-store.test.ts` — 固定した復習集合／残りslugの保存形式と、集合外slug・不正JSONの拒否
   * `safe-compare.test.ts` — トークンの定数時間比較（`safeEqual`）
+  * `public-page-metadata.test.ts` — 公開ページのmetadata生成（パスからの絶対URLの正規URL・`og:url`、タイトルと説明の共有、親レイアウトを置き換えても欠けないサイト名・言語・共有画像）
   * `study-utils.test.ts` — 学習モードの出題選定（連続正解数による難易度プール選択・同一単語の再抽選・順番出題）、`sessionStorage` 保存状態のパース、例文ハイライト分割（乱数は注入式にして全分岐を決定的に検証）
   * `study-saved-words.test.ts` — 保存一覧の形式検証、正常・不正・未対応バージョンの状態判定、異なる将来スキーマの解釈防止、文字列以外の要素の個別除去と採点後の保持、重複・空値の除去、分類移動・削除と順序保持、入力の非変更、現行コーパスへの絞り込み
   * `semantic-search.test.ts` — セマンティック検索のクエリ正規化（NFKC・空白圧縮・小文字化）、Vector世代付きキャッシュキー生成、最低類似度の設定・フィルタ、ベクトルL2正規化、embedding用ドキュメント組み立て（`buildEmbeddingText`：類義語の重複排除・空フィールド省略）、Vector検索結果／キャッシュ値のパース検証
