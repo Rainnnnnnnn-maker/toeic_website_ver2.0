@@ -254,24 +254,12 @@ export default function StudyClient({
     });
   };
 
-  if (!currentWord) {
-    return (
-      <div className="min-h-screen w-full flex justify-center items-center py-8 px-4 bg-[radial-gradient(circle_at_top,#bae6fd_0,#eff6ff_45%,#f8fafc_100%)]">
-        <div className="w-full max-w-150 flex flex-col gap-8 items-center">
-          <p className="text-sm leading-[1.6] text-gray-500">読み込み中...</p>
-        </div>
-      </div>
-    );
-  }
-
   const fromParam = wordDetailFrom ?? (backLink === '/favorites' ? 'review' : 'study');
   const detailParams = new URLSearchParams({ from: fromParam });
   if (fromParam === 'review' && reviewQueue) {
     detailParams.set('queue', reviewQueue);
   }
-  const detailHref = `/words/${currentWord.slug}?${detailParams.toString()}`;
-
-  if (saveWordLists && showSavedSummary) {
+  if (currentWord && saveWordLists && showSavedSummary) {
     return (
       <StudySavedWordsSummary
         forgottenWords={forgottenWords}
@@ -289,7 +277,7 @@ export default function StudyClient({
   }
 
   return (
-    <div className="min-h-screen w-full flex justify-center items-center py-8 px-4 bg-[radial-gradient(circle_at_top,#bae6fd_0,#eff6ff_45%,#f8fafc_100%)] sm:py-12 sm:px-6">
+    <div className="min-h-screen w-full flex justify-center items-start py-8 px-4 bg-[radial-gradient(circle_at_top,#bae6fd_0,#eff6ff_45%,#f8fafc_100%)] sm:py-12 sm:px-6">
       <div
         className={`w-full items-start ${
           saveWordLists
@@ -323,40 +311,46 @@ export default function StudyClient({
             </p>
           </header>
 
-          <StudyCard
-            cardRef={cardRef}
-            answerRef={answerRef}
-            word={currentWord}
-            isRevealed={isRevealed}
-            isHintVisible={isHintVisible}
-            detailState={detailBySlug[currentWord.slug] ?? { status: 'loading' }}
-            detailHref={detailHref}
-            isFavorite={isFavorite(currentWord.slug)}
-            audioLoading={audioLoading}
-            sentenceAudioLoading={sentenceAudioLoading}
-            onToggleHint={handleToggleHint}
-            onRetryDetail={handleRetryDetail}
-            onToggleFavorite={() => toggleFavorite(currentWord.slug)}
-            onPlayWordAudio={() => handlePlayAudio(currentWord.term, undefined, "en", currentWord.slug)}
-            onPlaySentenceAudio={handlePlaySentenceAudio}
-            audioError={audioError}
-            onRetryAudio={retryAudio}
-          />
+          {currentWord ? (
+            <>
+              <StudyCard
+                cardRef={cardRef}
+                answerRef={answerRef}
+                word={currentWord}
+                isRevealed={isRevealed}
+                isHintVisible={isHintVisible}
+                detailState={detailBySlug[currentWord.slug] ?? { status: 'loading' }}
+                detailHref={`/words/${currentWord.slug}?${detailParams.toString()}`}
+                isFavorite={isFavorite(currentWord.slug)}
+                audioLoading={audioLoading}
+                sentenceAudioLoading={sentenceAudioLoading}
+                onToggleHint={handleToggleHint}
+                onRetryDetail={handleRetryDetail}
+                onToggleFavorite={() => toggleFavorite(currentWord.slug)}
+                onPlayWordAudio={() => handlePlayAudio(currentWord.term, undefined, "en", currentWord.slug)}
+                onPlaySentenceAudio={handlePlaySentenceAudio}
+                audioError={audioError}
+                onRetryAudio={retryAudio}
+              />
 
-          <StudyActions
-            actionsRef={actionsRef}
-            revealButtonRef={revealButtonRef}
-            isRevealed={isRevealed}
-            answerStatus={answerStatus}
-            onReveal={handleReveal}
-            onRemembered={handleRemembered}
-            onForgot={handleForgot}
-            onLater={handleLater}
-            showDifficultyTip={order !== 'sequential'}
-            consecutiveRememberCount={consecutiveRememberCount}
-          />
+              <StudyActions
+                actionsRef={actionsRef}
+                revealButtonRef={revealButtonRef}
+                isRevealed={isRevealed}
+                answerStatus={answerStatus}
+                onReveal={handleReveal}
+                onRemembered={handleRemembered}
+                onForgot={handleForgot}
+                onLater={handleLater}
+                showDifficultyTip={order !== 'sequential'}
+                consecutiveRememberCount={consecutiveRememberCount}
+              />
+            </>
+          ) : (
+            <p role="status" className="text-sm leading-[1.6] text-gray-500">読み込み中...</p>
+          )}
 
-          {saveWordLists && (
+          {currentWord && saveWordLists && (
             <div className="flex w-full flex-col items-center gap-2 text-center">
               <button
                 type="button"
@@ -371,7 +365,7 @@ export default function StudyClient({
           )}
         </main>
 
-        {saveWordLists && (
+        {currentWord && saveWordLists && (
           <div className="min-w-0 lg:col-start-1 lg:row-start-1 lg:sticky lg:top-8">
             <SavedStudyWordsPanel
               kind="forgotten"
@@ -383,7 +377,7 @@ export default function StudyClient({
           </div>
         )}
 
-        {saveWordLists ? (
+        {currentWord && saveWordLists && (
           <div className="min-w-0 lg:col-start-3 lg:row-start-1 lg:sticky lg:top-8">
             <SavedStudyWordsPanel
               kind="later"
@@ -392,7 +386,9 @@ export default function StudyClient({
               onSelect={handleSelectSavedWord}
             />
           </div>
-        ) : laterWords.length > 0 && (
+        )}
+
+        {currentWord && !saveWordLists && laterWords.length > 0 && (
           <LaterWordsSidebar
             words={laterWords}
             currentSlug={currentWord.slug}

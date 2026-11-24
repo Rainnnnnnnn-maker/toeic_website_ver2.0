@@ -1,18 +1,16 @@
 import Link from "next/link";
-import type { Metadata } from "next";
 import { Suspense } from "react";
 import { ArrowLeft, BookOpen } from "lucide-react";
 import { getTodayRecommendedSelection } from "@/data/words";
 import TodayRecommendedWordsClient from "@/components/features/words/TodayRecommendedWordsClient";
 import { TODAY_WORDS_COUNT } from "@/lib/word-select";
+import { createPublicPageMetadata } from "@/lib/public-page-metadata";
 
-export const metadata: Metadata = {
-  title: `今日おすすめの${TODAY_WORDS_COUNT}単語`,
-  description: `毎日更新されるおすすめ${TODAY_WORDS_COUNT}単語で、TOEIC学習を短時間で始めましょう。`,
-  alternates: {
-    canonical: "https://www.toeic-words.com/today-words",
-  },
-};
+export const metadata = createPublicPageMetadata({
+  pathname: "/today-words",
+  title: `今日のTOEIC単語${TODAY_WORDS_COUNT}語｜毎日の語彙学習`,
+  description: `日替わりで選ばれるTOEIC単語${TODAY_WORDS_COUNT}語の意味・例文・発音を確認。聞き流しやクイズも使って、その日の単語を短時間で復習できます。`,
+});
 
 export default async function TodayWordsPage() {
   const { words: todayWords } = await getTodayRecommendedSelection();
@@ -27,7 +25,7 @@ export default async function TodayWordsPage() {
               今日おすすめの{TODAY_WORDS_COUNT}単語
             </h1>
             <p className="text-sm leading-[1.6] text-gray-500">
-              毎日同じ{TODAY_WORDS_COUNT}語を固定表示。まずはここから短時間で学習を始めましょう。
+              日替わりで選ばれるTOEIC単語の意味・例文・発音を確認できます。
             </p>
           </div>
           <div className="flex gap-4 items-center justify-end flex-wrap">
@@ -67,7 +65,7 @@ export default async function TodayWordsPage() {
               <strong>朝のスキマ時間</strong>：通勤・通学中に {TODAY_WORDS_COUNT} 単語の意味と例文を確認
             </li>
             <li>
-              <strong>昼休み</strong>：聞き流しモードで「単語 → 英文例 → 日本語訳」の順に音声を聴く
+              <strong>昼休み</strong>：<Link href="/today-words/listen" prefetch={false} className="text-blue-600 underline">今日の単語を聞き流す</Link>。単語、英語例文、日本語訳の順に再生できます。
             </li>
             <li>
               <strong>夜の復習</strong>：覚えにくかった単語を「お気に入り」に追加し、後日復習モードで再確認

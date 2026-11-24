@@ -1,18 +1,16 @@
 import Link from "next/link";
-import type { Metadata } from "next";
 import { getTodayRecommendedWords } from "@/data/words";
 import TodayWordsListenClient from "@/components/features/today-words/TodayWordsListenClient";
 import { A8AdBanner468x60 } from "@/components/common/A8AdBanner";
 import { TODAY_WORDS_COUNT } from "@/lib/word-select";
+import { createPublicPageMetadata } from "@/lib/public-page-metadata";
 import { Suspense } from "react";
 
-export const metadata: Metadata = {
-  title: "今日の単語 聞き流し | TOEIC Words",
-  description: `その日に選ばれた英単語${TODAY_WORDS_COUNT}つの発音・AI生成の英語例文・日本語訳を順に自動再生する「聞き流しモード」です。`,
-  alternates: {
-    canonical: "https://www.toeic-words.com/today-words/listen",
-  },
-};
+export const metadata = createPublicPageMetadata({
+  pathname: "/today-words/listen",
+  title: `TOEIC単語の聞き流し｜日替わり${TODAY_WORDS_COUNT}語を音声で学習`,
+  description: `日替わりのTOEIC単語${TODAY_WORDS_COUNT}語を音声で学習。単語の発音、英語例文、日本語訳を順に自動再生する無料の聞き流しモードです。`,
+});
 
 export default async function TodayWordsListenPage() {
   const todayWords = await getTodayRecommendedWords();
@@ -42,7 +40,7 @@ export default async function TodayWordsListenPage() {
         </p>
         <ol className="mb-3 list-inside list-decimal space-y-1">
           <li>
-            <strong>単語の発音</strong>：英単語をネイティブ音声で読み上げ
+            <strong>単語の発音</strong>：英単語の発音を音声で確認
           </li>
           <li>
             <strong>英語例文</strong>：ビジネス場面を想定した AI 生成例文を英語で再生

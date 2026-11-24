@@ -3,14 +3,13 @@ import { getAllWords } from "@/data/words";
 import StudyClient from "@/components/features/study/StudyClient";
 import Script from "next/script";
 import { serializeJsonLd } from "@/lib/json-ld";
+import { createPublicPageMetadata } from "@/lib/public-page-metadata";
 
-export const metadata = {
-	title: "Webで使えるTOEIC単語帳 | 英単語学習モード",
-	description: "インストール不要、ブラウザで使える無料のTOEIC単語帳。収録語をランダムに出題し、意味を思い出せるか確認できます。",
-	alternates: {
-		canonical: "https://www.toeic-words.com/study",
-	},
-};
+export const metadata = createPublicPageMetadata({
+  pathname: "/study",
+  title: "無料TOEIC単語帳｜フラッシュカードで暗記",
+  description: "ブラウザで使える無料のTOEIC単語フラッシュカード。ランダムに出る英単語の意味を思い出し、和訳・例文・発音を確認。覚えにくい語はこのブラウザに保存できます。",
+});
 
 export default async function StudyPage() {
   const words = await getAllWords();
@@ -29,7 +28,7 @@ export default async function StudyPage() {
         "@type": "ListItem",
         "position": 2,
         "name": "学習モード",
-        "item": "https://www.toeic-words.com/study"
+        "item": metadata.alternates.canonical
       }
     ]
   };
@@ -42,19 +41,16 @@ export default async function StudyPage() {
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
       />
 
-      <StudyClient words={words} saveWordLists />
+      <StudyClient words={words} pageTitle="TOEIC単語フラッシュカード" saveWordLists />
 
       <section className="mx-auto max-w-3xl px-4 pt-8 pb-2 text-sm leading-relaxed text-slate-700">
-        {/* <nav className="mb-4 text-xs text-slate-500">
-          <Link href="/" className="hover:underline">TOP</Link>
-          <span className="mx-2">/</span>
-          <span>学習モード</span>
-        </nav> */}
         <h2 className="mb-3 text-xl font-bold text-slate-900">
-          学習モード｜ランダム出題で TOEIC 単語を効率よく暗記
+          TOEIC単語のフラッシュカードの使い方
         </h2>
         <p className="mb-3">
-          学習モードは、当サイトに収録された 1,300 語以上の TOEIC 重要単語からランダムに出題し、暗記の定着度をフラッシュカード形式でチェックできる機能です。レベル（important / mid / high）を絞って出題することもでき、目標スコア帯に最適化された学習が可能です。
+          ランダムに出題される英単語の意味を思い浮かべ、「答えを見る」で和訳と例文を確認します。目標スコアの目安から単語を選びたいときは、
+          <Link href="/words" prefetch={false} className="text-blue-600 underline">レベル別のTOEIC単語一覧</Link>
+          を使えます。
         </p>
         <p className="mb-3">
           「覚えていない」と「あとで」を選んだ単語は、それぞれの一覧にたまり、このブラウザに保存されます。次回開いたときも一覧から確認でき、「覚えている」を選ぶと一覧から外れます。「学習を終えて確認」で、これまでに保存した単語をまとめて見返せます。保存はこのブラウザ内のみで、ほかの端末には同期されません。
@@ -76,11 +72,11 @@ export default async function StudyPage() {
         </ul>
         <p className="mb-1 text-xs text-slate-500">
           より詳しい学習戦略は、{" "}
-          <Link href="/guide/forgetting-curve" className="text-blue-600 underline">
+          <Link href="/guide/forgetting-curve" prefetch={false} className="text-blue-600 underline">
             「忘却曲線と間隔反復を取り入れる方法」
           </Link>{" "}
           や{" "}
-          <Link href="/guide/toeic-vocab-by-score" className="text-blue-600 underline">
+          <Link href="/guide/toeic-vocab-by-score" prefetch={false} className="text-blue-600 underline">
             「スコア別の単語学習戦略」
           </Link>{" "}
           をご参照ください。
