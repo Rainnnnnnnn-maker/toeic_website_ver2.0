@@ -1,5 +1,5 @@
 import { getAllWords } from "@/data/words";
-import { getPublishedGuideArticles } from "@/data/guide-articles";
+import { getLatestGuideArticles, getPublishedGuideArticles } from "@/data/guide-articles";
 
 const BASE_URL = "https://www.toeic-words.com";
 const publishedGuideArticles = getPublishedGuideArticles();
@@ -7,6 +7,13 @@ const publishedGuideArticles = getPublishedGuideArticles();
 function formatLastmod(date: string): string {
   return new Date(date).toISOString();
 }
+
+// /guide は公開記事を更新日の新しい順に並べ、各記事の更新日も表示する。
+// 記事を更新すると一覧の内容も変わるため、最新記事の updatedAt を一覧の lastmod にする。
+const latestGuideUpdatedAt = getLatestGuideArticles(1)[0]?.updatedAt;
+const guideIndexLastmodTag = latestGuideUpdatedAt
+  ? `\n    <lastmod>${formatLastmod(latestGuideUpdatedAt)}</lastmod>`
+  : "";
 
 export async function GET() {
   const allWords = await getAllWords();
@@ -42,7 +49,7 @@ export async function GET() {
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>${BASE_URL}/guide</loc>
+    <loc>${BASE_URL}/guide</loc>${guideIndexLastmodTag}
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>

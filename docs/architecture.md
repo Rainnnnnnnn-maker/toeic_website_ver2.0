@@ -910,7 +910,7 @@
   * 全単語一覧を `getAllWords()` で取得し、XML文字列を組み立てて返却する。
   * `Cache-Control` ヘッダーを用いてキャッシュされ、再生成の負荷を抑える。
   * 公開の聞き流しモード（`/today-words/listen`）を掲載する。`noindex` のお気に入り聞き流し（`/favorites/listen`）と日替わりクイズ（`/today-words/quiz`）は掲載対象外。ログインなどの `noindex` ページも同様に扱う。
-  * `lastmod` は公開ガイド記事の `article.updatedAt` から出力する。実更新日を管理していないURLでは省略する。
+  * `lastmod` は公開ガイド記事の `article.updatedAt` から出力する。ガイド一覧（`/guide`）は各記事の更新日を表示して更新日順に並べるため、公開記事のうち最新の `updatedAt` を出力する。実更新日を管理していないURLでは省略する。
 
 #### 4.3.6 サーバ側データ取得（`src/data/word-detail.ts` / `src/actions/word.ts`）
 
