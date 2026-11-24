@@ -1054,10 +1054,14 @@ RLS は `favorites` と同じく「自分の行のみ全操作可」（`auth.uid
 * `server-only` モジュール（`src/data/words.ts`、`src/data/word-detail.ts`、`src/app/api/tts/route.ts`、`src/hooks/useListenPlayer.ts`）からテスト対象を切り出す際は、純粋関数を `src/lib/` に置き（`server-only` を付けず、サーバ専用型は type-only import）、元モジュールはそれを import して利用する（ロジックを二重に持たない）。
 * 現行スイート:
   * `word-select.test.ts` — 単語パース／重複排除、FNV-1a ハッシュ、JST 日付キー（7時切替）、「今日の6単語」決定論的選定
+  * `today-navigation.test.ts` — 今日の6語から開いた単語詳細の前後ナビ（表示順の `picks` スナップショットをコーパス変更後も往復で維持、旧日付・版より表示スナップショットを優先、不正JSON・重複・未知slug・件数超過・現在語や削除済みの語との不整合では全単語へフォールバックせず拒否、件数未満の選定とslug記号のエンコード、旧 `today`/`v` リンクの照合とスナップショットへの格上げ）
+  * `word-search.test.ts` — 見出し語検索のクエリ正規化（NFKC・空白圧縮・小文字化）、お気に入り一覧の前方一致（`filterWordsByTermPrefix`：元の順序を保ち完全一致を先頭へ、途中一致は対象外、入力配列を変更しない）、単語一覧の `*` ワイルドカード検索（`filterWordsByTermQuery`：正規表現メタ文字をリテラル扱い、コーパス側も正規化）
   * `word-detail-parse.test.ts` — Gemini 応答の JSON 抽出（コードフェンス除去・truncation 検知）と正規化（既定値補完・件数上限）
+  * `word-detail-disclosure.test.ts` — 単語詳細で長い要素を折りたたむ判定（長い補足文、件数か総文字数の多いタグ一覧、件数が多いか長い例文、詳細が複数あるか定義が長い意味）と、短い内容を開いたままにする境界
   * `tts-utils.test.ts` — テキスト正規化、slug サニタイズ、TTS キャッシュキー生成、例文 allowlist マッチング
   * `listen-utils.test.ts` — 聞き流しモードの `pickExample` フォールバック
   * `favorites-sync.test.ts` — お気に入り同期（保存データのパース、マージ、一括追加対象の抽出、マージ可否判定、upsert 行の構築）
+  * `auth-redirect.test.ts` — ログイン後の `?next=` のオープンリダイレクト対策（`sanitizeNextPath`）。サイト内パスはクエリ・フラグメントごと返し、未指定・外部URL・`//`・`///`・`//localhost`、タブ・改行・制御文字・バックスラッシュを含む値はフォールバック先に置き換える。ログイン画面を基準に解決してもサイト内に留まることも検証
   * `review-schedule.test.ts` — Leitner遷移、JST日境界、期限・苦手順、集計、ストリーク、Supabase行変換、未送信進捗との統合
   * `review-progress-outbox.test.ts` — 再送アウトボックスの保存形式検証と壊れた行／JSONの安全な除外
   * `review-session-store.test.ts` — 固定した復習集合／残りslugの保存形式と、集合外slug・不正JSONの拒否
@@ -1075,6 +1079,10 @@ RLS は `favorites` と同じく「自分の行のみ全操作可」（`auth.uid
   * `daily-quiz.test.ts` — 今日の6語クイズの純粋ロジック（日付の範囲と表記、誤答生成プロンプトと応答の解析、候補ごとの検証、確認応答の解析、問題の組み立て、Redis保存値の検証、当日の6語との照合、結果の集計）
   * `daily-quiz-session.test.ts` — 端末に保存した回答の検証付き読み取り、表示する日の決定、回答・次へ・やり直しの状態遷移、作り直されたクイズへの古い回答の不適用
   * `daily-quiz-gemini.test.ts` — fake client により、クイズ全体の期限切れがSDKの試行へ伝わり再送しないこと、期限切れ後はリクエストを開始しないことを検証（実通信なし）
+  * `json-ld.test.ts` — `serializeJsonLd` が `<` をエスケープして `</script>` を出力しないこと、U+2028/U+2029 のエスケープ、`JSON.parse` で元の値に戻ること、エスケープ不要な値は `JSON.stringify` と同じ文字列になること、単語詳細の JSON-LD（`generateWordDetailJsonLd`）に混入したタグも閉じタグにならないこと
+  * `guide-articles.test.ts` — 学習ガイド記事データ（`src/data/guide-articles.ts`）の公開制御と整合性（下書き記事を公開slug一覧・公開記事一覧・最新記事・公開件数から外すこと、slugの一意性と関連記事の参照先の存在、出典URLが `https://` であること）
+  * `content-review.test.ts` — 人手レビュー承認の判定（`contentFingerprint` / `hasCurrentHumanReview`：キー順に依存しない指紋、本文や例文の順序が変わると承認が外れること、AI支援のチェックや無記名のレビューを人手承認とみなさないこと）と、下書きのガイド記事を公開用の取得関数（`getGuideArticleBySlug` / `getPublishedGuideArticles`）で返さないこと
+  * `audit-report.test.ts` — CIの依存関係監査ゲート（`scripts/audit-report.mjs`）。`npm audit` のJSON検証（エラー応答・`vulnerabilities` 欠落・未対応のレポート形式を拒否）と判定（許可リストのアドバイザリだけに由来するhighは除外し、許可外のhighは失敗。許可済みhighに合流した未許可アドバイザリはmoderate以下なら通し、high・critical・重大度不明なら失敗。根本アドバイザリを辿れないhighはfail-closed）
 * Gemini/Redis/Blob/TTS を必要とするもの、React コンポーネントの描画は **ユニットテストの対象外**（下記の手動テストで担保）。
 
 #### 手動テスト
