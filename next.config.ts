@@ -14,6 +14,24 @@ const nextConfig: NextConfig = {
       static:300,
     },
   },
+  // 全レスポンスに付ける固定値のセキュリティヘッダー。nonce を使わないので静的プリレンダーに影響しない。
+  // script-src / connect-src はあえて含めていない（GA・Supabase・Next.js のインラインスクリプトを壊さないため）。
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          {
+            key: "Content-Security-Policy",
+            value:
+              "frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'",
+          },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+        ],
+      },
+    ];
+  },
   async rewrites() {
     return [
       {

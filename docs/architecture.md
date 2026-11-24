@@ -273,6 +273,16 @@
 * `server-only`: Next.js のモジュールグラフ内で、サーバー専用コードの Client Component への誤 import を防止する。`scripts/embed-words.ts` のようにNode/`tsx` が直接実行するCLIでは、通常のNode条件でパッケージの既定エントリが例外を投げるため import しない。代わりに Client Component から参照不可とする
 * `babel-plugin-react-compiler`: React Compilerによる自動メモ化（`next.config.ts` で `reactCompiler: true` を指定、`cacheComponents: true` も併用）。`partialPrefetching`（Next.js 16.3 で追加。`cacheComponents` 有効時に未指定だと警告が出る）は `false` を明示し、従来のプリフェッチ動作を維持する。有効化すると既定・`prefetch={true}` のリンクが取得する内容が変わるため、切り替える前に `node_modules/next/dist/docs/01-app/02-guides/adopting-partial-prefetching.md` の手順で確認する。次のメジャーで常時有効になり、このオプションは削除される予定
 
+#### セキュリティヘッダー
+
+`next.config.ts` の `headers()` で、全レスポンスに固定値のヘッダーを付ける。
+
+* `Content-Security-Policy: frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'`（他サイトの iframe への埋め込み、プラグイン、`<base>` の書き換え、外部へのフォーム送信を禁止）
+* `X-Content-Type-Options: nosniff`
+* `Referrer-Policy: strict-origin-when-cross-origin`
+
+`script-src` / `connect-src` は含めていない。nonce 方式はリクエストごとの動的レンダリングが必要で、静的プリレンダーと `src/proxy.ts` の matcher を絞る方針に反するため採用しない。これらを追加する場合は、GA4・Supabase・TTS 音声再生が壊れないことを `Content-Security-Policy-Report-Only` で先に確認する。
+
 ### 3.3 開発環境構築手順
 
 1. 依存関係インストール
@@ -532,8 +542,10 @@
 * マイページ `src/app/mypage/page.tsx` / `src/components/features/mypage/*`（**ログイン必須**・noindex）
 
   * 「今日どれを復習すべきか」を提示し、既存の復習モードへ送り込むための個人向け画面。ユーザー情報の表示は最小限（アバター・表示名・ログアウト）に留める
-  * ページ本体は Server Component で `getAllWords()` のみを渡す薄い作り。個人データはすべてクライアントから Supabase を読むため、ページシェルは静的なまま保てる（`src/proxy.ts` の matcher は広げない）
-  * `MyPageClient` が状態分岐（`guest` / `loading` / `ready` / `error`）だけを担当し、データが揃ってから `MyPageDashboard` をマウントする。現在時刻に依存する集計を Dashboard 側へ閉じ込めることで、Cache Components のプリレンダリング時に `new Date()` が評価されない
+  * ページ本体は Server Component で `getAllWords()` のみを渡す薄い作り。個人データはすべてクライアントから Supabase を読むため、ページシェルは静的なまま保てる（`src/proxy.ts` の matcher は広げない）。見出しと TOP リンクは `MyPageShell` が描画し、`getAllWords()` を待つ本体だけを `<Suspense fallback={<MyPageContentFallback />}>` で包む（TOP と同じく、単語リストの取得待ちで見出しを止めない）
+  * `/mypage/loading.tsx` も `MyPageShell` ＋ `MyPageContentFallback` を表示する。`prefetch={false}` のリンクではクリック直後には出ないが、低速回線ではページの応答（RSC）を受け取った時点で表示され、マイページの JS チャンクが届くまで遷移元の画面で止まって見えるのを防ぐ。loading 内にクライアント部品があると JS の到着まで描画を待たされるため、TOP リンクも `htmlTopLink` で素の `<a>` にする
+  * `MyPageClient` が状態分岐（`guest` / `loading` / `ready` / `error`）とパーツ単位のスケルトン差し替えを担当する。認証判定中（プリレンダリング時を含む）は全パーツをスケルトンで表示し、ログインが分かった時点でアカウント行と既存機能への導線を本体に差し替え、Supabase のお気に入りと復習記録の両方が揃ってから集計パーツ（`MyPageDashboard`：今日の復習・継続・定着度・苦手単語）をマウントする。現在時刻に依存する集計を Dashboard 側へ閉じ込めることで、Cache Components のプリレンダリング時に `new Date()` が評価されない
+  * スケルトンは `MyPageFallback.tsx`（フックを持たず `"use client"` なし。Suspense fallback と Client Component の両方から使う）。各パーツと同じ外枠・文字サイズ・文言で組んで文字だけを透明にし（`TextBar`）、端末幅ごとの折り返しまで本物と揃えて差し替え時のレイアウトシフトを抑える。苦手単語パネルは該当語があるときだけ出るため場所を確保しない
   * **お気に入りは Supabase 由来のものだけを表示する**。`FavoritesContext.favoritesStatus === "ready"` を待ってから描画するため、ログイン直後に一瞬 `localStorage` の値が混ざることがない
   * 構成: アカウント行 → 今日の復習ヒーローカード（期限到来数・進捗リング・CTA） → 継続パネル（連続学習日数／自己ベスト／直近7日の復習語数） → 定着度の内訳（未着手・復習中・定着間近・定着済みの4区分バー） → 苦手単語トップ7（`WEAK_WORDS_LIMIT`） → 既存機能への導線 → 忘却曲線の解説記事へのリンク
   * お気に入り0件のときは「今日の6単語」から始める空状態、期限到来0件のときは完了表示＋次回予定日＋先取り復習CTAへ切り替える

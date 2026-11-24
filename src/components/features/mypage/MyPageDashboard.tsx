@@ -3,7 +3,6 @@
 import { useEffect, useRef } from "react";
 import { sendGAEvent } from "@next/third-parties/google";
 import { TriangleAlert } from "lucide-react";
-import type { User } from "@supabase/supabase-js";
 import type { Word } from "@/data/words";
 import { buildWordMap } from "@/lib/study-utils";
 import { getTodayKey } from "@/lib/word-select";
@@ -21,17 +20,13 @@ import {
   type ReviewRecord,
   type StreakState,
 } from "@/lib/review-schedule";
-import MyPageAccountCard from "@/components/features/mypage/MyPageAccountCard";
 import RetentionBreakdown from "@/components/features/mypage/RetentionBreakdown";
-import ReviewMenu from "@/components/features/mypage/ReviewMenu";
 import StreakPanel from "@/components/features/mypage/StreakPanel";
 import TodayReviewCard from "@/components/features/mypage/TodayReviewCard";
 import WeakWordsPanel from "@/components/features/mypage/WeakWordsPanel";
 
 type Props = {
   allWords: Word[];
-  user: User;
-  onSignOut: () => void;
   /** Supabase から取得済みのお気に入り（登録が古い順） */
   favorites: string[];
   records: ReadonlyMap<string, ReviewRecord>;
@@ -40,15 +35,15 @@ type Props = {
 };
 
 /**
- * マイページ本体。Supabase のデータが揃ってからのみマウントされる。
+ * マイページの集計パーツ（今日の復習・継続・定着度・苦手単語）。
+ * Supabase のデータが揃ってからのみマウントされ、それまでは
+ * MyPageClient が同じ位置に MyPageDashboardFallback を表示する。
  *
  * 現在時刻に依存する集計をここに閉じ込めることで、プリレンダリング時に
  * `new Date()` が評価されない（Cache Components の制約）。
  */
 export default function MyPageDashboard({
   allWords,
-  user,
-  onSignOut,
   favorites,
   records,
   streak,
@@ -102,8 +97,6 @@ export default function MyPageDashboard({
 
   return (
     <>
-      <MyPageAccountCard user={user} onSignOut={onSignOut} />
-
       {hasSyncError && (
         <p className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-700">
           <TriangleAlert size={14} />
@@ -128,8 +121,6 @@ export default function MyPageDashboard({
       {favoriteSlugs.length > 0 && <RetentionBreakdown summary={summary} words={retentionWords} />}
 
       <WeakWordsPanel items={weakItems} sessionCount={weakSessionCount} />
-
-      <ReviewMenu />
     </>
   );
 }

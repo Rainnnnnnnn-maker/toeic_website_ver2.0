@@ -46,6 +46,32 @@ export default async function TodayQuizPage() {
 
         <TodayQuizClient todayKey={todayKey} days={days} />
 
+        <section aria-labelledby="quiz-related-game" className="mt-6">
+          <h2 id="quiz-related-game" className="mb-3 text-base font-semibold text-slate-900">
+            <span aria-hidden="true">🎮</span>{" "}
+            クイズのあとは、ゲームで単語を綴ってみよう！
+          </h2>
+          <a
+            href="https://word-forge.replit.app/"
+            target="_blank"
+            rel="noopener"
+            className="block rounded-2xl border border-slate-200 bg-white p-4 no-underline shadow-[0_1px_2px_rgba(0,0,0,0.05)] transition hover:border-slate-300 hover:shadow-md focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-2 sm:p-5"
+          >
+            <div className="mb-2 flex flex-wrap items-center gap-2 text-xs text-slate-500">
+              <span className="rounded-sm bg-violet-50 px-2 py-0.5 font-semibold text-violet-700">
+                英単語ゲーム
+              </span>
+              <span>無料・登録なしで遊べる</span>
+              <span>外部サイト</span>
+            </div>
+            <h3 className="mb-1 text-base font-bold text-slate-900">WordForge - 英単語の魔法</h3>
+            <p className="text-sm leading-relaxed text-slate-600">
+              手持ちのアルファベットから英単語を作って競う、スクラブル風のワードゲームです。45 ステージの冒険モードやオンライン対戦、5,273 語以上の学習モードで、4択とは違う「自分で綴る」練習ができます。
+            </p>
+          </a>
+          <p className="mt-2 text-xs text-slate-500">運営者が相互に紹介している外部サービスです。</p>
+        </section>
+
         <section className="mt-6 text-sm leading-relaxed text-slate-700">
           <h2 className="mb-3 text-base font-semibold text-slate-900">クイズの仕組み</h2>
           <ul className="mb-3 list-inside list-disc space-y-1">
