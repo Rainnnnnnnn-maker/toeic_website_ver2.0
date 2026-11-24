@@ -3,7 +3,7 @@
  *
  * 既存の WordDetails だけから4択問題を組めるかを確かめる。正解は出題語の
  * `japaneseTranslation`、誤答は他の収録語の `japaneseTranslation` から選ぶ。
- * 設計の背景は docs/plans/TOEIC_今日の6語チャレンジ_実装イメージ_実現性評価.md の 6.4。
+ * 現行の仕様は docs/specs/daily-quiz/spec.md を参照。
  *
  * 実行方法:
  *   npm run quiz:prototype                        # 今日から14日分

@@ -1,6 +1,6 @@
 # Phase 1 準備ドキュメント: ログイン任意 + お気に入り同期（Supabase）
 
-> 元資料: [improvement-proposal.md](./improvement-proposal.md) の「Phase 1: 最小ローンチ」（§5.1 / §6 / §8）
+> 元資料: 改善提案書の「Phase 1: 最小ローンチ」（§5.1 / §6 / §8）。提案書は削除済みのため、必要なら Git 履歴の `docs/plans/improvement-proposal.md` を参照
 > 対象ブランチ: `42-add-user-sign-in-and-login-pag`（GitHub Issue [#42](https://github.com/Rainnnnnnnn-maker/toeic_website_ver2.0/issues/42)）
 > 作成日: 2026-07-10
 > 本番 URL: `https://www.toeic-words.com`
@@ -79,7 +79,7 @@
 ```sql
 -- ============================================
 -- Phase 1: profiles + favorites のみ
--- (improvement-proposal.md §4.2 のサブセット + 自動プロフィール作成)
+-- (改善提案書 §4.2 のサブセット + 自動プロフィール作成)
 -- ============================================
 
 -- 1. profiles（Phase 1 では中身は最小。Phase 2 で列を活用）
@@ -303,7 +303,6 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...   # 3-1 で控えた Pub
 - [Supabase Google ログイン設定](https://supabase.com/docs/guides/auth/social-login/auth-google)
 - [Supabase カスタム SMTP](https://supabase.com/docs/guides/auth/auth-smtp)
 - [Supabase RLS](https://supabase.com/docs/guides/database/postgres/row-level-security)
-- 元提案書: [improvement-proposal.md](./improvement-proposal.md)（§4.2 フルスキーマ / §8 実装コード例 / §9 リスク表）
 
 ---
 
