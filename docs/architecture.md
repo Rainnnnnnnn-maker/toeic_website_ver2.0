@@ -1,6 +1,6 @@
 # TOEIC重要単語（toeic_website_ver2.0）技術ドキュメント
 
-最終更新日: 2026-11-11
+最終更新日: 2026-11-24
 
 ### SEO・コンテンツ改善の初回対応（2026-10-02）
 
@@ -672,8 +672,9 @@
   * 単語別OGP画像 `src/app/words/[word]/opengraph-image.tsx`（各単語のタイトル＋日本語訳を描画）
   * **OGP画像のActive CPU対策**：`cacheComponents: true` の環境では metadata image route（`opengraph-image`）がビルド時にプリレンダリングされず、`generateStaticParams` / `dynamicParams = false` を付けても動的（ƒ）のままになる。そのため単語別OGPルートは両者を**持たない**。付けても出力は1枚も生まれない一方で、ビルドの静的生成対象だけが単語数ぶん増える（1,422 → 2,798ページ）ため、ローカルビルドが実測で静的生成 9.1s → 28.2s、全体 17s → 35s、macOSの圧縮メモリ 4.7GB → 11.4GB、swapin 1.4万 → 20万回まで悪化していた。未知スラッグの排除は Function 内の `getWordBySlug` チェックで代替し、画像を描かず `OG_IMAGE_NOT_FOUND_CACHE_CONTROL`（`s-maxage=3600`）付きの404を返す。データアクセスを一切持たない最小構成でも ƒ になること、`prerender-manifest.json` 上のOGPルートが0件であることを実測で確認済み。`export const revalidate` も同環境では無効。OGP画像1枚の生成は Satori のレイアウト計算と resvg による 1200x630 PNG のラスタライズを伴い Active CPU を大きく消費するため、放置するとリクエスト数に比例してCPUを焼く（Vercel Fluid の Active CPU 逼迫の主因）。対策として `OG_IMAGE_CACHE_CONTROL`（`src/lib/og-utils.ts`）を両OGPルートのレスポンスヘッダに付与し、CDN側で保持してFunction実行を「エッジごとに一度」まで畳む。`s-maxage` は単語詳細キャッシュ（`WORD_CACHE_TTL_DAYS` 既定30日／`cacheLife("max")`）と歩調を合わせた30日、期限切れ後も `stale-while-revalidate` で配信を止めない。あわせて `loadGoogleFont` を `'use cache'`（`cacheTag('og-font')` + `cacheLife('max')`）にし、画像生成ごとに発生していた Google Fonts への往復2回を除去した
   * **OGPフォントキャッシュのOOM対策**：`loadGoogleFont` は Google Fonts の `text=` を付けない安定したフルTTF URLを両OGPで共有する。サーバー向け truetype は `text=` が違っても実体が同じ約7MBのフォントだが、URL／キャッシュキーは文字列ごとに変わる。単語数分を保持した実測キャッシュは約10GBまで膨張しVercelの8GBビルドでOOMになったため、安定URL化してフォントキャッシュを1エントリへ集約する
-  * robots `src/app/robots.ts` / sitemap `src/app/api/sitemap/route.ts`（動的生成、`/sitemap.xml` へrewrite）。robots は App Router のメタデータルート `robots.ts` が唯一の生成元（旧 `public/robots.txt` は競合する残骸だったため削除済み）。sitemap には `noindex` ページ（`/favorites`・`/review`・`/login`・`*/listen`）を掲載しない（sitemap 掲載と `noindex` は矛盾シグナルになるため）。`lastmod` は静的ページ・ガイド記事のみ出力し、実更新日を管理していない URL（全単語詳細ページ、および日次ローテーションする `/today-words`）では出力しない（同一固定日を出すと Google が lastmod を信用しなくなるため、偽の日付を出すより省略する方針。`changefreq`/`priority` は残置しているが Google は無視する）
-  * 学習ガイドは `indexable !== false` の記事だけを一覧・`generateStaticParams`・関連記事・sitemapへ出す。保留記事の直接URLは `noindex, nofollow` とし、内容確認が完了するまで公開記事数に含めない
+  * `src/lib/public-page-metadata.ts` はトップ、単語一覧、学習モード、今日の単語、聞き流し、ガイドで使用する。ページ固有のタイトル・説明・正規URLをOpen GraphとTwitterカードにも反映し、共有画像はトップのOGP画像を使う。
+  * robots は `src/app/robots.ts` で生成する。公開ページのsitemapと更新日の扱いは「4.3.5 サイトマップ生成」に記載する。
+  * 学習ガイドは `status: "published"` の記事を一覧・`generateStaticParams`・関連記事・sitemapへ出す。下書きの直接URLは404を返す。
   * manifest `src/app/manifest.ts` (PWA対応)
   * JSON-LD ヘルパ `src/lib/json-ld.ts`（単語詳細用の BreadcrumbList / DefinedTerm 生成と、全ページの JSON-LD を `</script>` で抜け出せない形に文字列化する `serializeJsonLd`）
   * **Googlebot への切断 HTML 問題（2026-10-03 時点で再現せず）**: 2026-07-21 の監査で、キャッシュ未生成（`x-vercel-cache: BYPASS`）の単語ページにて Googlebot だけが `<Suspense>` 未解決の切断 HTML を受信する現象を確認した。`htmlLimitedBots` の上書きは、Next.js ソース精査により本問題に無効と判明してリバート済み（メタデータ限定の設定で、Googlebot の botType は不変）。2026-10-03 の再検証では、Googlebot desktop／mobile にもプリレンダー済みの完全 HTML が返った。原因は未特定。経緯・再発時の切り分け手順・恒久対策候補（単語本体の動的境界撤去）は `docs/plans/seo-content-improvement-plan.md` に集約。
@@ -903,13 +904,13 @@
 
 #### 4.3.5 サイトマップ生成 `GET /api/sitemap`
 
-* 概要: サイト内の全ページ（静的ページ群および全単語詳細ページ）のURLを網羅した `sitemap.xml` を動的に生成する。
+* 概要: 主要公開ページ、公開ガイド記事、全単語詳細ページを含む `sitemap.xml` を動的に生成する。
 * 動作:
   * `next.config.ts` の `rewrites` 機能により、`/sitemap.xml` へのアクセスがこのAPIルートへルーティングされる。
   * 全単語一覧を `getAllWords()` で取得し、XML文字列を組み立てて返却する。
   * `Cache-Control` ヘッダーを用いてキャッシュされ、再生成の負荷を抑える。
-  * **`noindex` ページ（`/favorites`・`/review`・`/login`・`*/listen`）は掲載しない**：sitemap に載せつつページ側で `noindex` を返すのは Google に矛盾したシグナルを送るため。
-  * `lastmod` は静的ページ・ガイド記事（`article.updatedAt`）のみ出力する。**実更新日を管理していない URL（全単語詳細ページ、および日次ローテーションする `/today-words`）では `lastmod` を出力しない**：同一固定日を出すと Google が lastmod 自体を信用しなくなりクロール効率に悪影響が出るため、偽の日付を出すより省略する方針。`changefreq`/`priority` は残置しているが Google は無視する。
+  * 公開の聞き流しモード（`/today-words/listen`）を掲載する。`noindex` のお気に入り聞き流し（`/favorites/listen`）と日替わりクイズ（`/today-words/quiz`）は掲載対象外。ログインなどの `noindex` ページも同様に扱う。
+  * `lastmod` は公開ガイド記事の `article.updatedAt` から出力する。実更新日を管理していないURLでは省略する。
 
 #### 4.3.6 サーバ側データ取得（`src/data/word-detail.ts` / `src/actions/word.ts`）
 
