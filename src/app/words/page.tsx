@@ -24,13 +24,17 @@ import { WORD_LEVEL_INFO } from "@/lib/word-level";
 import type { WordLevel } from "@/lib/word-level";
 import { TODAY_WORDS_COUNT } from "@/lib/word-select";
 import { serializeJsonLd } from "@/lib/json-ld";
+import { createPublicPageMetadata } from "@/lib/public-page-metadata";
+
+const listTitle = "TOEIC重要単語 一覧【2026年版】1,300語以上をレベル別に検索";
 
 export const metadata: Metadata = {
-  title: {
-    absolute: "TOEIC重要単語 一覧【2026年版】1,300語以上 | AI解説付き無料",
-  },
-  description:
-    "TOEIC学習向け英単語1,300語以上を、目標スコアの目安・アルファベット・英単語検索から探せる無料リスト。AI解説・例文・類義語・発音を確認できます。",
+  ...createPublicPageMetadata({
+    pathname: "/words",
+    title: listTitle,
+    description: "TOEIC学習向けの英単語1,300語以上を、目標スコアの目安・A〜Z索引・日本語の意味から探せる無料一覧。各単語の意味・例文・類義語・発音を確認できます。",
+  }),
+  title: { absolute: listTitle },
   keywords: [
     "TOEIC 重要単語 一覧",
     "TOEIC 単語 リスト",
@@ -42,9 +46,6 @@ export const metadata: Metadata = {
     "2026年",
     "無料",
   ],
-  alternates: {
-    canonical: "https://www.toeic-words.com/words",
-  },
 };
 
 function groupByFirstLetter(words: Word[]): Record<string, Word[]> {

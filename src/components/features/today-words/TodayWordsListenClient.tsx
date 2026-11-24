@@ -15,7 +15,7 @@ export default function TodayWordsListenClient({ words }: Props) {
   return (
     <ListenPlayerView
       player={player}
-      title="今日の単語 聞き流し"
+      title="TOEIC単語の聞き流し"
       completionMessage={`${TODAY_WORDS_COUNT}単語の再生が完了しました。再生ボタンでもう一度聞けます。`}
     />
   );

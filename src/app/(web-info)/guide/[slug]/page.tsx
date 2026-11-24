@@ -9,6 +9,7 @@ import {
   type GuideSource,
 } from "@/data/guide-articles";
 import { serializeJsonLd } from "@/lib/json-ld";
+import { createPublicPageMetadata } from "@/lib/public-page-metadata";
 
 const SITE_URL = "https://www.toeic-words.com";
 
@@ -26,14 +27,16 @@ export async function generateMetadata({
   if (!article) {
     notFound();
   }
-  return {
+  const pageMetadata = createPublicPageMetadata({
+    pathname: `/guide/${article.slug}`,
     title: article.title,
     description: article.description,
-    alternates: { canonical: `${SITE_URL}/guide/${article.slug}` },
+  });
+
+  return {
+    ...pageMetadata,
     openGraph: {
-      title: article.title,
-      description: article.description,
-      url: `${SITE_URL}/guide/${article.slug}`,
+      ...pageMetadata.openGraph,
       type: "article",
       publishedTime: article.publishedAt,
       modifiedTime: article.updatedAt,

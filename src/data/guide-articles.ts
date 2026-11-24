@@ -151,18 +151,18 @@ const BASE_GUIDE_ARTICLES: GuideArticle[] = [
   },
   {
     slug: "part5-frequent-words",
-    title: "TOEIC Part 5 の語彙・語形変化を解くための確認手順",
+    title: "TOEIC Part 5の語彙・品詞対策｜例題5問と解き方",
     description:
-      "TOEIC Part 5（短文穴埋め問題）に向けて、品詞・語彙・文法を見分ける手順、派生語の覚え方、練習時の時間配分例をまとめました。",
+      "TOEIC Part 5の短文穴埋めを自作例題5問で練習。空所前後から品詞を見分ける方法、語の組み合わせや文脈から選ぶ方法を、選択肢ごとの解説で確認できます。",
     status: "published",
     category: "Part 別対策",
     publishedAt: "2026-04-26",
-    updatedAt: "2026-09-18",
+    updatedAt: "2026-11-24",
     estimatedReadingMin: 6,
     blocks: [
       {
         type: "p",
-        text: "TOEIC Part 5 は短文穴埋め 30 問です。公式にパート別の制限時間はなく、Reading 75 分をどう配分するかは受験者が決めます。本記事では、Part 6・7 に時間を残すための当サイトの練習例として、品詞・語彙・文法の判断手順を整理します。",
+        text: "TOEIC Part 5 は短文穴埋め 30 問です。空所前後の構造から品詞を見分け、語の組み合わせや文脈から答えを選ぶ手順を、自作例題 5 問で練習します。Reading 75 分のうち Part 6・7 に時間を残すための、練習時の時間配分例も紹介します。",
       },
       { type: "h2", text: "練習時に分けて確認したい 3 タイプ" },
       {

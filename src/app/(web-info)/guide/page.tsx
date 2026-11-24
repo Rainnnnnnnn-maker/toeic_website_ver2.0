@@ -1,25 +1,16 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { getLatestGuideArticles } from "@/data/guide-articles";
 import { serializeJsonLd } from "@/lib/json-ld";
+import { createPublicPageMetadata } from "@/lib/public-page-metadata";
 
 const SITE_URL = "https://www.toeic-words.com";
 
-export const metadata: Metadata = {
-  title: "TOEIC 学習ガイド｜スコア別戦略・Part 別対策・語彙集",
+export const metadata = createPublicPageMetadata({
+  pathname: "/guide",
+  title: "TOEIC学習ガイド｜スコア別の単語学習・Part別対策",
   description:
-    "TOEIC 学習の計画づくりに使えるガイド記事一覧。目標別の学習順、Part 5 対策、間隔を空けた復習、ビジネス英語の語彙などを解説しています。",
-  alternates: {
-    canonical: `${SITE_URL}/guide`,
-  },
-  openGraph: {
-    title: "TOEIC 学習ガイド｜スコア別戦略・Part 別対策・語彙集",
-    description:
-      "TOEIC 学習の計画づくりに使えるガイドを公開しています。目標別の優先順位、派生語の覚え方、間隔を空けた復習の始め方などをまとめています。",
-    url: `${SITE_URL}/guide`,
-    type: "website",
-  },
-};
+    "TOEICの目標スコア別に単語を学ぶ順序、Part 5の自作例題、ビジネス英語の語彙、間隔を空けた復習の進め方を確認できる学習ガイドです。",
+});
 
 export default function GuideIndexPage() {
   // 更新日の新しい順（updatedAt desc → publishedAt desc）
@@ -76,7 +67,11 @@ export default function GuideIndexPage() {
 
       <h1 className="mb-4 text-2xl font-bold">TOEIC 学習ガイド</h1>
       <p className="mb-10 text-sm leading-relaxed text-black/70 dark:text-white/70">
-        学習計画・Part 別対策・語彙の整理方法をまとめた記事一覧です。当サイトの単語学習機能と組み合わせ、現在の弱点に合う方法を選ぶための参考としてご利用ください。
+        目標スコア別の単語学習、Part 5の練習問題、間隔を空けた復習の進め方をまとめました。気になる語は
+        <Link href="/words" prefetch={false} className="text-blue-600 underline dark:text-blue-400">TOEIC単語一覧</Link>
+        で調べ、覚えた語は
+        <Link href="/study" prefetch={false} className="text-blue-600 underline dark:text-blue-400">フラッシュカード</Link>
+        で確認できます。
       </p>
 
       <ul className="space-y-6">

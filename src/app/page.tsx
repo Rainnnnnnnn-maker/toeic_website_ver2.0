@@ -13,36 +13,21 @@ import { SemanticSearchLauncher } from "@/components/features/words/SemanticSear
 import { getLatestGuideArticles,PUBLISHED_GUIDE_ARTICLE_COUNT} from "@/data/guide-articles";
 import { TODAY_WORDS_COUNT } from "@/lib/word-select";
 import { serializeJsonLd } from "@/lib/json-ld";
+import { createPublicPageMetadata } from "@/lib/public-page-metadata";
 import { HomeScrollReveal } from "@/components/features/home/HomeScrollReveal";
 
 const homeTitle = "TOEIC 重要単語【2026年版】600点・730点・800点向け｜詳しい解説付き無料単語帳";
-const homeDescription = `【完全無料】TOEIC学習向け英単語1,300語以上を3段階に整理。ビジネス場面の例文、類義語、発音、学習・復習機能と学習ガイド${PUBLISHED_GUIDE_ARTICLE_COUNT}本を、登録不要で利用できます。`;
+const homeDescription = `TOEIC学習向けの英単語1,300語以上を、目標スコアの目安から探せる無料単語帳。意味・ビジネス例文・発音に加え、フラッシュカード、日替わりの${TODAY_WORDS_COUNT}語、学習ガイドが使えます。`;
 const homeRevealDelays = [undefined, "short", "long"] as const;
 
 export const metadata: Metadata = {
-  title: {
-    absolute: homeTitle,
-  },
-  description: homeDescription,
-  openGraph: {
+  ...createPublicPageMetadata({
+    pathname: "/",
     title: homeTitle,
     description: homeDescription,
-    url: "https://www.toeic-words.com/",
-    siteName: "TOEIC語彙ラボ",
-    locale: "ja_JP",
-    type: "website",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "TOEIC語彙ラボ｜例文・音声付き無料単語帳" }],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: homeTitle,
-    description: homeDescription,
-    images: ["/opengraph-image"],
-  },
+  }),
+  title: { absolute: homeTitle },
   keywords: ["TOEIC 重要単語", "TOEIC 単語帳", "TOEIC 英単語", "2026年", "無料", "アプリ", "600点", "730点", "800点"],
-  alternates: {
-    canonical: "https://www.toeic-words.com/",
-  },
 };
 
 async function TodayRecommendedWordsSection() {
@@ -274,7 +259,7 @@ export default function Home() {
             <p className="text-xs tracking-[0.12em] text-slate-500">TOEIC語彙ラボ · LEVEL UP YOUR SCORE</p>
             <h1 className="text-[22px] leading-[1.3] text-slate-900 font-bold sm:text-[26px] lg:text-[28px]">【2026年版】TOEIC 重要単語</h1>
             <p className="text-sm leading-[1.6] text-gray-500">
-              目標と弱点に合わせて英単語を確認し、学習を続けましょう。
+              TOEIC向けの英単語を目標スコアの目安から探し、意味・ビジネス例文・発音を確認できる無料の単語帳です。
             </p>
           </div>
           <Suspense fallback={<HeroStatsFallback />}>
@@ -412,14 +397,16 @@ export default function Home() {
                 <span className="shrink-0 w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold mt-0.5">1</span>
                 <div>
                   <p className="font-bold text-slate-800">朝のスキマ時間：今日のおすすめ{TODAY_WORDS_COUNT}単語をチェック</p>
-                  <p className="text-sm text-slate-600 mt-1">トップページに表示される{TODAY_WORDS_COUNT}単語を通勤・通学中に確認し、英語脳にスイッチを入れます。</p>
+                  <p className="text-sm text-slate-600 mt-1">
+                    通勤・通学中に<Link href="/today-words" prefetch={false} className="text-blue-700 underline">日替わりのTOEIC単語{TODAY_WORDS_COUNT}語</Link>の意味や例文を確認します。
+                  </p>
                 </div>
               </li>
               <li className="flex gap-4 items-start">
                 <span className="shrink-0 w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold mt-0.5">2</span>
                 <div>
                   <p className="font-bold text-slate-800">まとまった時間：学習モードで新規単語をインプット</p>
-                  <p className="text-sm text-slate-600 mt-1">「学習モード」を使って、目標スコアの単語を1日10〜20語ペースで進めます。音声も必ず再生しましょう。</p>
+                  <p className="text-sm text-slate-600 mt-1">ランダムに出題される単語の意味を思い出してから答えを開き、例文と発音を確認します。</p>
                 </div>
               </li>
               <li className="flex gap-4 items-start">
