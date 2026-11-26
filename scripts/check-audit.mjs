@@ -11,21 +11,10 @@ import { execFileSync } from "node:child_process";
 import { evaluateAuditReport } from "./audit-report.mjs";
 
 // 受容済みアドバイザリ。期限を過ぎたら（上流が直った可能性があるため）失敗させて見直す。
-const ALLOWLIST = [
-  {
-    id: "GHSA-vfj7-8cjw-p6xm",
-    expires: "2026-11-30",
-    reason: [
-      "braces の深いネストによるスタック枯渇 DoS。アドバイザリ範囲 <=3.0.3 は最新版 3.0.3 を",
-      "含み、修正版が存在しないため overrides での回避もできない。",
-      "経路は tailwindcss@3（chokidar / micromatch / fast-glob）と eslint-config-next",
-      "（@next/eslint-plugin-next → fast-glob → micromatch）の2つ。npm audit が提示する",
-      "tailwindcss@4 への --force 更新は破壊的変更なうえ、eslint-config-next 側の経路が残る。",
-      "dev 依存のみで本番バンドルには入らず（npm audit --omit=dev は0件）、悪用には自前の",
-      "tailwind content / ESLint 設定へ細工した glob パターンを書く必要があるため実質到達不能。",
-    ].join("\n      "),
-  },
-];
+// 追加するときは id（GHSA-…）・expires（見直し期限 YYYY-MM-DD）・reason（受容理由）をそろえる。
+// 現在、受容済みのアドバイザリは無い。
+/** @type {{ id: string, expires: string, reason: string }[]} */
+const ALLOWLIST = [];
 
 function runAudit() {
   try {
