@@ -185,6 +185,15 @@ Project documentation lives under `docs/`; use `docs/README.md` as the index. Up
 - Keep detailed feature specifications in `docs/specs/` and setup, deployment, and troubleshooting procedures in `docs/operations/`; link to them instead of duplicating their contents in the overview documents. Update `docs/README.md` when adding or moving documents.
 - UI wording, styling, and internal refactors do not require edits to both overview documents unless their descriptions become inaccurate. Do not make date-only edits or append routine changes to the architecture history; Git/PR history records those changes.
 
+### Commit Granularity
+Commit each task as atomic commits — one logical change each — ordered by kind, skipping kinds the task does not touch:
+
+1. Code and config: everything except tests and docs (`feat` / `fix` / `refactor` / `ci` …)
+2. Tests: `*.test.ts` and `cypress/` (`test`)
+3. Docs: `*.md` (`docs`)
+
+Every commit stays green on its own so `git bisect` and `git revert` work anywhere in history: when a change breaks existing tests, fix those tests in the same commit as the change. Before pushing, verify with `git rebase -x "npm run lint && npm run test" HEAD~<n>`, where `<n>` is the number of commits the task added. Messages follow Conventional Commits (`type(scope): summary`), as in `git log`.
+
 ### Working Agreements
 These carry over from the retired `.trae/rules/project_rules.md`; `AGENTS.md` is now their only home.
 
