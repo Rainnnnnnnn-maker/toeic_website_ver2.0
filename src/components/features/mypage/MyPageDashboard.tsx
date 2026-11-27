@@ -15,6 +15,7 @@ import {
   getNextDueAt,
   getWeakSlugs,
   resolveDisplayStreak,
+  sortByRecentReview,
   summarizeReview,
   REVIEW_SESSION_LIMIT,
   type ReviewRecord,
@@ -67,7 +68,8 @@ export default function MyPageDashboard({
   const nextDueAt = getNextDueAt(favoriteSlugs, records, now);
   const currentStreak = resolveDisplayStreak(streak, todayKey);
 
-  const retentionWords = favoriteSlugs.map((slug) => ({
+  // 定着度別一覧は最近採点した順（定着済みなら最近覚えた順）に並べる
+  const retentionWords = sortByRecentReview(favoriteSlugs, records).map((slug) => ({
     word: wordBySlug.get(slug)!,
     level: getRetentionLevel(records.get(slug)),
   }));
