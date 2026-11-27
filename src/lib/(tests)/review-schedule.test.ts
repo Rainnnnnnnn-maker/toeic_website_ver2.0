@@ -26,6 +26,7 @@ import {
   resolveDisplayStreak,
   REVIEW_INTERVAL_DAYS,
   shiftDateKey,
+  sortByRecentReview,
   summarizeReview,
   type ReviewRecord,
 } from "@/lib/review-schedule";
@@ -565,5 +566,28 @@ describe("getRetentionLevel", () => {
       const record = { ...createReviewRecord("test"), box } as ReviewRecord;
       expect(getRetentionLevel(record)).toBe(levels[box]);
     }
+  });
+});
+
+describe("sortByRecentReview", () => {
+  it("最終採点が新しい順に並べ、未採点は末尾で入力順を保つ", () => {
+    const records = buildRecordMap([
+      record({ slug: "old", box: 5, lastReviewedAt: NOW.getTime() - 3 * DAY_MS }),
+      record({ slug: "new", box: 5, lastReviewedAt: NOW.getTime() }),
+      record({ slug: "mid", box: 5, lastReviewedAt: NOW.getTime() - DAY_MS }),
+      record({ slug: "untouched-b" }),
+    ]);
+    expect(
+      sortByRecentReview(["untouched-a", "old", "untouched-b", "new", "mid"], records)
+    ).toEqual(["new", "mid", "old", "untouched-a", "untouched-b"]);
+  });
+
+  it("同じ採点日時の単語は入力順を保つ", () => {
+    const at = NOW.getTime();
+    const records = buildRecordMap([
+      record({ slug: "b", lastReviewedAt: at }),
+      record({ slug: "a", lastReviewedAt: at }),
+    ]);
+    expect(sortByRecentReview(["b", "a"], records)).toEqual(["b", "a"]);
   });
 });

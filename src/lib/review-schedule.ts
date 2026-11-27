@@ -220,6 +220,30 @@ export function getRetentionLevel(record: ReviewRecord | undefined): RetentionLe
   return "mastered";
 }
 
+/**
+ * 最後に採点した日時が新しい順に slug を並べる（定着度別一覧の表示順）。
+ *
+ * 定着済み（box 5）では最終採点日時が「定着した日時」に相当するため、
+ * 最近覚えた単語ほど上に来る。未採点の単語は末尾に回し、同時刻や未採点
+ * 同士は入力順（お気に入り登録が古い順）を保つ。
+ */
+export function sortByRecentReview(
+  slugs: readonly string[],
+  records: ReadonlyMap<string, ReviewRecord>
+): string[] {
+  return slugs
+    .map((slug, index) => ({ slug, index, at: records.get(slug)?.lastReviewedAt ?? null }))
+    .sort((a, b) => {
+      if (a.at !== b.at) {
+        if (a.at === null) return 1;
+        if (b.at === null) return -1;
+        return b.at - a.at;
+      }
+      return a.index - b.index;
+    })
+    .map((entry) => entry.slug);
+}
+
 export function summarizeReview(
   favoriteSlugs: readonly string[],
   records: ReadonlyMap<string, ReviewRecord>,
